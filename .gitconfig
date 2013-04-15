@@ -1,0 +1,25 @@
+# Local user config & usernames
+[include]
+  path=~/.gitconfig.local
+[color]
+  branch = auto
+  diff = auto
+  interactive = auto
+  status = auto
+  ui = auto
+[apply]
+  whitespace = fix
+[core]
+  excludesfile = ~/.gitignore
+  autocrlf = input
+  editor = /usr/bin/vim
+  whitespace = fix,space-before-tab,tab-in-indent,trailing-space
+  pager = less -r
+[alias]
+  lg = log --graph --pretty=oneline --abbrev-commit --decorate
+  lall = log --graph --pretty=oneline --abbrev-commit --decorate --all
+  pullm = !git fetch origin && git rebase -p origin/master
+  ls = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate
+  ll = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --numstat
+[push]
+  default = upstream
