@@ -6,7 +6,13 @@ PS1="\[\e[0;32m\]\u@\h\[\e[m\]:\[\e[1;33m\]\w\[\e[m\] \[\e[0;37m\]\A [\j]\$\[\e[
 export COFFEELINT_CONFIG=~/.coffeelint.json
 
 # Map ls to be colorful
-alias ls='ls -GpFh'
+if [[ $(uname) == "Linux" ]]; then
+  alias ls='ls --color=auto -GpFh'
+  alias la='ls -la --color=auto -GpFh'
+else
+  alias ls='ls -GpFh'
+  alias la='ls -la -GpFh'
+fi
 # Nicer colors
 export LSCOLORS=gxBxhxDxfxhxhxhxhxcxcx
 
