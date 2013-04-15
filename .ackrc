@@ -1,0 +1,15 @@
+--smart-case
+# Follow symlinks
+--follow
+
+--type-add
+js=.md
+# Search .coffee and .json
+--type-add
+js=.coffee
+--type-add
+js=.json
+
+--ignore-dir=lib
+--ignore-dir=build
+--ignore-dir=node_modules
