@@ -1,6 +1,5 @@
-# Local user config & usernames
 [include]
-  path=~/.gitconfig.local
+  path=.gitconfig.local
 [color]
   branch = auto
   diff = auto
