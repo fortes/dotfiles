@@ -1,1 +1,4 @@
-/Users/fortes/Dropbox/dotfiles/bash_profile_mac
+# All config in .bashrc
+if [ -f ~/.bashrc ]; then
+  source ~/.bashrc
+fi
