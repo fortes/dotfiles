@@ -30,7 +30,7 @@ alias random_mac='sudo ifconfig en0 ether `openssl rand -hex 6 | sed "s/\(..\)/\
 alias restore_mac='sudo ifconfig en0 ether b8:8d:12:0b:30:30'
 
 # Enable options:
-shopt -s autocd
+# shopt -s autocd # Not supported in OS X version of bash
 shopt -s cdspell
 shopt -s cdable_vars
 shopt -s checkhash
