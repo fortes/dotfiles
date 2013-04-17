@@ -1,20 +1,20 @@
-# Better path
-PS1="\t \u@\h:\w$ "
-PS1="\[\e[0;32m\]\u@\h\[\e[m\]:\[\e[1;33m\]\w\[\e[m\] \[\e[0;37m\]\A [\j]\$\[\e[m\] \[\e[0m\]"
-
-# For default CoffeeLint settings
-export COFFEELINT_CONFIG=~/.coffeelint.json
-
 # Map ls to be colorful
 if [[ $(uname) == "Linux" ]]; then
   alias ls='ls --color=auto -GpFh'
   alias la='ls -la --color=auto -GpFh'
+  # Green username on linux
+  PS1="\[\e[0;32m\]\u@\h\[\e[m\]:\[\e[1;33m\]\w\[\e[m\] \[\e[0;37m\]\A [\j]\$\[\e[m\] \[\e[0m\]"
 else
   alias ls='ls -GpFh'
   alias la='ls -la -GpFh'
+  # Red username on mac
+  PS1="\[\e[0;31m\]\u@\h\[\e[m\]:\[\e[1;33m\]\w\[\e[m\] \[\e[0;37m\]\A [\j]\$\[\e[m\] \[\e[0m\]"
 fi
 # Nicer colors
 export LSCOLORS=gxBxhxDxfxhxhxhxhxcxcx
+
+# For default CoffeeLint settings
+export COFFEELINT_CONFIG=~/.coffeelint.json
 
 # JSON Viewing view python
 alias json='python -mjson.tool'
