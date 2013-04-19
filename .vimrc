@@ -140,6 +140,9 @@ nnoremap <Backspace> <C-b>
 " Never use the manual command
 nnoremap K <nop>
 
+" Stay fast by not going too far back to figure out syntax highlighting
+syntax sync minlines=64
+
 " Ignore source directories and some others
 set wildignore+=*.o,*.obj,.git,node_modules,*.pyc
 
