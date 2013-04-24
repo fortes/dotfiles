@@ -50,6 +50,7 @@ Bundle "benmills/vimux"
 Bundle "altercation/vim-colors-solarized"
 Bundle "chriskempson/vim-tomorrow-theme"
 Bundle "airblade/vim-gitgutter"
+Bundle "justincampbell/vim-eighties.git"
 
 " Enable plugins and languages
 filetype on
