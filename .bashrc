@@ -10,6 +10,7 @@ else
   # Red username on mac
   PS1="\[\e[0;31m\]\u@\h\[\e[m\]:\[\e[1;33m\]\w\[\e[m\] \[\e[0;37m\]\A [\j]\$\[\e[m\] \[\e[0m\]"
 fi
+
 # Nicer colors
 export LSCOLORS=gxBxhxDxfxhxhxhxhxcxcx
 
@@ -22,8 +23,17 @@ alias json='python -mjson.tool'
 # Colorized cat (nyan)
 alias nyan='pygmentize -O style=friendly -f console256 -g'
 
+# Debugging CoffeeScript
+alias coffeedebug='coffee --nodejs --debug-brk'
+
 # Tmux over screen
 alias screen='tmux'
+
+# Tyops and shortcuts
+alias l='ls'
+alias g='git'
+alias v='vim'
+alias pythong='python'
 
 # MAC manipulators, via jashkenas
 alias random_mac='sudo ifconfig en0 ether `openssl rand -hex 6 | sed "s/\(..\)/\1:/g; s/.$//"`'
