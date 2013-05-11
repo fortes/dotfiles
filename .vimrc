@@ -106,7 +106,7 @@ if &t_Co >= 256
   " Make solarized work well in terimnals
   let g:solarized_termcolors=256
 
-  colorscheme railscasts
+  silent! colorscheme railscasts
   "colorscheme solarized
 else
   " Meh
