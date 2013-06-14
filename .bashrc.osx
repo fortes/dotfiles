@@ -9,6 +9,9 @@ export PATH=/usr/local/share/npm/bin:$PATH
 # Prefer local bins before system, for homebrew
 export PATH=/usr/local/bin:/usr/local/sbin:$PATH
 
+# Use brew python
+export PYTHONPATH=/usr/local/lib/python2.7/site-packages:$PYTHONPATH
+
 # Bash completion for git, ack, etc
 if [ -f `brew --prefix`/etc/bash_completion.d/git-completion.bash  ]; then
   . `brew --prefix`/etc/bash_completion.d/git-completion.bash
