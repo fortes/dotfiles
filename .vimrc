@@ -53,7 +53,7 @@ Bundle "benmills/vimux"
 Bundle "altercation/vim-colors-solarized"
 Bundle "chriskempson/vim-tomorrow-theme"
 Bundle "airblade/vim-gitgutter"
-Bundle "justincampbell/vim-eighties.git"
+"Bundle "justincampbell/vim-eighties.git"
 
 " Enable plugins and languages
 filetype on
@@ -69,6 +69,9 @@ if has('notitle')
 else
   let &titleold=getcwd()
 endif
+
+" Hide default mode text (i.e. INSERT below status line)
+set noshowmode
 
 " Default to UTF-8
 set encoding=utf-8
@@ -489,7 +492,7 @@ let g:tagbar_sort = 1
 let g:tagbar_compact = 1
 
 " Syntastic
-let g:syntastic_coffee_lint_options = "-f ~/.coffeelint.json"
+"let g:syntastic_coffee_lint_options = "-f ~/.coffeelint.json"
 
 " Map leader-e to show syntastic errors
 nnoremap <silent> <leader>e :Errors<CR>
