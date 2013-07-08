@@ -12,48 +12,53 @@ call vundle#rc()
 Bundle 'gmarik/vundle'
 
 " Bundles go here
+" Colors
 Bundle "fortes/vim-railscasts"
-Bundle "fortes/vim-coffeescript-snippets"
-Bundle "mileszs/ack.vim"
-Bundle "lukaszkorecki/CoffeeTags"
-Bundle "kien/ctrlp.vim"
+Bundle "altercation/vim-colors-solarized"
+" Languages
+Bundle "digitaltoad/vim-jade"
+Bundle "groenewege/vim-less"
+Bundle "jelera/vim-javascript-syntax"
+Bundle "kchmck/vim-coffee-script"
+Bundle "mattn/zencoding-vim"
 Bundle "othree/html5.vim"
+Bundle "pangloss/vim-javascript"
+Bundle "tpope/vim-haml"
+Bundle "tpope/vim-markdown"
+Bundle "tpope/vim-surround"
 Bundle "vim-scripts/JSON.vim"
-Bundle "vim-scripts/matchit.zip"
+Bundle "vim-scripts/Python-Syntax"
+Bundle "vim-scripts/Python-Syntax-Folding"
+Bundle "vim-scripts/python.vim--Vasiliev"
+" Snippets
+Bundle "garbas/vim-snipmate"
+Bundle "fortes/vim-coffeescript-snippets"
+Bundle "ervandew/supertab"
+" Statusline
+Bundle "bling/vim-airline"
+Bundle "bling/vim-bufferline"
+
+"Bundle "justincampbell/vim-eighties.git"
+Bundle "Lokaltog/vim-easymotion"
+Bundle "MarcWeber/vim-addon-mw-utils"
+Bundle "Townk/vim-autoclose"
+Bundle "airblade/vim-gitgutter"
+Bundle "benmills/vimux"
+Bundle "chriskempson/vim-tomorrow-theme"
+Bundle "conormcd/matchindent.vim"
+Bundle "gregsexton/gitv"
+Bundle "kien/ctrlp.vim"
+Bundle "majutsushi/tagbar"
+Bundle "michaeljsmith/vim-indent-object"
+Bundle "mileszs/ack.vim"
 Bundle "scrooloose/nerdcommenter"
 Bundle "scrooloose/nerdtree"
-Bundle "vim-scripts/Python-Syntax"
-Bundle "vim-scripts/python.vim--Vasiliev"
-Bundle "vim-scripts/Python-Syntax-Folding"
-Bundle "vim-scripts/matchindent.vim"
-Bundle "MarcWeber/vim-addon-mw-utils"
+Bundle "scrooloose/syntastic"
 Bundle "tomtom/tlib_vim"
-Bundle "garbas/vim-snipmate"
-"Bundle "scrooloose/syntastic"
-Bundle "majutsushi/tagbar"
-Bundle "kchmck/vim-coffee-script"
-Bundle "Lokaltog/vim-easymotion"
 Bundle "tpope/vim-eunuch"
 Bundle "tpope/vim-fugitive"
-Bundle "gregsexton/gitv"
-Bundle "tpope/vim-haml"
-Bundle "michaeljsmith/vim-indent-object"
-Bundle "groenewege/vim-less"
-Bundle "digitaltoad/vim-jade"
-Bundle "pangloss/vim-javascript"
-Bundle "jelera/vim-javascript-syntax"
-Bundle "tpope/vim-surround"
-Bundle "tpope/vim-markdown"
-Bundle "Lokaltog/vim-powerline"
-Bundle "mattn/zencoding-vim"
 Bundle "vim-scripts/indent-motion"
-Bundle "Townk/vim-autoclose"
-Bundle "ervandew/supertab"
-Bundle "benmills/vimux"
-Bundle "altercation/vim-colors-solarized"
-Bundle "chriskempson/vim-tomorrow-theme"
-Bundle "airblade/vim-gitgutter"
-"Bundle "justincampbell/vim-eighties.git"
+Bundle "vim-scripts/matchit.zip"
 
 " Enable plugins and languages
 filetype on
@@ -169,17 +174,12 @@ let NERDTreeIgnore=['node_modules$[[dir]]', 'lib$[[dir]]', 'build$[[dir]]']
 " Always show statusline
 set laststatus=2
 
-" Filename and flags
-set statusline=%<%F%h%m%r%w
+" Bufferline should only be in airline
+let g:bufferline_echo=0
 
-" Display a flag if paste is set
-set statusline+=\ %{&paste?'[paste]':''}
-
-" Git branch info
-set statusline+=\ %{fugitive#statusline()}
-
-" Line and column number on right
-set statusline+=\ %=%c\,%l
+" Remove separators
+let g:airline_left_sep=''
+let g:airline_right_sep=''
 
 """""""""""""""""""
 " Autocomplete
