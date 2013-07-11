@@ -177,6 +177,9 @@ set laststatus=2
 " Bufferline should only be in airline
 let g:bufferline_echo=0
 
+" Make sure the current file is always visible
+let g:bufferline_rotate=1
+
 " Remove separators
 let g:airline_left_sep=''
 let g:airline_right_sep=''
