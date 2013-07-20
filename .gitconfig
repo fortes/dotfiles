@@ -18,7 +18,7 @@
   lg = log --graph --pretty=oneline --abbrev-commit --decorate
   lall = log --graph --pretty=oneline --abbrev-commit --decorate --all
   pullm = !git fetch origin && git rebase -p origin/master
-  ls = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate
-  ll = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --numstat
+  ls = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cgreen\\ [%cn]" --decorate
+  ll = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cgreen\\ [%cn]" --decorate --numstat
 [push]
   default = upstream
