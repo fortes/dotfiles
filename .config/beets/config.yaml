@@ -1,0 +1,31 @@
+library: /var/music/albums.blb
+directory: /var/music/albums
+
+list_format_item: $albumartist - $album - $track - $title ($genre)
+list_format_album: $albumartist - $album [$year] ($genre)
+
+# pluginpath: /Volumes/megafil/beets-plugins
+plugins: fetchart embedart scrub lyrics mbsync mbcollection discogs beatport lastgenre web info missing chroma
+
+art_filename: folder
+
+threaded: yes
+color: yes
+
+import:
+    write: yes
+    move: yes
+    resume: no
+    incremental: no
+
+paths:
+    default: $albumartist - $album%aunique{}/$track - $title
+    comp: $albumartist - $album%aunique{}/$track - $title
+    singleton: Non-Album/$artist/$title
+
+musicbrainz:
+    user: fortes
+    pass: alogmaxotedg
+
+scrub:
+    auto: no
