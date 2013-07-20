@@ -50,6 +50,13 @@ shopt -s histappend histreedit histverify
 # update the values of LINES and COLUMNS.
 shopt -s checkwinsize
 
+# virtualenv should use Distribute instead of legacy setuptools
+export VIRTUALENV_DISTRIBUTE=true
+# Centralized location for new virtual environments
+export PIP_VIRTUALENV_BASE=$HOME/virtualenvs
+# cache pip-installed packages to avoid re-downloading
+export PIP_DOWNLOAD_CACHE=$HOME/.pip/cache
+
 # Load local file if present
 if [ -f ~/.bashrc.local ]; then
   source ~/.bashrc.local
