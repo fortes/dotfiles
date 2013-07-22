@@ -2,10 +2,10 @@ library: /var/music/albums.blb
 directory: /var/music/albums
 
 list_format_item: $albumartist - $album - $track - $title ($genre)
-list_format_album: $albumartist - $album [$year] ($genre)
+list_format_album: $albumartist - $album [$original_year] ($genre)
 
 # pluginpath: /Volumes/megafil/beets-plugins
-plugins: fetchart embedart scrub lyrics mbsync mbcollection discogs beatport lastgenre web info missing chroma
+plugins: fetchart embedart scrub lyrics mbsync mbcollection lastgenre web info missing chroma bpd #discogs beatport
 
 art_filename: folder
 
@@ -19,9 +19,9 @@ import:
     incremental: no
 
 paths:
-    default: $albumartist - $album%aunique{}/$track - $title
-    comp: $albumartist - $album%aunique{}/$track - $title
-    singleton: Non-Album/$artist/$title
+    default: $albumartist - $album%aunique{} [$original_year]/$track - $title
+    comp: $albumartist - $album%aunique{} [$original_year]/$track - $title
+    singleton: Non-Album/$artist/$year - $title
 
 musicbrainz:
     user: fortes
