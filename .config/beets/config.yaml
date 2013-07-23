@@ -1,7 +1,7 @@
 library: /var/music/albums.blb
 directory: /var/music/albums
 
-list_format_item: $albumartist - $album - $track - $title ($genre)
+list_format_item: $artist - $album - $track - $title ($genre)
 list_format_album: $albumartist - $album [$original_year] ($genre)
 
 # pluginpath: /Volumes/megafil/beets-plugins
@@ -29,3 +29,7 @@ musicbrainz:
 
 scrub:
     auto: no
+
+bpd:
+    host: 127.0.0.1
+    port: 6600
