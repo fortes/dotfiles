@@ -16,7 +16,6 @@ Bundle 'gmarik/vundle'
 Bundle "fortes/vim-railscasts"
 Bundle "altercation/vim-colors-solarized"
 " Languages
-Bundle "digitaltoad/vim-jade"
 Bundle "groenewege/vim-less"
 Bundle "jelera/vim-javascript-syntax"
 Bundle "kchmck/vim-coffee-script"
@@ -37,8 +36,7 @@ Bundle "ervandew/supertab"
 " Statusline
 Bundle "bling/vim-airline"
 Bundle "bling/vim-bufferline"
-
-"Bundle "justincampbell/vim-eighties.git"
+" Other
 Bundle "Lokaltog/vim-easymotion"
 Bundle "MarcWeber/vim-addon-mw-utils"
 Bundle "Townk/vim-autoclose"
@@ -48,7 +46,6 @@ Bundle "chriskempson/vim-tomorrow-theme"
 Bundle "conormcd/matchindent.vim"
 Bundle "gregsexton/gitv"
 Bundle "kien/ctrlp.vim"
-Bundle "majutsushi/tagbar"
 Bundle "michaeljsmith/vim-indent-object"
 Bundle "mileszs/ack.vim"
 Bundle "scrooloose/nerdcommenter"
@@ -273,9 +270,6 @@ vnoremap <S-Tab> <gv
 
 " Use <leader><tab> to toggle NERDTree visibility
 nnoremap <silent> <leader><tab> :NERDTreeToggle<cr>
-
-" Use <leader>p to toggle Tagbar visibility
-nnoremap <silent> <leader>p :TagbarToggle<cr>
 
 " Set CoffeeCompile to be vertical
 let coffee_compile_vert = 1
