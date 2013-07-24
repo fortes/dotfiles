@@ -1,5 +1,5 @@
 library: /var/music/albums.blb
-directory: /var/music/albums
+directory: /var/music
 
 list_format_item: $artist - $album - $track - $title ($genre)
 list_format_album: $albumartist - $album [$original_year] ($genre)
@@ -19,9 +19,9 @@ import:
     incremental: no
 
 paths:
-    default: $albumartist - $album%aunique{} [$original_year]/$track - $title
-    comp: $albumartist - $album%aunique{} [$original_year]/$track - $title
-    singleton: Non-Album/$artist/$year - $title
+    default: albums/$albumartist - $album%aunique{} [$original_year]/$track - $title
+    comp: albums/$albumartist - $album%aunique{} [$original_year]/$track - $title
+    singleton: non-albums/$artist/$year - $title
 
 musicbrainz:
     user: fortes
