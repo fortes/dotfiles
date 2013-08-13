@@ -56,6 +56,7 @@ Bundle "tpope/vim-eunuch"
 Bundle "tpope/vim-fugitive"
 Bundle "vim-scripts/indent-motion"
 Bundle "vim-scripts/matchit.zip"
+Bundle "godlygeek/tabular"
 
 " Enable plugins and languages
 filetype on
@@ -156,7 +157,7 @@ syntax sync minlines=64
 set wildignore+=*.o,*.obj,.git,node_modules,*.pyc
 
 " Ignore lib/ dirs since the contain compiled libraries typically
-set wildignore+=lib,build,_site
+set wildignore+=lib,build,public,_site
 
 " Ignore images and fonts
 set wildignore+=*.ttf,*.otf,*.svg,*.png,*.jpg,*.gif,*.jpeg
@@ -263,6 +264,14 @@ nnoremap <S-Tab> <<
 " Use tab when in visual mode for indentation, while maintaining selection
 vnoremap <Tab> >gv
 vnoremap <S-Tab> <gv
+
+" Tabularize shortcuts
+if exists(":Tabularize")
+  "nmap <Leader>a= :Tabularize /=<CR>
+  "vmap <Leader>a= :Tabularize /=<CR>
+  "nmap <Leader>a: :Tabularize /:\zs<CR>
+  "vmap <Leader>a: :Tabularize /:\zs<CR>
+endif
 
 """""""""""""""
 " Misc Plugins
