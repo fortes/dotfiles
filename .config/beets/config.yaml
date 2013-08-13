@@ -4,19 +4,27 @@ directory: /var/music
 list_format_item: $artist - $album - $track - $title ($genre)
 list_format_album: $albumartist - $album [$original_year] ($genre)
 
-# pluginpath: /Volumes/megafil/beets-plugins
-plugins: fetchart embedart scrub lyrics mbsync mbcollection lastgenre web info missing chroma bpd #discogs beatport
+pluginpath: /var/music/ # beets-plugins
+plugins: fetchart embedart scrub lyrics mbsync mbcollection lastgenre web info missing # chroma bpd # discogs beatport
 
 art_filename: folder
 
 threaded: yes
 color: yes
+clutter: ['Thumbs.db', '.DS_Store']
 
 import:
     write: yes
     move: yes
     resume: no
     incremental: no
+    languages: ['en']
+
+match:
+    preferred:
+        countries: ['US', 'GB|UK']
+        media: ['CD', 'Digital Media|File']
+        original_year: yes
 
 paths:
     default: albums/$albumartist - $album%aunique{} [$original_year]/$track - $title

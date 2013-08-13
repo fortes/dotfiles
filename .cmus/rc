@@ -1,0 +1,17 @@
+# Default to correct working directory
+cd /var/music/albums
+
+# Slightly less nasty colors
+colorscheme zenburn
+
+# Scrobber
+set status_display_program=~/last-cmus.py
+
+# Filters
+fset 2013=date=2013
+fset 2012=date=2012
+fset 2011=date=2011
+fset 2010=date=2010
+fset 2000s=date>=2000&date<2010
+fset 1990s=date>=1990&date<2000
+fset 1980s=date>=1980&date<1990
