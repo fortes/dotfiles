@@ -22,3 +22,5 @@
   ll = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cgreen\\ [%cn]" --decorate --numstat
 [push]
   default = upstream
+[help]
+	autocorrect = 1
