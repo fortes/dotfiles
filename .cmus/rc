@@ -7,6 +7,12 @@ colorscheme zenburn
 # Scrobber
 set status_display_program=~/last-cmus.py
 
+# Include genre in playlist view
+set format_playlist= %-25%a %3n %t %= [%g] %-4y
+set format_playlist_va= %-25%A %3n %t (%a)%= [%g] %-4y
+set format_trackwin=%3n %t%= [%g] %-4y
+set format_trackwin_va=%3n %t (%a)%= [%g] %-4y
+
 # Filters
 fset 2013=date=2013
 fset 2012=date=2012
