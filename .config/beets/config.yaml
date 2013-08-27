@@ -4,8 +4,8 @@ directory: /var/music
 list_format_item: $artist - $album - $track - $title ($genre)
 list_format_album: $albumartist - $album [$original_year] ($genre)
 
-pluginpath: /var/music/ # beets-plugins
-plugins: fetchart embedart scrub lyrics mbsync mbcollection lastgenre web info missing # chroma bpd # discogs beatport
+pluginpath: /var/music/
+plugins: fetchart embedart scrub lyrics mbsync mbcollection lastgenre web info missing # bpd chroma
 
 art_filename: folder
 
