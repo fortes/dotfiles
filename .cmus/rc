@@ -1,5 +1,5 @@
 # Default to correct working directory
-cd /var/music/albums
+# cd /var/music/albums
 
 # Slightly less nasty colors
 colorscheme zenburn

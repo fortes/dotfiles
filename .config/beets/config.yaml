@@ -27,8 +27,10 @@ match:
         original_year: yes
 
 paths:
-    default: albums/$albumartist - $album%aunique{} [$original_year]/$track - $title
-    comp: albums/$albumartist - $album%aunique{} [$original_year]/$track - $title
+    default: albums/$albumartist - $album%aunique{}/$track - $title
+    comp: albums/$albumartist - $album%aunique{}/$track - $title
+    #default: albums/$albumartist - $album%aunique{} [$original_year]/$track - $title
+    #comp: albums/$albumartist - $album%aunique{} [$original_year]/$track - $title
     singleton: non-albums/$artist/$year - $title
 
 musicbrainz:
