@@ -255,6 +255,9 @@ nnoremap <silent> <leader>v :set invpaste<cr>
 " <leader>-e Does CoffeeScript compilation in visual mode
 vnoremap <silent> <leader>e :CoffeeCompile<cr>
 
+" <leader>-r Runs CoffeeScript in visual mode
+vnoremap <silent> <leader>r :CoffeeRun<cr>
+
 " Tab in normal mode can indent
 nnoremap <Tab> >>
 nnoremap <S-Tab> <<
