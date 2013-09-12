@@ -4,7 +4,7 @@ directory: /var/music
 list_format_item: $artist - $album - $track - $title ($genre)
 list_format_album: $albumartist - $album [$original_year] ($genre)
 
-pluginpath: /var/music/
+pluginpath: /var/music/tools/
 plugins: fetchart embedart scrub lyrics mbsync mbcollection lastgenre web info missing # bpd chroma
 
 art_filename: folder
