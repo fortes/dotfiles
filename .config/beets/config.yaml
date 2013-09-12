@@ -35,7 +35,7 @@ paths:
 
 musicbrainz:
     user: fortes
-    pass: alogmaxotedg
+    pass: REPLACEME
 
 scrub:
     auto: no
