@@ -20,7 +20,8 @@
   pullm = !git fetch origin && git rebase -p origin/master
   ls = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cgreen\\ [%cn]" --decorate
   ll = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cgreen\\ [%cn]" --decorate --numstat
+  gbl= for-each-ref --sort=committerdate refs/heads/ --format='%(committerdate:short) %(refname:short)'
 [push]
   default = upstream
 [help]
-	autocorrect = 1
+  autocorrect = 1
