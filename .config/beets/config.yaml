@@ -1,11 +1,11 @@
-library: /var/music/albums.blb
+library: /var/music/tools/albums.blb
 directory: /var/music
 
 list_format_item: $artist - $album - $track - $title ($genre)
 list_format_album: $albumartist - $album [$original_year] ($genre)
 
 pluginpath: /var/music/tools/
-plugins: fetchart embedart scrub lyrics mbsync mbcollection lastgenre web info missing # bpd chroma
+plugins: fetchart mbsync mbcollection embedart info missing lyrics lastgenre # scrub web bpd chroma
 
 art_filename: folder
 
