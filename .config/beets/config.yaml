@@ -27,11 +27,11 @@ match:
         original_year: yes
 
 paths:
-    default: albums/$albumartist - $album%aunique{}/$track - $title
-    comp: albums/$albumartist - $album%aunique{}/$track - $title
+    default: albums/$albumartist - $album%aunique{albumartist album year, albumtype year label catalognum albumdisambig} [$original_year]/$track - $title
+    comp: albums/$albumartist - $album%aunique{albumartist album year, albumtype year label catalognum albumdisambig} [$original_year]/$track - $title
     #default: albums/$albumartist - $album%aunique{} [$original_year]/$track - $title
     #comp: albums/$albumartist - $album%aunique{} [$original_year]/$track - $title
-    singleton: non-albums/$artist/$year - $title
+    singleton: non-albums/$artist/$original_year - $title
 
 musicbrainz:
     user: fortes
@@ -45,5 +45,8 @@ bpd:
     port: 6600
 
 lastgenre:
-    source: artist
+    source: 'artist'
     canonical: ''
+    multiple: true
+    fallback: 'Unknown'
+    #force: 'no'
