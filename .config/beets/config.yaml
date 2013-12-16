@@ -27,8 +27,8 @@ match:
         original_year: yes
 
 paths:
-    default: albums/$albumartist - $album%aunique{albumartist album year, albumtype year label catalognum albumdisambig} [$original_year]/$track - $title
-    comp: albums/$albumartist - $album%aunique{albumartist album year, albumtype year label catalognum albumdisambig} [$original_year]/$track - $title
+    default: albums/$albumartist - $album [$original_year]%aunique{albumartist album original_year, albumtype original_year year label catalognum albumdisambig}/$track - $title
+    comp: albums/$albumartist - $album [$original_year]%aunique{albumartist album original_year, albumtype original_year year label catalognum albumdisambig}/$track - $title
     #default: albums/$albumartist - $album%aunique{} [$original_year]/$track - $title
     #comp: albums/$albumartist - $album%aunique{} [$original_year]/$track - $title
     singleton: non-albums/$artist/$original_year - $title
