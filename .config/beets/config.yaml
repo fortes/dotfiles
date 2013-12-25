@@ -11,7 +11,7 @@ art_filename: folder
 
 threaded: yes
 color: yes
-clutter: ['Thumbs.db', '.DS_Store']
+clutter: ['Thumbs.db', '.DS_Store', '*.log', '*.txt']
 
 import:
     write: yes
@@ -22,15 +22,13 @@ import:
 
 match:
     preferred:
-        countries: ['US', 'GB|UK']
+        countries: ['US', 'GB|UK', 'XW']
         media: ['CD', 'Digital Media|File']
         original_year: yes
 
 paths:
     default: albums/$albumartist - $album [$original_year]%aunique{albumartist album original_year, albumtype original_year year label catalognum albumdisambig}/$track - $title
     comp: albums/$albumartist - $album [$original_year]%aunique{albumartist album original_year, albumtype original_year year label catalognum albumdisambig}/$track - $title
-    #default: albums/$albumartist - $album%aunique{} [$original_year]/$track - $title
-    #comp: albums/$albumartist - $album%aunique{} [$original_year]/$track - $title
     singleton: non-albums/$artist/$original_year - $title
 
 musicbrainz:
@@ -45,8 +43,8 @@ bpd:
     port: 6600
 
 lastgenre:
-    source: 'artist'
-    canonical: ''
-    multiple: true
     fallback: 'Unknown'
-    #force: 'no'
+    source: artist
+    count: 3
+    whitelist: /var/music/tools/genres.txt
+    canonical: /var/music/tools/genres-tree.yaml
