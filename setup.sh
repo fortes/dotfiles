@@ -9,26 +9,6 @@ if [ $OS == "Darwin" ]; then
   else
     echo "Homebrew already installed"
   fi
-
-  # Install packages
-  for p in $(cat $HOME/dotfiles/brew-packages); do
-    if ! brew list $p > /dev/null; then
-      brew install $p
-    fi
-  done
-
-  echo "Homebrew packages installed"
-
-  # Install npm packages
-  for p in $(cat $HOME/dotfiles/npm-packages); do
-    if ! npm list -g $p > /dev/null; then
-      echo "Installing npm package $p"
-      sudo npm install -g -q $p
-    fi
-  done
-
-  echo "npm packages installed"
-
 elif [ $OS == "Linux" ]; then
   echo "Linux not implemented yet"
 fi
@@ -38,6 +18,27 @@ if [ ! -d $HOME/dotfiles ]; then
   git clone http://github.com/fortes/dotfiles $HOME/dotfiles
 fi
 echo "dotfiles repo present"
+
+if [ $OS == "Darwin" ]; then
+  # Install packages
+  for p in $(cat $HOME/dotfiles/brew-packages); do
+    if ! brew list $p > /dev/null; then
+      brew install $p
+      brew doctor
+    fi
+  done
+  echo "Homebrew packages installed"
+fi
+
+# Install npm packages
+for p in $(cat $HOME/dotfiles/npm-packages); do
+  if ! npm list -g $p > /dev/null; then
+    echo "Installing npm package $p"
+    sudo npm install -g -q $p
+  fi
+done
+
+echo "npm packages installed"
 
 # Link missing dotfiles
 for p in $(ls -ad $HOME/dotfiles/.[a-z]* | grep -v .git); do
