@@ -13,3 +13,11 @@ If you're me (which you're not), then don't forget to set the remote url for thi
 ```
 git remote set-url origin git@github.com:fortes/dotfiles.git
 ```
+
+Don't forget to setup your `.gitconfig.local`:
+
+````
+[user]
+  name = Filipe Fortes
+  email = accounts@fortes.com
+```
