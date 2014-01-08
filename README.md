@@ -18,6 +18,6 @@ Don't forget to setup your `.gitconfig.local`:
 
 ````
 [user]
-  name = Filipe Fortes
-  email = accounts@fortes.com
+  name = Your Name
+  email = xyz@abc.com
 ```
