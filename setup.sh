@@ -22,7 +22,7 @@ echo "dotfiles repo present"
 if [ $OS == "Darwin" ]; then
   # Install packages
   for p in $(cat $HOME/dotfiles/brew-packages); do
-    if ! brew list $p > /dev/null; then
+    if [ ! -n "$(brew list $p)" ]; then
       brew install $p
       brew doctor
     fi
