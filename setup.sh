@@ -41,7 +41,7 @@ done
 echo "npm packages installed"
 
 # Link missing dotfiles
-for p in $(ls -ad $HOME/dotfiles/.[a-z]* | grep -v .git); do
+for p in $(ls -ad $HOME/dotfiles/.[a-z]* | grep -v .git/$); do
   target_f=$HOME/`basename $p`
   if [ ! -e $target_f ]; then
     echo "Linking $target_f"
