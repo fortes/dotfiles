@@ -19,29 +19,42 @@ if [ $OS == "Darwin" ]; then
 
   echo "Homebrew packages installed"
 
-  # Checkout
+  # Install npm packages
+  for p in $(cat $HOME/dotfiles/npm-packages); do
+    if ! npm list -g $p > /dev/null; then
+      echo "Installing npm package $p"
+      sudo npm install -g -q $p
+    fi
+  done
 
-  echo "dotfiles linked"
+  echo "npm packages installed"
+
 elif [ $OS == "Linux" ]; then
   echo "Linux not implemented yet"
 fi
 
-# Clone dotfiles
+# Check dotfiles
+if [ ! -d $HOME/dotfiles ]; then
+  git clone http://github.com/fortes/dotfiles $HOME/dotfiles
+fi
+echo "dotfiles repo present"
 
 # Link missing dotfiles
-for p in $(ls -ad ~/dotfiles/.[a-z]* | grep -v .git); do
-  target_f=~/`basename $p`
+for p in $(ls -ad $HOME/dotfiles/.[a-z]* | grep -v .git); do
+  target_f=$HOME/`basename $p`
   if [ ! -e $target_f ]; then
     echo "Linking $target_f"
     ln -s $p $target_f
   fi
 done
+echo "dotfiles linked"
 
 # Setup Vundle & Vim
-if [ ! -d ~/.vim/bundle/vundle ]; then
+if [ ! -d $HOME/.vim/bundle/vundle ]; then
   echo "Installing Vundle for Vim"
-  mkdir -p ~/.vim/
-  git clone https://github.com/gmarik/vundle.git ~/.vim/bundle/vundle
+  mkdir -p $HOME/.vim/
+  git clone https://github.com/gmarik/vundle.git $HOME/.vim/bundle/vundle
   # Install all bundles via CLI
   vim +BundleInstall +qall
 fi
+echo "Vim setup"
