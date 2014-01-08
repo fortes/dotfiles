@@ -1,14 +1,16 @@
+OS=`uname`
+
 # Map ls to be colorful
-if [[ $(uname) == "Linux" ]]; then
-  alias ls='ls --color=auto -GpFh'
-  alias la='ls -la --color=auto -GpFh'
-  # Green username on linux
-  PS1="\[\e[0;32m\]\u@\h\[\e[m\]:\[\e[1;33m\]\w\[\e[m\] \[\e[0;37m\]\A [\j]\$\[\e[m\] \[\e[0m\]"
-else
+if [ $OS == "Darwin" ]; then
   alias ls='ls -GpFh'
   alias la='ls -la -GpFh'
   # Red username on mac
   PS1="\[\e[0;31m\]\u@\h\[\e[m\]:\[\e[1;33m\]\w\[\e[m\] \[\e[0;37m\]\A [\j]\$\[\e[m\] \[\e[0m\]"
+else
+  alias ls='ls --color=auto -GpFh'
+  alias la='ls -la --color=auto -GpFh'
+  # Green username on linux
+  PS1="\[\e[0;32m\]\u@\h\[\e[m\]:\[\e[1;33m\]\w\[\e[m\] \[\e[0;37m\]\A [\j]\$\[\e[m\] \[\e[0m\]"
 fi
 
 # Nicer colors
@@ -56,6 +58,13 @@ export VIRTUALENV_DISTRIBUTE=true
 export PIP_VIRTUALENV_BASE=$HOME/virtualenvs
 # cache pip-installed packages to avoid re-downloading
 export PIP_DOWNLOAD_CACHE=$HOME/.pip/cache
+
+# Load OS-specific files
+if [ $OS == "Darwin" ]; then
+  if [ -f ~/.bashrc.osx ]; then
+    source ~/.bashrc.osx
+  fi
+fi
 
 # Load local file if present
 if [ -f ~/.bashrc.local ]; then
