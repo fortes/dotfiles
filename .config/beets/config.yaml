@@ -11,7 +11,7 @@ art_filename: folder
 
 threaded: yes
 color: yes
-clutter: ['Thumbs.db', '.DS_Store', '*.log', '*.txt']
+clutter: ['Thumbs.db', '.DS_Store', '*.log', '*.txt', '*.cue']
 
 import:
     write: yes
