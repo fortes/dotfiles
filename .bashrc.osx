@@ -29,7 +29,7 @@ fi
 if [ -f `brew --prefix`/etc/bash_completion.d/git-prompt.sh ]; then
   . `brew --prefix`/etc/bash_completion.d/git-prompt.sh
   # Change PS1 to include git prompt
-  PS1='\[\e[0;31m\]\u@\h\[\e[m\]:\[\e[1;33m\]\w\[\e[m\] \[\e[0;37m\]\A$(__git_ps1 " (%s) ") [\j]\$\[\e[m\] \[\e[0m\]'
+  PS1='\[\e[0;31m\]\u@\h\[\e[m\]:\[\e[1;33m\]\w\[\e[m\] \[\e[0;37m\]\A$(__git_ps1 " (%s)") [\j]\$\[\e[m\] \[\e[0m\]'
 fi
 
 # MAC manipulators, via jashkenas
