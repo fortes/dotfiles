@@ -9,16 +9,27 @@ export PATH=/usr/local/share/npm/bin:$PATH
 # Prefer local bins before system, for homebrew
 export PATH=/usr/local/bin:/usr/local/sbin:$PATH
 
-# Use brew python
-export PYTHONPATH=/usr/local/lib/python2.7/site-packages:$PYTHONPATH
+# Bash completion for brew, git, etc
+if [ -f `brew --prefix`/etc/bash_completion  ]; then
+  . `brew --prefix`/etc/bash_completion
+fi
 
-# Bash completion for git, ack, etc
 if [ -f `brew --prefix`/etc/bash_completion.d/git-completion.bash  ]; then
   . `brew --prefix`/etc/bash_completion.d/git-completion.bash
 fi
 
-if [ -f `brew --prefix`/etc/bash_completion.d/ack.bash_completion.bash  ]; then
-  . `brew --prefix`/etc/bash_completion.d/ack.bash_completion.bash
+if [ -f `brew --prefix`/etc/bash_completion.d/mosh  ]; then
+  . `brew --prefix`/etc/bash_completion.d/mosh
+fi
+
+if [ -f `brew --prefix`/etc/bash_completion.d/tmux  ]; then
+  . `brew --prefix`/etc/bash_completion.d/tmux
+fi
+
+if [ -f `brew --prefix`/etc/bash_completion.d/git-prompt.sh ]; then
+  . `brew --prefix`/etc/bash_completion.d/git-prompt.sh
+  # Change PS1 to include git prompt
+  PS1='\[\e[0;31m\]\u@\h\[\e[m\]:\[\e[1;33m\]\w\[\e[m\] \[\e[0;37m\]\A$(__git_ps1 " (%s) ") [\j]\$\[\e[m\] \[\e[0m\]'
 fi
 
 # MAC manipulators, via jashkenas
