@@ -19,6 +19,10 @@ export LSCOLORS=gxBxhxDxfxhxhxhxhxcxcx
 # For default CoffeeLint settings
 export COFFEELINT_CONFIG=~/.coffeelint.json
 
+# Easy CD
+alias ..="cd .."
+alias ...="cd .. && cd .."
+
 # JSON Viewing view python
 alias json='python -mjson.tool'
 
@@ -36,6 +40,12 @@ alias l='ls'
 alias g='git'
 alias v='vim'
 alias pythong='python'
+
+# Get readable list of network IPs
+alias ips="ifconfig -a | perl -nle'/(\d+\.\d+\.\d+\.\d+)/ && print $1'"
+alias myip="dig +short myip.opendns.com @resolver1.opendns.com"
+# Flush DNS cache
+alias flush="dscacheutil -flushcache"
 
 # Enable options:
 # shopt -s autocd # Not supported in OS X version of bash
