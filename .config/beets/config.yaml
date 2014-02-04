@@ -38,9 +38,8 @@ musicbrainz:
 scrub:
     auto: no
 
-bpd:
-    host: 127.0.0.1
-    port: 6600
+lyrics:
+    google_API_key: REPLACEME
 
 lastgenre:
     fallback: 'Unknown'
