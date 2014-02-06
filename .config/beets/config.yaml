@@ -33,13 +33,13 @@ paths:
 
 musicbrainz:
     user: fortes
-    pass: REPLACEME
+    pass: togiannefisl
 
 scrub:
     auto: no
 
 lyrics:
-    google_API_key: REPLACEME
+    google_API_key: AIzaSyAf3PdtSx2_HCsNyJl4DvZt4aYaHVTWo50
 
 lastgenre:
     fallback: 'Unknown'
