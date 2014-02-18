@@ -19,6 +19,12 @@ export LSCOLORS=gxBxhxDxfxhxhxhxhxcxcx
 # For default CoffeeLint settings
 export COFFEELINT_CONFIG=~/.coffeelint.json
 
+# Easy timezones
+alias lisbon='TZ="Europe/Lisbon" date'
+alias nyc='TZ="America/New_York" date'
+alias sf='TZ="America/Los_Angeles" date'
+alias rio='TZ="America/Sao_Paulo" date'
+
 # Easy CD
 alias ..="cd .."
 alias ...="cd .. && cd .."
