@@ -23,5 +23,7 @@
   gbl= for-each-ref --sort=committerdate refs/heads/ --format='%(committerdate:short) %(refname:short)'
 [push]
   default = upstream
+[pull]
+  rebase = true
 [help]
   autocorrect = 1
