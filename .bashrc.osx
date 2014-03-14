@@ -6,6 +6,9 @@ alias ql="qlmanage -p 2>/dev/null"
 # For Android to work via homebrew
 export ANDROID_SDK_ROOT=/usr/local/opt/android-sdk
 
+# Make sure brew's site-packages are in the path
+export PYTHONPATH=$(brew --prefix)/lib/python2.7/site-packages:$PYTHONPATH
+
 # Add NPM-installed items to path
 export PATH=/usr/local/share/npm/bin:$PATH
 
