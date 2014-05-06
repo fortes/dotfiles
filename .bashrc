@@ -24,6 +24,7 @@ alias lisbon='TZ="Europe/Lisbon" date'
 alias nyc='TZ="America/New_York" date'
 alias sf='TZ="America/Los_Angeles" date'
 alias rio='TZ="America/Sao_Paulo" date'
+alias bj='TZ="Asia/Shanghai" date'
 alias utc='TZ="UTC" date'
 
 # Easy CD
