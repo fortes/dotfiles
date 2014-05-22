@@ -47,3 +47,6 @@ lastgenre:
     count: 3
     whitelist: /var/music/tools/genres.txt
     canonical: /var/music/tools/genres-tree.yaml
+
+check:
+    backup: no
