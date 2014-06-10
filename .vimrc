@@ -1,63 +1,66 @@
 " Must be first, since has side effects for other options
 set nocompatible
+filetype off
 
 " Force 256 colors on load
 " set t_Co=256
 
 " Load up Vundle
-set rtp+=~/.vim/bundle/vundle/
-call vundle#rc()
+set rtp+=~/.vim/bundle/Vundle.vim/
+call vundle#begin()
 
 " let Vundle manage Vundle (required!)
-Bundle 'gmarik/vundle'
+Plugin 'gmarik/vundle'
 
 " Bundles go here
 " Colors
-Bundle "fortes/vim-railscasts"
-Bundle "altercation/vim-colors-solarized"
+Plugin 'fortes/vim-railscasts'
+Plugin 'altercation/vim-colors-solarized'
 " Languages
-Bundle "groenewege/vim-less"
-Bundle "jelera/vim-javascript-syntax"
-Bundle "kchmck/vim-coffee-script"
-Bundle "othree/html5.vim"
-Bundle "pangloss/vim-javascript"
-Bundle "tpope/vim-haml"
-Bundle "tpope/vim-markdown"
-Bundle "tpope/vim-surround"
-Bundle "vim-scripts/JSON.vim"
-Bundle "vim-scripts/Python-Syntax"
-Bundle "vim-scripts/Python-Syntax-Folding"
-Bundle "vim-scripts/python.vim--Vasiliev"
+Plugin 'groenewege/vim-less'
+Plugin 'kchmck/vim-coffee-script'
+Plugin 'pangloss/vim-javascript'
+Plugin 'jelera/vim-javascript-syntax'
+Plugin 'moll/vim-node'
+Plugin 'othree/html5.vim'
+Plugin 'tpope/vim-haml'
+Plugin 'tpope/vim-markdown'
+Plugin 'tpope/vim-surround'
+Plugin 'vim-scripts/JSON.vim'
+Plugin 'vim-scripts/Python-Syntax'
+Plugin 'vim-scripts/Python-Syntax-Folding'
+Plugin 'vim-scripts/python.vim--Vasiliev'
 " Snippets
-Bundle "garbas/vim-snipmate"
-Bundle "fortes/vim-coffeescript-snippets"
-Bundle "ervandew/supertab"
+Plugin 'garbas/vim-snipmate'
+Plugin 'fortes/vim-coffeescript-snippets'
+Plugin 'ervandew/supertab'
 " Statusline
-Bundle "bling/vim-airline"
-Bundle "bling/vim-bufferline"
+Plugin 'bling/vim-airline'
+Plugin 'bling/vim-bufferline'
 " Other
-Bundle "Lokaltog/vim-easymotion"
-Bundle "MarcWeber/vim-addon-mw-utils"
-Bundle "Townk/vim-autoclose"
-Bundle "mhinz/vim-signify"
-Bundle "benmills/vimux"
-Bundle "conormcd/matchindent.vim"
-Bundle "gregsexton/gitv"
-Bundle "kien/ctrlp.vim"
-Bundle "michaeljsmith/vim-indent-object"
-Bundle "mileszs/ack.vim"
-Bundle "scrooloose/nerdcommenter"
-Bundle "scrooloose/nerdtree"
-Bundle "scrooloose/syntastic"
-Bundle "tomtom/tlib_vim"
-Bundle "tpope/vim-eunuch"
-Bundle "tpope/vim-fugitive"
-Bundle "vim-scripts/indent-motion"
-Bundle "vim-scripts/matchit.zip"
-Bundle "godlygeek/tabular"
+Plugin 'Lokaltog/vim-easymotion'
+Plugin 'MarcWeber/vim-addon-mw-utils'
+Plugin 'Townk/vim-autoclose'
+Plugin 'mhinz/vim-signify'
+Plugin 'benmills/vimux'
+Plugin 'conormcd/matchindent.vim'
+Plugin 'gregsexton/gitv'
+Plugin 'kien/ctrlp.vim'
+Plugin 'michaeljsmith/vim-indent-object'
+Plugin 'mileszs/ack.vim'
+Plugin 'scrooloose/nerdcommenter'
+Plugin 'scrooloose/nerdtree'
+Plugin 'scrooloose/syntastic'
+Plugin 'tomtom/tlib_vim'
+Plugin 'tpope/vim-eunuch'
+Plugin 'tpope/vim-fugitive'
+Plugin 'vim-scripts/indent-motion'
+Plugin 'vim-scripts/matchit.zip'
+Plugin 'godlygeek/tabular'
+
+call vundle#end()
 
 " Enable plugins and languages
-filetype on
 filetype plugin indent on
 
 """""""""""""""""""

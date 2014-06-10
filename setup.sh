@@ -87,11 +87,13 @@ done
 echo "dotfiles linked"
 
 # Setup Vundle & Vim
-if [ ! -d $HOME/.vim/bundle/vundle ]; then
+if [ ! -d $HOME/.vim/bundle/Vundle.vim ]; then
   echo "Installing Vundle for Vim"
   mkdir -p $HOME/.vim/
-  git clone https://github.com/gmarik/vundle.git $HOME/.vim/bundle/vundle
-  # Install all bundles via CLI
-  vim +BundleInstall +qall
+  git clone https://github.com/gmarik/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim
 fi
+
+# Install all bundles via CLI
+vim +PluginInstall +qall
+
 echo "Vim setup"
