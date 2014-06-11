@@ -84,6 +84,16 @@ if [ $OS == "Darwin" ]; then
   fi
 fi
 
+# Activate default virtual env, if not already in an env
+if [ -z $VIRTUAL_ENV ]; then
+  if [ -d $PIP_VIRTUALENV_BASE/default ]; then
+    PROMPT=$PS1
+    source $PIP_VIRTUALENV_BASE/default/bin/activate
+    # Reset prompt to default
+    PS1=$PROMPT
+  fi
+fi
+
 # Load local file if present
 if [ -f ~/.bashrc.local ]; then
   source ~/.bashrc.local

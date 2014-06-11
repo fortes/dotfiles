@@ -40,10 +40,13 @@ if [ $OS == "Darwin" ]; then
     pip install --upgrade setuptools
     pip install --upgrade pip
     pip install virtualenv
+    echo "Python installed"
+
     # Python3 bonus
     brew install python3 --with-brewed-openssl
     pip3 install --upgrade setuptools
     pip3 install --upgrade pip
+    echo "Python3 installed"
   fi
 
   for p in $(cat $HOME/dotfiles/brew-packages); do
@@ -56,6 +59,20 @@ if [ $OS == "Darwin" ]; then
     fi
   done
   echo "Homebrew packages installed"
+fi
+
+# Create default virtualenv
+if [ ! -d ~/virtualenvs/default ]; then
+  echo "Creating default virtualenv"
+  mkdir -p ~/virtualenvs/
+  rm -rf ~/virtualenvs/*
+  # Now create the default virtualenv
+  virtualenv ~/virtualenvs/default
+  # And activate
+  PROMPT=$PS1
+  source ~/virtualenvs/default/bin/activate
+  PS1=$PROMPT
+  echo "Default virtualenv created and activated"
 fi
 
 # Install python packages
@@ -91,9 +108,9 @@ if [ ! -d $HOME/.vim/bundle/Vundle.vim ]; then
   echo "Installing Vundle for Vim"
   mkdir -p $HOME/.vim/
   git clone https://github.com/gmarik/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim
+  echo "Vundle installed"
 fi
 
 # Install all bundles via CLI
 vim +PluginInstall +qall
-
 echo "Vim setup"
