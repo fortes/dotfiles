@@ -18,7 +18,7 @@
   "nonbsp": true, // Avoid funky characters
   "nonew": true, // Don't call consturctors only for the side effects
   "plusplus": false, // Allow ++ and --
-  "quotmark": "single", // Use single quotes by preference
+  "quotmark": false, // JSHint's detection here is terrible
   "undef": true, // Must declare variables explicitly
   "unused": true, // Warn about unused variables
   "strict": false, // Don't require function-level strict mode
