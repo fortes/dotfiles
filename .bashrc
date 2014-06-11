@@ -13,6 +13,9 @@ else
   PS1="\[\e[0;32m\]\u@\h\[\e[m\]:\[\e[1;33m\]\w\[\e[m\] \[\e[0;37m\]\A [\j]\$\[\e[m\] \[\e[0m\]"
 fi
 
+# Confirm file overwrite
+alias mv='mv -i'
+
 # Nicer colors
 export LSCOLORS=gxBxhxDxfxhxhxhxhxcxcx
 
