@@ -76,7 +76,9 @@ if [ ! -d ~/virtualenvs/default ]; then
 fi
 
 # Install python packages
-pip install --upgrade "$(cat $HOME/dotfiles/python-packages | tr '\n', ' ')"
+for p in $(cat $HOME/dotfiles/python-packages); do
+  pip install -U $p
+done
 echo "python packages installed"
 
 # Install npm packages
