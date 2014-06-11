@@ -1,6 +1,7 @@
 coffee-script
 coffeelint
 enfield
+eslint
 js2coffee
 node-inspector
 nodemon

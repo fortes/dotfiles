@@ -43,6 +43,9 @@ alias nyan='pygmentize -O style=friendly -f console256 -g'
 # Debugging CoffeeScript
 alias coffeedebug='coffee --nodejs --debug-brk'
 
+# Have eslint pick up default config
+alias eslint='eslint -c ~/.eslintrc'
+
 # Tmux over screen
 alias screen='tmux'
 
