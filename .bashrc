@@ -80,12 +80,27 @@ export PIP_VIRTUALENV_BASE=$HOME/virtualenvs
 # cache pip-installed packages to avoid re-downloading
 export PIP_DOWNLOAD_CACHE=$HOME/.pip/cache
 
+# Update commands
+DIST_UPDATE_COMMANDS=()
+DIST_UPDATE_COMMANDS+=('sudo npm update -g')
+DIST_UPDATE_COMMANDS+=('vim +PluginUpdate +qall')
+DIST_UPDATE_COMMANDS+=("pip install --upgrade $(cat $HOME/dotfiles/python-packages | tr '\n', ' ')")
+
 # Load OS-specific files
 if [ $OS == "Darwin" ]; then
   if [ -f ~/.bashrc.osx ]; then
     source ~/.bashrc.osx
   fi
 fi
+
+# Helper command for updating all package managers
+function dist_update() {
+  for cmd in "${DIST_UPDATE_COMMANDS[@]}"; do
+    $cmd
+  done
+}
+
+export -f dist_update
 
 # Activate default virtual env, if not already in an env
 if [ -z $VIRTUAL_ENV ]; then

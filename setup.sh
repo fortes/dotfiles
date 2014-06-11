@@ -39,7 +39,7 @@ if [ $OS == "Darwin" ]; then
     brew install python --with-brewed-openssl
     pip install --upgrade setuptools
     pip install --upgrade pip
-    pip install virtualenv
+    pip install --upgrade virtualenv
     echo "Python installed"
 
     # Python3 bonus
@@ -76,12 +76,7 @@ if [ ! -d ~/virtualenvs/default ]; then
 fi
 
 # Install python packages
-for p in $(cat $HOME/dotfiles/python-packages); do
-  if [ ! -n "$(pip show $p)" ]; then
-    echo "Installing pip package $p"
-    pip install $p
-  fi
-done
+pip install --upgrade "$(cat $HOME/dotfiles/python-packages | tr '\n', ' ')"
 echo "python packages installed"
 
 # Install npm packages
@@ -109,8 +104,7 @@ if [ ! -d $HOME/.vim/bundle/Vundle.vim ]; then
   mkdir -p $HOME/.vim/
   git clone https://github.com/gmarik/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim
   echo "Vundle installed"
+  # Install all bundles via CLI
+  vim +PluginInstall +qall
 fi
-
-# Install all bundles via CLI
-vim +PluginInstall +qall
 echo "Vim setup"
