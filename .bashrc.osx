@@ -39,7 +39,8 @@ if [ -f `brew --prefix`/etc/bash_completion.d/git-prompt.sh ]; then
 fi
 
 # Updating Homebrew
-DIST_UPDATE_COMMANDS+=('brew update && brew upgrade')
+DIST_UPDATE_COMMANDS+=('brew update')
+DIST_UPDATE_COMMANDS+=('brew upgrade')
 
 # MAC manipulators, via jashkenas
 alias random_mac='sudo ifconfig en0 ether `openssl rand -hex 6 | sed "s/\(..\)/\1:/g; s/.$//"`'

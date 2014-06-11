@@ -3,6 +3,7 @@ coffeelint
 enfield
 eslint
 js2coffee
+jshint
 node-inspector
 nodemon
 supervisor
