@@ -501,8 +501,12 @@ let g:tagbar_sort = 1
 " Use compact mode
 let g:tagbar_compact = 1
 
+""""""""""""""
 " Syntastic
+""""""""""""""
+
 "let g:syntastic_coffee_lint_options = "-f ~/.coffeelint.json"
+let g:syntastic_javascript_jshint_conf = "~/.jshintrc"
 
 " Map leader-e to show syntastic errors
 nnoremap <silent> <leader>e :Errors<CR>
