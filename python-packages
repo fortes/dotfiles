@@ -1,1 +1,8 @@
+beautifulsoup4
+beets
+flask
+pyacoustid
 pygments
+pylast
+requests
+git+git://github.com/geigerzaehler/beets-check.git
