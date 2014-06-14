@@ -112,12 +112,12 @@ done
 echo "dotfiles linked"
 
 # Setup Vundle & Vim
-if [ ! -d $HOME/.vim/bundle/Vundle.vim ]; then
-  echo "Installing Vundle for Vim"
+if [ ! -d $HOME/.vim/bundle/neobundle.vim ]; then
+  echo "Installing NeoBundle for Vim"
   mkdir -p $HOME/.vim/bundle
-  git clone https://github.com/gmarik/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim
-  echo "Vundle installed"
+  git clone https://github.com/Shougo/neobundle.vim ~/.vim/bundle/neobundle.vim
+  echo "NeoBundle installed"
 fi
 # Install all bundles via CLI
-vim +PluginUpdate +qall
+vim +NeoBundleUpdate +qall
 echo "Vim setup"
