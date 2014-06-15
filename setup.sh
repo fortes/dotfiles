@@ -3,6 +3,10 @@ OS=`uname`
 
 # Install Homebrew
 if [ $OS == "Darwin" ]; then
+  # OS X build tools have to agree to license agreement, which must
+  # be done by root
+  sudo make
+
   if [ ! -x /usr/local/bin/brew ]; then
     # There is a license agreement before you can run make, and you have to
     # agree to it via sudo. This command checks for normal the normal make
