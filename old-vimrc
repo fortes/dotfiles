@@ -1,0 +1,375 @@
+
+" Bundles
+" Editor
+Plugin 'tpope/vim-surround'
+Plugin 'godlygeek/tabular'
+"Plugin 'Shougo/unite.vim'
+" Colors
+Plugin 'fortes/vim-railscasts'
+Plugin 'altercation/vim-colors-solarized'
+" Languages
+" JS
+Plugin 'moll/vim-node'
+Plugin 'ahayman/vim-nodejs-complete'
+Plugin 'marijnh/tern_for_vim'
+"Plugin 'pangloss/vim-javascript'
+"Plugin 'jelera/vim-javascript-syntax'
+"Plugin 'groenewege/vim-less'
+"Plugin 'kchmck/vim-coffee-script'
+"Plugin 'othree/html5.vim'
+"Plugin 'tpope/vim-haml'
+"Plugin 'tpope/vim-markdown'
+"Plugin 'vim-scripts/JSON.vim'
+"Plugin 'vim-scripts/Python-Syntax'
+"Plugin 'vim-scripts/Python-Syntax-Folding'
+"Plugin 'vim-scripts/python.vim--Vasiliev'
+" Snippets
+"Plugin 'garbas/vim-snipmate'
+"Plugin 'fortes/vim-coffeescript-snippets'
+"Plugin 'ervandew/supertab'
+" Statusline
+"Plugin 'bling/vim-airline'
+"Plugin 'bling/vim-bufferline'
+" Other
+"Plugin 'Lokaltog/vim-easymotion'
+"Plugin 'MarcWeber/vim-addon-mw-utils'
+"Plugin 'Townk/vim-autoclose'
+"Plugin 'mhinz/vim-signify'
+"Plugin 'benmills/vimux'
+"Plugin 'conormcd/matchindent.vim'
+"Plugin 'gregsexton/gitv'
+"Plugin 'kien/ctrlp.vim'
+"Plugin 'michaeljsmith/vim-indent-object'
+"Plugin 'mileszs/ack.vim'
+"Plugin 'scrooloose/nerdcommenter'
+"Plugin 'scrooloose/nerdtree'
+"Plugin 'scrooloose/syntastic'
+"Plugin 'tomtom/tlib_vim'
+"Plugin 'tpope/vim-eunuch'
+"Plugin 'tpope/vim-fugitive'
+"Plugin 'vim-scripts/indent-motion'
+"Plugin 'vim-scripts/matchit.zip'
+
+call vundle#end()
+
+" Enable plugins and languages
+filetype plugin indent on
+
+" }
+
+"""""""""""""""""""
+" Global Settings
+"""""""""""""""""""
+
+" Have space PageDown, like in more
+nnoremap <space> <C-f>
+" Make backspce PageUp
+nnoremap <Backspace> <C-b>
+
+" Never use the manual command
+nnoremap K <nop>
+
+" Stay fast by not going too far back to figure out syntax highlighting
+syntax sync minlines=64
+
+" Tell NERDtree to ignore common directories
+let NERDTreeIgnore=['node_modules$[[dir]]', 'lib$[[dir]]', 'build$[[dir]]']
+
+""""""""""""""""
+" Status Line
+""""""""""""""""
+
+" Bufferline should only be in airline
+let g:bufferline_echo=0
+
+" Make sure the current file is always visible
+let g:bufferline_rotate=1
+
+" Remove separators
+let g:airline_left_sep=''
+let g:airline_right_sep=''
+
+"""""""""""""""""""
+" Autocomplete
+"""""""""""""""""""
+
+" Allow type-filtering when using tab completion (use longest common text)
+set completeopt+=longest
+
+" Use Control-Space for autocomplete
+if has("gui_running")
+  inoremap <C-Space> <C-n>
+else
+  inoremap <Nul> <C-n>
+end
+
+" Supertab should use omnicomplete by default
+"let g:SuperTabDefaultCompletionType = "<c-x><c-o>"
+"let g:SuperTabDefaultCompletionType = "context"
+"let g:SuperTabContextDefaultCompletionType= "<c-x><c-o>"
+
+"""""""""""""""""""
+" UltiSnips
+"""""""""""""""""""
+
+" Directory where private snippet definition files are stored
+let g:UltiSnipsSnippetDirectories = ["snippets"]
+
+" Bind to Tab
+let g:UltiSnipsExpandTrigger="<tab>"                                                               |
+let g:UltiSnipsJumpForwardTrigger="<tab>"
+let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
+
+"""""""""""""""""""
+" Editing
+"""""""""""""""""""
+
+" <leader>-n toggles line numbers
+nnoremap <silent> <leader>n :set invnumber<cr>
+
+" <leader>-v toggles paste mode
+nnoremap <silent> <leader>v :set invpaste<cr>
+
+" <leader>-e Does CoffeeScript compilation in visual mode
+vnoremap <silent> <leader>e :CoffeeCompile<cr>
+
+" <leader>-r Runs CoffeeScript in visual mode
+vnoremap <silent> <leader>r :CoffeeRun<cr>
+
+" Tab in normal mode can indent
+nnoremap <Tab> >>
+nnoremap <S-Tab> <<
+
+" Use tab when in visual mode for indentation, while maintaining selection
+vnoremap <Tab> >gv
+vnoremap <S-Tab> <gv
+
+" Tabularize shortcuts
+if exists(":Tabularize")
+  "nmap <Leader>a= :Tabularize /=<CR>
+  "vmap <Leader>a= :Tabularize /=<CR>
+  "nmap <Leader>a: :Tabularize /:\zs<CR>
+  "vmap <Leader>a: :Tabularize /:\zs<CR>
+endif
+
+"""""""""""""""
+" Misc Plugins
+"""""""""""""""
+
+" Use <leader><tab> to toggle NERDTree visibility
+nnoremap <silent> <leader><tab> :NERDTreeToggle<cr>
+
+" Set CoffeeCompile to be vertical
+let coffee_compile_vert = 1
+
+" <leader>-gg toggles Git Gutter
+nnoremap <silent> <leader>gg :ToggleGitGutter<cr>
+" <leader>-gh to toggle Git Highlight
+nnoremap <silent> <leader>gh :ToggleGitGutterLineHighlights<cr>
+" Jump to next / prev change hunks
+nnoremap <silent> <leader>gj :GitGutterNextHunk<cr>
+nnoremap <silent> <leader>gk :GitGutterPrevHunk<cr>
+
+" Clear sign column highlight
+" highlight clear SignColumn
+
+"""""""""
+" Vimux
+"""""""""
+
+" Use exising pane (not used by vim) if found instead of running split-window.
+let VimuxUseNearestPane = 1
+
+" Use <leader>rp to run a command in Tmux pane below
+nnoremap <leader>rp :VimuxPromptCommand<cr>
+" <leader>rr repeats last command
+nnoremap <silent> <leader>rr :VimuxRunLastCommand<cr>
+" <leader>rc kills the command
+nnoremap <silent> <leader>rc :VimuxInterruptRunner<cr>
+" <leader>rq closes the bottom pane
+nnoremap <silent> <leader>rq :VimuxCloseRunner<cr>
+" <leader>rx closes all panes
+nnoremap <silent> <leader>rx :VimuxClosePanes<cr>
+" Inspect runner pane
+nnoremap <silent> <leader>ri :VimuxInspectRunner<cr>
+
+""""""""""""
+" Buffers
+""""""""""""
+
+" Hide buffers instead of closing them (useful for switching between files)
+set hidden
+
+"""""""""
+" CtrlP
+"""""""""
+
+" Alias Cmd-T shortcuts for CtrlP
+" <leader>t to search
+nnoremap <silent> <leader>t :CtrlP<cr>
+
+" <leader>b to open buffers
+nnoremap <silent> <leader>b :CtrlPBuffer<cr>
+
+" Don't jump to a window that is already open, but do jump to tabs
+let g:ctrlp_switch_buffer = 't'
+
+" List from top to bottom, like Cmd-T
+let g:ctrlp_match_window_reversed = 0
+
+"""""""""
+" Splits
+"""""""""
+
+" Resize splits when the window is resized
+au VimResized * exe "normal! \<c-w>="
+
+" Use control key modifier to move between split windows
+nnoremap <C-h> <C-w>h
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+" Note: This overrides the normal <C-l> which redraws the screen
+nnoremap <C-l> <C-l><C-w>l
+
+"" Hold down alt to change size of splits
+"map <silent> <A-h> <C-w><
+"map <silent> <A-j> <C-w>-
+"map <silent> <A-k> <C-w>+
+"map <silent> <A-l> <C-w>>
+""nnoremap <A-h> <C-w><
+""nnoremap <A-j> <C-w>-
+""nnoremap <A-k> <C-w>+
+""nnoremap <A-l> <C-w>>
+
+"""""""""""
+" Folding
+"""""""""""
+
+set foldmethod=indent
+set foldnestmax=3
+set nofoldenable
+" Default to having folds open
+set foldlevel=9
+" Have leader-space toggle folds
+nnoremap <leader><space> za
+
+""""""""""""""""""""""
+" Indents and Wrapping
+""""""""""""""""""""""
+
+
+" Vim 7.3 adds support for highlighting cols after textwidth
+if exists('+colorcolumn')
+  set colorcolumn=+1
+else
+  " Fallback for older Vim
+  au BufWinEnter * let w:m2=matchadd('ColorColumn', '\%>80v.\+', -1)
+endif
+
+" Highlight current line and column when in insert mode
+autocmd InsertEnter * set cursorline cursorcolumn
+autocmd InsertLeave * set nocursorline nocursorcolumn
+
+" Highlight trailing spaces
+set listchars=trail:.,tab:»·
+set list
+
+" Keep lines in view at edges of screen
+set scrolloff=8
+set sidescrolloff=7
+set sidescroll=1
+
+" Scroll a few lines by default with Ctrl-E and -Y
+nnoremap <C-e> 15<C-e>
+nnoremap <C-y> 15<C-y>
+
+"""""""""""""""""""""""
+" Syntax Highlighting
+"""""""""""""""""""""""
+
+syntax on
+
+" Show matching brackets
+set showmatch
+set matchtime=2
+
+" Highlight VCS conflict markers
+match ErrorMsg '^\(<\|=\|>\)\{7\}\([^=].\+\)\?$'
+
+""""""""""
+" Search
+""""""""""
+
+
+" Use standard Perl/Python syntax for regex
+"nnoremap / /\v
+"vnoremap / /\v
+
+" Clear out search highlight with <leader>/
+nnoremap <leader>/ :nohls<cr>
+" Control-L in insert mode clears highlight (and redraws screen)
+inoremap <C-L> <C-O>:nohls<cr><C-O><C-L>
+
+" Ack for the last search
+nnoremap <silent> <leader>? :execute "Ack! '" . substitute(substitute(substitute(@/, "\\\\<", "\\\\b", ""), "\\\\>", "\\\\b", ""), "\\\\v", "", "") . "'"<CR>
+
+" Ack shortcut
+map <leader>a :Ack!
+
+"""""""""""""
+" Tabs
+"""""""""""""
+
+" Show tab line only if there is more than one tab
+set showtabline=1
+
+"""""""""""
+" Tagbar
+"""""""""""
+
+" Automatically close after use
+let g:tagbar_autoclose = 0
+
+" Focus on open
+let g:tagbar_autofocus = 1
+
+" Sort by file order by default
+let g:tagbar_sort = 1
+
+" Use compact mode
+let g:tagbar_compact = 1
+
+""""""""""""""
+" Syntastic
+""""""""""""""
+
+let g:syntastic_javascript_checkers = ['gjslint', 'jshint']
+
+"let g:syntastic_coffee_lint_options = "-f ~/.coffeelint.json"
+let g:syntastic_javascript_jshint_conf = "~/.jshintrc"
+
+" eslint is way too slow to run on every save
+let g:syntastic_javascript_eslint_conf = "~/.eslintrc"
+nnoremap <leader>eslint :SyntasticCheck eslint<CR>
+
+" Map leader-er to show syntastic errors
+nnoremap <silent> <leader>er :Errors<CR>
+
+""""""""""""""""""""
+" Misc commands
+""""""""""""""""""""
+
+" Format JSON
+nnoremap <leader>json :%!python -mjson.tool<CR>
+
+" Remove trailing whitespace
+nnoremap <leader>whitespace :%s/\s\+$<CR>
+
+"""""""""""""""""
+" Local Settings
+"""""""""""""""""
+
+" Load only if file exists
+if filereadable(expand("~/.vimrc.local"))
+  so ~/.vimrc.local
+endif
