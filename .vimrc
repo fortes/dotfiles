@@ -273,6 +273,11 @@ nnoremap <silent> <leader>vsi :VimShellInteractive<cr>
 
 " }}}
 
+" FileType tweaks {{{
+" Enable marker folds in .vimrc
+autocmd FileType vim set fdm=marker fdl=0
+"}}}
+
 " Local Settings {{{
 if filereadable(expand("~/.vimrc.local"))
   so ~/.vimrc.local
