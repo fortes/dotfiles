@@ -123,7 +123,7 @@
     "no-wrap-func": 0,
     "quotes": [1, "single", "avoid-escape"],
     "quote-props": 0,
-    "semi": 2,
+    "semi": [2, "always"],
     "sort-vars": 1,
     "space-after-keywords": [2, "always"],
     "space-in-brackets": [2, "never"],
