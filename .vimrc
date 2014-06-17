@@ -265,6 +265,10 @@ function! s:unite_settings()
 endfunction
 " }}}
 
+" Unite Ack/Ag search {{{
+nnoremap <leader>a :<C-U>Unite grep:.<cr>
+" }}}
+
 " Projects, Filenames, and Search {{{
 " Ignore source directories and some others
 set wildignore+=*.o,*.obj,.git,node_modules,*.pyc
