@@ -269,6 +269,13 @@ endfunction
 nnoremap <leader>a :<C-U>Unite grep:.<cr>
 " }}}
 
+" Unite Yank history {{{
+let g:unite_source_history_yank_enable = 1
+" Save system clipboard value as well
+let g:unite_source_history_yank_save_clipboard = 1
+nnoremap <leader>y :<C-u>Unite history/yank<cr>
+" }}}
+
 " Projects, Filenames, and Search {{{
 " Ignore source directories and some others
 set wildignore+=*.o,*.obj,.git,node_modules,*.pyc
