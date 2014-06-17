@@ -371,6 +371,11 @@ vnoremap <silent> <leader>vs :VimShellSendString<cr>
 " let g:vimshell_interactive_interpreter_commands.coffee = 'coffee'
 " }}}
 
+" Git helpers {{{
+" Ignore whitespace for diffs in gutter
+let g:gitgutter_diff_args = '-w'
+" }}}
+
 " FileType tweaks {{{
 " Enable marker folds in .vimrc
 autocmd FileType vim set fdm=marker fdl=0
