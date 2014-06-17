@@ -1,7 +1,7 @@
 {
   "indent": {
     "ArrayExpression": 1,
-    "CallExpression": 1,
+    "CallExpression": 0,
     "CatchClause": 1,
     "ChainedMemberExpression": 1,
     "ConditionalExpression": 1,
@@ -13,7 +13,7 @@
     "IfStatement": 1,
     "MultipleVariableDeclaration": 1,
     "ObjectExpression": 1,
-    "ReturnStatement": 1,
+    "ReturnStatement": 0,
     "SwitchCase": 1,
     "SwitchStatement": 1,
     "TopLevelFunctionBlock": 1,
