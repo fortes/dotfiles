@@ -172,6 +172,7 @@ let g:neocomplcache_max_list = 5
 " Automatically select first option in list
 let g:neocomplcache_enable_auto_select = 1
 " Match across string like Control-P
+
 let g:neocomplcache_enable_fuzzy_completion = 1
 
 " Make Neocomplcache work with Tern, per
@@ -225,6 +226,43 @@ set laststatus=2
 
 " Make airline match main theme
 let g:airline_theme = 'solarized'
+" }}}
+
+" Unite File/Buffer Explorer {{{
+" Taken from this informative post:
+" http://eblundell.com/thoughts/2013/08/15/Vim-CtrlP-behaviour-with-Unite.html
+let g:unite_enable_start_insert = 1
+let g:unite_split_rule = "botright"
+let g:unite_force_overwrite_statusline = 0
+let g:unite_winheight = 10
+
+call unite#custom_source('file_rec,file_rec/async,file_mru,file,buffer,grep',
+\ 'ignore_pattern', join([
+\ '\.git/',
+\ ], '\|'))
+
+call unite#filters#matcher_default#use(['matcher_fuzzy'])
+call unite#filters#sorter_default#use(['sorter_rank'])
+
+" Map file/buffer list to leader-t
+nnoremap <leader>t :<C-u>Unite -buffer-name=files -start-insert buffer file_rec/async:!<cr>
+" BufExplorer-like mapping with leader-b
+nnoremap <leader>b :<C-u>Unite -buffer-name=files -start-insert buffer bookmark<cr>
+
+autocmd FileType unite call s:unite_settings()
+
+function! s:unite_settings()
+  imap <buffer> <C-j>   <Plug>(unite_select_next_line)
+  imap <buffer> <C-k>   <Plug>(unite_select_previous_line)
+  imap <silent><buffer><expr> <C-x> unite#do_action('split')
+  imap <silent><buffer><expr> <C-v> unite#do_action('vsplit')
+  imap <silent><buffer><expr> <C-t> unite#do_action('tabopen')
+
+  " Make Esc / Control-C close the explorer
+  imap <buffer> <ESC> <Plug>(unite_exit)
+  nmap <buffer> <ESC> <Plug>(unite_exit)
+  nmap <C-c> <ESC> <Plug>(unite_exit)
+endfunction
 " }}}
 
 " Projects, Filenames, and Search {{{
