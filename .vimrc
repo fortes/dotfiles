@@ -316,10 +316,27 @@ let g:neosnippet#disable_runtime_snippets = {
 " }}}
 
 " VimShell {{{
+"
+" ,vs to open a quick pop-up shell for commands
+nnoremap <silent> <leader>vs :VimShellPop<cr>
 
-" ,vsi to open up interpreter
-nnoremap <silent> <leader>vsi :VimShellInteractive<cr>
+" ,vs(h|v) to open up shell in vertical/horizontal split
+nnoremap <silent> <leader>hvs :VimShell -split -split-command=split<cr>
+nnoremap <silent> <leader>vvs :VimShell -split -split-command=vsplit<cr>
 
+" ,vsi(h|v) to open up interpreter
+nnoremap <silent> <leader>hvsi :VimShellInteractive -split -split-command=split<cr>
+nnoremap <silent> <leader>vvsi :VimShellInteractive -split -split-command=vsplit<cr>
+
+" Send current selection to VimShell with <leader>vs
+vnoremap <silent> <leader>vs :VimShellSendString<cr>
+
+" TODO: Figure out why none of this works
+" if !exists('g:vimshell_interactive_interpreter_commands')
+"   let g:vimshell_interactive_interpreter_commands = {}
+" endif
+" let g:vimshell_interactive_interpreter_commands.javascript = 'node'
+" let g:vimshell_interactive_interpreter_commands.coffee = 'coffee'
 " }}}
 
 " FileType tweaks {{{
