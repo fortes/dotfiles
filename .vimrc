@@ -167,13 +167,38 @@ set infercase
 set omnifunc=syntaxcomplete#Complete
 
 " Neocomplcache
+" Show matches automatically
 let g:neocomplcache_enable_at_startup = 1
 let g:neocomplcache_max_list = 5
 " Automatically select first option in list
 let g:neocomplcache_enable_auto_select = 1
 " Match across string like Control-P
-
 let g:neocomplcache_enable_fuzzy_completion = 1
+
+" Define dictionary.
+let g:neocomplcache_dictionary_filetype_lists = {
+\   'default' : '',
+\   'vimshell' : $HOME.'/.vimshell_hist'
+\ }
+
+" Define keyword.
+if !exists('g:neocomplcache_keyword_patterns')
+  let g:neocomplcache_keyword_patterns = {}
+endif
+let g:neocomplcache_keyword_patterns['default'] = '\h\w*'
+
+if !exists('g:neocomplcache_same_filetype_lists')
+  let g:neocomplcache_same_filetype_lists = {}
+endif
+" Look across all open buffers for completion options
+let g:neocomplcache_same_filetype_lists._ = '_'
+
+" Plugin key-mappings.
+inoremap <expr><C-g> neocomplcache#undo_completion()
+inoremap <expr><C-l> neocomplcache#complete_common_string()
+
+" Use <TAB> completion
+inoremap <expr><TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
 
 " Make Neocomplcache work with Tern, per
 " https://github.com/Shougo/neocomplete.vim/issues/91
@@ -182,6 +207,20 @@ if !exists('g:neocomplcache_force_omni_patterns')
 endif
 let g:neocomplcache_force_omni_patterns.javascript = '[^. \t]\.\w*'
 
+" Add some language support
+autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
+autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
+autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+
+" }}}
+
+" Snippets {{{
+" Disable default runtime snippets
+let g:neosnippet#disable_runtime_snippets = {
+\ '_': 1,
+\ }
 " }}}
 
 " Colors {{{
@@ -306,13 +345,6 @@ set gdefault
 set spell
 " Toggle spell check
 nnoremap <F7> :setlocal spell! spell?<CR>
-" }}}
-
-" Snippets {{{
-" Disable default runtime snippets
-let g:neosnippet#disable_runtime_snippets = {
-        \ '_': 1,
-        \ }
 " }}}
 
 " VimShell {{{
