@@ -342,6 +342,9 @@ vnoremap <silent> <leader>vs :VimShellSendString<cr>
 " FileType tweaks {{{
 " Enable marker folds in .vimrc
 autocmd FileType vim set fdm=marker fdl=0
+" Fold via indent in CoffeeScript and Python
+autocmd BufNewFile,BufReadPost *.coffee setl foldmethod=indent
+autocmd BufNewFile,BufReadPost *.py setl foldmethod=indent
 "}}}
 
 " Local Settings {{{
