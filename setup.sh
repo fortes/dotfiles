@@ -117,7 +117,7 @@ if [ ! -d $HOME/.vim/bundle/Vundle.vim ]; then
   mkdir -p $HOME/.vim/
   git clone https://github.com/gmarik/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim
   echo "Vundle installed"
-  # Install all bundles via CLI
-  vim +PluginInstall +qall
 fi
+# Install all bundles via CLI
+vim +PluginUpdate +qall
 echo "Vim setup"
