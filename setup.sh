@@ -4,6 +4,15 @@ OS=`uname`
 # Install Homebrew
 if [ $OS == "Darwin" ]; then
   if [ ! -x /usr/local/bin/brew ]; then
+    # There is a license agreement before you can run make, and you have to
+    # agree to it via sudo. This command checks for normal the normal make
+    # output when there is no Makefile:
+    #   make: *** No targets specified and no makefile found. Stop.
+    # Note that this goes out on stderr, so we pipe stderr to stdout
+    if [[ -z $(make 2>&1 >/dev/null | grep "no makefile") ]]; then
+      echo "Must agree to make license agreement. Run 'sudo make' first"
+      exit 1
+    fi
     # Install Homebrew
     echo "Homebrew not installed. Installing:"
     ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"
