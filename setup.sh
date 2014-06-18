@@ -114,7 +114,7 @@ echo "dotfiles linked"
 # Setup Vundle & Vim
 if [ ! -d $HOME/.vim/bundle/Vundle.vim ]; then
   echo "Installing Vundle for Vim"
-  mkdir -p $HOME/.vim/
+  mkdir -p $HOME/.vim/bundle
   git clone https://github.com/gmarik/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim
   echo "Vundle installed"
 fi
