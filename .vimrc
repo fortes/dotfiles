@@ -155,7 +155,7 @@ nnoremap K <nop>
 syntax sync minlines=64
 
 " Ignore source directories and some others
-set wildignore+=*.o,*.obj,.git,node_modules,*.pyc
+set wildignore+=*.o,*.obj,.git,node_modules,third_party,*.pyc
 
 " Ignore lib/ dirs since the contain compiled libraries typically
 set wildignore+=lib,build,public,_site
@@ -164,7 +164,7 @@ set wildignore+=lib,build,public,_site
 set wildignore+=*.ttf,*.otf,*.svg,*.png,*.jpg,*.gif,*.jpeg
 
 " Tell NERDtree to ignore common directories
-let NERDTreeIgnore=['node_modules$[[dir]]', 'lib$[[dir]]', 'build$[[dir]]']
+let NERDTreeIgnore=['node_modules$[[dir]]', 'lib$[[dir]]', 'build$[[dir]]', 'third_party$[[dir]]']
 
 """"""""""""""""
 " Status Line
