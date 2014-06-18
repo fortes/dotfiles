@@ -47,15 +47,15 @@ if [ $OS == "Darwin" ]; then
   # Install python with up-to-date OpenSSL
   if [ ! -n "$(brew list python 2> /dev/null)" ]; then
     brew install python --with-brewed-openssl
-    pip install --upgrade setuptools
-    pip install --upgrade pip
-    pip install --upgrade virtualenv
+    pip install -q --upgrade setuptools
+    pip install -q --upgrade pip
+    pip install -q --upgrade virtualenv
     echo "Python installed"
 
     # Python3 bonus
     brew install python3 --with-brewed-openssl
-    pip3 install --upgrade setuptools
-    pip3 install --upgrade pip
+    pip3 install -q --upgrade setuptools
+    pip3 install -q --upgrade pip
     echo "Python3 installed"
   fi
 
@@ -78,16 +78,17 @@ if [ ! -d ~/virtualenvs/default ]; then
   rm -rf ~/virtualenvs/*
   # Now create the default virtualenv
   virtualenv ~/virtualenvs/default
-  # And activate
-  PROMPT=$PS1
-  source ~/virtualenvs/default/bin/activate
-  PS1=$PROMPT
-  echo "Default virtualenv created and activated"
+  echo "Default virtualenv created"
 fi
+
+# Always activate default virtualenv, since we will install via pip
+PROMPT=$PS1
+source ~/virtualenvs/default/bin/activate
+PS1=$PROMPT
 
 # Install python packages
 for p in $(cat $HOME/dotfiles/python-packages); do
-  pip install -U $p
+  pip install -q -U $p
 done
 echo "python packages installed"
 
