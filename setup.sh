@@ -1,3 +1,4 @@
+#!/bin/bash
 OS=`uname`
 
 # Install Homebrew
