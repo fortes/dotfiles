@@ -69,5 +69,7 @@
   "white": false,
 
   // Custom globals
-  "predef": []
+  "predef": [
+    "describe", "it", "before", "beforeEach", "after", "afterEach"
+  ]
 }

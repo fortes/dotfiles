@@ -38,7 +38,7 @@ alias ...="cd .. && cd .."
 alias json='python -mjson.tool'
 
 # Colorized cat (nyan)
-alias nyan='pygmentize -O style=friendly -f console256 -g'
+alias nyan='pygmentize -O style=default -f console256 -g'
 
 # Debugging CoffeeScript
 alias coffeedebug='coffee --nodejs --debug-brk'
