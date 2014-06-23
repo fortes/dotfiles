@@ -1,0 +1,2 @@
+--errors=compatible-vendor-prefixes,empty-rules,display-property-grouping,duplicate-background-images,duplicate-properties,fallback-colors,font-faces,import,important,known-properties,outline-none,shorthand,star-property-hack,text-indent,underscore-property-hack,universal-selector,vendor-prefix
+--warnings=floats,unique-headings,zero-units
