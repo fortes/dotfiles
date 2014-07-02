@@ -12,7 +12,7 @@
   "immed": true, // Wrap immediate function invocations in parens
   "indent": 2, // Force consistent indentation
   "latedef": true, // Can only use vars after they've been declared
-  "newcap": true, // Capitalize class names
+  "newcap": false, // Capitalize class names
   "noarg": true, // Can't use arguments.caller and arguments.callee
   "noempty": true, // No empty blocks
   "nonbsp": true, // Avoid funky characters
