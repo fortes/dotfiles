@@ -257,6 +257,8 @@ set matchtime=2
 " Only insert longest common text of matches & show menu when only one match
 set completeopt=menuone,longest
 
+" Control-K for omnicomplete
+inoremap <C-k> <c-x><c-o><Down>
 " Use Control-space to omnicomplete
 inoremap <C-Space> <c-x><c-o><Down>
 " In terminal, control-space makes a different character
@@ -265,8 +267,8 @@ inoremap <NUL> <C-X><C-O><Down>
 " Escape closes the menu and goes back to what was there
 inoremap <expr> <Esc> pumvisible() ? "\<C-e>" : "\<Esc>"
 " Enter/Tab accepts the current match
-inoremap <expr> <CR> pumvisible() ? "\<C-y> " : "\<CR>"
-inoremap <expr> <Tab> pumvisible() ? "\<C-y> " : "\<CR>"
+inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<CR>"
+inoremap <expr> <Tab> pumvisible() ? "\<C-y>" : "\<Tab>"
 
 " Be smart about case when using autocomplete
 set infercase
