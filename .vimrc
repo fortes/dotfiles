@@ -37,6 +37,7 @@ NeoBundle 'nathanaelkane/vim-indent-guides'
 " Gutter & Status Line
 NeoBundle 'airblade/vim-gitgutter'
 NeoBundle 'bling/vim-bufferline'
+NeoBundle 'scrooloose/syntastic'
 NeoBundle 'bling/vim-airline'
 " }}}
 " }}}
@@ -440,6 +441,18 @@ let g:gitgutter_eager=1
 
 " Change modified sign
 let g:gitgutter_sign_modified='±'
+" }}}
+
+" Syntastic {{{
+let g:syntastic_javascript_checkers = ['jshint']
+let g:syntastic_javascript_jshint_args = '--config ~/.jshintrc'
+
+" eslint is way too slow to run on every save
+let g:syntastic_javascript_eslint_conf = "~/.eslintrc"
+nnoremap <leader>eslint :SyntasticCheck eslint<CR>
+
+" Map leader-er to show syntastic errors
+nnoremap <silent> <leader>er :Errors<CR>
 " }}}
 
 " Indent Guides {{{
