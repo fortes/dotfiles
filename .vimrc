@@ -1,68 +1,18 @@
 " vim:fdm=marker ts=2 sts=2 sw=2 fdl=0
 
-" NeoBundle Setup {{{
-if has('vim_starting')
-  set nocompatible
-  set runtimepath+=~/.vim/bundle/neobundle.vim/
-endif
-
-call neobundle#begin(expand('~/.vim/bundle/'))
-
-" Let NeoBundle manage NeoBundle
-NeoBundleFetch 'Shougo/neobundle.vim'
-" }}}
-
-" Bundles {{{
-" VimProc install / build
-NeoBundle 'Shougo/vimproc.vim',{
-\   'build' : {
-\     'mac' : 'make -f make_mac.mak',
-\     'unix' : 'make -f make_unix.mak',
-\     'cygwin': 'make -f make_cygwin.mak',
-\     'windows': '"C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\nmake.exe" make_msvc32.mak',
-\   },
-\ }
-NeoBundle 'Shougo/vimshell.vim'
-NeoBundle 'Shougo/unite.vim'
-NeoBundle 'Shougo/neocomplcache.vim'
-NeoBundle 'Shougo/neosnippet.vim'
-" Languages & Dev Tools
-NeoBundle 'marijnh/tern_for_vim',{
-\   'build' : {
-\     'others': 'npm install',
-\   }
-\ }
-NeoBundle 'tpope/vim-fugitive'
-" Colors / Display
-NeoBundle 'altercation/vim-colors-solarized'
-NeoBundle 'nathanaelkane/vim-indent-guides'
-" Gutter & Status Line
-NeoBundle 'airblade/vim-gitgutter'
-NeoBundle 'bling/vim-airline'
-call neobundle#end()
-
-" Complete loading
-filetype plugin indent on
-syntax enable
-
-" Prompt to install missing bundles
-NeoBundleCheck
-" }}}
-
 " Base Configuration {{{
+" Welcome to the future
+set nocompatible
 
-" Turn off 'Thanks for flying Vim' message
-if has('notitle')
-  set notitle
-else
-  let &titleold=getcwd()
-endif
+" Display incomplete commands
+set showcmd
 
 " Hide default mode text (i.e. INSERT below status line)
 set noshowmode
 
-" Hide the intro screen
-set shortmess+=I
+" Hide the intro screen, use [+] instead of [Modified], use [RO] instead
+" of [readyonly]
+set shortmess+=Imr
 
 " Default to UTF-8
 set encoding=utf-8
@@ -76,6 +26,22 @@ set wildmode=longest,full
 " Pretty much always on a fast connection
 set ttyfast
 
+" Mapping & keycode timeouts
+set timeoutlen=300
+set ttimeout
+set ttimeoutlen=100
+
+" Never forget
+if &history < 1000
+  set history=1000
+endif
+
+" Unix/windows compatibility
+set viewoptions=cursor,folds,options,slash,unix
+
+" Hide buffers instead of closing them (useful for switching between files)
+set hidden
+
 " Automatically reload modified files
 set autoread
 
@@ -85,10 +51,7 @@ set nomodeline
 " Show cursor position in bottom right
 set ruler
 
-" Make the xterm window inherit Vim title
-set title
-
-" Don't use backup files, we have Dropbox/Git for that
+" Don't use backup files, we have Git for that
 set nobackup
 set noswapfile
 
@@ -96,23 +59,12 @@ set noswapfile
 set noerrorbells
 set visualbell t_vb=
 
+" Always show statusline
+set laststatus=2
+
 " Support mouse
 set mouse=a
 set ttymouse=xterm2
-
-" Use comma as leader
-let mapleader=","
-
-" Make ; equivalent to : (faster commands)
-nnoremap ; :
-
-" Map jj and jk to <ESC> to leave insert mode quickly
-inoremap jj <ESC>
-inoremap jk <ESC>
-
-" Make j/k move screen visible lines, not file lines
-nnoremap j gj
-nnoremap k gk
 
 " Make h/l move across beginning/end of line
 set whichwrap+=hl
@@ -120,12 +72,18 @@ set whichwrap+=hl
 " Remove silly restrictions from backspace
 set backspace=indent,eol,start
 
+" Open new split panes to right and bottom, which feels more natural
+set splitbelow
+set splitright
+
+" Resize splits when the window is resized
+au VimResized * exe "normal! \<c-w>="
 " }}}
 
-" Indents and Wrapping {{{
+" Indents, Wrapping, and Whitespace {{{
 set autoindent
 
-" Spaces, not tabs. Two characters
+" 2 spaces, not tabs
 set tabstop=2
 set softtabstop=2
 set shiftwidth=2
@@ -133,15 +91,26 @@ set expandtab
 " Round up indents
 set shiftround
 set smarttab
+
+" Use smart indenting
 set cindent
 
-" Be smart when indenting
-set smartindent
+" Automatically reselect visual block after indent
+vnoremap < <gv
+vnoremap > >gv
 
 " Soft wrap, with indicator
 set wrap
+set showbreak=«
 " Wrap at 80 characters
 set textwidth=80
+" Highlight textwidth column
+set colorcolumn=+1
+
+" Highlight current line and column when in insert mode
+autocmd WinEnter,InsertEnter * set cursorline cursorcolumn
+autocmd WinLeave,InsertLeave * set nocursorline nocursorcolumn
+
 " Only break the line if wasn't longer than 80 chars when editing began
 " and there is a blank somewhere in the line
 set formatoptions+=lb
@@ -149,98 +118,52 @@ set formatoptions+=lb
 set formatoptions-=o
 " Recognize numbered lists and wrap accordingly
 set formatoptions+=n
-" Remove comment leader when joining lines
-set formatoptions+=j
-
-" Some files shouldn't be wrapped automatically
-autocmd BufRead,BufNewFile *.txt,*.md,*.markdown setlocal textwidth=0
-" }}}
-
-" Autocomplete {{{
-" Consider '-' part of a world when tab completion, etc
-set iskeyword+=-
-
-" Be smart about case when using autocomplete
-set infercase
-
-" Enable Omnicomplete
-set omnifunc=syntaxcomplete#Complete
-
-" Neocomplcache
-" Show matches automatically
-let g:neocomplcache_enable_at_startup = 1
-let g:neocomplcache_max_list = 5
-" Automatically select first option in list
-let g:neocomplcache_enable_auto_select = 1
-" Match across string like Control-P
-let g:neocomplcache_enable_fuzzy_completion = 1
-
-" Define dictionary.
-let g:neocomplcache_dictionary_filetype_lists = {
-\   'default' : '',
-\   'vimshell' : $HOME.'/.vimshell_hist'
-\ }
-
-" Define keyword.
-if !exists('g:neocomplcache_keyword_patterns')
-  let g:neocomplcache_keyword_patterns = {}
+" Remove comment leader when joining lines (added in Vim 7.4)
+if version >= 740
+  set formatoptions+=j
 endif
-let g:neocomplcache_keyword_patterns['default'] = '\h\w*'
 
-if !exists('g:neocomplcache_same_filetype_lists')
-  let g:neocomplcache_same_filetype_lists = {}
-endif
-" Look across all open buffers for completion options
-let g:neocomplcache_same_filetype_lists._ = '_'
+" Allow incrementing letters
+set nrformats+=alpha
+" Always assume decimal numbers
+set nrformats-=octal
 
-" Plugin key-mappings.
-inoremap <expr><C-g> neocomplcache#undo_completion()
-inoremap <expr><C-l> neocomplcache#complete_common_string()
+" Show special indicators
+set list
+" Highlight trailing spaces
+set listchars=trail:·,tab:»·
+" Show wrap indicators
+set listchars+=extends:»,precedes:«
+" Show non-breaking spaces
+set listchars+=nbsp:%
 
-" Use <TAB> completion
-inoremap <expr><TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
+" Keep lines in view at edges of screen
+set scrolloff=8
+set sidescrolloff=7
+set sidescroll=1
 
-" Make Neocomplcache work with Tern, per
-" https://github.com/Shougo/neocomplete.vim/issues/91
-if !exists('g:neocomplcache_force_omni_patterns')
-  let g:neocomplcache_force_omni_patterns = {}
-endif
-let g:neocomplcache_force_omni_patterns.javascript = '[^. \t]\.\w*'
+" Display as much as possible as last line, instead of just showing @
+set display=lastline
 
-" Add some language support
-autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
-autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
-autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
-
-" }}}
-
-" Snippets {{{
-" Disable default runtime snippets
-let g:neosnippet#disable_runtime_snippets = {
-\ '_': 1,
-\ }
+" Use 5 characters for number well
+set numberwidth=5
 " }}}
 
 " Colors {{{
-" Set Colors
 set background=dark
 
-" Only looks good with 256 colors
 if &t_Co >= 256
-  " Make solarized work well in terminals
-  let g:solarized_termcolors=256
-
-  colorscheme solarized
+  silent! colorscheme railscasts
 else
-  " Meh
+  " Ugh, no colors
   colorscheme desert
 endif
 " }}}
 
 " GUI {{{
 if has('gui_running')
+  " Use light colors
+  set background=light
   " Use a good font
   set guifont=Consolas:h14
   " Turn off toolbars
@@ -251,68 +174,91 @@ if has('gui_running')
   set guioptions-=L
   " Default to a reasonable window size
   set lines=40 columns=86 " Give space for line numbers
-  " Use light colors
-  set background=light
-  colorscheme solarized
-  " Map F5 for switching light/dark
-  call togglebg#map("<F5>")
 endif
 " }}}
 
-" Status Line {{{
-" Always show statusline
-set laststatus=2
+" Syntax Highlighting {{{
+syntax enable
 
-" Make airline match main theme
-let g:airline_theme = 'solarized'
+" Show matching brackets
+set showmatch
+set matchtime=2
 " }}}
 
-" Unite File/Buffer Explorer {{{
-" Taken from this informative post:
-" http://eblundell.com/thoughts/2013/08/15/Vim-CtrlP-behaviour-with-Unite.html
-let g:unite_enable_start_insert = 1
-let g:unite_split_rule = "botright"
-let g:unite_force_overwrite_statusline = 0
-let g:unite_winheight = 10
+" Autocomplete {{{
+" Consider '-' part of a world when tab completion, etc
+set iskeyword+=-
 
-call unite#custom_source('file_rec,file_rec/async,file_mru,file,buffer,grep',
-\ 'ignore_pattern', join([
-\ '\.git/',
-\ ], '\|'))
+" Only insert longest common text of matches & show menu when only one match
+set completeopt=menuone,longest
 
-call unite#filters#matcher_default#use(['matcher_fuzzy'])
-call unite#filters#sorter_default#use(['sorter_rank'])
+" Use Control-space to omnicomplete
+inoremap <C-Space> <c-x><c-o><Down>
+" In terminal, control-space makes a different character
+inoremap <NUL> <C-X><C-O><Down>
 
-" Map file/buffer list to leader-t
-nnoremap <leader>t :<C-u>Unite -buffer-name=files -start-insert buffer file_rec/async:!<cr>
-" BufExplorer-like mapping with leader-b
-nnoremap <leader>b :<C-u>Unite -buffer-name=files -start-insert buffer bookmark<cr>
+" Escape closes the menu and goes back to what was there
+inoremap <expr> <Esc> pumvisible() ? "\<C-e>" : "\<Esc>"
+" Enter/Tab accepts the current match
+inoremap <expr> <CR> pumvisible() ? "\<C-y> " : "\<CR>"
+inoremap <expr> <Tab> pumvisible() ? "\<C-y> " : "\<CR>"
 
-autocmd FileType unite call s:unite_settings()
+" Be smart about case when using autocomplete
+set infercase
 
-function! s:unite_settings()
-  imap <buffer> <C-j>   <Plug>(unite_select_next_line)
-  imap <buffer> <C-k>   <Plug>(unite_select_previous_line)
-  imap <silent><buffer><expr> <C-x> unite#do_action('split')
-  imap <silent><buffer><expr> <C-v> unite#do_action('vsplit')
-  imap <silent><buffer><expr> <C-t> unite#do_action('tabopen')
-
-  " Make Esc / Control-C close the explorer
-  imap <buffer> <ESC> <Plug>(unite_exit)
-  nmap <buffer> <ESC> <Plug>(unite_exit)
-  nmap <C-c> <ESC> <Plug>(unite_exit)
-endfunction
+" Enable Omnicomplete
+set omnifunc=syntaxcomplete#Complete
 " }}}
 
-" Unite Ack/Ag search {{{
-nnoremap <leader>a :<C-U>Unite grep:.<cr>
-" }}}
+" Efficiency Shortcuts {{{
+" Use comma as leader
+let mapleader=","
+let g:mapleader=","
 
-" Unite Yank history {{{
-let g:unite_source_history_yank_enable = 1
-" Save system clipboard value as well
-let g:unite_source_history_yank_save_clipboard = 1
-nnoremap <leader>y :<C-u>Unite history/yank<cr>
+" Make ; equivalent to : (faster commands)
+nnoremap ; :
+
+" Hide annoying quit message
+nnoremap <C-c> <C-c>:echo<cr>
+
+" Map jj and jk to <ESC> to leave insert mode quickly
+inoremap jj <ESC>
+inoremap jk <ESC>
+
+" Make j/k move screen visible lines, not file lines
+nnoremap j gj
+nnoremap k gk
+
+" Never use the manual command, remap to search (see below)
+nnoremap K <nop>
+
+" Easy paste mode
+nnoremap <silent> <leader>v :set invpaste<cr>
+
+" Toggle line numbers
+nnoremap <silent> <leader>n :set invnumber<cr>
+
+" Navigate splits with control key
+nnoremap <C-h> <C-w>h
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+" Note: This overrides the normal <C-l> which redraws the screen
+nnoremap <C-l> <C-l><C-w>l
+
+" Navigate splits with arrow keys
+nnoremap <left> <C-w>h
+nnoremap <right> <C-w>l
+nnoremap <up> <C-w>k
+nnoremap <down> <C-w>j
+
+" Close out non-modifable windows (quickfix, help, etc) with q, Escape,
+" or Control-C
+autocmd BufReadPost * if !&modifiable | nnoremap <buffer> q :q<cr> | endif
+autocmd BufReadPost * if !&modifiable | nnoremap <buffer> <Esc> :q<cr> | endif
+autocmd BufReadPost * if !&modifiable | nnoremap <buffer> <C-c> :q<cr> | endif
+
+" <leader><leader> to switch to last file edited
+nnoremap <leader><leader> <c-^>
 " }}}
 
 " Projects, Filenames, and Search {{{
@@ -335,53 +281,65 @@ set incsearch
 " Match all results in a line by default
 set gdefault
 
+" Center cursor after jumping to next match
+nnoremap n nzz
+
+" Use ag/ack instead of grep, if available
+if executable('ack')
+  set grepprg=ack\ --nogroup\ --column\ --smart-case\ --nocolor\ --follow\ $*
+  set grepformat=%f:%l:%c:%m
+endif
+if executable('ag')
+  set grepprg=ag\ --nogroup\ --column\ --smart-case\ --nocolor\ --follow
+  set grepformat=%f:%l:%c:%m
+endif
+
+" Prompt for search and show results in quicklist via <leader>a or \ (backslash)
+" nnoremap <leader>a :grep! "\b<C-R><C-W>\b"<CR>:cw<CR>
+if !exists(':Ag')
+  command -nargs=+ -complete=file -bar Ag silent! grep! <args>|cwindow|redraw!
+endif
+nnoremap \ :Ag<SPACE>
+nnoremap <leader>a :Ag<SPACE>
+
+" Search for word under cursor
+nnoremap K :grep! "\b<C-R><C-W>\b"<CR>:cwindow<CR>
 " }}}
 
 " Folds {{{
+set foldenable
+set foldmethod=marker
+set foldnestmax=3
+" Default to having folds open
+set foldlevel=9
 " }}}
 
 " Spelling {{{
-" Turn on spell checking
-set spell
+" Enable word completion from dictionary
+set complete+=kspell
+
 " Toggle spell check
 nnoremap <F7> :setlocal spell! spell?<CR>
 " }}}
 
-" VimShell {{{
-"
-" ,vs to open a quick pop-up shell for commands
-nnoremap <silent> <leader>vs :VimShellPop<cr>
-
-" ,vs(h|v) to open up shell in vertical/horizontal split
-nnoremap <silent> <leader>hvs :VimShell -split -split-command=split<cr>
-nnoremap <silent> <leader>vvs :VimShell -split -split-command=vsplit<cr>
-
-" ,vsi(h|v) to open up interpreter
-nnoremap <silent> <leader>hvsi :VimShellInteractive -split -split-command=split<cr>
-nnoremap <silent> <leader>vvsi :VimShellInteractive -split -split-command=vsplit<cr>
-
-" Send current selection to VimShell with <leader>vs
-vnoremap <silent> <leader>vs :VimShellSendString<cr>
-
-" TODO: Figure out why none of this works
-" if !exists('g:vimshell_interactive_interpreter_commands')
-"   let g:vimshell_interactive_interpreter_commands = {}
-" endif
-" let g:vimshell_interactive_interpreter_commands.javascript = 'node'
-" let g:vimshell_interactive_interpreter_commands.coffee = 'coffee'
-" }}}
-
-" Git helpers {{{
-" Ignore whitespace for diffs in gutter
-let g:gitgutter_diff_args = '-w'
-" }}}
-
 " FileType tweaks {{{
-" Enable marker folds in .vimrc
-autocmd FileType vim set fdm=marker fdl=0
+" Close folds in .vimrc
+autocmd FileType vim set fdm=marker fdl=1
 " Fold via indent in CoffeeScript and Python
 autocmd BufNewFile,BufReadPost *.coffee setl foldmethod=indent
 autocmd BufNewFile,BufReadPost *.py setl foldmethod=indent
+" Not all files should wrap automatically
+autocmd BufNewFile,BufReadPost *.txt,*.md,*.markdown setlocal textwidth=0
+" Enable spell checking in some filetypes
+autocmd BufNewFile,BufReadPost *.txt,*.md,*.markdown setlocal spell
+" Disable spell checking on unmodifiable files (what's the point?)
+autocmd BufReadPost * if !&modifiable | setlocal nospell | endif
+" Some plugins will override the formatoptions, so this overrides them back
+autocmd BufNewFile,BufReadPost * setlocal formatoptions+=lbon
+" Stupid old vim on MacOS doesn't support 'j' formatoption
+if version >= 740
+  autocmd BufNewFile,BufReadPost * setlocal formatoptions+=j
+endif
 "}}}
 
 " Local Settings {{{
