@@ -24,6 +24,7 @@ NeoBundle 'kien/ctrlp.vim'
 
 " Editing features
 NeoBundle 'tomtom/tcomment_vim'
+NeoBundle 'jiangmiao/auto-pairs'
 
 " Languages & Dev Tools {{{
 NeoBundle 'tpope/vim-fugitive'
