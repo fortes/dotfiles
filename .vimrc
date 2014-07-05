@@ -7,7 +7,48 @@ if !filereadable(expand('~/.vim/bundle/neobundle.vim/README.md'))
   exit
 endif
 
+" NeoBundle Setup {{{
+if has('vim_starting')
+  set runtimepath+=~/.vim/bundle/neobundle.vim/
+endif
+
+call neobundle#begin(expand('~/.vim/bundle/'))
+
+" Let NeoBundle manage NeoBundle
+NeoBundleFetch 'Shougo/neobundle.vim'
+" }}}
+
+" Bundles {{{
+
+" Editing features
+
+" Languages & Dev Tools {{{
+NeoBundle 'marijnh/tern_for_vim',{
+\   'build' : {
+\     'others': 'npm install',
+\   }
+\ }
+" }}}
+
+" Colors & Display {{{
+NeoBundle 'fortes/vim-railscasts'
+" Gutter & Status Line
+NeoBundle 'airblade/vim-gitgutter'
+" }}}
+" }}}
+
+" NeoBundle Coda {{{
+call neobundle#end()
+
+filetype plugin on
+
+" Check for uninstalled bundles and automatically install
+NeoBundleCheck
+" }}}
+
 " Base Configuration {{{
+
+" Sensible things {{{
 " Welcome to the future
 set nocompatible
 
@@ -328,6 +369,7 @@ set complete+=kspell
 " Toggle spell check
 nnoremap <F7> :setlocal spell! spell?<CR>
 " }}}
+" }}}
 
 " FileType tweaks {{{
 " Close folds in .vimrc
@@ -348,6 +390,31 @@ if version >= 740
   autocmd BufNewFile,BufReadPost * setlocal formatoptions+=j
 endif
 "}}}
+
+" Plugin Configuration {{{
+
+" GitGutter {{{
+" Toggle GitGutter with <leader>gg
+nnoremap <silent> <leader>gg :GitGutterToggle<CR>
+
+" Ignore whitespace
+let g:gitgutter_diff_args='-w'
+
+" Use raw grep
+let g:gitgutter_escape_grep=1
+
+" Use highlighting as well as signs
+let g:gitgutter_highlight_lines=1
+
+" Be aggressive about looking for diffs
+let g:gitgutter_realtime=1
+let g:gitgutter_eager=1
+
+" Change modified sign
+let g:gitgutter_sign_modified='±'
+" }}}
+
+" }}}
 
 " Local Settings {{{
 if filereadable(expand("~/.vimrc.local"))
