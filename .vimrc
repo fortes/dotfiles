@@ -127,6 +127,10 @@ set splitright
 
 " Resize splits when the window is resized
 au VimResized * exe "normal! \<c-w>="
+
+" Use system clipboard by default
+set clipboard=unnamed
+
 " }}}
 
 " Indents, Wrapping, and Whitespace {{{
@@ -235,9 +239,6 @@ set matchtime=2
 " }}}
 
 " Autocomplete {{{
-" Consider '-' part of a world when tab completion, etc
-set iskeyword+=-
-
 " Only insert longest common text of matches & show menu when only one match
 set completeopt=menuone,longest
 
@@ -373,23 +374,30 @@ nnoremap <F7> :setlocal spell! spell?<CR>
 " }}}
 
 " FileType tweaks {{{
-" Close folds in .vimrc
-autocmd FileType vim set fdm=marker fdl=1
-" Fold via indent in CoffeeScript and Python
-autocmd BufNewFile,BufReadPost *.coffee setl foldmethod=indent
-autocmd BufNewFile,BufReadPost *.py setl foldmethod=indent
-" Not all files should wrap automatically
-autocmd BufNewFile,BufReadPost *.txt,*.md,*.markdown setlocal textwidth=0
-" Enable spell checking in some filetypes
-autocmd BufNewFile,BufReadPost *.txt,*.md,*.markdown setlocal spell
-" Disable spell checking on unmodifiable files (what's the point?)
-autocmd BufReadPost * if !&modifiable | setlocal nospell | endif
 " Some plugins will override the formatoptions, so this overrides them back
 autocmd BufNewFile,BufReadPost * setlocal formatoptions+=lbon
 " Stupid old vim on MacOS doesn't support 'j' formatoption
 if version >= 740
   autocmd BufNewFile,BufReadPost * setlocal formatoptions+=j
 endif
+
+" Close folds in .vimrc
+autocmd FileType vim set fdm=marker fdl=1
+
+" Fold via indent in CoffeeScript and Python
+autocmd BufNewFile,BufReadPost *.coffee setl foldmethod=indent
+autocmd BufNewFile,BufReadPost *.py setl foldmethod=indent
+
+" Not all files should wrap automatically
+autocmd BufNewFile,BufReadPost *.txt,*.md,*.markdown setlocal textwidth=0
+
+" Enable spell checking in some filetypes
+autocmd BufNewFile,BufReadPost *.txt,*.md,*.markdown setlocal spell
+" Disable spell checking on unmodifiable files (what's the point?)
+autocmd BufReadPost * if !&modifiable | setlocal nospell | endif
+
+" Consider '-' part of a world when tab completion, etc
+au Filetype css setlocal iskeyword+=-
 "}}}
 
 " Plugin Configuration {{{
