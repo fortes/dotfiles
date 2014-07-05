@@ -19,6 +19,8 @@ NeoBundleFetch 'Shougo/neobundle.vim'
 " }}}
 
 " Bundles {{{
+" Core Features
+NeoBundle 'kien/ctrlp.vim'
 
 " Editing features
 
@@ -328,7 +330,7 @@ nnoremap <leader><leader> <c-^>
 set wildignore+=*.o,*.obj,.git,node_modules,*.pyc
 
 " Ignore lib/ dirs since the contain compiled libraries typically
-set wildignore+=lib,build,public,_site
+set wildignore+=lib,build,public,_site,third_party
 
 " Ignore images and fonts
 set wildignore+=*.ttf,*.otf,*.svg,*.png,*.jpg,*.gif,*.jpeg
@@ -416,6 +418,21 @@ au Filetype css setlocal iskeyword+=-
 "}}}
 
 " Plugin Configuration {{{
+
+" CtrlP {{{
+" Alias Cmd-T shortcuts for CtrlP
+" <leader>t to search
+nnoremap <silent> <leader>t :CtrlP<cr>
+
+" <leader>b to open buffers
+nnoremap <silent> <leader>b :CtrlPBuffer<cr>
+
+" Don't jump to a window that is already open, but do jump to tabs
+let g:ctrlp_switch_buffer = 't'
+
+" List from top to bottom, like Cmd-T
+let g:ctrlp_match_window_reversed = 0
+" }}}
 
 " Airline {{{
 " Use nice symbols (assumes patched fonts)
