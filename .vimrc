@@ -1,5 +1,12 @@
 " vim:fdm=marker ts=2 sts=2 sw=2 fdl=0
 
+" Check if NeoBundle is installed by seeing if the README is there
+if !filereadable(expand('~/.vim/bundle/neobundle.vim/README.md'))
+  echo 'Must install NeoBundle. Run ~/dotfiles/setup.sh'
+  echo 'Run vim -u NONE to open vim without .vimrc'
+  exit
+endif
+
 " Base Configuration {{{
 " Welcome to the future
 set nocompatible
