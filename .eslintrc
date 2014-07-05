@@ -2,6 +2,7 @@
   "env": {
     "amd": true,
     "browser": true,
+    "mocha": true,
     "node": true
   },
   // All rules documented here: http://eslint.org/docs/rules/
@@ -141,5 +142,6 @@
     "max-statements": [0, 10],
     "no-bitwise": 1,
     "no-plusplus": 0
+
   }
 }

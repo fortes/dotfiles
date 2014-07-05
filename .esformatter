@@ -281,5 +281,12 @@
       "WhileStatementConditionalOpening": 1,
       "WhileStatementOpeningBrace": 1
     }
+  },
+  "plugins": [
+    "esformatter-quotes"
+  ],
+  "quotes": {
+    "type": "single",
+    "avoidEscape": true
   }
 }
