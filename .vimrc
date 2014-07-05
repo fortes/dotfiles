@@ -23,6 +23,7 @@ NeoBundleFetch 'Shougo/neobundle.vim'
 " Editing features
 
 " Languages & Dev Tools {{{
+NeoBundle 'tpope/vim-fugitive'
 NeoBundle 'marijnh/tern_for_vim',{
 \   'build' : {
 \     'others': 'npm install',
