@@ -32,6 +32,7 @@ NeoBundle 'marijnh/tern_for_vim',{
 
 " Colors & Display {{{
 NeoBundle 'fortes/vim-railscasts'
+NeoBundle 'nathanaelkane/vim-indent-guides'
 " Gutter & Status Line
 NeoBundle 'airblade/vim-gitgutter'
 " }}}
@@ -414,6 +415,17 @@ let g:gitgutter_eager=1
 let g:gitgutter_sign_modified='±'
 " }}}
 
+" Indent Guides {{{
+" Default on
+autocmd BufNewFile,BufReadPost * IndentGuidesEnable
+
+" Toggle Indent guides with <leader>ig
+nnoremap <silent> <leader>ig :IndentGuidesToggle<CR>
+
+" Don't use their colors
+let g:indent_guides_auto_colors=0
+
+" }}}
 " }}}
 
 " Local Settings {{{
