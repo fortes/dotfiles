@@ -23,6 +23,7 @@ NeoBundleFetch 'Shougo/neobundle.vim'
 NeoBundle 'kien/ctrlp.vim'
 
 " Editing features
+NeoBundle 'tomtom/tcomment_vim'
 
 " Languages & Dev Tools {{{
 NeoBundle 'tpope/vim-fugitive'
@@ -500,6 +501,12 @@ nnoremap <silent> <leader>ig :IndentGuidesToggle<CR>
 " Don't use their colors
 let g:indent_guides_auto_colors=0
 
+" }}}
+
+" tcomment {{{
+" Match old NERDCommenter bindings I got used to
+nnoremap <leader>cc :TComment<CR>
+vnoremap <leader>cc :TComment<CR>
 " }}}
 " }}}
 
