@@ -408,6 +408,9 @@ autocmd BufNewFile,BufReadPost *.py setl foldmethod=indent
 " Not all files should wrap automatically
 autocmd BufNewFile,BufReadPost *.txt,*.md,*.markdown setlocal textwidth=0
 
+" .md is markdown, not modula
+autocmd BufRead,BufNewFile *.md set filetype=markdown
+
 " Enable spell checking in some filetypes
 autocmd BufNewFile,BufReadPost *.txt,*.md,*.markdown setlocal spell
 " Disable spell checking on unmodifiable files (what's the point?)
