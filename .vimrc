@@ -24,9 +24,17 @@ NeoBundleFetch 'Shougo/neobundle.vim'
 
 " Languages & Dev Tools {{{
 NeoBundle 'tpope/vim-fugitive'
-NeoBundle 'marijnh/tern_for_vim',{
-\   'build' : {
+NeoBundleLazy 'marijnh/tern_for_vim', {
+\   'build': {
 \     'others': 'npm install',
+\   },
+\   'autoload': {
+\     'filetypes': ['javascript']
+\   }
+\ }
+NeoBundleLazy 'jelera/vim-javascript-syntax', {
+\   'autoload': {
+\     'filetypes': ['javascript']
 \   }
 \ }
 " }}}
@@ -388,6 +396,9 @@ endif
 " Close folds in .vimrc
 autocmd FileType vim set fdm=marker fdl=1
 
+" Decent JS folding
+autocmd FileType javascript call JavaScriptFold()
+
 " Fold via indent in CoffeeScript and Python
 autocmd BufNewFile,BufReadPost *.coffee setl foldmethod=indent
 autocmd BufNewFile,BufReadPost *.py setl foldmethod=indent
@@ -444,6 +455,10 @@ let g:gitgutter_sign_modified='±'
 " }}}
 
 " Syntastic {{{
+" Check on open
+let g:syntastic_check_on_open=1
+
+" JS Checking
 let g:syntastic_javascript_checkers = ['jshint']
 let g:syntastic_javascript_jshint_args = '--config ~/.jshintrc'
 
