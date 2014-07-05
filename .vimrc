@@ -36,6 +36,8 @@ NeoBundle 'fortes/vim-railscasts'
 NeoBundle 'nathanaelkane/vim-indent-guides'
 " Gutter & Status Line
 NeoBundle 'airblade/vim-gitgutter'
+NeoBundle 'bling/vim-bufferline'
+NeoBundle 'bling/vim-airline'
 " }}}
 " }}}
 
@@ -402,6 +404,22 @@ au Filetype css setlocal iskeyword+=-
 "}}}
 
 " Plugin Configuration {{{
+
+" Airline {{{
+" Use nice symbols (assumes patched fonts)
+let g:airline_powerline_fonts = 1
+
+" Better colors
+let g:airline_theme='simple'
+" }}}
+
+" Bufferline {{{
+" Should only be in airline
+let g:bufferline_echo=0
+
+" Make sure the current file is always visible
+let g:bufferline_rotate=1
+" }}}
 
 " GitGutter {{{
 " Toggle GitGutter with <leader>gg
