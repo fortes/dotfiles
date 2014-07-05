@@ -1,0 +1,2 @@
+# Mac OS X workaround for clipboard issue
+set-option -g default-command "tmux rename-window bash; exec reattach-to-user-namespace -l bash"

@@ -12,6 +12,7 @@ mp3val
 mobile-shell
 node
 phantomjs
+reattach-to-user-namespace
 tmux
 vim
 wget
