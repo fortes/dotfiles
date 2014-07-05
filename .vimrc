@@ -502,7 +502,7 @@ nnoremap <silent> <leader>er :Errors<CR>
 
 " Indent Guides {{{
 " Default on
-autocmd BufNewFile,BufReadPost * IndentGuidesEnable
+autocmd BufNewFile,BufReadPost * silent! IndentGuidesEnable
 
 " Toggle Indent guides with <leader>ig
 nnoremap <silent> <leader>ig :IndentGuidesToggle<CR>
