@@ -44,7 +44,7 @@ NeoBundleLazy 'jelera/vim-javascript-syntax', {
 " }}}
 
 " Colors & Display {{{
-NeoBundle 'fortes/vim-escuro'
+NeoBundle 'nanotech/jellybeans.vim'
 NeoBundle 'nathanaelkane/vim-indent-guides'
 " Gutter & Status Line
 NeoBundle 'airblade/vim-gitgutter'
@@ -222,7 +222,7 @@ set numberwidth=5
 set background=dark
 
 if &t_Co >= 256
-  silent! colorscheme escuro
+  silent! colorscheme jellybeans
 else
   " Ugh, no colors
   colorscheme desert
