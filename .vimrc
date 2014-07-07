@@ -570,6 +570,13 @@ let g:indent_guides_auto_colors=0
 
 " }}}
 
+" Tabularize {{{
+nnoremap <leader>l= :Tabularize /=<CR>
+vnoremap <leader>l= :Tabularize /=<CR>
+nnoremap <leader>l: :Tabularize /:<CR>
+vnoremap <leader>l: :Tabularize /:<CR>
+" }}}
+
 " tcomment {{{
 " Match old NERDCommenter bindings I got used to
 nnoremap <leader>cc :TComment<CR>
