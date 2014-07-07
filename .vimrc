@@ -117,7 +117,7 @@ set ttyfast
 " Mapping & keycode timeouts
 set timeoutlen=300
 set ttimeout
-set ttimeoutlen=100
+set ttimeoutlen=150
 
 " Never forget
 if &history < 1000
