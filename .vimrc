@@ -25,6 +25,7 @@ NeoBundle 'kien/ctrlp.vim'
 " Editing features
 NeoBundle 'tomtom/tcomment_vim'
 NeoBundle 'jiangmiao/auto-pairs'
+NeoBundle 'godlygeek/tabular'
 
 " Languages & Dev Tools {{{
 NeoBundle 'tpope/vim-fugitive'
@@ -428,8 +429,8 @@ au Filetype css setlocal iskeyword+=-
 
 " CtrlP {{{
 " Alias Cmd-T shortcuts for CtrlP
-" <leader>t to search
-nnoremap <silent> <leader>t :CtrlP<cr>
+" <leader>t to search files, buffers, and MRU
+nnoremap <silent> <leader>t :CtrlPMixed<cr>
 
 " <leader>b to open buffers
 nnoremap <silent> <leader>b :CtrlPBuffer<cr>
@@ -439,6 +440,15 @@ let g:ctrlp_switch_buffer = 't'
 
 " List from top to bottom, like Cmd-T
 let g:ctrlp_match_window_reversed = 0
+
+" Use ag for listing files
+if executable('ag')
+  " Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
+  let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
+
+  " ag is fast enough that CtrlP doesn't need to cache
+  let g:ctrlp_use_caching = 0
+endif
 " }}}
 
 " Airline {{{
