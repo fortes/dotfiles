@@ -500,8 +500,13 @@ let g:bufferline_rotate=1
 " }}}
 
 " GitGutter {{{
-" Toggle GitGutter with <leader>gg
+" Toggle GitGutter with <leader>gl
 nnoremap <silent> <leader>gg :GitGutterToggle<CR>
+nnoremap <silent> <leader>gl :GitGutterLineHighlightsToggle<CR>
+
+" Move between hunks with <leader>gn and <leader>gp
+nnoremap <silent> <leader>gp :GitGutterPrevHunk<CR>
+nnoremap <silent> <leader>gn :GitGutterNextHunk<CR>
 
 " Ignore whitespace
 let g:gitgutter_diff_args='-w'
@@ -518,6 +523,15 @@ let g:gitgutter_eager=1
 
 " Change modified sign
 let g:gitgutter_sign_modified='±'
+" }}}
+
+" Fugitive {{{
+" Status with <leader>gs
+nnoremap <silent> <leader>gs :Gstatus<CR>
+" Diff with <leader>gd
+nnoremap <silent> <leader>gd :Gdiff<CR>
+" Commit with <leader>gc
+nnoremap <silent> <leader>gc :Gcommit<CR>
 " }}}
 
 " Syntastic {{{
