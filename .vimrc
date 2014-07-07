@@ -58,6 +58,12 @@ NeoBundleLazy 'mattn/emmet-vim', {
 \     'filetypes': ['html', 'css']
 \   }
 \ }
+NeoBundleLazy 'tpope/vim-liquid', {
+\   'autoload': {
+\     'filetypes': ['html', 'markdown']
+\   }
+\ }
+
 " }}}
 
 " Colors & Display {{{
