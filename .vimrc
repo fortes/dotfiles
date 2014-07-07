@@ -347,6 +347,11 @@ autocmd BufReadPost * if !&modifiable | nnoremap <buffer> <C-c> :q<cr> | endif
 
 " <leader><leader> to switch to last file edited
 nnoremap <leader><leader> <c-^>
+
+" <leader>par to format the paragraph the cursor is currently in (or selection)
+nnoremap <leader>par {!}par<CR>
+vnoremap <leader>par !par<CR>
+
 " }}}
 
 " Projects, Filenames, and Search {{{
