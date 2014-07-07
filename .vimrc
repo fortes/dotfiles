@@ -507,7 +507,7 @@ let g:syntastic_javascript_checkers = ['jshint']
 let g:syntastic_javascript_jshint_args = '--config ~/.jshintrc'
 
 " eslint is way too slow to run on every save
-let g:syntastic_javascript_eslint_conf = "~/.eslintrc"
+let g:syntastic_javascript_eslint_args = "--config ~/.eslintrc"
 nnoremap <leader>eslint :SyntasticCheck eslint<CR>
 
 " Map leader-er to show syntastic errors
