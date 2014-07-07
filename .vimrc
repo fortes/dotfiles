@@ -581,6 +581,7 @@ vnoremap <leader>l: :Tabularize /:<CR>
 " Match old NERDCommenter bindings I got used to
 nnoremap <leader>cc :TComment<CR>
 vnoremap <leader>cc :TComment<CR>
+vnoremap <leader>cu :TComment<CR>
 " }}}
 " }}}
 
