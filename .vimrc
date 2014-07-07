@@ -410,6 +410,9 @@ autocmd FileType javascript call JavaScriptFold()
 autocmd BufNewFile,BufReadPost *.coffee setl foldmethod=indent
 autocmd BufNewFile,BufReadPost *.py setl foldmethod=indent
 
+" Python uses 4 spaces
+au FileType python setlocal shiftwidth=4
+
 " Not all files should wrap automatically
 autocmd BufNewFile,BufReadPost *.txt,*.md,*.markdown setlocal textwidth=0
 
@@ -422,7 +425,7 @@ autocmd BufNewFile,BufReadPost *.txt,*.md,*.markdown setlocal spell
 autocmd BufReadPost * if !&modifiable | setlocal nospell | endif
 
 " Consider '-' part of a world when tab completion, etc
-au Filetype css setlocal iskeyword+=-
+au FileType css setlocal iskeyword+=-
 "}}}
 
 " Plugin Configuration {{{
