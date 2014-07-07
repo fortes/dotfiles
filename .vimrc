@@ -26,6 +26,7 @@ NeoBundle 'kien/ctrlp.vim'
 NeoBundle 'tomtom/tcomment_vim'
 NeoBundle 'jiangmiao/auto-pairs'
 NeoBundle 'godlygeek/tabular'
+NeoBundle 'tpope/vim-surround'
 
 " Languages & Dev Tools {{{
 NeoBundle 'tpope/vim-fugitive'
@@ -449,7 +450,8 @@ autocmd BufNewFile,BufReadPost *.txt,*.md,*.markdown setlocal textwidth=0
 autocmd BufRead,BufNewFile *.md set filetype=markdown
 
 " Enable spell checking in some filetypes
-autocmd BufNewFile,BufReadPost *.txt,*.md,*.markdown setlocal spell
+autocmd BufNewFile,BufReadPost *.txt,*.md,*.markdown,COMMIT_EDITMSG
+        \ setlocal spell
 " Disable spell checking on unmodifiable files (what's the point?)
 autocmd BufReadPost * if !&modifiable | setlocal nospell | endif
 
