@@ -575,6 +575,8 @@ nnoremap <leader>l= :Tabularize /=<CR>
 vnoremap <leader>l= :Tabularize /=<CR>
 nnoremap <leader>l: :Tabularize /:<CR>
 vnoremap <leader>l: :Tabularize /:<CR>
+nnoremap <leader>l| :Tabularize /|<CR>
+vnoremap <leader>l| :Tabularize /|<CR>
 " }}}
 
 " tcomment {{{
