@@ -27,6 +27,7 @@ NeoBundle 'tomtom/tcomment_vim'
 NeoBundle 'jiangmiao/auto-pairs'
 NeoBundle 'godlygeek/tabular'
 NeoBundle 'tpope/vim-surround'
+NeoBundle 'tpope/vim-rsi'
 
 " Languages & Dev Tools {{{
 NeoBundle 'tpope/vim-fugitive'
