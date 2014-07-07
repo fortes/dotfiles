@@ -29,6 +29,7 @@ NeoBundle 'godlygeek/tabular'
 
 " Languages & Dev Tools {{{
 NeoBundle 'tpope/vim-fugitive'
+NeoBundle 'gregsexton/gitv'
 NeoBundleLazy 'marijnh/tern_for_vim', {
 \   'build': {
 \     'others': 'npm install',
