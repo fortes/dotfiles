@@ -407,6 +407,9 @@ autocmd FileType vim set fdm=marker fdl=1
 " Decent JS folding
 autocmd FileType javascript call JavaScriptFold()
 
+" Use esformatter for formatting JS
+autocmd FileType javascript setlocal formatprg=esformatter
+
 " Fold via indent in CoffeeScript and Python
 autocmd BufNewFile,BufReadPost *.coffee setl foldmethod=indent
 autocmd BufNewFile,BufReadPost *.py setl foldmethod=indent
@@ -508,7 +511,7 @@ let g:syntastic_javascript_jshint_args = '--config ~/.jshintrc'
 
 " eslint is way too slow to run on every save
 let g:syntastic_javascript_eslint_args = "--config ~/.eslintrc"
-nnoremap <leader>eslint :SyntasticCheck eslint<CR>
+nnoremap <leader>esl :SyntasticCheck eslint<CR>
 
 " Map leader-er to show syntastic errors
 nnoremap <silent> <leader>er :Errors<CR>
