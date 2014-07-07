@@ -410,9 +410,13 @@ autocmd FileType javascript call JavaScriptFold()
 " Use esformatter for formatting JS
 autocmd FileType javascript setlocal formatprg=esformatter
 
+" Use html-beautify and css-beautify for respective types
+autocmd FileType html setlocal formatprg=html-beautify\ -f\ -
+autocmd FileType css setlocal formatprg=css-beautify\ -f\ -
+
 " Fold via indent in CoffeeScript and Python
-autocmd BufNewFile,BufReadPost *.coffee setl foldmethod=indent
-autocmd BufNewFile,BufReadPost *.py setl foldmethod=indent
+autocmd BufNewFile,BufReadPost *.coffee setlocal foldmethod=indent
+autocmd BufNewFile,BufReadPost *.py setlocal foldmethod=indent
 
 " Python uses 4 spaces
 au FileType python setlocal shiftwidth=4

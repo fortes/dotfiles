@@ -4,6 +4,7 @@ enfield
 esformatter
 esformatter-quotes
 eslint
+js-beautify
 js2coffee
 jshint
 node-inspector
