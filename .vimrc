@@ -44,11 +44,6 @@ NeoBundleLazy 'jelera/vim-javascript-syntax', {
 \     'filetypes': ['javascript']
 \   }
 \ }
-NeoBundleLazy 'ahayman/vim-nodejs-complete', {
-\   'autoload': {
-\     'filetypes': ['javascript']
-\   }
-\ }
 NeoBundleLazy 'groenewege/vim-less', {
 \   'autoload': {
 \     'filetypes': ['less']
@@ -575,8 +570,6 @@ nnoremap <leader>l= :Tabularize /=<CR>
 vnoremap <leader>l= :Tabularize /=<CR>
 nnoremap <leader>l: :Tabularize /:<CR>
 vnoremap <leader>l: :Tabularize /:<CR>
-nnoremap <leader>l| :Tabularize /|<CR>
-vnoremap <leader>l| :Tabularize /|<CR>
 " }}}
 
 " tcomment {{{
