@@ -28,7 +28,6 @@ NeoBundle 'jiangmiao/auto-pairs'
 NeoBundle 'godlygeek/tabular'
 NeoBundle 'tpope/vim-surround'
 NeoBundle 'tpope/vim-rsi'
-NeoBundle 'amdt/vim-niji'
 
 " Languages & Dev Tools {{{
 NeoBundle 'tpope/vim-fugitive'
@@ -581,8 +580,6 @@ vnoremap <leader>cc :TComment<CR>
 vnoremap <leader>cu :TComment<CR>
 " }}}
 
-" Niji (Rainbow parenthesis)
-let g:niji_matching_filetypes = ['python', 'javascript']
 " }}}
 
 " Local Settings {{{
