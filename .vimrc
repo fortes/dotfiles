@@ -43,6 +43,16 @@ NeoBundleLazy 'jelera/vim-javascript-syntax', {
 \     'filetypes': ['javascript']
 \   }
 \ }
+NeoBundleLazy 'ahayman/vim-nodejs-complete', {
+\   'autoload': {
+\     'filetypes': ['javascript']
+\   }
+\ }
+NeoBundleLazy 'groenewege/vim-less', {
+\   'autoload': {
+\     'filetypes': ['less']
+\   }
+\ }
 " }}}
 
 " Colors & Display {{{
