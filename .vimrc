@@ -53,6 +53,11 @@ NeoBundleLazy 'groenewege/vim-less', {
 \     'filetypes': ['less']
 \   }
 \ }
+NeoBundleLazy 'mattn/emmet-vim', {
+\   'autoload': {
+\     'filetypes': ['html', 'css']
+\   }
+\ }
 " }}}
 
 " Colors & Display {{{
