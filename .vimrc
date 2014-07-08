@@ -28,6 +28,7 @@ NeoBundle 'jiangmiao/auto-pairs'
 NeoBundle 'godlygeek/tabular'
 NeoBundle 'tpope/vim-surround'
 NeoBundle 'tpope/vim-rsi'
+NeoBundle 'SirVer/ultisnips'
 
 " Languages & Dev Tools {{{
 NeoBundle 'tpope/vim-fugitive'
@@ -67,6 +68,8 @@ NeoBundleLazy 'tpope/vim-liquid', {
 \ }
 
 " }}}
+
+NeoBundle 'fortes/vim-personal-snippets'
 
 " Colors & Display {{{
 NeoBundle 'nanotech/jellybeans.vim'
@@ -604,6 +607,12 @@ vnoremap <silent> <leader>e :CoffeeCompile<cr>
 
 " <leader>-r Runs CoffeeScript in visual mode
 vnoremap <silent> <leader>r :CoffeeRun<cr>
+" }}}
+
+" Ultisnips {{{
+let g:UltiSnipsExpandTrigger="<tab>"
+let g:UltiSnipsJumpForwardTrigger="<tab>"
+let g:UltiSnipsJumpBackwardTrigger="<C-Z>"
 " }}}
 " }}}
 
