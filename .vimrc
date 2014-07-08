@@ -55,6 +55,11 @@ NeoBundleLazy 'mattn/emmet-vim', {
 \     'filetypes': ['html', 'css']
 \   }
 \ }
+NeoBundleLazy 'kchmck/vim-coffee-script', {
+\   'autoload': {
+\     'filetypes': ['coffee']
+\   }
+\ }
 NeoBundleLazy 'tpope/vim-liquid', {
 \   'autoload': {
 \     'filetypes': ['html', 'markdown']
@@ -585,6 +590,13 @@ vnoremap <leader>cc :TComment<CR>
 vnoremap <leader>cu :TComment<CR>
 " }}}
 
+" CoffeeScript {{{
+" <leader>-e Does CoffeeScript compilation in visual mode
+vnoremap <silent> <leader>e :CoffeeCompile<cr>
+
+" <leader>-r Runs CoffeeScript in visual mode
+vnoremap <silent> <leader>r :CoffeeRun<cr>
+" }}}
 " }}}
 
 " Local Settings {{{
