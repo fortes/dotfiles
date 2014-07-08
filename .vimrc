@@ -354,8 +354,10 @@ autocmd BufReadPost * if !&modifiable | nnoremap <buffer> <C-c> :q<cr> | endif
 nnoremap <leader><leader> <c-^>
 
 " <leader>par to format the paragraph the cursor is currently in (or selection)
-nnoremap <leader>par {!}par<CR>
-vnoremap <leader>par !par<CR>
+if executable('par')
+  nnoremap <leader>par {!}par<CR>
+  vnoremap <leader>par !par<CR>
+endif
 
 " }}}
 
@@ -422,6 +424,11 @@ nnoremap <F7> :setlocal spell! spell?<CR>
 " }}}
 
 " FileType tweaks {{{
+
+" Make views automatic
+autocmd BufWinLeave *.* mkview
+autocmd BufWinEnter *.* silent loadview
+
 " Some plugins will override the formatoptions, so this overrides them back
 autocmd BufNewFile,BufReadPost * setlocal formatoptions+=lbon
 " Stupid old vim on MacOS doesn't support 'j' formatoption
