@@ -144,6 +144,7 @@ set ruler
 " Don't use backup files, we have Git for that
 set nobackup
 set noswapfile
+set nowritebackup
 
 " Disable visual bell
 set noerrorbells
