@@ -29,6 +29,7 @@ NeoBundle 'godlygeek/tabular'
 NeoBundle 'tpope/vim-surround'
 NeoBundle 'tpope/vim-rsi'
 NeoBundle 'SirVer/ultisnips'
+NeoBundle 'ervandew/supertab'
 
 " Languages & Dev Tools {{{
 NeoBundle 'tpope/vim-fugitive'
