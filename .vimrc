@@ -450,6 +450,11 @@ autocmd FileType javascript call JavaScriptFold()
 " Use esformatter for formatting JS
 autocmd FileType javascript setlocal formatprg=esformatter
 
+" <leader>tr to rename variable under cursor
+autocmd FileType javascript nnoremap <leader>tr :TernRename<cr>
+" <leader>td to go to definition
+autocmd FileType javascript nnoremap <leader>td :TernDef<cr>
+
 " Use html-beautify and css-beautify for respective types
 autocmd FileType html setlocal formatprg=html-beautify\ -f\ -
 autocmd FileType css setlocal formatprg=css-beautify\ -f\ -
@@ -480,12 +485,8 @@ au FileType css setlocal iskeyword+=-
 " Plugin Configuration {{{
 
 " CtrlP {{{
-" Alias Cmd-T shortcuts for CtrlP
-" <leader>t to search files, buffers, and MRU
-nnoremap <silent> <leader>t :CtrlPMixed<cr>
-
-" <leader>b to open buffers
-nnoremap <silent> <leader>b :CtrlPBuffer<cr>
+" <leader>p to search files, buffers, and MRU
+nnoremap <silent> <leader>p :CtrlPMixed<cr>
 
 " Don't jump to a window that is already open, but do jump to tabs
 let g:ctrlp_switch_buffer = 't'
