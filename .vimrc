@@ -376,6 +376,9 @@ set wildignore+=lib,build,public,_site,third_party
 " Ignore images and fonts
 set wildignore+=*.ttf,*.otf,*.svg,*.png,*.jpg,*.gif,*.jpeg
 
+" Automatically cd into the directory of the file we're editing
+set autochdir
+
 " Ignore case, except when using some uppercase
 set ignorecase
 set smartcase
