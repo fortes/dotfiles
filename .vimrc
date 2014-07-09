@@ -489,6 +489,9 @@ au FileType css setlocal iskeyword+=-
 " <leader>p to search files, buffers, and MRU
 nnoremap <silent> <leader>p :CtrlPMixed<cr>
 
+" CtrlB for just buffers
+nnoremap <silent> <C-b> :CtrlPBuffer<cr>
+
 " Don't jump to a window that is already open, but do jump to tabs
 let g:ctrlp_switch_buffer = 't'
 
