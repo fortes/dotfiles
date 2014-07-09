@@ -456,8 +456,9 @@ autocmd FileType javascript nnoremap <leader>tr :TernRename<cr>
 autocmd FileType javascript nnoremap <leader>td :TernDef<cr>
 
 " Use html-beautify and css-beautify for respective types
-autocmd FileType html setlocal formatprg=html-beautify\ -f\ -
-autocmd FileType css setlocal formatprg=css-beautify\ -f\ -
+autocmd FileType html setlocal formatprg=html-beautify\ -s\ 2\ -I\ -f\ -
+autocmd FileType css setlocal formatprg=css-beautify\ -s\ 2\ -f\ -
+autocmd FileType less setlocal formatprg=css-beautify\ -s\ 2\ -f\ -
 
 " Fold via indent in CoffeeScript and Python
 autocmd BufNewFile,BufReadPost *.coffee setlocal foldmethod=indent
