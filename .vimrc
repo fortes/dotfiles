@@ -515,6 +515,18 @@ endif
 " Use nice symbols (assumes patched fonts)
 let g:airline_powerline_fonts = 1
 
+" Set truncation order when short on space
+" y: fileencoding, fileformat
+" x: tagbar, filetype, virtualenv
+" b: hunks, branch
+" z: percentage, line number, column number
+let g:airline#extensions#default#section_truncate_width = {
+\   'y': 120,
+\   'x': 100,
+\   'b': 80,
+\   'z': 65
+\ }
+
 " Better colors
 let g:airline_theme='simple'
 " }}}
