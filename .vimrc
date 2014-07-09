@@ -591,6 +591,11 @@ nnoremap <silent> <leader>ig :IndentGuidesToggle<CR>
 " Don't use their colors
 let g:indent_guides_auto_colors=0
 
+" Wait until we've nested a little before showing
+let g:indent_guides_start_level = 3
+
+" Skinny guides
+let g:indent_guides_guide_size = 1
 " }}}
 
 " Tabularize {{{
