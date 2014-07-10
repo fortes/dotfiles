@@ -467,6 +467,10 @@ autocmd FileType less setlocal formatprg=css-beautify\ -s\ 2\ -f\ -
 autocmd BufNewFile,BufReadPost *.coffee setlocal foldmethod=indent
 autocmd BufNewFile,BufReadPost *.py setlocal foldmethod=indent
 
+" Simple folding for CSS/LESS
+autocmd FileType css setlocal fdm=marker fmr={,}
+autocmd FileType less setlocal fdm=marker fmr={,}
+
 " Python uses 4 spaces
 au FileType python setlocal shiftwidth=4
 
