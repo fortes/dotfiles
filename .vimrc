@@ -521,10 +521,10 @@ let g:airline_powerline_fonts = 1
 " b: hunks, branch
 " z: percentage, line number, column number
 let g:airline#extensions#default#section_truncate_width = {
-\   'y': 120,
-\   'x': 100,
-\   'b': 80,
-\   'z': 65
+\   'y': 140,
+\   'x': 120,
+\   'b': 100,
+\   'z': 80
 \ }
 
 " Better colors
