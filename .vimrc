@@ -191,8 +191,9 @@ set expandtab
 set shiftround
 set smarttab
 
-" Use smart indenting
-set cindent
+" Don't use smart indenting, it's too broken
+set nocindent
+set nosmartindent
 
 " Automatically reselect visual block after indent
 vnoremap < <gv
