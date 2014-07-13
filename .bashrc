@@ -92,7 +92,7 @@ export PIP_DOWNLOAD_CACHE=$HOME/.pip/cache
 
 # Update commands
 DIST_UPDATE_COMMANDS=()
-DIST_UPDATE_COMMANDS+=('sudo npm update -g')
+DIST_UPDATE_COMMANDS+=('npm update -g')
 DIST_UPDATE_COMMANDS+=('vim +NeoBundleUpdate +qall')
 DIST_UPDATE_COMMANDS+=("pip install --upgrade $(cat $HOME/dotfiles/python-packages | tr '\n', ' ')")
 
