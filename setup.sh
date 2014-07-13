@@ -19,6 +19,14 @@ if [ $OS == "Darwin" ]; then
   else
     echo "Homebrew already installed"
   fi
+
+  # Brew cask
+  if [[ -z $(brew tap | grep caskroom/cask) ]]; then
+    echo "Caskroom not setup. Tapping & installing"
+    brew tap caskroom/cask
+    brew install brew-cask
+    brew cask
+  fi
 elif [ $OS == "Linux" ]; then
   echo "Linux not implemented yet"
 fi
@@ -59,16 +67,28 @@ if [ $OS == "Darwin" ]; then
     echo "Python3 installed"
   fi
 
+  brew doctor
+  brew update
   for p in $(cat $HOME/dotfiles/brew-packages); do
     if [ ! -n "$(brew list $p 2> /dev/null)" ]; then
       brew install $p
-      brew doctor
-      brew update
       # Update source paths, etc
       . ~/.bashrc
     fi
   done
   echo "Homebrew packages installed"
+
+  # Install cask packages
+  brew cask doctor
+  brew cask update
+  for p in $(cat $HOME/dotfiles/cask-packages); do
+    if [ ! -n "$(brew cask list $p 2> /dev/null)" ]; then
+      brew cask install $p
+      # Update source paths, etc
+      . ~/.bashrc
+    fi
+  done
+  echo "Cask packages installed"
 fi
 
 # Create default virtualenv
