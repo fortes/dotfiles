@@ -115,8 +115,8 @@ echo "python packages installed"
 # Install npm packages
 for p in $(cat $HOME/dotfiles/npm-packages); do
   if ! npm list -g $p > /dev/null; then
-    echo "Installing global npm package $p (requires sudo)"
-    sudo npm install -g -q $p
+    echo "Installing global npm package $p"
+    npm install -g -q $p
   fi
 done
 echo "npm packages installed"
