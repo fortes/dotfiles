@@ -76,9 +76,9 @@
       "location": "start"
     }],
     "no-with": 2,
-    "no-yoda": 1,
     "radix": 0,
     "wrap-iife": [2, "outside"],
+    "yoda": "never",
 
     // Strict Mode
     "no-global-strict": 0,
@@ -91,6 +91,7 @@
     "no-label-var": 2,
     "no-shadow": 2,
     "no-undef": 2,
+    "no-undefined": 2,
     "no-undef-init": 2,
     "no-unused-vars": 0,
     "no-use-before-define": 0,
@@ -109,6 +110,7 @@
     "brace-style": [2, "1tbs"],
     "camelcase": 1,
     "consistent-this": [1, "self"],
+    "eol-last": 2,
     "func-names": 0,
     "func-style": [2, "expression"],
     "new-cap": 2,
@@ -119,9 +121,11 @@
     "no-new-object": 2,
     "no-spaced-func": 2,
     "no-ternary": 0,
+    "no-trailing-spaces": 2,
     "no-underscore-dangle": 1,
     "no-unreachable": 2,
     "no-wrap-func": 0,
+    "no-mixed-spaces-and-tabs": 2,
     "quotes": [1, "single", "avoid-escape"],
     "quote-props": 0,
     "semi": [2, "always"],
