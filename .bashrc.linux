@@ -1,0 +1,4 @@
+# Linux-specific tweaks
+
+# Add NPM-installed items to path
+export PATH=$HOME/npm/bin:$PATH

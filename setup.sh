@@ -116,6 +116,10 @@ elif [ $OS == "Linux" ]; then
     if ! dpkg -s $p > /dev/null; then
       echo "Installing missing package $p"
       sudo aptitude install -q -y $p
+      if [ $p == "nodejs" ]; then
+        echo "Setting NPM path"
+        npm config set prefix $HOME/npm
+      fi
     fi
   done
   # Update source paths, etc

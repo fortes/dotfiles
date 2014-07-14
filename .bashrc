@@ -101,6 +101,10 @@ if [ $OS == "Darwin" ]; then
   if [ -f ~/.bashrc.osx ]; then
     source ~/.bashrc.osx
   fi
+elif [ $OS == "Linux" ]; then
+  if [ -f ~/.bashrc.linux ]; then
+    source ~/.bashrc.linux
+  fi
 fi
 
 # Helper command for updating all package managers
