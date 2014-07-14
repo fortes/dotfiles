@@ -1,6 +1,9 @@
 #!/bin/bash
 OS=`uname`
 
+# Error out if any command fails
+set -e
+
 # Install Homebrew
 if [ $OS == "Darwin" ]; then
   if [ ! -x /usr/local/bin/brew ]; then
@@ -28,12 +31,26 @@ if [ $OS == "Darwin" ]; then
     brew cask
   fi
 elif [ $OS == "Linux" ]; then
-  echo "Linux not implemented yet"
+  if ! hash aptitude 2> /dev/null; then
+    echo "Non-apt setup not supported"
+    exit
+  fi
+
+  if ! hash git 2> /dev/null; then
+    echo "Installing pre-requisites first (requires sudo)"
+    sudo aptitude update && \
+    sudo aptitude install -q -y git build-essential libssl-dev
+  fi
+  echo "Git and build tools installed"
 fi
 
 # Check dotfiles
 if [ ! -d $HOME/dotfiles ]; then
   git clone http://github.com/fortes/dotfiles $HOME/dotfiles
+  # Make sure to link .bashrc, else some annoying errors happen
+  if [ ! -e $HOME/.bashrc ]; then
+    ln -s $HOME/dotfiles/.bashrc $HOME/.bashrc
+  fi
 fi
 echo "dotfiles repo present"
 
@@ -73,7 +90,7 @@ if [ $OS == "Darwin" ]; then
     if [ ! -n "$(brew list $p 2> /dev/null)" ]; then
       brew install $p
       # Update source paths, etc
-      . ~/.bashrc
+      . $HOME/.bashrc
     fi
   done
   echo "Homebrew packages installed"
@@ -85,25 +102,37 @@ if [ $OS == "Darwin" ]; then
     if [ ! -n "$(brew cask list $p 2> /dev/null)" ]; then
       brew cask install $p
       # Update source paths, etc
-      . ~/.bashrc
+      . $HOME/.bashrc
     fi
   done
   echo "Cask packages installed"
+elif [ $OS == "Linux" ]; then
+  echo "Updating apt (requires sudo)"
+  sudo aptitude update
+  for p in $(cat $HOME/dotfiles/apt-packages); do
+    if ! dpkg -s $p > /dev/null; then
+      echo "Installing missing package $p"
+      sudo aptitude install -q -y $p
+    fi
+  done
+  # Update source paths, etc
+  . $HOME/.bashrc
+  echo "apt packages installed"
 fi
 
 # Create default virtualenv
-if [ ! -d ~/virtualenvs/default ]; then
+if [ ! -d $HOME/virtualenvs/default ]; then
   echo "Creating default virtualenv"
-  mkdir -p ~/virtualenvs/
-  rm -rf ~/virtualenvs/*
+  mkdir -p $HOME/virtualenvs/
+  rm -rf $HOME/virtualenvs/*
   # Now create the default virtualenv
-  virtualenv ~/virtualenvs/default
+  virtualenv $HOME/virtualenvs/default
   echo "Default virtualenv created"
 fi
 
 # Always activate default virtualenv, since we will install via pip
 PROMPT=$PS1
-source ~/virtualenvs/default/bin/activate
+source $HOME/virtualenvs/default/bin/activate
 PS1=$PROMPT
 
 # Install python packages
@@ -135,7 +164,7 @@ echo "dotfiles linked"
 if [ ! -d $HOME/.vim/bundle/neobundle.vim ]; then
   echo "Installing NeoBundle for Vim"
   mkdir -p $HOME/.vim/bundle
-  git clone https://github.com/Shougo/neobundle.vim ~/.vim/bundle/neobundle.vim
+  git clone https://github.com/Shougo/neobundle.vim $HOME/.vim/bundle/neobundle.vim
   echo "NeoBundle installed"
 fi
 # Install all bundles via CLI
