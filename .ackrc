@@ -14,3 +14,4 @@ js=.json
 --ignore-dir=public
 --ignore-dir=build
 --ignore-dir=node_modules
+--ignore-dir=third_party
