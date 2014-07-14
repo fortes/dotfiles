@@ -1,5 +1,6 @@
 #!/bin/bash
 OS=`uname`
+NPM_COMMAND='npm'
 
 # Error out if any command fails
 set -e
@@ -47,6 +48,9 @@ elif [ $OS == "Linux" ]; then
     echo "Adding Node PPA (requires sudo)"
     sudo add-apt-repository -y ppa:chris-lea/node.js
   fi
+
+  # Use sudo on Ubuntu for npm
+  NPM_COMMAND="sudo npm"
 fi
 
 # Check dotfiles
@@ -118,12 +122,6 @@ elif [ $OS == "Linux" ]; then
     if ! dpkg -s $p > /dev/null; then
       echo "Installing missing package $p"
       sudo aptitude install -q -y $p
-      if [ $p == "nodejs" ]; then
-        echo "Setting NPM path"
-        npm config set prefix $HOME/npm
-        # Make sure npm functions are in path during this script
-        PATH=$HOME/npm/bin:$PATH
-      fi
     fi
   done
   # Update source paths, etc
@@ -156,7 +154,7 @@ echo "python packages installed"
 for p in $(cat $HOME/dotfiles/npm-packages); do
   if ! npm list -g $p > /dev/null; then
     echo "Installing global npm package $p"
-    npm install -g -q $p
+    $NPM_COMMAND install -g -q $p
   fi
 done
 echo "npm packages installed"

@@ -2,6 +2,3 @@
 
 # Ack is ack-grep on ubuntu
 alias ack=ack-grep
-
-# Add NPM-installed items to path
-export PATH=$HOME/npm/bin:$PATH
