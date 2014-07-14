@@ -107,7 +107,7 @@
     "no-sync": 1,
 
     // Stylistic Issues
-    "brace-style": [2, "1tbs"],
+    "brace-style": [2, "stroustrup"],
     "camelcase": 1,
     "consistent-this": [1, "self"],
     "eol-last": 2,
