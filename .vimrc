@@ -36,7 +36,7 @@ NeoBundle 'tpope/vim-fugitive'
 NeoBundle 'gregsexton/gitv'
 NeoBundleLazy 'marijnh/tern_for_vim', {
 \   'build': {
-\     'others': 'npm install',
+\     'others': 'npm install || sudo npm install',
 \   },
 \   'autoload': {
 \     'filetypes': ['javascript']
