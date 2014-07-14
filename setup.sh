@@ -44,7 +44,7 @@ elif [ $OS == "Linux" ]; then
   echo "Git and build tools installed"
 
   echo "Adding Node PPA (requires sudo)"
-  sudo add-apt-repository ppa:chris-lea/node.js
+  sudo add-apt-repository -y ppa:chris-lea/node.js
 fi
 
 # Check dotfiles
