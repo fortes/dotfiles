@@ -39,9 +39,12 @@ elif [ $OS == "Linux" ]; then
   if ! hash git 2> /dev/null; then
     echo "Installing pre-requisites first (requires sudo)"
     sudo aptitude update && \
-    sudo aptitude install -q -y git build-essential libssl-dev
+    sudo aptitude install -q -y git build-essential libssl-dev python-software-properties
   fi
   echo "Git and build tools installed"
+
+  echo "Adding Node PPA (requires sudo)"
+  sudo add-apt-repository ppa:chris-lea/node.js
 fi
 
 # Check dotfiles
