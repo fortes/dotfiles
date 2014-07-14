@@ -119,6 +119,8 @@ elif [ $OS == "Linux" ]; then
       if [ $p == "nodejs" ]; then
         echo "Setting NPM path"
         npm config set prefix $HOME/npm
+        # Make sure npm functions are in path during this script
+        PATH=$HOME/npm/bin:$PATH
       fi
     fi
   done
