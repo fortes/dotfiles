@@ -285,6 +285,7 @@
     }
   },
   "plugins": [
+    "esformatter-braces",
     "esformatter-quotes"
   ],
   "quotes": {

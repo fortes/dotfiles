@@ -2,6 +2,7 @@ coffee-script
 coffeelint
 enfield
 esformatter
+esformatter-braces
 esformatter-quotes
 eslint
 js-beautify
