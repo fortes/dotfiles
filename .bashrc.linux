@@ -2,3 +2,7 @@
 
 # Ack is ack-grep on ubuntu
 alias ack=ack-grep
+
+if [ -z $SSH_AGENT_PID ]; then
+  eval `ssh-agent -s`
+fi
