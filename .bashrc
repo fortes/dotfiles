@@ -1,5 +1,11 @@
 OS=`uname`
 
+# If not running interactively, do nothing
+case $- in
+  *i*) ;;
+    *) return;;
+esac
+
 # Map ls to be colorful
 if [ $OS == "Darwin" ]; then
   alias ls='ls -GpFh'
@@ -65,6 +71,12 @@ alias myip="dig +short myip.opendns.com @resolver1.opendns.com"
 # Flush DNS cache
 alias flush="dscacheutil -flushcache"
 
+# Don't put duplicate lines into history
+HISTCONTROL=ignoredup
+# Set history length
+HISTSIZE=1000
+HISTFILESIZE=2000
+
 # Enable options:
 shopt -s cdspell
 shopt -s cdable_vars
@@ -77,6 +89,7 @@ shopt -s histappend histreedit histverify
 if [ ! $OS == "Darwin" ]; then
   # Not supported in OS X version of bash
   shopt -s autocd
+  shopt -s globstar
 fi
 
 # check the window size after each command and, if necessary,
