@@ -8,6 +8,12 @@ This is only public so I can easily share it across machines. There is probably 
 bash <(curl -fsSL https://raw.github.com/fortes/dotfiles/master/scripts/setup-machine.sh)
 ```
 
+If the machine doesn't have a GUI (i.e. EC2), do the following:
+
+```
+HEADLESS=1 bash <(curl -fsSL https://raw.github.com/fortes/dotfiles/master/scripts/setup-machine.sh)
+```
+
 Then you'll still have to do the following manual steps:
 
 1. Add your ssh keys into `~/.ssh`

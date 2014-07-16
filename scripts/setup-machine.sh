@@ -118,12 +118,20 @@ if [ $OS == "Darwin" ]; then
 elif [ $OS == "Linux" ]; then
   echo "Updating apt (requires sudo)"
   sudo aptitude update
-  for p in $(cat $HOME/dotfiles/apt-packages); do
+
+  # Different apt packages if we don't have a GUI
+  PACKAGE_FILE=$HOME/dotfiles/apt-packages
+  if $HEADESS; then
+    PACKAGE_FILE=$HOME/dotfiles/apt-packages-headless
+  fi
+
+  for p in $(cat $PACKAGE_FILE); do
     if ! dpkg -s $p > /dev/null; then
       echo "Installing missing package $p"
       sudo aptitude install -q -y $p
     fi
   done
+
   # Update source paths, etc
   . $HOME/.bashrc
   echo "apt packages installed"
