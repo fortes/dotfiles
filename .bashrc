@@ -86,7 +86,7 @@ shopt -s sourcepath
 shopt -s no_empty_cmd_completion
 shopt -s cmdhist
 shopt -s histappend histreedit histverify
-if [ ! $OS == "Darwin" ]; then
+if [ "${BASH_VERSION%.*}" \> "4.2" ]; then
   # Not supported in OS X version of bash
   shopt -s autocd
   shopt -s globstar
