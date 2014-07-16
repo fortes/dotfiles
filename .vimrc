@@ -37,7 +37,7 @@ NeoBundle 'gregsexton/gitv'
 if executable('npm')
   NeoBundleLazy 'marijnh/tern_for_vim', {
 \   'build': {
-\     'others': 'npm install --quiet 2> /dev/null || sudo npm install --quiet',
+\     'others': 'npm install -q 2> /dev/null || sudo npm install -q',
 \   },
 \   'autoload': {
 \     'filetypes': ['javascript']
