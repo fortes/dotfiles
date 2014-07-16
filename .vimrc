@@ -34,14 +34,16 @@ NeoBundle 'ervandew/supertab'
 " Languages & Dev Tools {{{
 NeoBundle 'tpope/vim-fugitive'
 NeoBundle 'gregsexton/gitv'
-NeoBundleLazy 'marijnh/tern_for_vim', {
+if executable('npm')
+  NeoBundleLazy 'marijnh/tern_for_vim', {
 \   'build': {
-\     'others': 'npm install || sudo npm install',
+\     'others': 'npm install --quiet 2> /dev/null || sudo npm install --quiet',
 \   },
 \   'autoload': {
 \     'filetypes': ['javascript']
 \   }
 \ }
+endif
 NeoBundleLazy 'jelera/vim-javascript-syntax', {
 \   'autoload': {
 \     'filetypes': ['javascript']
