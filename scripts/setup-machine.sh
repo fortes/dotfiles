@@ -15,7 +15,7 @@ if [ $OS == "Darwin" ]; then
     # Note that this goes out on stderr, so we pipe stderr to stdout
     if [[ -z $(make 2>&1 >/dev/null | grep "no makefile") ]]; then
       echo "Must agree to make license agreement. Run 'sudo make' first"
-      exit 1
+      return 1
     fi
     # Install Homebrew
     echo "Homebrew not installed. Installing:"
@@ -34,7 +34,7 @@ if [ $OS == "Darwin" ]; then
 elif [ $OS == "Linux" ]; then
   if ! hash aptitude 2> /dev/null; then
     echo "Non-apt setup not supported"
-    exit
+    return 1
   fi
 
   if ! hash git 2> /dev/null; then
