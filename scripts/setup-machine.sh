@@ -1,3 +1,5 @@
+set -euo pipefail
+
 #!/bin/bash
 OS=`uname`
 NPM_COMMAND='npm'

@@ -1,3 +1,5 @@
+set -euo pipefail
+
 if ! hash aptitude 2> /dev/null; then
   echo "Currently only works on Ubuntu systems"
   return 1

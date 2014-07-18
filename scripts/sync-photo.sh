@@ -1,3 +1,5 @@
+set -euo pipefail
+
 DESTINATION_DRIVE=/Volumes/backup/
 
 echo "Cleaning directory before sync"

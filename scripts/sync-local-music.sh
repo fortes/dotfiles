@@ -1,3 +1,5 @@
+set -euo pipefail
+
 CURRENT_YEAR=2014
 LOCAL_MUSIC_DIR=~/albums
 
