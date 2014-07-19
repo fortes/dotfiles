@@ -53,3 +53,4 @@ TODO: Automate these steps.
 
 * Install curl: `sudo apt-get -q -y install curl` (not on all systems)
 * Map Caps Lock to Control
+* Install ssh keys to `.ssh/authorized_keys`

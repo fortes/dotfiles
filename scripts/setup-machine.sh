@@ -53,6 +53,11 @@ elif [ $OS == "Linux" ]; then
     sudo add-apt-repository -y ppa:chris-lea/node.js
   fi
 
+  if [ ! -f /etc/apt/sources.list.d/jon-severinsson-ffmpeg-trusty.list ]; then
+    echo "Adding ffmpeg PPA (requires sudo)"
+    sudo add-apt-repository -y ppa:jon-severinsson/ffmpeg
+  fi
+
   # Use sudo on Ubuntu for npm
   NPM_COMMAND="sudo npm"
 fi
