@@ -58,6 +58,14 @@ elif [ $OS == "Linux" ]; then
     sudo add-apt-repository -y ppa:jon-severinsson/ffmpeg
   fi
 
+  if [ ! $HEADLESS ]; then
+    if [ ! -f /etc/apt/sources.list.d/google.list ]; then
+      echo "Adding Chrome PPA (requires sudo)"
+      wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+      sudo sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
+    fi
+  fi
+
   # Use sudo on Ubuntu for npm
   NPM_COMMAND="sudo npm"
 fi
