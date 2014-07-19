@@ -1,8 +1,8 @@
 set -euo pipefail
 
-if ! hash aptitude 2> /dev/null; then
+if ! hash apt-get 2> /dev/null; then
   echo "Currently only works on Ubuntu systems"
-  return 1
+  exit 1
 fi
 
 PLEX_DEB_URL="http://downloads.plexapp.com/plex-media-server/0.9.9.12.504-3e7f93c/plexmediaserver_0.9.9.12.504-3e7f93c_amd64.deb"
@@ -13,7 +13,7 @@ APT_PREREQUISITES=(avahi-utils)
 for p in "${APT_PREREQUISITES[0]}"; do
   if ! dpkg -s $p > /dev/null; then
     echo "Installing missing package $p (requires sudo)"
-    sudo aptitude install -q -y $p
+    sudo apt-get install -q -y $p
   fi
 done
 
@@ -40,17 +40,17 @@ echo "  ssh ip.address.of.server -L 8888:localhost:32400"
 echo "Then open http://localhost:8888/web on your computer"
 echo "------------------------------------------------------"
 
-# This is for the media center UI (not implemented yet)
-# # Add plex into apt sources list
-# if [ ! -f /etc/apt/sources.list.d/plexapp-plexht-trusty.list ]; then
-#   echo "Adding Plex apt source (requires sudo)"
-#   sudo add-apt-repository -y ppa:plexapp/plexht
-# fi
-# # Remote / HDMI integration
-# if [ ! -f /etc/apt/sources.list.d/pulse-eight-libcec-trusty.list ]; then
-#   echo "Adding libcec apt source (requires sudo)"
-#   sudo add-apt-repository -y ppa:pulse-eight/libcec
-# fi
-#
-# echo "Installing Plex Home Theatre (requires sudo)"
-# sudo apt-get install plexhometheater
+# This is for the media center UI (not fully implemented yet)
+# Add plex into apt sources list
+if [ ! -f /etc/apt/sources.list.d/plexapp-plexht-trusty.list ]; then
+  echo "Adding Plex apt source (requires sudo)"
+  sudo add-apt-repository -y ppa:plexapp/plexht
+fi
+# Remote / HDMI integration
+if [ ! -f /etc/apt/sources.list.d/pulse-eight-libcec-trusty.list ]; then
+  echo "Adding libcec apt source (requires sudo)"
+  sudo add-apt-repository -y ppa:pulse-eight/libcec
+fi
+
+echo "Installing Plex Home Theatre (requires sudo)"
+sudo apt-get install plexhometheater
