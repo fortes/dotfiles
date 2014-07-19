@@ -34,15 +34,15 @@ if [ $OS == "Darwin" ]; then
     brew cask
   fi
 elif [ $OS == "Linux" ]; then
-  if ! hash aptitude 2> /dev/null; then
+  if ! hash apt-get 2> /dev/null; then
     echo "Non-apt setup not supported"
     return 1
   fi
 
   if ! hash git 2> /dev/null; then
     echo "Installing pre-requisites first (requires sudo)"
-    sudo aptitude update && \
-    sudo aptitude install -q -y git build-essential libssl-dev python-software-properties
+    sudo apt-get update && \
+    sudo apt-get install -q -y git build-essential libssl-dev python-software-properties
   fi
   echo "Git and build tools installed"
 
@@ -119,7 +119,7 @@ if [ $OS == "Darwin" ]; then
   echo "Cask packages installed"
 elif [ $OS == "Linux" ]; then
   echo "Updating apt (requires sudo)"
-  sudo aptitude update
+  sudo apt-get update
 
   # Different apt packages if we don't have a GUI
   PACKAGE_FILE=$HOME/dotfiles/apt-packages
@@ -130,7 +130,7 @@ elif [ $OS == "Linux" ]; then
   for p in $(cat $PACKAGE_FILE); do
     if ! dpkg -s $p > /dev/null; then
       echo "Installing missing package $p"
-      sudo aptitude install -q -y $p
+      sudo apt-get install -q -y $p
     fi
   done
 

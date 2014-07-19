@@ -4,11 +4,13 @@ chromium-browser
 elinks
 exfat-fuse
 exfat-util
+firefox
 git
 irssi
 mosh
 mp3val
 nodejs
+openssh-server
 phantomjs
 python-virtualenv
 silversearcher-ag
