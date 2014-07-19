@@ -1,4 +1,4 @@
-set -euo pipefail
+set -eo pipefail
 
 #!/bin/bash
 OS=`uname`
