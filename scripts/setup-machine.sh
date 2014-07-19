@@ -130,7 +130,7 @@ elif [ $OS == "Linux" ]; then
 
   # Different apt packages if we don't have a GUI
   PACKAGE_FILE=$HOME/dotfiles/apt-packages
-  if $HEADESS; then
+  if [ $HEADLESS ]; then
     PACKAGE_FILE=$HOME/dotfiles/apt-packages-headless
   fi
 
