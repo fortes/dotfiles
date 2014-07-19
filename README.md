@@ -40,3 +40,16 @@ Then you'll still have to do the following manual steps:
     name = Your Name
     email = xyz@abc.com
   ```
+
+## Additional Settings
+
+TODO: Automate these steps.
+
+### Mac
+
+* Map Caps Lock to Control
+
+### Ubuntu
+
+* Install curl: `sudo apt-get -q -y install curl` (not on all systems)
+* Map Caps Lock to Control
