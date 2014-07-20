@@ -64,6 +64,11 @@ elif [ $OS == "Linux" ]; then
       wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
       sudo sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
     fi
+
+    if [ ! -f /etc/apt/sources.list.d/tuxpoldo-btsync-trusty.list ]; then
+      echo "Adding btsync PPA (requires sudo)"
+      sudo add-apt-repository -y ppa:tuxpoldo/btsync
+    fi
   fi
 
   # Use sudo on Ubuntu for npm
