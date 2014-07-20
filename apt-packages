@@ -15,6 +15,7 @@ nodejs
 openssh-server
 phantomjs
 python-virtualenv
+openjdk-7-jre
 silversearcher-ag
 tmux
 usbmount
