@@ -206,6 +206,7 @@ if [ ! -d $HOME/.vim/bundle/neobundle.vim ]; then
   git clone https://github.com/Shougo/neobundle.vim $HOME/.vim/bundle/neobundle.vim
   echo "NeoBundle installed"
 fi
-# Install all bundles via CLI
-vim +NeoBundleUpdate +qall
 echo "Vim setup"
+
+# NeoBundle will auto-update, so no need to install bundles via CLI
+# vim +NeoBundleUpdate +qall
