@@ -44,7 +44,7 @@ if executable('npm')
 \   }
 \ }
 endif
-NeoBundleLazy 'jelera/vim-javascript-syntax', {
+NeoBundleLazy 'pangloss/vim-javascript', {
 \   'autoload': {
 \     'filetypes': ['javascript']
 \   }
@@ -183,6 +183,7 @@ set clipboard=unnamed
 
 " Indents, Wrapping, and Whitespace {{{
 set autoindent
+set cindent
 
 " 2 spaces, not tabs
 set tabstop=2
@@ -450,9 +451,6 @@ endif
 " Close folds in .vimrc
 autocmd FileType vim set fdm=marker fdl=1
 
-" Decent JS folding
-autocmd FileType javascript call JavaScriptFold()
-
 " Use esformatter for formatting JS
 autocmd FileType javascript setlocal formatprg=esformatter
 
@@ -473,6 +471,9 @@ autocmd BufNewFile,BufReadPost *.py setlocal foldmethod=indent
 " Simple folding for CSS/LESS
 autocmd FileType css setlocal fdm=marker fmr={,}
 autocmd FileType less setlocal fdm=marker fmr={,}
+
+" Simple folding for JS
+autocmd FileType javascript setlocal fdm=marker fmr={,}
 
 " Python uses 4 spaces
 au FileType python setlocal shiftwidth=4
