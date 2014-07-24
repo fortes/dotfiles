@@ -482,7 +482,7 @@ au FileType python setlocal shiftwidth=4
 autocmd BufNewFile,BufReadPost *.txt,*.md,*.markdown setlocal textwidth=0
 
 " .md is markdown, not modula
-autocmd BufRead,BufNewFile *.md set filetype=markdown
+autocmd BufNewFile,BufReadPost *.md set filetype=markdown
 
 " Enable spell checking in some filetypes
 autocmd BufNewFile,BufReadPost *.txt,*.md,*.markdown,COMMIT_EDITMSG
