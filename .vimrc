@@ -245,6 +245,9 @@ set scrolloff=8
 set sidescrolloff=7
 set sidescroll=1
 
+" Let same document scroll differently in separate panes
+set noscrollbind
+
 " Display as much as possible as last line, instead of just showing @
 set display=lastline
 
