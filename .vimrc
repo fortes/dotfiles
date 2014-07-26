@@ -337,6 +337,9 @@ nnoremap k gk
 " Never use the manual command, remap to search (see below)
 nnoremap K <nop>
 
+" Never use ZZ, too dangerous
+nnoremap ZZ <nop>
+
 " Easy paste mode
 nnoremap <silent> <leader>v :set invpaste<cr>
 
@@ -439,10 +442,6 @@ nnoremap <F7> :setlocal spell! spell?<CR>
 " }}}
 
 " FileType tweaks {{{
-
-" Make views automatic
-autocmd BufWinLeave *.* mkview
-autocmd BufWinEnter *.* silent loadview
 
 " Some plugins will override the formatoptions, so this overrides them back
 autocmd BufNewFile,BufReadPost * setlocal formatoptions+=lbon
