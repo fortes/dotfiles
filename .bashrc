@@ -32,6 +32,9 @@ export LSCOLORS=gxBxhxDxfxhxhxhxhxcxcx
 # For default CoffeeLint settings
 export COFFEELINT_CONFIG=~/.coffeelint.json
 
+# Beets configuration files
+export BEETSDIR=$HOME/.beets/
+
 # Easy timezones
 alias lisbon='TZ="Europe/Lisbon" date'
 alias nyc='TZ="America/New_York" date'
