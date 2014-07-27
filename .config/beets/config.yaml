@@ -19,6 +19,7 @@ import:
     resume: no
     incremental: no
     languages: ['en']
+    default_action: 'skip'
 
 match:
     preferred:
