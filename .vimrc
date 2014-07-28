@@ -24,7 +24,7 @@ NeoBundle 'kien/ctrlp.vim'
 
 " Editing features
 NeoBundle 'tomtom/tcomment_vim'
-NeoBundle 'jiangmiao/auto-pairs'
+NeoBundle 'Raimondi/delimitMate'
 NeoBundle 'godlygeek/tabular'
 NeoBundle 'tpope/vim-surround'
 NeoBundle 'tpope/vim-rsi'
