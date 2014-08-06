@@ -308,9 +308,6 @@ inoremap <expr> <Esc> pumvisible() ? "\<C-e>" : "\<Esc>"
 inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<CR>"
 inoremap <expr> <Tab> pumvisible() ? "\<C-y>" : "\<Tab>"
 
-" Be smart about case when using autocomplete
-set infercase
-
 " Enable Omnicomplete
 set omnifunc=syntaxcomplete#Complete
 " }}}
