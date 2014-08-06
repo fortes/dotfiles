@@ -46,7 +46,7 @@ elif [ $OS == "Linux" ]; then
     echo "Installing pre-requisites first (requires sudo)"
     sudo -E apt-get -q update && \
     sudo -E apt-get -q -y dist-upgrade && \
-    sudo -E apt-get install -q -y \
+    sudo -E apt-get install -q -y --force-confdef --force-confnew \
       git build-essential libssl-dev python-software-properties
   fi
   echo "Git and build tools installed"
@@ -153,7 +153,7 @@ elif [ $OS == "Linux" ]; then
   for p in $(cat $PACKAGE_FILE); do
     if ! dpkg -s $p > /dev/null; then
       echo "Installing missing package $p"
-      sudo -E apt-get install -q -y $p
+      sudo -E apt-get install -q -y --force-confdef --force-confnew $p
     fi
   done
 

@@ -16,7 +16,7 @@ APT_PREREQUISITES=(avahi-utils)
 for p in "${APT_PREREQUISITES[0]}"; do
   if ! dpkg -s $p > /dev/null; then
     echo "Installing missing package $p (requires sudo)"
-    sudo -E apt-get install -q -y $p
+    sudo -E apt-get install --force-confdef --force-confnew -q -y $p
   fi
 done
 
@@ -24,7 +24,7 @@ if ! dpkg -s plexmediaserver > /dev/null; then
   pushd /tmp > /dev/null
   echo "Downloading & Installing Plex Media Server .deb (requires sudo)"
   wget $PLEX_DEB_URL
-  sudo -E dpkg -i `basename $PLEX_DEB_URL`
+  sudo -E dpkg -i --force-confdef --force-confnew `basename $PLEX_DEB_URL`
   rm `basename $PLEX_DEB_URL`
   popd
 fi
@@ -55,5 +55,7 @@ if [ ! -f /etc/apt/sources.list.d/pulse-eight-libcec-trusty.list ]; then
   sudo -E add-apt-repository -y ppa:pulse-eight/libcec
 fi
 
-echo "Installing Plex Home Theatre (requires sudo)"
-sudo -E apt-get install plexhometheater
+if ! dpkg -s plexhometheater > /dev/null; then
+  echo "Installing Plex Home Theatre (requires sudo)"
+  sudo -E apt-get install --force-confdef --force-confnew plexhometheater
+fi
