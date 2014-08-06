@@ -13,7 +13,7 @@ APT_PREREQUISITES=(avahi-utils)
 for p in "${APT_PREREQUISITES[0]}"; do
   if ! dpkg -s $p > /dev/null; then
     echo "Installing missing package $p (requires sudo)"
-    sudo apt-get install -q -y $p
+    sudo -E apt-get install -q -y $p
   fi
 done
 
@@ -21,14 +21,14 @@ if ! dpkg -s plexmediaserver > /dev/null; then
   pushd /tmp > /dev/null
   echo "Downloading & Installing Plex Media Server .deb (requires sudo)"
   wget $PLEX_DEB_URL
-  sudo dpkg -i `basename $PLEX_DEB_URL`
+  sudo -E dpkg -i `basename $PLEX_DEB_URL`
   rm `basename $PLEX_DEB_URL`
   popd
 fi
 
 if [[ -z "$(status plexmediaserver | grep start)" ]]; then
   echo "Starting Plex Media Server Service (requires sudo)"
-  sudo service plexmediaserver start
+  sudo -E service plexmediaserver start
   echo ""
 fi
 
@@ -44,13 +44,13 @@ echo "------------------------------------------------------"
 # Add plex into apt sources list
 if [ ! -f /etc/apt/sources.list.d/plexapp-plexht-trusty.list ]; then
   echo "Adding Plex apt source (requires sudo)"
-  sudo add-apt-repository -y ppa:plexapp/plexht
+  sudo -E add-apt-repository -y ppa:plexapp/plexht
 fi
 # Remote / HDMI integration
 if [ ! -f /etc/apt/sources.list.d/pulse-eight-libcec-trusty.list ]; then
   echo "Adding libcec apt source (requires sudo)"
-  sudo add-apt-repository -y ppa:pulse-eight/libcec
+  sudo -E add-apt-repository -y ppa:pulse-eight/libcec
 fi
 
 echo "Installing Plex Home Theatre (requires sudo)"
-sudo apt-get install plexhometheater
+sudo -E apt-get install plexhometheater

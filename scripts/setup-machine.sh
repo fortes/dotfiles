@@ -41,33 +41,33 @@ elif [ $OS == "Linux" ]; then
 
   if ! hash git 2> /dev/null; then
     echo "Installing pre-requisites first (requires sudo)"
-    sudo apt-get update && \
-    sudo apt-get -q -y dist-upgrade && \
-    sudo apt-get install -q -y \
+    sudo -E apt-get update && \
+    sudo -E apt-get -q -y dist-upgrade && \
+    sudo -E apt-get install -q -y \
       git build-essential libssl-dev python-software-properties
   fi
   echo "Git and build tools installed"
 
   if [ ! -f /etc/apt/sources.list.d/chris-lea-node_js-trusty.list ]; then
     echo "Adding Node PPA (requires sudo)"
-    sudo add-apt-repository -y ppa:chris-lea/node.js
+    sudo -E add-apt-repository -y ppa:chris-lea/node.js
   fi
 
   if [ ! -f /etc/apt/sources.list.d/jon-severinsson-ffmpeg-trusty.list ]; then
     echo "Adding ffmpeg PPA (requires sudo)"
-    sudo add-apt-repository -y ppa:jon-severinsson/ffmpeg
+    sudo -E add-apt-repository -y ppa:jon-severinsson/ffmpeg
   fi
 
   if [ ! $HEADLESS ]; then
     if [ ! -f /etc/apt/sources.list.d/google-chrome.list ]; then
       echo "Adding Chrome PPA (requires sudo)"
       wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-      sudo sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
+      sudo -E sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
     fi
 
     if [ ! -f /etc/apt/sources.list.d/tuxpoldo-btsync-trusty.list ]; then
       echo "Adding btsync PPA (requires sudo)"
-      sudo add-apt-repository -y ppa:tuxpoldo/btsync
+      sudo -E add-apt-repository -y ppa:tuxpoldo/btsync
     fi
   fi
 
@@ -139,7 +139,7 @@ if [ $OS == "Darwin" ]; then
   echo "Cask packages installed"
 elif [ $OS == "Linux" ]; then
   echo "Updating apt (requires sudo)"
-  sudo apt-get update
+  sudo -E apt-get update
 
   # Different apt packages if we don't have a GUI
   PACKAGE_FILE=$HOME/dotfiles/apt-packages
@@ -150,7 +150,7 @@ elif [ $OS == "Linux" ]; then
   for p in $(cat $PACKAGE_FILE); do
     if ! dpkg -s $p > /dev/null; then
       echo "Installing missing package $p"
-      sudo apt-get install -q -y $p
+      sudo -E apt-get install -q -y $p
     fi
   done
 
