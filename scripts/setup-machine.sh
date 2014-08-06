@@ -42,12 +42,15 @@ elif [ $OS == "Linux" ]; then
   # Make sure not to get stuck on any prompts
   DEBIAN_FRONTEND=noninteractive
 
+  # Keep things silent and without prompts
+  APT_INSTALL_OPTIONS="-q -y -o Dpkg::Options::=\"--force-confdef\" -o Dpkg::Options::=\"--force-confold\""
+
   if ! hash git 2> /dev/null; then
     echo "Installing pre-requisites first (requires sudo)"
     sudo -E apt-get -q update && \
     sudo -E apt-get -q -y dist-upgrade && \
-    sudo -E apt-get install -q -y --force-confdef --force-confnew \
-      git build-essential libssl-dev python-software-properties
+    sudo -E apt-get install $APT_INSTALL_OPTIONS git build-essential \
+      libssl-dev python-software-properties
   fi
   echo "Git and build tools installed"
 
@@ -153,7 +156,7 @@ elif [ $OS == "Linux" ]; then
   for p in $(cat $PACKAGE_FILE); do
     if ! dpkg -s $p > /dev/null; then
       echo "Installing missing package $p"
-      sudo -E apt-get install -q -y --force-confdef --force-confnew $p
+      sudo -E apt-get install $APT_INSTALL_OPTIONS $p
     fi
   done
 

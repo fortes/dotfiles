@@ -12,11 +12,14 @@ PLEX_DEB_URL="http://downloads.plexapp.com/plex-media-server/0.9.9.12.504-3e7f93
 
 APT_PREREQUISITES=(avahi-utils)
 
+# Keep things silent and without prompts
+APT_INSTALL_OPTIONS="-q -y -o Dpkg::Options::=\"--force-confdef\" -o Dpkg::Options::=\"--force-confold\""
+
 # Install pre-requisites
 for p in "${APT_PREREQUISITES[0]}"; do
   if ! dpkg -s $p > /dev/null; then
     echo "Installing missing package $p (requires sudo)"
-    sudo -E apt-get install --force-confdef --force-confnew -q -y $p
+    sudo -E apt-get $APT_INSTALL_OPTIONS install $p
   fi
 done
 
@@ -57,5 +60,5 @@ fi
 
 if ! dpkg -s plexhometheater > /dev/null; then
   echo "Installing Plex Home Theatre (requires sudo)"
-  sudo -E apt-get install --force-confdef --force-confnew plexhometheater
+  sudo -E apt-get $APT_INSTALL_OPTIONS install plexhometheater
 fi
