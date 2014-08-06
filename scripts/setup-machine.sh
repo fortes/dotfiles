@@ -39,9 +39,12 @@ elif [ $OS == "Linux" ]; then
     return 1
   fi
 
+  # Make sure not to get stuck on any prompts
+  DEBIAN_FRONTEND=noninteractive
+
   if ! hash git 2> /dev/null; then
     echo "Installing pre-requisites first (requires sudo)"
-    sudo -E apt-get update && \
+    sudo -E apt-get -q update && \
     sudo -E apt-get -q -y dist-upgrade && \
     sudo -E apt-get install -q -y \
       git build-essential libssl-dev python-software-properties
@@ -139,7 +142,7 @@ if [ $OS == "Darwin" ]; then
   echo "Cask packages installed"
 elif [ $OS == "Linux" ]; then
   echo "Updating apt (requires sudo)"
-  sudo -E apt-get update
+  sudo -E apt-get -q update
 
   # Different apt packages if we don't have a GUI
   PACKAGE_FILE=$HOME/dotfiles/apt-packages

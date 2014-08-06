@@ -5,6 +5,9 @@ if ! hash apt-get 2> /dev/null; then
   exit 1
 fi
 
+# Make sure not to get stuck on any prompts
+DEBIAN_FRONTEND=noninteractive
+
 PLEX_DEB_URL="http://downloads.plexapp.com/plex-media-server/0.9.9.12.504-3e7f93c/plexmediaserver_0.9.9.12.504-3e7f93c_amd64.deb"
 
 APT_PREREQUISITES=(avahi-utils)
