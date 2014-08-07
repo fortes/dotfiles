@@ -47,8 +47,8 @@ elif [ $OS == "Linux" ]; then
 
   if ! hash git 2> /dev/null; then
     echo "Installing pre-requisites first (requires sudo)"
-    sudo -E apt-get -q update && \
-    sudo -E apt-get $APT_INSTALL_OPTIONS dist-upgrade && \
+    sudo -E apt-get update -q && \
+    sudo -E apt-get dist-upgrade $APT_INSTALL_OPTIONS && \
     sudo -E apt-get install $APT_INSTALL_OPTIONS git build-essential \
       libssl-dev python-software-properties
   fi
