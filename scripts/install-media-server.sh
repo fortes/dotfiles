@@ -6,14 +6,14 @@ if ! hash apt-get 2> /dev/null; then
 fi
 
 # Make sure not to get stuck on any prompts
-DEBIAN_FRONTEND=noninteractive
+export DEBIAN_FRONTEND=noninteractive
+
+# Keep things silent and without prompts
+APT_INSTALL_OPTIONS='-y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"'
 
 PLEX_DEB_URL="http://downloads.plexapp.com/plex-media-server/0.9.9.12.504-3e7f93c/plexmediaserver_0.9.9.12.504-3e7f93c_amd64.deb"
 
 APT_PREREQUISITES=(avahi-utils)
-
-# Keep things silent and without prompts
-APT_INSTALL_OPTIONS="-q -y -o Dpkg::Options::=\"--force-confdef\" -o Dpkg::Options::=\"--force-confold\""
 
 # Install pre-requisites
 for p in "${APT_PREREQUISITES[0]}"; do

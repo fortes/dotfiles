@@ -40,10 +40,10 @@ elif [ $OS == "Linux" ]; then
   fi
 
   # Make sure not to get stuck on any prompts
-  DEBIAN_FRONTEND=noninteractive
+  export DEBIAN_FRONTEND=noninteractive
 
   # Keep things silent and without prompts
-  APT_INSTALL_OPTIONS="-q -y -o Dpkg::Options::=\"--force-confdef\" -o Dpkg::Options::=\"--force-confold\""
+  APT_INSTALL_OPTIONS='-y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"'
 
   if ! hash git 2> /dev/null; then
     echo "Installing pre-requisites first (requires sudo)"
