@@ -57,5 +57,6 @@ fi
 
 if ! dpkg -s plexhometheater > /dev/null; then
   echo "Installing Plex Home Theatre (requires sudo)"
+  sudo -E apt-get -q update
   sudo -E apt-get -qfuy install plexhometheater
 fi
