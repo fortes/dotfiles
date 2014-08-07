@@ -333,6 +333,7 @@ nnoremap k gk
 
 " Never use the manual command, remap to search (see below)
 nnoremap K <nop>
+vnoremap K <nop>
 
 " Never use ZZ, too dangerous
 nnoremap ZZ <nop>
