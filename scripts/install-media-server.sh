@@ -8,9 +8,6 @@ fi
 # Make sure not to get stuck on any prompts
 export DEBIAN_FRONTEND=noninteractive
 
-# Keep things silent and without prompts
-APT_INSTALL_OPTIONS='-y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"'
-
 PLEX_DEB_URL="http://downloads.plexapp.com/plex-media-server/0.9.9.12.504-3e7f93c/plexmediaserver_0.9.9.12.504-3e7f93c_amd64.deb"
 
 APT_PREREQUISITES=(avahi-utils)
@@ -19,7 +16,7 @@ APT_PREREQUISITES=(avahi-utils)
 for p in "${APT_PREREQUISITES[0]}"; do
   if ! dpkg -s $p > /dev/null; then
     echo "Installing missing package $p (requires sudo)"
-    sudo -E apt-get $APT_INSTALL_OPTIONS install $p
+    sudo -E apt-get -qfuy install $p
   fi
 done
 
@@ -60,5 +57,5 @@ fi
 
 if ! dpkg -s plexhometheater > /dev/null; then
   echo "Installing Plex Home Theatre (requires sudo)"
-  sudo -E apt-get $APT_INSTALL_OPTIONS install plexhometheater
+  sudo -E apt-get -qfuy install plexhometheater
 fi
