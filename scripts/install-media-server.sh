@@ -8,7 +8,7 @@ fi
 # Make sure not to get stuck on any prompts
 export DEBIAN_FRONTEND=noninteractive
 
-PLEX_DEB_URL="http://downloads.plexapp.com/plex-media-server/0.9.9.12.504-3e7f93c/plexmediaserver_0.9.9.12.504-3e7f93c_amd64.deb"
+PLEX_DEB_URL="http://downloads.plexapp.com/plex-media-server/0.9.9.14.531-7eef8c6/plexmediaserver_0.9.9.14.531-7eef8c6_amd64.deb"
 
 APT_PREREQUISITES=(avahi-utils)
 
