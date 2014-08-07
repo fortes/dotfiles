@@ -44,19 +44,21 @@ echo "Then open http://localhost:8888/web on your computer"
 echo "------------------------------------------------------"
 
 # This is for the media center UI (not fully implemented yet)
-# Add plex into apt sources list
-if [ ! -f /etc/apt/sources.list.d/plexapp-plexht-trusty.list ]; then
-  echo "Adding Plex apt source (requires sudo)"
-  sudo -E add-apt-repository -y ppa:plexapp/plexht
-fi
-# Remote / HDMI integration
-if [ ! -f /etc/apt/sources.list.d/pulse-eight-libcec-trusty.list ]; then
-  echo "Adding libcec apt source (requires sudo)"
-  sudo -E add-apt-repository -y ppa:pulse-eight/libcec
-fi
+if [ ! $HEADLESS ]; then
+  # Add plex into apt sources list
+  if [ ! -f /etc/apt/sources.list.d/plexapp-plexht-trusty.list ]; then
+    echo "Adding Plex apt source (requires sudo)"
+    sudo -E add-apt-repository -y ppa:plexapp/plexht
+  fi
+  # Remote / HDMI integration
+  if [ ! -f /etc/apt/sources.list.d/pulse-eight-libcec-trusty.list ]; then
+    echo "Adding libcec apt source (requires sudo)"
+    sudo -E add-apt-repository -y ppa:pulse-eight/libcec
+  fi
 
-if ! dpkg -s plexhometheater > /dev/null; then
-  echo "Installing Plex Home Theatre (requires sudo)"
-  sudo -E apt-get -q update
-  sudo -E apt-get -qfuy install plexhometheater
+  if ! dpkg -s plexhometheater > /dev/null; then
+    echo "Installing Plex Home Theatre (requires sudo)"
+    sudo -E apt-get -q update
+    sudo -E apt-get -qfuy install plexhometheater
+  fi
 fi
