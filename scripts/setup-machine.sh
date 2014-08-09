@@ -53,25 +53,34 @@ elif [ $OS == "Linux" ]; then
 
   if [ ! -f /etc/apt/sources.list.d/chris-lea-node_js-trusty.list ]; then
     echo "Adding Node PPA (requires sudo)"
+    $PPA_ADDED=1
     sudo -E add-apt-repository -y ppa:chris-lea/node.js
   fi
 
   if [ ! -f /etc/apt/sources.list.d/jon-severinsson-ffmpeg-trusty.list ]; then
     echo "Adding ffmpeg PPA (requires sudo)"
+    $PPA_ADDED=1
     sudo -E add-apt-repository -y ppa:jon-severinsson/ffmpeg
   fi
 
   if [ ! $HEADLESS ]; then
     if [ ! -f /etc/apt/sources.list.d/google-chrome.list ]; then
       echo "Adding Chrome PPA (requires sudo)"
+      $PPA_ADDED=1
       wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
       sudo -E sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
     fi
 
     if [ ! -f /etc/apt/sources.list.d/tuxpoldo-btsync-trusty.list ]; then
       echo "Adding btsync PPA (requires sudo)"
+      $PPA_ADDED=1
       sudo -E add-apt-repository -y ppa:tuxpoldo/btsync
     fi
+  fi
+
+  # Update sources if we added a PPA
+  if $PPA_ADDED; then
+    sudo apt-get -q update
   fi
 
   # Use sudo on Ubuntu for npm
