@@ -197,7 +197,7 @@ for p in $(ls -ad $HOME/dotfiles/.[a-z]* | grep -v .git/$ | grep -v .git$); do
     ln -s $p $target_f
   elif ! diff $p $target_f > /dev/null; then
     echo "Moving old $target_f"
-    mv $target_f $target_f.old
+    mv $target_f .old-$target_f
     ln -s $p $target_f
   fi
 done
