@@ -141,9 +141,6 @@ if [ $OS == "Darwin" ]; then
   done
   echo "Cask packages installed"
 elif [ $OS == "Linux" ]; then
-  echo "Updating apt (requires sudo)"
-  sudo -E apt-get -q update
-
   # Different apt packages if we don't have a GUI
   PACKAGE_FILE=$HOME/dotfiles/apt-packages
   if [ $HEADLESS ]; then
