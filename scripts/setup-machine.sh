@@ -204,6 +204,8 @@ for p in $(ls -ad $HOME/dotfiles/.[a-z]* | grep -v .git/$ | grep -v .git$); do
     ln -s $p $target_f
   fi
 done
+# Make sure ~/.ssh exists
+mkdir -p $HOME/.ssh
 echo "dotfiles linked"
 
 # Setup Vundle & Vim
