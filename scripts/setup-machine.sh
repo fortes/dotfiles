@@ -198,7 +198,7 @@ for p in $(ls -ad $HOME/dotfiles/.[a-z]* | grep -v .git/$ | grep -v .git$); do
   if [ ! -e $target_f ]; then
     echo "Linking $target_f"
     ln -s $p $target_f
-  elif [ ! diff $p $target_f ]; then
+  elif ! diff $p $target_f > /dev/null; then
     echo "Moving old $target_f"
     mv $target_f $target_f.old
     ln -s $p $target_f
