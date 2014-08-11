@@ -1,4 +1,4 @@
-set -euo pipefail
+set -eo pipefail
 
 if ! hash apt-get 2> /dev/null; then
   echo "Currently only works on Ubuntu systems"
