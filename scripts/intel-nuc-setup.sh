@@ -4,5 +4,6 @@ if [ ! -f /etc/apt/sources.list.d/ubuntu-audio-dev-alsa-daily-trusty.list ]; the
   sudo add-apt-repository -y ppa:ubuntu-audio-dev/alsa-daily
   sudo apt-get -q update
   sudo -E apt-get -qfuy install oem-audio-hda-daily-dkms
-fi
 
+  echo "New Audio Drivers Added. You need to reboot"
+fi
