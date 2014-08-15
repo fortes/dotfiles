@@ -92,9 +92,12 @@ fi
 if [ ! -d $HOME/dotfiles ]; then
   git clone http://github.com/fortes/dotfiles $HOME/dotfiles
   # Make sure to link .bashrc, else some annoying errors happen
-  if [ ! -e $HOME/.bashrc ]; then
-    ln -s $HOME/dotfiles/.bashrc $HOME/.bashrc
+  if [ -e $HOME/.bashrc ]; then
+    echo "Moving old .bashrc"
+    mv .bashrc .bashrc-old
   fi
+  echo "Installing .bashrc"
+  ln -s $HOME/dotfiles/.bashrc $HOME/.bashrc
 fi
 echo "dotfiles repo present"
 

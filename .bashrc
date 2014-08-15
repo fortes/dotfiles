@@ -110,7 +110,7 @@ export PIP_DOWNLOAD_CACHE=$HOME/.pip/cache
 DIST_UPDATE_COMMANDS=()
 DIST_UPDATE_COMMANDS+=('npm update -g')
 DIST_UPDATE_COMMANDS+=('vim +NeoBundleUpdate +qall')
-DIST_UPDATE_COMMANDS+=("pip install --upgrade $(cat $HOME/dotfiles/python-packages | tr '\n', ' ')")
+DIST_UPDATE_COMMANDS+=("pip install --upgrade $(cat $HOME/dotfiles/scripts/python-packages | tr '\n', ' ')")
 
 # Load OS-specific files
 if [ $OS == "Darwin" ]; then
