@@ -195,7 +195,7 @@ echo "python packages installed"
 
 # Install npm packages
 for p in $(cat $HOME/dotfiles/scripts/npm-packages); do
-  if ! npm list -g $p > /dev/null; then
+  if [ ! -z "$(npm list -g $p | grep \(empty\))" ]; then
     echo "Installing global npm package $p"
     $NPM_COMMAND install -g -q $p
   fi
