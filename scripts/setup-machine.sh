@@ -130,7 +130,7 @@ if [ $OS == "Darwin" ]; then
 
   brew doctor
   brew update
-  for p in $(cat $HOME/dotfiles/brew-packages); do
+  for p in $(cat $HOME/dotfiles/scripts/brew-packages); do
     if [ ! -n "$(brew list $p 2> /dev/null)" ]; then
       brew install $p
       # Update source paths, etc
@@ -142,7 +142,7 @@ if [ $OS == "Darwin" ]; then
   # Install cask packages
   brew cask doctor
   brew cask update
-  for p in $(cat $HOME/dotfiles/cask-packages); do
+  for p in $(cat $HOME/dotfiles/scripts/cask-packages); do
     if [ ! -n "$(brew cask list $p 2> /dev/null)" ]; then
       brew cask install $p
       # Update source paths, etc
@@ -152,9 +152,9 @@ if [ $OS == "Darwin" ]; then
   echo "Cask packages installed"
 elif [ $OS == "Linux" ]; then
   # Different apt packages if we don't have a GUI
-  PACKAGE_FILE=$HOME/dotfiles/apt-packages
+  PACKAGE_FILE=$HOME/dotfiles/scripts/apt-packages
   if [ $HEADLESS ]; then
-    PACKAGE_FILE=$HOME/dotfiles/apt-packages-headless
+    PACKAGE_FILE=$HOME/dotfiles/scripts/apt-packages-headless
   fi
 
   for p in $(cat $PACKAGE_FILE); do
@@ -185,13 +185,13 @@ source $HOME/virtualenvs/default/bin/activate
 PS1=$PROMPT
 
 # Install python packages
-for p in $(cat $HOME/dotfiles/python-packages); do
+for p in $(cat $HOME/dotfiles/scripts/python-packages); do
   pip install -q -U $p
 done
 echo "python packages installed"
 
 # Install npm packages
-for p in $(cat $HOME/dotfiles/npm-packages); do
+for p in $(cat $HOME/dotfiles/scripts/npm-packages); do
   if ! npm list -g $p > /dev/null; then
     echo "Installing global npm package $p"
     $NPM_COMMAND install -g -q $p
