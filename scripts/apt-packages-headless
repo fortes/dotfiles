@@ -5,6 +5,7 @@ git
 irssi
 mosh
 nodejs
+npm
 phantomjs
 python-virtualenv
 silversearcher-ag

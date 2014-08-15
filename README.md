@@ -8,6 +8,12 @@ This is only public so I can easily share it across machines. There is probably 
 bash <(curl -fsSL https://raw.github.com/fortes/dotfiles/master/scripts/setup-machine.sh)
 ```
 
+If for some reason, you don't have `curl` installed (why?):
+
+```
+bash <(wget -qO- https://raw.github.com/fortes/dotfiles/master/scripts/setup-machine.sh)
+```
+
 If the machine doesn't have a GUI (i.e. EC2), do the following:
 
 ```
