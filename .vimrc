@@ -593,7 +593,7 @@ let g:syntastic_warning_symbol = '⚠'
 let g:syntastic_style_warning_symbol = '⚠'
 
 " JS Checking
-let g:syntastic_javascript_checkers = ['jshint']
+let g:syntastic_javascript_checkers = ['jsxhint']
 let g:syntastic_javascript_jshint_args = '--config ~/.jshintrc'
 
 " eslint is way too slow to run on every save

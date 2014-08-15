@@ -8,6 +8,7 @@ eslint
 js-beautify
 js2coffee
 jshint
+jsxhint
 node-inspector
 nodemon
 supervisor
