@@ -4,8 +4,7 @@ elinks
 git
 irssi
 mosh
-nodejs
-npm
+nodejs-legacy
 phantomjs
 python-virtualenv
 silversearcher-ag

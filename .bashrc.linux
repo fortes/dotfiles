@@ -3,6 +3,9 @@
 # Ack is ack-grep on ubuntu
 alias ack=ack-grep
 
+# Node is nodejs on ubuntu
+alias node=nodejs
+
 if [ -z $SSH_AGENT_PID ]; then
   eval `ssh-agent -s` > /dev/null
 fi

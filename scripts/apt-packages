@@ -12,8 +12,7 @@ google-chrome-stable
 irssi
 mosh
 mp3val
-nodejs
-npm
+nodejs-legacy
 openssh-server
 phantomjs
 python-virtualenv
