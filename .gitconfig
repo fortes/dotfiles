@@ -23,8 +23,14 @@
   gbl = for-each-ref --sort=committerdate refs/heads/ --format='%(committerdate:short) %(refname:short)'
   rbl = for-each-ref --sort=committerdate refs/remotes/ --format='%(committerdate:short)  %(refname:short) (%(authorname))'
 [push]
-  default = upstream
+  default = simple
 [pull]
   rebase = true
+[merge]
+  defaultToUpstream = true
+[branch]
+  autosetupmerge = true
+[rebase]
+  autosquash = true
 [help]
   autocorrect = 1
