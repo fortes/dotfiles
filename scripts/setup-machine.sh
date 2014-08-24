@@ -94,7 +94,7 @@ if [ ! -d $HOME/dotfiles ]; then
   # Make sure to link .bashrc, else some annoying errors happen
   if [ -e $HOME/.bashrc ]; then
     echo "Moving old .bashrc"
-    mv .bashrc .bashrc-old
+    mv $HOME/.bashrc $HOME/.bashrc-old
   fi
   echo "Installing .bashrc"
   ln -s $HOME/dotfiles/.bashrc $HOME/.bashrc
