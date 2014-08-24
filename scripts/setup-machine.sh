@@ -80,8 +80,8 @@ elif [ $OS == "Linux" ]; then
   fi
 
   # Update sources if we added a PPA
-  if $PPA_ADDED; then
-    sudo apt-get -q update
+  if [ $PPA_ADDED ]; then
+    sudo -E apt-get -q update
   fi
 
   # Use sudo on Ubuntu for npm
