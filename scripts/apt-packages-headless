@@ -1,5 +1,6 @@
 ack-grep
 bash-completion
+curl
 elinks
 git
 irssi
@@ -12,3 +13,4 @@ silversearcher-ag
 tmux
 unzip
 vim
+wget

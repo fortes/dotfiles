@@ -2,6 +2,7 @@ ack-grep
 bash-completion
 btsync
 chromium-browser
+curl
 elinks
 exfat-fuse
 exfat-utils
@@ -23,3 +24,4 @@ tmux
 unzip
 vim
 vlc
+wget
