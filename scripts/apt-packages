@@ -11,9 +11,10 @@ ffmpeg
 git
 google-chrome-stable
 irssi
+mediainfo
 mosh
 mp3val
-nodejs-legacy
+nodejs
 openssh-server
 phantomjs
 python-virtualenv

@@ -4,8 +4,9 @@ curl
 elinks
 git
 irssi
+mediainfo
 mosh
-nodejs-legacy
+nodejs
 phantomjs
 python-virtualenv
 silversearcher-ag
