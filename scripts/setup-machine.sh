@@ -44,10 +44,10 @@ elif [ $OS == "Linux" ]; then
 
   if ! hash git 2> /dev/null; then
     echo "Installing pre-requisites first (requires sudo)"
-    sudo -E apt-get update -q && \
-    sudo -E apt-get dist-upgrade -qfuy && \
+    sudo -E apt-get update -q > /dev/null && \
+    sudo -E apt-get dist-upgrade -qfuy > /dev/null && \
     sudo -E apt-get install -qfuy git build-essential \
-      libssl-dev python-software-properties
+      libssl-dev python-software-properties > /dev/null
   fi
   echo "Git and build tools installed"
 
@@ -55,33 +55,33 @@ elif [ $OS == "Linux" ]; then
   if [ ! -f /etc/apt/sources.list.d/chris-lea-node_js-trusty.list ]; then
     echo "Adding Node PPA (requires sudo)"
     PPA_ADDED=1
-    sudo -E add-apt-repository -y ppa:chris-lea/node.js
+    sudo -E add-apt-repository -y ppa:chris-lea/node.js > /dev/null
   fi
 
   if [ ! -f /etc/apt/sources.list.d/jon-severinsson-ffmpeg-trusty.list ]; then
     echo "Adding ffmpeg PPA (requires sudo)"
     PPA_ADDED=1
-    sudo -E add-apt-repository -y ppa:jon-severinsson/ffmpeg
+    sudo -E add-apt-repository -y ppa:jon-severinsson/ffmpeg > /dev/null
   fi
 
   if [ ! $HEADLESS ]; then
     if [ ! -f /etc/apt/sources.list.d/google-chrome.list ]; then
       echo "Adding Chrome PPA (requires sudo)"
       PPA_ADDED=1
-      wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+      wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add - > /dev/null
       sudo -E sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
     fi
 
     if [ ! -f /etc/apt/sources.list.d/tuxpoldo-btsync-trusty.list ]; then
       echo "Adding btsync PPA (requires sudo)"
       PPA_ADDED=1
-      sudo -E add-apt-repository -y ppa:tuxpoldo/btsync
+      sudo -E add-apt-repository -y ppa:tuxpoldo/btsync > /dev/null
     fi
   fi
 
   # Update sources if we added a PPA
   if [ $PPA_ADDED ]; then
-    sudo -E apt-get -q update
+    sudo -E apt-get -q update > /dev/null
   fi
 
   # Use sudo on Ubuntu for npm
@@ -90,7 +90,8 @@ fi
 
 # Check dotfiles
 if [ ! -d $HOME/dotfiles ]; then
-  git clone http://github.com/fortes/dotfiles $HOME/dotfiles
+  echo "Cloning dotfiles repo"
+  git clone http://github.com/fortes/dotfiles $HOME/dotfiles > /dev/null
   # Make sure to link .bashrc, else some annoying errors happen
   if [ -e $HOME/.bashrc ]; then
     echo "Moving old .bashrc"
@@ -102,17 +103,17 @@ fi
 echo "dotfiles repo present"
 
 # Mac OS Settings
-if [ $OS == "Darwin" ]; then
-  # Show percent remaining for battery
-  defaults write com.apple.menuextra.battery ShowPercent -string "YES"
-
-  # Don't require password right away after sleep
-  defaults write com.apple.screensaver askForPassword -int 1
-  defaults write com.apple.screensaver askForPasswordDelay -int 300
-
-  # Show all filename extensions in Finder
-  #defaults write NSGlobalDomain AppleShowAllExtensions -bool true
-fi
+# if [ $OS == "Darwin" ]; then
+#   # Show percent remaining for battery
+#   defaults write com.apple.menuextra.battery ShowPercent -string "YES"
+#
+#   # Don't require password right away after sleep
+#   defaults write com.apple.screensaver askForPassword -int 1
+#   defaults write com.apple.screensaver askForPasswordDelay -int 300
+#
+#   # Show all filename extensions in Finder
+#   #defaults write NSGlobalDomain AppleShowAllExtensions -bool true
+# fi
 
 # Install homebrew packages
 if [ $OS == "Darwin" ]; then
@@ -163,7 +164,7 @@ elif [ $OS == "Linux" ]; then
   for p in $(cat $PACKAGE_FILE); do
     if ! dpkg -s $p > /dev/null; then
       echo "Installing missing package $p"
-      sudo -E apt-get install -qfuy $p
+      sudo -E apt-get install -qfuy $p > /dev/null
     fi
   done
 
