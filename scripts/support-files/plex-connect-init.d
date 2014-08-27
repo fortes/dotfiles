@@ -23,7 +23,7 @@ DAEMON_OPTS="-S PlexConnect -d -m /usr/local/plexconnect/PlexConnect.py"
 DAEMON_USER="plexconnect"
 
 # pid file for the daemon
-PIDFILE=/var/run/PlexConnect.pid
+PIDFILE=/var/run/plexconnect/pid
 
 # If the daemon is not there, then exit.
 test -x "$DAEMON" || exit 5

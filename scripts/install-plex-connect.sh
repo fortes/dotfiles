@@ -7,6 +7,7 @@ fi
 
 PLEX_CONNECT_DIR=/usr/local/plexconnect
 PLEX_CONNECT_LOG_DIR=/var/log/plexconnect
+PLEX_CONNECT_PID_DIR=/var/run/plexconnect
 ASSETS_DIR=$PLEX_CONNECT_DIR/assets/certificates
 
 if ! grep media /etc/group > /dev/null; then
@@ -52,6 +53,12 @@ if [ ! -d $PLEX_CONNECT_LOG_DIR ]; then
   echo "Creating $PLEX_CONNECT_LOG_DIR"
   sudo -E mkdir -p $PLEX_CONNECT_LOG_DIR
   sudo -E chown -R plexconnect $PLEX_CONNECT_LOG_DIR
+fi
+
+if [ ! -d $PLEX_CONNECT_PID_DIR ]; then
+  echo "Creating /var/run/plexconnect"
+  sudo -E mkdir -p $PLEX_CONNECT_PID_DIR
+  sudo -E chown -R plexconnect $PLEX_CONNECT_PID_DIR
 fi
 
 if [ ! -f /etc/init.d/plexconnect ]; then
