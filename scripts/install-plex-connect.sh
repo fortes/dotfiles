@@ -61,10 +61,6 @@ if [ ! -d $PLEX_CONNECT_PID_DIR ]; then
   sudo -E chown -R plexconnect $PLEX_CONNECT_PID_DIR
 fi
 
-if [ ! -f /etc/init.d/plexconnect ]; then
-  sudo ln -s /lib/init/upstart-job /etc/init.d/plexconnect
-fi
-
 if [ ! -f /etc/init/plexconnect.conf ]; then
   echo "Copying PlexConnect service configuration"
   sudo -E cp $HOME/dotfiles/scripts/support-files/plexconnect.conf /etc/init/plexconnect.conf
@@ -78,13 +74,18 @@ if [ ! -f /etc/default/plexconnect ]; then
 fi
 
 if [ ! -f /usr/sbin/start_plexconnect ]; then
-  echo "Copying PlexConnect configuration"
+  echo "Copying PlexConnect start script"
   sudo -E cp $HOME/dotfiles/scripts/support-files/start_plexconnect /usr/sbin/start_plexconnect
   sudo -E chmod a+x /usr/sbin/start_plexconnect
 fi
 
+if [ ! -f /etc/init.d/plexconnect ]; then
+  sudo ln -s /lib/init/upstart-job /etc/init.d/plexconnect
+fi
+
 echo "Starting PlexConnect Service"
 sudo service plexconnect start
+sudo update-rc.d plexconnect defaults
 
 echo "----------------------------------------------------------------"
 echo "Now you must setup firewall forwarding rules"
