@@ -83,6 +83,11 @@ if [ ! -f /etc/init.d/plexconnect ]; then
   sudo ln -s /lib/init/upstart-job /etc/init.d/plexconnect
 fi
 
+BEFORE_RULES=$HOME/dotfiles/scripts/support-files/plexconnect-before.rules
+if grep -Fxq /etc/ufw/before.rules "$BEFORE_RULES"; then
+  cat $BEFORE_RULES | sudo tee -a /etc/ufw/before.rules
+fi
+
 echo "Starting PlexConnect Service"
 sudo service plexconnect start
 sudo update-rc.d plexconnect defaults

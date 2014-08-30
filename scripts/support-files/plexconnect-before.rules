@@ -1,0 +1,7 @@
+# PlexConnect rules to forward to non-privileged ports
+*nat
+:PREROUTING ACCEPT [0:0]
+-A PREROUTING -p tcp --dport  80 -j REDIRECT --to-port 10080
+-A PREROUTING -p tcp --dport  53 -j REDIRECT --to-port 10053
+-A PREROUTING -p tcp --dport 443 -j REDIRECT --to-port 10443
+COMMIT
