@@ -84,8 +84,9 @@ if [ ! -f /etc/init.d/plexconnect ]; then
 fi
 
 BEFORE_RULES=$HOME/dotfiles/scripts/support-files/plexconnect-before.rules
-if grep -Fxq "### PlexConnect Rules" /etc/ufw/before.rules; then
-  cat $BEFORE_RULES | sudo tee -a /etc/ufw/before.rules
+if ! sudo grep -Fxq "# BEGIN: PlexConnect Rules" /etc/ufw/before.rules; then
+  echo "Adding UFW rules to forward PlexConnect ports"
+  cat $BEFORE_RULES | sudo tee -a /etc/ufw/before.rules > /dev/null
 fi
 
 echo "Starting PlexConnect Service"
