@@ -4,7 +4,7 @@
 # Provides:          plexconnect
 # Required-Start:    plexmediaserver networking
 # Required-Stop:     plexmediaserver networking
-# Default-Start:     3 4 5
+# Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # Short-Description: This is the Plex Connect daemon
 # Description:       This script starts the Plex Connect
@@ -18,8 +18,8 @@
 NAME=PlexConnect
 
 # Daemon name, where is the actual executable
-DAEMON="/usr/bin/screen"
-DAEMON_OPTS="-S PlexConnect -d -m /usr/local/plexconnect/PlexConnect.py"
+DAEMON="/usr/local/plexconnect/PlexConnect.py"
+DAEMON_NAME="PlexConnect"
 DAEMON_USER="plexconnect"
 
 # pid file for the daemon
@@ -30,58 +30,42 @@ test -x "$DAEMON" || exit 5
 
 case $1 in
  start)
-  # Checked the PID file exists and check the actual status of process
-  if [ -e $PIDFILE ]; then
-   status_of_proc -p $PIDFILE "$DAEMON $DAEMON_OPTS" "$NAME process" && status="0" || status="$?"
-   # If the status is SUCCESS then don't need to start again.
-   if [ $? = "0" ]; then
-    log_success_msg "Starting the process $NAME"
-    exit # Exit
-   fi
-  fi
-  # Start the daemon.
-  # Start the daemon with the help of start-stop-daemon
-  # Log the message appropriately
-  if start-stop-daemon --start --quiet --oknodo --pidfile $PIDFILE --startas $DAEMON -p $PIDFILE -- ${DAEMON_OPTS}; then
-   while read line ; do [[ $line =~ ([0-9]*).PlexConnect ]] && echo ${BASH_REMATCH[1]} ; done < <(screen -ls) > $PIDFILE
-   log_success_msg "Starting the process $NAME"
-  else
-   log_failure_msg "Starting the process $NAME"
-  fi
+  log_daemon_msg "Starting system $DAEMON_NAME daemon"
+  start-stop-daemon --start --background --pidfile $PIDFILE --make-pidfile \
+    --user $DAEMON_USER --chuid $DAEMON_USER --start-as=$DAEMON
+  log_end_msg $?
   ;;
- stop)
 
-  # Stop the daemon.
-  if [ -e $PIDFILE ]; then
-   status_of_proc -p $PIDFILE "$DAEMON DAEMON_OPTS" "Stoppping the $NAME process" && status="0" || status="$?"
-   if [ "$?" = 0 ]; then
-    start-stop-daemon --stop --quiet --oknodo --pidfile $PIDFILE
-    /bin/rm -rf $PIDFILE
-    log_success_msg ""Stopping the $NAME process""
-   fi
-  else
-   log_failure_msg "$NAME process is not running"
-  fi
+ stop)
+  log_daemon_msg "Stopping system $DAEMON_NAME daemon"
+  start-stop-daemon --stop --pidfile $PIDFILE --retry 10
+  log_end_msg $?
   ;;
+
  restart)
   # Restart the daemon.
-  $0 stop && sleep 2 && $0 start
+  $0 stop
+  $0 start
   ;;
+
  status)
   # Check the status of the process.
   if [ -e $PIDFILE ]; then
-   status_of_proc -p $PIDFILE "$DAEMON $DAEMON_OPTS" "$NAME process" && exit 0 || exit $?
-   log_success_msg "$NAME process is running"
+   status_of_proc "$DAEMON_NAME" "$DAEMON" && exit 0 || exit $?
+   log_success_msg "$DAEMON_NAME process is running"
   else
-   log_failure_msg "$NAME process is not running"
+   log_failure_msg "$DAEMON_NAME process is not running"
   fi
   ;;
+
  reload)
   $0 restart
   ;;
+
  *)
+
   # For invalid arguments, print the usage message.
   echo "Usage: $0 {start|stop|restart|reload|status}"
-  exit 2
+  exit 1
   ;;
 esac
