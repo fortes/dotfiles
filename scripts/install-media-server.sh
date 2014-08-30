@@ -42,23 +42,40 @@ echo "If not on same network, open SSH tunnel:"
 echo "  ssh ip.address.of.server -L 8888:localhost:32400"
 echo "Then open http://localhost:8888/web on your computer"
 echo "------------------------------------------------------"
+exit
 
 # This is for the media center UI (not fully implemented yet)
-if [ ! $HEADLESS ]; then
-  # Add plex into apt sources list
-  if [ ! -f /etc/apt/sources.list.d/plexapp-plexht-trusty.list ]; then
-    echo "Adding Plex apt source (requires sudo)"
-    sudo -E add-apt-repository -y ppa:plexapp/plexht
-  fi
-  # Remote / HDMI integration
-  if [ ! -f /etc/apt/sources.list.d/pulse-eight-libcec-trusty.list ]; then
-    echo "Adding libcec apt source (requires sudo)"
-    sudo -E add-apt-repository -y ppa:pulse-eight/libcec
-  fi
+# if [ ! $HEADLESS ]; then
+#   # Add plex into apt sources list
+#   if [ ! -f /etc/apt/sources.list.d/plexapp-plexht-trusty.list ]; then
+#     echo "Adding Plex apt source (requires sudo)"
+#     sudo -E add-apt-repository -y ppa:plexapp/plexht
+#   fi
+#   # Remote / HDMI integration
+#   if [ ! -f /etc/apt/sources.list.d/pulse-eight-libcec-trusty.list ]; then
+#     echo "Adding libcec apt source (requires sudo)"
+#     sudo -E add-apt-repository -y ppa:pulse-eight/libcec
+#   fi
+#
+#   if ! dpkg -s plexhometheater > /dev/null; then
+#     echo "Installing Plex Home Theatre (requires sudo)"
+#     sudo -E apt-get -q update
+#     sudo -E apt-get -qfuy install plexhometheater
+#   fi
+# fi
 
-  if ! dpkg -s plexhometheater > /dev/null; then
-    echo "Installing Plex Home Theatre (requires sudo)"
-    sudo -E apt-get -q update
-    sudo -E apt-get -qfuy install plexhometheater
-  fi
-fi
+# if ! dpkg -s mopidy > /dev/null 2> /dev/null; then
+#   echo "Installing mopidy apt source"
+#   wget -q -O - https://apt.mopidy.com/mopidy.gpg | sudo apt-key add - > /dev/null
+#   sudo wget -q -O /etc/apt/sources.list.d/mopidy.list \
+#     https://apt.mopidy.com/mopidy.list
+#   sudo apt-get update -q
+#   sudo apt-get install -qfuy mopidy mopidy-scrobbler mopidy-soundcloud \
+#     mopidy-beets
+#   echo "Starting mopidy service"
+#   sudo service mopidy start
+#
+#   echo "----------------------------------------------"
+#   echo "Set configuration in /etc/mopidy/mopidy.conf"
+#   echo "----------------------------------------------"
+# fi
