@@ -62,9 +62,25 @@ if [ ! -d $PLEX_CONNECT_PID_DIR ]; then
 fi
 
 if [ ! -f /etc/init.d/plexconnect ]; then
-  echo "Copying PlexConnect boot script"
-  sudo -E cp $HOME/dotfiles/scripts/support-files/plex-connect-init.d /etc/init.d/plexconnect
-  sudo -E chmod a+x /etc/init.d/plexconnect
+  sudo ln -s /lib/init/upstart-job /etc/init.d/plexconnect
+fi
+
+if [ ! -f /etc/init/plexconnect.conf ]; then
+  echo "Copying PlexConnect service configuration"
+  sudo -E cp $HOME/dotfiles/scripts/support-files/plexconnect.conf /etc/init/plexconnect.conf
+  sudo -E chmod a+x /etc/init/plexconnect.conf
+fi
+
+if [ ! -f /etc/default/plexconnect ]; then
+  echo "Copying PlexConnect configuration"
+  sudo -E cp $HOME/dotfiles/scripts/support-files/default-plexconnect /etc/default/plexconnect
+  sudo -E chmod a+x /etc/default/plexconnect
+fi
+
+if [ ! -f /usr/sbin/start_plexconnect ]; then
+  echo "Copying PlexConnect configuration"
+  sudo -E cp $HOME/dotfiles/scripts/support-files/start_plexconnect /usr/sbin/start_plexconnect
+  sudo -E chmod a+x /usr/sbin/start_plexconnect
 fi
 
 echo "Starting PlexConnect Service"
