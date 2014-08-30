@@ -84,16 +84,17 @@ if [ ! -f /etc/init.d/plexconnect ]; then
 fi
 
 BEFORE_RULES=$HOME/dotfiles/scripts/support-files/plexconnect-before.rules
-if grep -Fxq /etc/ufw/before.rules "$BEFORE_RULES"; then
+if grep -Fxq "### PlexConnect Rules" /etc/ufw/before.rules; then
   cat $BEFORE_RULES | sudo tee -a /etc/ufw/before.rules
 fi
 
 echo "Starting PlexConnect Service"
 sudo service plexconnect start
+sudo update-rc.d -f plexconnect remove
 sudo update-rc.d plexconnect defaults
 
 echo "----------------------------------------------------------------"
-echo "Now you must setup firewall forwarding rules"
+echo "Now you must reload ufw forwarding rules"
 echo ""
 echo "Then setup Apple TV: https://github.com/iBaa/PlexConnect/wiki"
 echo "----------------------------------------------------------------"
