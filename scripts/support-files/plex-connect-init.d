@@ -1,15 +1,16 @@
 #!/bin/bash
-# Cribbed from https://gist.github.com/natewalck/6128023
 ### BEGIN INIT INFO
 # Provides:          plexconnect
 # Required-Start:    plexmediaserver networking
 # Required-Stop:     plexmediaserver networking
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: This is the Plex Connect daemon
+# Short-Description: The Plex Connect daemon
 # Description:       This script starts the Plex Connect
-#                    Python scripts in a detached screen.
+#                    Python scripts in daemon form.
 ### END INIT INFO
+
+# Cribbed from https://gist.github.com/natewalck/6128023
 
 # Using the lsb functions to perform the operations.
 . /lib/lsb/init-functions
