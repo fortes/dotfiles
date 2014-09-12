@@ -13,6 +13,8 @@ threaded: yes
 color: yes
 clutter: ['Thumbs.db', '.DS_Store', '*.log', '*.txt', '*.cue']
 
+asciify_paths: yes
+
 import:
     write: yes
     move: yes
