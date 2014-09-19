@@ -337,6 +337,9 @@ nnoremap k gk
 nnoremap K <nop>
 vnoremap K <nop>
 
+" Never use Ex-mode
+nnoremap Q <nop>
+
 " Never use ZZ, too dangerous
 nnoremap ZZ <nop>
 
