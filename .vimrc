@@ -579,6 +579,8 @@ let g:gitgutter_sign_modified='±'
 " }}}
 
 " Fugitive {{{
+" Use vertical Gdiffs
+set diffopt+=vertical
 " Status with <leader>gs
 nnoremap <silent> <leader>gs :Gstatus<CR>
 " Diff with <leader>gd

@@ -18,7 +18,7 @@ nodejs
 openssh-server
 phantomjs
 python-virtualenv
-openjdk-7-jre
+default-jre
 silversearcher-ag
 tmux
 unzip
