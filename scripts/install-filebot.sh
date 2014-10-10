@@ -8,7 +8,7 @@ fi
 # Make sure not to get stuck on any prompts
 DEBIAN_FRONTEND=noninteractive
 
-FILEBOT_DEB_URL='http://downloads.sourceforge.net/project/filebot/filebot/FileBot_4.2/filebot_4.2_amd64.deb?r=&ts=1407563882&use_mirror=iweb'
+FILEBOT_DEB_URL='http://downloads.sourceforge.net/project/filebot/filebot/FileBot_4.5/filebot_4.5_amd64.deb?r=&ts=1407563882&use_mirror=iweb'
 
 if ! dpkg -s filebot > /dev/null; then
   pushd /tmp > /dev/null
