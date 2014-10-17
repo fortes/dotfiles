@@ -209,6 +209,8 @@ set wrap
 set showbreak=«
 " Wrap at 80 characters
 set textwidth=80
+" Indent on wrapping
+set breakindent
 " Highlight textwidth column
 set colorcolumn=+1
 
