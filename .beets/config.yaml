@@ -5,7 +5,7 @@ list_format_item: $artist - $album - $track - $title ($genre)
 list_format_album: $albumartist - $album [$original_year] ($genre)
 
 pluginpath: /var/music/tools/
-plugins: fetchart mbsync mbcollection embedart info missing lyrics lastgenre check # scrub web bpd chroma
+plugins: fetchart mbsync mbcollection embedart info missing lyrics lastgenre # check # scrub web bpd chroma
 
 art_filename: folder
 
