@@ -30,8 +30,7 @@ NeoBundle 'tpope/vim-abolish'
 NeoBundle 'tpope/vim-repeat'
 NeoBundle 'tpope/vim-surround'
 NeoBundle 'tpope/vim-rsi'
-NeoBundle 'SirVer/ultisnips'
-NeoBundle 'ervandew/supertab'
+" NeoBundle 'ervandew/supertab'
 
 " Languages & Dev Tools {{{
 NeoBundle 'tpope/vim-fugitive'
@@ -78,6 +77,7 @@ NeoBundle 'fortes/vim-personal-snippets'
 
 " Colors & Display {{{
 NeoBundle 'nanotech/jellybeans.vim'
+NeoBundle 'sjl/badwolf'
 NeoBundle 'nathanaelkane/vim-indent-guides'
 " Gutter & Status Line
 NeoBundle 'airblade/vim-gitgutter'
@@ -201,8 +201,8 @@ set nocindent
 set nosmartindent
 
 " Automatically reselect visual block after indent
-vnoremap < <gv
-vnoremap > >gv
+" vnoremap < <gv
+" vnoremap > >gv
 
 " Soft wrap, with indicator
 set wrap
@@ -335,7 +335,7 @@ inoremap jk <ESC>
 nnoremap j gj
 nnoremap k gk
 
-" Never use the manual command, remap to search (see below)
+" Never use the manual command
 nnoremap K <nop>
 vnoremap K <nop>
 
@@ -650,12 +650,6 @@ vnoremap <silent> <leader>e :CoffeeCompile<cr>
 
 " <leader>-r Runs CoffeeScript in visual mode
 vnoremap <silent> <leader>r :CoffeeRun<cr>
-" }}}
-
-" Ultisnips {{{
-let g:UltiSnipsExpandTrigger="<tab>"
-let g:UltiSnipsJumpForwardTrigger="<tab>"
-let g:UltiSnipsJumpBackwardTrigger="<C-Z>"
 " }}}
 " }}}
 
