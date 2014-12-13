@@ -1,17 +1,17 @@
-library: /var/music/tools/albums.blb
-directory: /var/music
+directory: /var/media/music
+library: ~/media/music/tools/music.blb
 
 list_format_item: $artist - $album - $track - $title ($genre)
 list_format_album: $albumartist - $album [$original_year] ($genre)
 
-pluginpath: /var/music/tools/
-plugins: fetchart mbsync mbcollection embedart info missing lyrics lastgenre # check # scrub web bpd chroma
+pluginpath: ~/media/music/tools/
+plugins: fetchart mbsync embedart info missing lyrics lastgenre # mbcollection  # check # scrub web bpd chroma
 
 art_filename: folder
 
 threaded: yes
 color: yes
-clutter: ['Thumbs.db', '.DS_Store', '*.log', '*.txt', '*.cue']
+clutter: ['Thumbs.db', '.DS_Store', '*.log', '*.txt', '*.cue', '*.m3u', '*.sfv', '*.nfo']
 
 asciify_paths: yes
 
@@ -34,10 +34,6 @@ paths:
     comp: albums/$albumartist - $album [$original_year]%aunique{albumartist album original_year, albumtype original_year year label catalognum albumdisambig}/$track - $title
     singleton: non-albums/$artist/$original_year - $title
 
-musicbrainz:
-    user: fortes
-    pass: REPLACEME
-
 scrub:
     auto: no
 
@@ -48,8 +44,8 @@ lastgenre:
     fallback: 'Unknown'
     source: artist
     count: 3
-    whitelist: /var/music/tools/genres.txt
-    canonical: /var/music/tools/genres-tree.yaml
+    whitelist: ~/media/music/tools/genres.txt
+    canonical: ~/media/music/tools/genres-tree.yaml
 
 check:
     backup: no
