@@ -25,7 +25,7 @@ import:
 
 match:
     preferred:
-        countries: ['US', 'GB|UK', 'XW']
+        countries: ['US', 'GB|UK', 'XW', 'XE']
         media: ['CD', 'Digital Media|File']
         original_year: yes
 

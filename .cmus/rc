@@ -5,7 +5,7 @@
 colorscheme zenburn
 
 # Scrobber
-set status_display_program=~/last-cmus.py
+set status_display_program=~/dotfiles/scripts/last-cmus.py
 
 # Include genre in playlist view
 set format_playlist= %-20%A %-20%l %3n %t %= [%g] %-4y
