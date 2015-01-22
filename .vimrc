@@ -21,6 +21,7 @@ NeoBundleFetch 'Shougo/neobundle.vim'
 " Bundles {{{
 " Core Features
 NeoBundle 'kien/ctrlp.vim'
+NeoBundle 'tpope/vim-vinegar'
 
 " Editing features
 NeoBundle 'tomtom/tcomment_vim'
@@ -469,9 +470,12 @@ autocmd FileType javascript nnoremap <leader>tr :TernRename<cr>
 autocmd FileType javascript nnoremap <leader>td :TernDef<cr>
 
 " Use html-beautify and css-beautify for respective types
-autocmd FileType html setlocal formatprg=html-beautify\ -s\ 2\ -I\ -f\ -
 autocmd FileType css setlocal formatprg=css-beautify\ -s\ 2\ -f\ -
 autocmd FileType less setlocal formatprg=css-beautify\ -s\ 2\ -f\ -
+autocmd FileType html setlocal formatprg=html-beautify\ -s\ 2\ -I\ -f\ -
+
+" Enable Emmet for HTML/CSS
+autocmd FileType html,css,less EmmetInstall
 
 " Fold via indent in CoffeeScript and Python
 autocmd BufNewFile,BufReadPost *.coffee setlocal foldmethod=indent
