@@ -338,6 +338,10 @@ inoremap jk <ESC>
 nnoremap j gj
 nnoremap k gk
 
+" Move to beginning / end of line with H/L
+nnoremap H 0
+nnoremap L $
+
 " Never use the manual command
 nnoremap K <nop>
 vnoremap K <nop>
