@@ -22,6 +22,7 @@ NeoBundleFetch 'Shougo/neobundle.vim'
 " Core Features
 NeoBundle 'kien/ctrlp.vim'
 NeoBundle 'tpope/vim-vinegar'
+NeoBundle 'dbakker/vim-projectroot'
 
 " Editing features
 NeoBundle 'tomtom/tcomment_vim'
@@ -31,6 +32,7 @@ NeoBundle 'tpope/vim-abolish'
 NeoBundle 'tpope/vim-repeat'
 NeoBundle 'tpope/vim-surround'
 NeoBundle 'tpope/vim-rsi'
+NeoBundle 'gcmt/wildfire.vim'
 " NeoBundle 'ervandew/supertab'
 
 " Languages & Dev Tools {{{
@@ -434,6 +436,9 @@ nnoremap <leader>a :Ag<SPACE>
 
 " Search for word under cursor
 nnoremap K :grep! "\b<C-R><C-W>\b"<CR>:cwindow<CR>
+
+" Leader cd to cd to project root
+nnoremap <leader>pcd :ProjectRootCD<CR>
 " }}}
 
 " Folds {{{
