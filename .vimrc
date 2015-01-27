@@ -84,7 +84,7 @@ NeoBundle 'sjl/badwolf'
 NeoBundle 'nathanaelkane/vim-indent-guides'
 " Gutter & Status Line
 NeoBundle 'airblade/vim-gitgutter'
-NeoBundle 'bling/vim-bufferline'
+" NeoBundle 'bling/vim-bufferline'
 NeoBundle 'scrooloose/syntastic'
 NeoBundle 'bling/vim-airline'
 " }}}
