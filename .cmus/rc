@@ -4,6 +4,9 @@
 # Slightly less nasty colors
 colorscheme zenburn
 
+# Soft volume control
+set softvol=true
+
 # Scrobber
 set status_display_program=~/dotfiles/scripts/last-cmus.py
 
