@@ -71,6 +71,7 @@ alias pythong='python'
 # Get readable list of network IPs
 alias ips="ifconfig -a | perl -nle'/(\d+\.\d+\.\d+\.\d+)/ && print $1'"
 alias myip="dig +short myip.opendns.com @resolver1.opendns.com"
+alias mygeo="curl -w \"\\n\" http://api.hackertarget.com/geoip/?q=`dig +short myip.opendns.com @resolver1.opendns.com`"
 # Flush DNS cache
 alias flush="dscacheutil -flushcache"
 
