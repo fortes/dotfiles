@@ -5,6 +5,10 @@
     "mocha": true,
     "node": true
   },
+  "globals": {
+    "assert": true,
+    "sinon": true
+  },
   // All rules documented here: http://eslint.org/docs/rules/
   "rules": {
     // Possible errors
@@ -81,9 +85,7 @@
     "yoda": "never",
 
     // Strict Mode
-    "no-global-strict": 0,
-    "no-extra-strict": 1,
-    "strict": 1,
+    "strict": [0, "global"],
 
     // Variables
     "no-catch-shadow": 1,
@@ -146,6 +148,5 @@
     "max-statements": [0, 10],
     "no-bitwise": 1,
     "no-plusplus": 0
-
   }
 }
