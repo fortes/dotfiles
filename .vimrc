@@ -53,6 +53,11 @@ NeoBundleLazy 'pangloss/vim-javascript', {
 \     'filetypes': ['javascript']
 \   }
 \ }
+NeoBundleLazy 'mxw/vim-jsx', {
+\   'autoload': {
+\     'filetypes': ['javascript']
+\   }
+\ }
 NeoBundleLazy 'groenewege/vim-less', {
 \   'autoload': {
 \     'filetypes': ['less']
