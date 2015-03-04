@@ -12,4 +12,5 @@ jshint
 jsxhint
 node-inspector
 nodemon
+react-tools
 supervisor
