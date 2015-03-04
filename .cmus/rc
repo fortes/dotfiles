@@ -1,11 +1,13 @@
 # Default to correct working directory
-# cd /var/music/albums
+cd ~/Music
 
 # Slightly less nasty colors
 colorscheme zenburn
 
 # Soft volume control
 set softvol=true
+
+set auto_expand_albums=false
 
 # Scrobber
 set status_display_program=~/dotfiles/scripts/last-cmus.py
