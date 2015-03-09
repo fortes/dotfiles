@@ -442,7 +442,7 @@ nnoremap <leader>a :Ag<SPACE>
 " Search for word under cursor
 nnoremap K :grep! "\b<C-R><C-W>\b"<CR>:cwindow<CR>
 
-" Leader cd to cd to project root
+" Leader pcd to cd to project root
 nnoremap <leader>pcd :ProjectRootCD<CR>
 " }}}
 
