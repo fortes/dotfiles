@@ -88,9 +88,9 @@ if ! sudo grep -Fxq "# BEGIN: PlexConnect Rules" /etc/ufw/before.rules; then
   echo "Adding UFW rules to forward PlexConnect ports"
   cat $BEFORE_RULES | sudo tee -a /etc/ufw/before.rules > /dev/null
   echo "Adding ufw rules for ports 10053, 10080, 10443"
-  sudo ufw allow 10053
-  sudo ufw allow 10080
-  sudo ufw allow 10443
+  sudo ufw allow from 192.168.0.0/24 to any port 10053
+  sudo ufw allow from 192.168.0.0/24 to any port 10080
+  sudo ufw allow from 192.168.0.0/24 to any port 10443
 fi
 
 echo "Starting PlexConnect Service"
