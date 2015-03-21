@@ -86,7 +86,7 @@ NeoBundle 'fortes/vim-personal-snippets'
 " Colors & Display {{{
 NeoBundle 'nanotech/jellybeans.vim'
 NeoBundle 'sjl/badwolf'
-NeoBundle 'vim-hybrid'
+NeoBundle 'w0ng/vim-hybrid'
 NeoBundle 'nathanaelkane/vim-indent-guides'
 " Gutter & Status Line
 NeoBundle 'airblade/vim-gitgutter'
