@@ -141,6 +141,11 @@ if [ -d $PIP_VIRTUALENV_BASE/default ]; then
   PS1=$PROMPT
 fi
 
+if [ -f ~/.fzf.bash ]; then
+  export FZF_DEFAULT_COMMAND='ag -l -g ""'
+  source ~/.fzf.bash
+fi
+
 # Load local file if present
 if [ -f ~/.bashrc.local ]; then
   source ~/.bashrc.local

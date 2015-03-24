@@ -137,6 +137,12 @@ if [ $OS == "Darwin" ]; then
   for p in $(cat $HOME/dotfiles/scripts/brew-packages); do
     if [ ! -n "$(brew list $p 2> /dev/null)" ]; then
       brew install $p
+
+      if [$p == 'fzf']; then
+        echo "Setting up fzf"
+        $(brew info fzf | grep /install)
+      fi
+
       # Update source paths, etc
       . $HOME/.bashrc
     fi
