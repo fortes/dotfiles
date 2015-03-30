@@ -40,7 +40,6 @@ alias lisbon='TZ="Europe/Lisbon" date'
 alias nyc='TZ="America/New_York" date'
 alias sf='TZ="America/Los_Angeles" date'
 alias rio='TZ="America/Sao_Paulo" date'
-alias bj='TZ="Asia/Shanghai" date'
 alias utc='TZ="UTC" date'
 
 # Easy CD
@@ -73,7 +72,7 @@ alias ips="ifconfig -a | perl -nle'/(\d+\.\d+\.\d+\.\d+)/ && print $1'"
 alias myip="dig +short myip.opendns.com @resolver1.opendns.com"
 alias mygeo="curl -w \"\\n\" http://api.hackertarget.com/geoip/?q=`dig +short myip.opendns.com @resolver1.opendns.com`"
 # Flush DNS cache
-alias flush="dscacheutil -flushcache"
+alias dnsflush="dscacheutil -flushcache"
 
 # Don't put duplicate lines into history
 HISTCONTROL=ignoredup
