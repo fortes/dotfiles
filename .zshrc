@@ -6,11 +6,11 @@ HISTSIZE=1000
 SAVEHIST=$HISTSIZE
 HISTFILE=~/.history
 
-# Load function-based completion system
-autoload -U compinit && compinit
-
 # Easier color output
 autoload -U colors && colors
+
+# Load function-based completion system
+autoload -U compinit && compinit
 
 # Zsh Options {{{
 
@@ -24,7 +24,7 @@ setopt auto_pushd
 setopt pushd_ignore_dups
 
 # Compact match display
-setopt LIST_PACKED
+setopt list_packed
 
 # More powerful pattern matching
 setopt extended_glob
@@ -106,9 +106,30 @@ alias json='python -mjson.tool'
 # Colorized cat (nyan)
 alias nyan='pygmentize -O style=default -f console256 -g'
 
+# Confirm file overwrite
+alias mv='mv -i'
+
+# Map ls to be colorful
+if [[ $OS == "Darwin" ]]; then
+  alias ls='ls -GpFh'
+else
+  alias ls='ls --color=auto -GpFh'
+fi
+
 # }}}
 
 # Environment / Configuration {{{
+
+# Everyone's favorite editor
+export VISUAL=vim
+export EDITOR=vim
+
+# Nicer colors. BSD uses $LSCOLORS, linux uses $LS_COLORS
+export LSCOLORS=gxfxbxbxCxegedabagGxGx
+export LS_COLORS='di=36;40:ln=35;40:so=31;40:pi=31;40:ex=1;32;40:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=36;01:ow=36;01:'
+
+# Use same ls colors for completion, zsh uses linux-style colors
+zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
 
 # For default CoffeeLint settings
 if [ -f ~/.coffeelint.json ]; then
