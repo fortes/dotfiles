@@ -1,3 +1,6 @@
+# For platform-specific conditions
+OS=`uname`
+
 # Remember stuff
 HISTSIZE=1000
 SAVEHIST=$HISTSIZE
@@ -31,7 +34,23 @@ setopt prompt_subst
 
 # /Options }}}
 
-# Setup a decent prompt
+# VirtualEnv {{{
+# virtualenv should use Distribute instead of legacy setuptools
+export VIRTUALENV_DISTRIBUTE=true
+# Centralized location for new virtual environments
+export PIP_VIRTUALENV_BASE=$HOME/virtualenvs
+# cache pip-installed packages to avoid re-downloading
+export PIP_DOWNLOAD_CACHE=$HOME/.pip/cache
+
+# Activate default virtual env, if not already in an env
+if [ -z $VIRTUAL_ENV ] && [ -d $PIP_VIRTUALENV_BASE/default ]; then
+  # This will modify the prompt, so do it before setting the prompt
+  source $PIP_VIRTUALENV_BASE/default/bin/activate
+fi
+# }}}
+
+# Prompt {{{
+
 # user@host: in red
 PS1='%F{red}%n@%m%f:'
 # directory name in yellow
@@ -45,7 +64,27 @@ PS1+='%# '
 # Full directory name, in magenta
 RPS1='%F{magenta}%~%f'
 
+# /Prompt }}}
+
 # Add fzf support, if present
 if [ -f ~/.fzf.zsh ]; then
+  # Honor .gitignore by default
+  export FZF_DEFAULT_COMMAND='ag -l -g ""'
   source ~/.fzf.zsh
+fi
+
+# Load OS-specific files
+if [[ $OS == "Darwin" ]]; then
+  if [ -f ~/.zshrc.osx ]; then
+    source ~/.zshrc.osx
+  fi
+elif [[ $OS == "Linux" ]]; then
+  if [ -f ~/.zshrc.linux ]; then
+    source ~/.zshrc.linux
+  fi
+fi
+
+# Load local file if present
+if [ -f ~/.zshrc.local ]; then
+  source ~/.zshrc.local
 fi
