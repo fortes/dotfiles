@@ -1,5 +1,5 @@
 # Mac OS X workaround for clipboard issue
-set-option -g default-command "tmux rename-window bash; exec reattach-to-user-namespace -l bash"
+set-option -g default-command "tmux rename-window zsh; exec reattach-to-user-namespace -l $(which zsh)"
 
 # This tmux statusbar config was created by tmuxline.vim
 set -g status-justify "left"
