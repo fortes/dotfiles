@@ -7,6 +7,23 @@ NPM_COMMAND='npm'
 # Error out if any command fails
 set -e
 
+# Helpers
+isHomebrewPackageInstalled() {
+  if brew list $1 2> /dev/null; then
+    return 1
+  else
+    return 0
+  fi
+}
+
+isAptPackageInstalled() {
+  if ! dpkg -s $1 > /dev/null; then
+    return 0
+  else
+    return 1
+  fi
+}
+
 # Install Homebrew
 if [ $OS == "Darwin" ]; then
   if [ ! -x /usr/local/bin/brew ]; then
@@ -100,7 +117,7 @@ if [ ! -d $HOME/dotfiles ]; then
   echo "Installing .bashrc"
   ln -s $HOME/dotfiles/.bashrc $HOME/.bashrc
 fi
-echo "dotfiles repo present"
+echo "✓ dotfiles repo present"
 
 # Mac OS Settings
 # if [ $OS == "Darwin" ]; then
@@ -114,6 +131,32 @@ echo "dotfiles repo present"
 #   # Show all filename extensions in Finder
 #   #defaults write NSGlobalDomain AppleShowAllExtensions -bool true
 # fi
+
+# Make sure we are using zsh
+if [ $SHELL != $(which zsh) ]; then
+  echo "✖ Shell is not zsh"
+  if [ $OS == "Darwin" ]; then
+    # Run latest zsh from homebrew
+    if [ ! $(isHomebrewPackageInstalled zsh) ]; then
+      echo "Installing homebrew zsh"
+      brew install zsh
+    fi
+
+    if [ -z $(cat /etc/shells | grep $(which zsh)) ]; then
+      echo "Adding homebrew zsh to accepted shell list (requires sudo)"
+      sudo sh -c 'which zsh >> /etc/shells'
+    fi
+    echo "Switching shell to zsh (will prompt for password)"
+    chsh -s $(which zsh)
+  elif [ $PS == "Linux" ]; then
+    echo "TODO: Implement Linux shell switch"
+  fi
+
+  echo "Must open a new terminal/log in in order to switch shells"
+else
+  echo "✓ Shell is zsh"
+fi
+exit
 
 # Install homebrew packages
 if [ $OS == "Darwin" ]; then
