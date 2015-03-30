@@ -53,16 +53,14 @@ fi
 
 # user@host: in red
 PS1='%F{red}%n@%m%f:'
-# directory name in yellow
-PS1+='%F{yellow}%.%f '
-# Current time in 18:30 format
-PS1+='%T'
+# full directory name in yellow
+PS1+='%F{yellow}%~%f '
 # Number of suspended jobs, if >= 1
 PS1+='%1(j. %F{cyan}[%j]%f.)'
 # % if normal user, $ if root
 PS1+='%# '
-# Full directory name, in magenta
-RPS1='%F{magenta}%~%f'
+# Current time in 18:30 format
+RPS1='%F{magenta}%T%f'
 
 # /Prompt }}}
 
