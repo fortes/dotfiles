@@ -71,14 +71,17 @@ fi
 
 # Only do VCS detection for Git
 zstyle ':vcs_info:*' enable git
-
+# Add yellow dot next to repo when there are staged changes
 zstyle ':vcs_info:*' stagedstr ' %F{yellow}●%f'
+# Add red dot next to repo when there are unstaged changes
 zstyle ':vcs_info:*' unstagedstr ' %F{red}●%f'
 zstyle ':vcs_info:*' check-for-changes true
+# Used during an action, like rebase
 zstyle ':vcs_info:*' actionformats '%F{green}(%b|%a)%f'
+# Normal prompt, just shows repo name in green
 zstyle ':vcs_info:*' formats '%F{green}(%b%c%u%F{green})%f'
 precmd () {
-    vcs_info
+  vcs_info
 }
 
 # user@host: in red in OSX, green otherwise
@@ -87,6 +90,8 @@ if [[ $OS == "Darwin" ]]; then
 else
   PS1='%F{green}%n@%m%f:'
 fi
+# Current Time in 18:30 format
+PS1='%F{magenta}[%T]%f '$PS1
 # full directory name in yellow
 PS1+='%F{yellow}%~%f '
 # Include VCS info
@@ -95,8 +100,10 @@ PS1+='${vcs_info_msg_0_}'
 PS1+='%1(j. %F{cyan}[%j]%f.)'
 # % if normal user, $ if root
 PS1+='%# '
-# Current time in 18:30 format
-RPS1='%F{magenta}%T%f'
+# Right side: Current time in 18:30 format
+#RPS1='%F{magenta}%T%f'
+# Spelling correction prompt
+SPROMPT='zsh: correct %F{red}%R%f to %F{green}%r%f [nyae]? '
 
 # /Prompt }}}
 
