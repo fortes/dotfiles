@@ -100,8 +100,6 @@ PS1+='${vcs_info_msg_0_}'
 PS1+='%1(j. %F{cyan}[%j]%f.)'
 # % if normal user, $ if root
 PS1+='%# '
-# Right side: Current time in 18:30 format
-#RPS1='%F{magenta}%T%f'
 # Spelling correction prompt
 SPROMPT='zsh: correct %F{red}%R%f to %F{green}%r%f [nyae]? '
 
@@ -119,7 +117,7 @@ alias utc='TZ="UTC" date'
 # Get readable list of network IPs
 alias ips="ifconfig -a | perl -nle'/(\d+\.\d+\.\d+\.\d+)/ && print $1'"
 alias myip="dig +short myip.opendns.com @resolver1.opendns.com"
-alias mygeo="curl -w \"\\n\" http://api.hackertarget.com/geoip/?q=`dig +short myip.opendns.com @resolver1.opendns.com`"
+alias mygeo="curl -w \"\\n\" http://api.hackertarget.com/geoip/\?q=\`myip\`"
 
 # Flush DNS cache
 alias dnsflush="dscacheutil -flushcache"
@@ -139,8 +137,10 @@ alias pcd="cd \$(git rev-parse --show-toplevel 2>/dev/null || echo '.')"
 # Map ls to be colorful
 if [[ $OS == "Darwin" ]]; then
   alias ls='ls -GpFh'
+  alias la='ls -AGpFh'
 else
   alias ls='ls --color=auto -GpFh'
+  alias ls='ls --color=auto -AGpFh'
 fi
 
 # }}}
