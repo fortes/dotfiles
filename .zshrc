@@ -12,6 +12,9 @@ autoload -U colors && colors
 # Load function-based completion system
 autoload -U compinit && compinit
 
+# For Git info in prompt
+autoload -Uz vcs_info
+
 # Zsh Options {{{
 
 # Change directory by typing its name like a command (useful with fzf)
@@ -66,6 +69,18 @@ fi
 
 # Prompt {{{
 
+# Only do VCS detection for Git
+zstyle ':vcs_info:*' enable git
+
+zstyle ':vcs_info:*' stagedstr ' %F{yellow}●%f'
+zstyle ':vcs_info:*' unstagedstr ' %F{red}●%f'
+zstyle ':vcs_info:*' check-for-changes true
+zstyle ':vcs_info:*' actionformats '%F{green}(%b|%a)%f'
+zstyle ':vcs_info:*' formats '%F{green}(%b%c%u%F{green})%f'
+precmd () {
+    vcs_info
+}
+
 # user@host: in red in OSX, green otherwise
 if [[ $OS == "Darwin" ]]; then
   PS1='%F{red}%n@%m%f:'
@@ -74,6 +89,8 @@ else
 fi
 # full directory name in yellow
 PS1+='%F{yellow}%~%f '
+# Include VCS info
+PS1+='${vcs_info_msg_0_}'
 # Number of suspended jobs, if >= 1
 PS1+='%1(j. %F{cyan}[%j]%f.)'
 # % if normal user, $ if root

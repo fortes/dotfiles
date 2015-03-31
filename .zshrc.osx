@@ -1,7 +1,9 @@
 # Tweak for accessing online help w/ homebrew installation
-unalias run-help
-autoload run-help
-HELPDIR=/usr/local/share/zsh/help
+if [[ -z $(type run-help | grep shell) ]]; then
+  unalias run-help
+  autoload run-help
+  HELPDIR=/usr/local/share/zsh/help
+fi
 
 # MAC manipulators, via jashkenas. Replace MAC in second line local MAC address
 # You can get the MAC address via: `ifconfig en0 | ack ether | cut -f2 -d' '`
