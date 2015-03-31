@@ -77,9 +77,9 @@ zstyle ':vcs_info:*' stagedstr ' %F{yellow}●%f'
 zstyle ':vcs_info:*' unstagedstr ' %F{red}●%f'
 zstyle ':vcs_info:*' check-for-changes true
 # Used during an action, like rebase
-zstyle ':vcs_info:*' actionformats '%F{green}(%b|%a)%f'
+zstyle ':vcs_info:*' actionformats '(%F{yellow}%b%f|%F{magenta}%a%f)'
 # Normal prompt, just shows repo name in green
-zstyle ':vcs_info:*' formats '%F{green}(%b%c%u%F{green})%f'
+zstyle ':vcs_info:*' formats '(%F{green}%b%c%u%f)'
 precmd () {
   vcs_info
 }
@@ -132,6 +132,9 @@ alias nyan='pygmentize -O style=default -f console256 -g'
 
 # Confirm file overwrite
 alias mv='mv -i'
+
+# CD into root of git project
+alias pcd="cd \$(git rev-parse --show-toplevel 2>/dev/null || echo '.')"
 
 # Map ls to be colorful
 if [[ $OS == "Darwin" ]]; then
