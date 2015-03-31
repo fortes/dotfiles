@@ -148,9 +148,15 @@ fi
 
 # Environment / Configuration {{{
 
-# Everyone's favorite editor
-export VISUAL=vim
-export EDITOR=vim
+# Use NeoVim if we have it
+if which nvim > /dev/null; then
+  alias vim=nvim
+  alias vi=nvim
+  export VISUAL=nvim
+else
+  export VISUAL=vim
+fi
+export EDITOR=$VISUAL
 
 # Keep emacs keys for easy readline
 bindkey -e
