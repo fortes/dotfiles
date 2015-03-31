@@ -10,7 +10,7 @@ set softvol=true
 set auto_expand_albums=false
 
 # Scrobber
-set status_display_program=~/dotfiles/scripts/last-cmus.py
+set status_display_program=~/dotfiles/scripts/cmus-status.sh
 
 # Include genre in playlist view
 set format_playlist= %-20%A %-20%l %3n %t %= [%g] %-4y
