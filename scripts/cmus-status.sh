@@ -4,8 +4,9 @@
 # Run last-cmus in background so we don't delay tmux status message
 python ~/dotfiles/scripts/last-cmus.py "$@" &
 
-# Send message to tmux
-if [ -n $TMUX ]; then
+# Send message to tmux (disabled since already in status bar)
+#if [ -n $TMUX ]; then
+if false; then
   title=""
   album=""
   artist=""
@@ -53,3 +54,6 @@ if [ -n $TMUX ]; then
     tmux set-opt -u display-time
   fi
 fi
+
+# Manually refresh the status bar
+tmux refresh-client -S
