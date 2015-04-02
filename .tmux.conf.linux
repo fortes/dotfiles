@@ -1,7 +1,0 @@
-# Ubuntu still running tmux 1.8, which doesn't support current_path
-unbind |
-bind-key | split-window -h
-unbind -
-bind-key - split-window -v
-unbind c
-bind-key c new-window
