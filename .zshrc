@@ -79,7 +79,7 @@ zstyle ':vcs_info:*' check-for-changes true
 # Used during an action, like rebase
 zstyle ':vcs_info:*' actionformats '(%F{yellow}%b%f|%F{magenta}%a%f)'
 # Normal prompt, just shows repo name in green
-zstyle ':vcs_info:*' formats '(%F{green}%b%c%u%f)'
+zstyle ':vcs_info:*' formats ' (%F{green}%b%f%c%u)'
 precmd () {
   vcs_info
 }
@@ -93,13 +93,11 @@ fi
 # Current Time in 18:30 format
 PS1='%F{magenta}[%T]%f '$PS1
 # full directory name in yellow
-PS1+='%F{yellow}%~%f '
+PS1+='%F{yellow}%~%f'
 # Include VCS info
 PS1+='${vcs_info_msg_0_}'
 # Number of suspended jobs, if >= 1
-PS1+='%1(j. %F{cyan}[%j]%f.)'
-# % if normal user, $ if root
-PS1+='%# '
+PS1+='%1(j. %F{cyan}[%j]%f . )'
 # Spelling correction prompt
 SPROMPT='zsh: correct %F{red}%R%f to %F{green}%r%f [nyae]? '
 
