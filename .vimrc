@@ -665,6 +665,11 @@ vnoremap <leader>cc :TComment<CR>
 vnoremap <leader>cu :TComment<CR>
 " }}}
 
+" Tern {{{
+let g:tern_show_signature_in_pum=1
+let g:tern_show_argument_hints=1
+" }}}
+
 " CoffeeScript {{{
 " <leader>-e Does CoffeeScript compilation in visual mode
 vnoremap <silent> <leader>e :CoffeeCompile<cr>
