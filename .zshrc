@@ -15,6 +15,9 @@ autoload -U compinit && compinit
 # For Git info in prompt
 autoload -Uz vcs_info
 
+# Enable bash-like command line editing via shortcut (see binding below)
+autoload -U edit-command-line
+
 # Zsh Options {{{
 
 # Change directory by typing its name like a command (useful with fzf)
@@ -148,6 +151,14 @@ fi
 # Everyone's favorite editor
 export VISUAL=vim
 export EDITOR=vim
+
+# Keep emacs keys for easy readline
+bindkey -e
+
+# Use <C-x><C-e> like bash to open command line in $EDITOR
+zle -N edit-command-line
+bindkey '^xe' edit-command-line
+bindkey '^x^e' edit-command-line
 
 # Nicer colors. BSD uses $LSCOLORS, linux uses $LS_COLORS
 export LSCOLORS=gxfxbxbxCxegedabagGxGx
