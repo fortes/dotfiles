@@ -1,0 +1,506 @@
+" vim:fdm=marker et fdl=2 ft=vim sts=2 sw=2 ts=2
+
+" Plugins {{{
+if !filereadable(expand('~/.nvim/autoload/plug.vim'))
+  echo 'Must install vim-plug, run ~/dotfiles/scripts/nvim-setup.sh'
+  echo 'Run vim -u NONE to open vim without .vimrc'
+  exit
+endif
+
+call plug#begin()
+
+" TODO: {{{
+" Plug 'benekastah/neomake'
+" Plug 'godlygeek/tabular'
+" Plug 'tpope/vim-abolish'
+" Supertab?
+" Plug 'gregsexton/gitv'
+" jsx
+" less
+" liquid
+" coffeescript
+" pangloss/vim-javascript?
+" snippets
+" statusline
+" syntastic?
+" }}}
+
+" Colors {{{
+Plug 'nanotech/jellybeans.vim'
+" Temporary while developing colorscheme
+Plug '~/x/vim-escuro'
+" }}}
+" Temporary while editing
+Plug '~/x/vim-personal-snippets/'
+
+" Editing {{{
+" Auto-creates matching parens, etc
+" <S-Tab> jumps over single delimiter in insert mode
+" <C-G>g jumps over contiguous in insert mode
+Plug 'Raimondi/delimitMate'
+" Snippet support, see configuration below
+Plug 'SirVer/ultisnips'
+" Comment / uncomment things quickly
+" {Visual}gc comment / uncomment selection
+" - gc{motion} comment / uncomment lines for motion
+Plug 'tpope/vim-commentary'
+" Make plugin actions for a few plugins repeatable
+Plug 'tpope/vim-repeat'
+" Readline-style keybindings everywhere (e.g. <C-a> for beginning of line)
+Plug 'tpope/vim-rsi'
+" Edit surrounding quotes / parents / etc
+" - {Visual}S<arg> surrounds selection
+" - cs/ds<arg1><arg2> change / delete
+" - ys<obj><arg> surrounds text object
+" - yss<arg> for entire line
+Plug 'tpope/vim-surround'
+" Extra motion commands, including:
+" - [f, ]f next/prev file in directory
+" - [n, ]n next/prev SCM conflict
+" Toggles a few options:
+" - coh hlsearch
+" - con number
+" - cos spell
+" - cow wrap
+" Additonal paste options
+" - >p paste and indent
+" - <p paste and deindent
+Plug 'tpope/vim-unimpaired'
+" }}}
+
+" File Handling {{{
+" Fuzzy finder, see config below for more
+" <C-p> start fuzzy finder
+" <C-d> toggle between full path and filename search
+" <C-r> Toggle between string and regex mode
+" <C-f>/<C-b> to change search modes
+" <C-s>/<C-v> open in split / vertical split
+" <C-t> open in tab
+" <tab> autocomplete directory
+Plug 'kien/ctrlp.vim'
+" Make netrw better
+" - '-' in any buffer to go up to directory listing
+" - cg/cl to cd into the 
+" - ! to use the file in a command
+Plug 'tpope/vim-vinegar'
+" }}}
+
+" General coding {{{
+" Cd into the root of of the project with :ProjectRootCD
+Plug 'dbakker/vim-projectroot'
+" }}}
+
+" Git {{{
+Plug 'tpope/vim-fugitive'
+" }}}
+
+" Javascript {{{
+" JS syntax, supports ES6
+Plug 'othree/yajs.vim', {
+\   'for': ['javascript']
+\ }
+" JS syntax for common libraries
+Plug 'othree/javascript-libraries-syntax.vim', {
+\   'for': ['javascript']
+\ }
+" Tern auto-completion engine for JS (requires node/npm)
+if executable('node')
+  Plug 'marijnh/tern_for_vim', {
+\     'do': 'npm install',
+\     'for': ['javascript', 'coffee']
+\   }
+endif
+" Makes gf work on node require statements
+Plug 'moll/vim-node', {
+\   'for': ['javascript']
+\ }
+call plug#end()
+" }}}
+" }}}
+
+" Vanilla Configuration (no plugins) {{{
+
+" Use `:help 'optionname'` (with the quotes) for documentation
+
+" Core Behavior {{{
+" Enable loading plugin / indent settings based on filetype
+filetype plugin indent on
+
+" Don't redraw while executing macros, etc
+set lazyredraw
+
+" Mapping & keycode timeouts
+set timeoutlen=250
+set ttimeout
+set ttimeoutlen=100
+
+" Never forget
+if &history < 1000
+  set history=1000
+endif
+
+" Allow more than 10 tabs at once
+if &tabpagemax < 25
+  set tabpagemax=25
+endif
+
+" Load matchit.vim, but only if the user hasn't installed a newer version.
+if !exists('g:loaded_matchit') && findfile('plugin/matchit.vim', &rtp) ==# ''
+  runtime! macros/matchit.vim
+endif
+" }}}
+
+" UI {{{
+" Maintain indent when wrapping
+if exists('+breakindent')
+  set breakindent
+endif
+
+" Highlight textwidth column
+set colorcolumn=+1
+
+" Display as much as possible as last line, instead of just showing @
+set display=lastline
+
+" Auto-close folds below current foldlevel when cursor leaves
+set foldclose=all
+
+" Enable folds, using markers by default
+set foldenable
+set foldmethod=marker
+
+" Default to having all folds open
+set foldlevelstart=99
+
+" Limit folds when using indent or syntax
+set foldnestmax=5
+
+set foldopen+=jump
+
+" Always show statusline
+set laststatus=2
+
+" Let same document scroll differently in separate panes
+set noscrollbind
+
+" Hide default mode text (i.e. INSERT below status line)
+set noshowmode
+
+" Use 5 characters for number well
+set numberwidth=5
+
+" Support mouse
+set mouse=a
+set ttymouse=xterm2
+
+" Disable visual bell
+set noerrorbells
+set visualbell t_vb=
+
+" Show cursor position in bottom right
+set ruler
+
+" Keep lines in view at edges of screen
+set scrolloff=5
+set sidescrolloff=5
+set sidescroll=1
+
+" Hide the intro screen, use [+] instead of [Modified], use [RO] instead
+" of [readyonly]
+set shortmess+=Imr
+
+" Display incomplete commands
+set showcmd
+
+" Open new split panes to right and bottom, which feels more natural
+set splitbelow
+set splitright
+
+" Make filename tab completion more bash-like
+set wildmenu
+set wildmode=longest,full
+" }}}
+
+" File Handling {{{
+" Automatically cd into the directory of the file we're editing
+set autochdir
+
+" Automatically reload modified files
+set autoread
+
+" Automatically write files on :next, :make, etc
+set autowrite
+
+" Support mac files
+set fileformats+=mac
+
+" Hide buffers instead of closing them (useful for switching between files)
+set hidden
+
+" Don't use backup files, we have Git for that
+set nobackup
+set noswapfile
+set nowritebackup
+
+" Ignore autogenerated files
+set wildignore+=*.o,*.obj,*.pyc
+" Ignore source control
+set wildignore+=.git
+" Ignore lib/ dirs since the contain compiled libraries typically
+set wildignore+=build,lib,node_modules,public,_site,third_party
+" Ignore images and fonts
+set wildignore+=*.gif,*.jpg,*.jpeg,*.otf,*.png,*.svg,*.ttf
+" }}}
+
+" Editing Behavior {{{
+" Indentation {{{
+" Basic auto indentation
+set autoindent
+
+" C-style indentation
+set cindent
+
+" Tabs are spaces
+set expandtab
+
+" 2 spaces, not tabs
+set shiftwidth=2
+set softtabstop=2
+set tabstop=2
+
+" Round up indents
+set shiftround
+
+" Backspace should delete tabwidth of characters
+set smarttab
+" }}}
+
+" Remove silly restrictions from backspace
+set backspace=indent,eol,start
+
+" Don't scan included files for keyword completion (too slow)
+set complete-=i
+
+" Keyword completion brings in the dictionary if spell check is enabled
+set complete+=kspell
+
+" Only insert longest common text of matches & show menu when only one match
+set completeopt=menuone,longest
+
+" Make sure there's a default dictionary for completion
+if filereadable('/usr/share/dict/words')
+  set dictionary+=/usr/share/dict/words
+endif
+
+" Default formatoptions: crqlbon
+" Auto-wrap text and comments using text width
+set formatoptions+=tc
+" Only break the line if wasn't longer than 80 chars when editing began
+" and there is a blank somewhere in the line
+set formatoptions+=lb
+" Don't continue comments when pressing o/O
+set formatoptions-=o
+" Recognize numbered lists and wrap accordingly
+set formatoptions+=n
+" Remove comment leader when joining lines (added in Vim 7.4)
+if version >= 704
+  set formatoptions+=j
+endif
+
+" Show special indicators
+set list
+" Highlight trailing spaces
+set listchars=trail:·,tab:»·
+" Show wrap indicators
+set listchars+=extends:»,precedes:«
+" Show non-breaking spaces
+set listchars+=nbsp:%
+
+" Allow incrementing letters
+set nrformats+=alpha
+
+" Always assume decimal numbers
+set nrformats-=octal
+
+" Show matching brackets for half a second
+set showmatch
+set matchtime=5
+
+" Wrap at 80 characters
+set textwidth=80
+
+" Make h/l move across beginning/end of line
+set whichwrap+=hl
+
+" Soft wrap, with indicator
+set wrap
+set showbreak=«
+" }}}
+
+" Colors & Syntax Highlighting {{{
+" Base install has some lame themes, this one is OK, I guess
+set background=dark
+colorscheme industry
+if &t_Co >= 256
+  " Upgrade if we have more colors, stays with default if not available
+  silent! colorscheme escuro
+endif
+
+" Enable syntax highlighting by default
+syntax enable
+" }}}
+
+" Searching {{{
+" Match all results in a line by default
+set gdefault
+
+" Highlight search results & clear with <C-L>
+set hlsearch
+nnoremap <silent> <C-L> :nohlsearch<CR><C-L>
+
+" Use ag/ack instead of grep, if available
+if executable('ag')
+  set grepprg=ag\ --nogroup\ --nocolor\ --column\ --smart-case\ --follow
+  set grepformat=%f:%l:%c:%m
+elseif executable('ack')
+  set grepprg=ack\ --nogroup\ --nocolor\ --column\ --smart-case\ --follow\ $*
+  set grepformat=%f:%l:%c:%m
+endif
+
+" K searches for word under cursor in root of project
+" Need to force redraw of screen after, since for some reason grep and opening
+" the quicklist mess everything up
+if exists(':ProjectRootCD')
+  " Search across entire project if possible
+  nnoremap K :ProjectRootCD<CR>:silent! grep! "\b<C-R><C-W>\b"<CR>:cwindow<CR><C-L>
+else
+  nnoremap K :silent! grep! "\b<C-R><C-W>\b"<CR>:cwindow<CR><C-L>
+endif
+
+" Q accepts regex input for searching in project via Ack
+" Inspired by https://robots.thoughtbot.com/faster-grepping-in-vim
+if executable('ack')
+  if !exists(':Ack')
+    command -nargs=+ -complete=file -bar Ack silent! grep! <args>|cwindow|redraw!
+  endif
+
+  if exists(':ProjectRootCD')
+    nnoremap Q :ProjectRootCD<CR>:Ack<SPACE>
+  else
+    nnoremap Q :Ack<SPACE>
+  endif
+endif
+
+" Ignore case, except when using some uppercase
+set ignorecase
+set smartcase
+
+" Show incremental search matches
+set incsearch
+" }}}
+
+" Efficiency Shortcuts {{{
+" Use comma as leader
+let mapleader=","
+let g:mapleader=","
+
+" Make ; equivalent to : (faster commands)
+nnoremap ; :
+
+" Hide annoying quit message
+nnoremap <C-c> <C-c>:echo<cr>
+
+" Map jj and jk to <ESC> to leave insert mode quickly
+inoremap jj <ESC>
+inoremap jk <ESC>
+
+" Make j/k move screen visible lines, not file lines
+nnoremap j gj
+nnoremap k gk
+
+" CTRL-U for undo in insert mode
+inoremap <C-U> <C-G>u<C-U>
+
+" Never use Ex-mode
+nnoremap Q <nop>
+
+" Never use ZZ, too dangerous
+nnoremap ZZ <nop>
+
+" }}}
+
+" Neovim/vim split settings {{{
+if has('nvim')
+  " Useful reference for Neovim-only features:
+  " https://github.com/neovim/neovim/wiki/Differences-from-vim
+
+  " Terminal key bindings for window switching
+else
+  " Defaults in Neovim
+  set nocompatible
+  set encoding=utf-8
+  set ttyfast
+endif
+" }}}
+" }}}
+
+syntax enable
+
+" Filetype configuration {{{
+augroup filetype_javascript
+  autocmd!
+  autocmd FileType javascript setlocal makeprg=eslint\ -f\ compact\ %
+  autocmd FileType javascript setlocal errorformat="%E%f: line %l\, col %c\, Error - %m,%W%f: line %l\, col %c\, Warning - %m"
+  "autocmd FileType javascript setlocal errorformat=%E%f: line %l\, col %c\, Error - %m,%W%f: line %l\, col %c\, Warning - %m
+augroup END
+" }}}
+
+" Plugin Configuration {{{
+" CtrlP {{{
+" <C-p> to search files, buffers, and MRU
+let g:ctrlp_map='<c-p>'
+let g:ctrlp_cmd='CtrlPMixed'
+
+" Use ag for listing files
+if executable('ag')
+  " Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
+  let g:ctrlp_user_command='ag %s -l --nocolor -g ""'
+
+  " ag is fast enough that CtrlP doesn't need to cache
+  let g:ctrlp_use_caching=0
+endif
+" }}}
+
+" UltiSnips {{{
+" Use tab to expand snippet and move to next target. Shift tab goes back.
+" <C-k> lists available snippets for the file
+let g:UltiSnipsExpandTrigger="<tab>"
+let g:UltiSnipsListSnippets="<C-k>"
+let g:UltiSnipsJumpForwardTrigger="<tab>"
+let g:UltiSnipsJumpBackwardTrigger="<S-tab>"
+" }}}
+
+" delimitMate {{{
+" <CR> after delimiter does block style
+let delimitMate_expand_cr=2
+" Pressing space after delimiter adds space on both sides
+let delimitMate_expand_space=1
+" Goes past closing expansions when on next line
+let delimitMate_jump_expansion=1
+" }}}
+
+" Tern {{{
+let g:tern_show_signature_in_pum=1
+let g:tern_show_argument_hints=1
+" }}}
+
+" Javascript libraries syntax {{{
+let g:used_javascript_libs='react'
+" }}}
+" }}}
+
+" Local Settings {{{
+if filereadable(expand("~/.nvimrc.local"))
+  so ~/.nvimrc.local
+endif
+" }}}
