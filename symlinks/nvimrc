@@ -3,7 +3,7 @@
 " Plugins {{{
 if !filereadable(expand('~/.nvim/autoload/plug.vim'))
   echo 'Must install vim-plug, run ~/dotfiles/scripts/nvim-setup.sh'
-  echo 'Run vim -u NONE to open vim without .vimrc'
+  echo 'Run nvim -u NONE to open without .vimrc'
   exit
 endif
 
@@ -12,6 +12,7 @@ call plug#begin()
 " TODO: {{{
 " Plug 'benekastah/neomake'
 " Plug 'godlygeek/tabular'
+" Plug 'tpope/vim-dispatch'
 " Plug 'tpope/vim-abolish'
 " Supertab?
 " Plug 'gregsexton/gitv'
@@ -25,12 +26,16 @@ call plug#begin()
 " syntastic?
 " }}}
 
+Plug 'dhruvasagar/vim-markify'
 " Colors {{{
 Plug 'nanotech/jellybeans.vim'
 " Temporary while developing colorscheme
 Plug '~/x/vim-escuro'
+" Shades indent levels
+Plug 'nathanaelkane/vim-indent-guides'
 " }}}
 " Temporary while editing
+"Plug 'fortes/vim-personal-snippets'
 Plug '~/x/vim-personal-snippets/'
 
 " Editing {{{
@@ -68,7 +73,9 @@ Plug 'tpope/vim-surround'
 Plug 'tpope/vim-unimpaired'
 " }}}
 
-" File Handling {{{
+" File/Buffer Handling {{{
+" Cd into the root of of the project with :ProjectRootCD
+Plug 'dbakker/vim-projectroot'
 " Fuzzy finder, see config below for more
 " <C-p> start fuzzy finder
 " <C-d> toggle between full path and filename search
@@ -78,6 +85,13 @@ Plug 'tpope/vim-unimpaired'
 " <C-t> open in tab
 " <tab> autocomplete directory
 Plug 'kien/ctrlp.vim'
+" Browser-like history for buffers (can go back several times to previous bufs)
+Plug 'ton/vim-bufsurf'
+" Adds helpers for UNIX shell commands
+" :Remove Delete buffer and file at same time
+" :Unlink Delete file, keep buffer
+" :Move Rename buffer and file
+Plug 'tpope/vim-eunuch'
 " Make netrw better
 " - '-' in any buffer to go up to directory listing
 " - cg/cl to cd into the 
@@ -86,12 +100,11 @@ Plug 'tpope/vim-vinegar'
 " }}}
 
 " General coding {{{
-" Cd into the root of of the project with :ProjectRootCD
-Plug 'dbakker/vim-projectroot'
 " }}}
 
 " Git {{{
 Plug 'tpope/vim-fugitive'
+"Plug 'airblade/vim-gitgutter'
 " }}}
 
 " Javascript {{{
@@ -117,6 +130,10 @@ Plug 'moll/vim-node', {
 call plug#end()
 " }}}
 " }}}
+
+" TODO:
+" - clipboard setup?
+" - VimResized event?
 
 " Vanilla Configuration (no plugins) {{{
 
@@ -424,9 +441,18 @@ inoremap <C-U> <C-G>u<C-U>
 " Never use Ex-mode
 nnoremap Q <nop>
 
+" Never use manual command
+nnoremap K <nop>
+vnoremap K <nop>
+
 " Never use ZZ, too dangerous
 nnoremap ZZ <nop>
 
+" <leader>c to copy to system clipboard in visual mode
+vnoremap <leader>c "+yy
+
+" <leader>v to paste from system clipboard in normal mode
+nnoremap <leader>p "+p
 " }}}
 
 " Neovim/vim split settings {{{
@@ -447,15 +473,44 @@ endif
 syntax enable
 
 " Filetype configuration {{{
-augroup filetype_javascript
+
+" .md is markdown, not modula
+autocmd BufNewFile,BufReadPost *.md set filetype=markdown
+
+" ES6 is JS
+augroup es6_filetype
   autocmd!
-  autocmd FileType javascript setlocal makeprg=eslint\ -f\ compact\ %
-  autocmd FileType javascript setlocal errorformat="%E%f: line %l\, col %c\, Error - %m,%W%f: line %l\, col %c\, Warning - %m"
-  "autocmd FileType javascript setlocal errorformat=%E%f: line %l\, col %c\, Error - %m,%W%f: line %l\, col %c\, Warning - %m
+  autocmd BufRead,BufNewFile *.es6 set filetype=javascript
+augroup END
+
+augroup javascript_configuration
+  autocmd!
+
+  " Set up linting for JS
+  if executable('eslint')
+    autocmd FileType javascript setlocal makeprg=eslint\ -f\ compact\ %
+    autocmd FileType javascript setlocal errorformat=%E%f:\ line\ %l\\,\ col\ %c\\,\ Error\ -\ %m
+    autocmd FileType javascript setlocal errorformat+=,%W%f:\ line\ %l\\,\ col\ %c\\,\ Warning\ -\ %m
+    " Check for lint errors on open & write
+    autocmd BufRead,BufWritePost *.js silent make! | redraw
+  endif
+
+  " Use esformatter to autoformat
+  if executable('esformatter')
+    autocmd FileType javascript setlocal formatprg=esformatter
+  endif
 augroup END
 " }}}
 
 " Plugin Configuration {{{
+
+" Markify {{{
+" Use nicer symbols
+let g:markify_error_text = '✗'
+let g:markify_warning_text = '⚠'
+let g:markify_info_text = 'ℹ'
+" }}}
+
 " CtrlP {{{
 " <C-p> to search files, buffers, and MRU
 let g:ctrlp_map='<c-p>'
@@ -492,6 +547,30 @@ let delimitMate_jump_expansion=1
 " Tern {{{
 let g:tern_show_signature_in_pum=1
 let g:tern_show_argument_hints=1
+" }}}
+
+" Indent Guides {{{
+" Default guides to on everywhere
+let g:indent_guides_enable_on_vim_startup=1
+
+" Don't turn on mapping for toggling guides
+let g:indent_guides_default_mapping=0
+
+" Don't use their colors, depending on the colorscheme to define
+let g:indent_guides_auto_colors=0
+
+" Wait until we've nested a little before showing
+let g:indent_guides_start_level=3
+
+" Skinny guides
+let g:indent_guides_guide_size=1
+" }}}
+
+" BufSurf {{{
+" Use [b and ]b (taken over from unimpaired)
+nnoremap [b :silent BufSurfBack<CR>
+" Use <M-^>/<M-6> as forward
+nnoremap ]b :silent BufSurfForward<CR>
 " }}}
 
 " Javascript libraries syntax {{{
