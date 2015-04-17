@@ -182,9 +182,9 @@ fi
 export BEETSDIR=$HOME/.beets/
 
 # Have eslint pick up default config
-if [ -f ~/.eslintrc ]; then
-  alias eslint='eslint -c ~/.eslintrc'
-fi
+# if [ -f ~/.eslintrc ]; then
+#   alias eslint='eslint -c ~/.eslintrc'
+# fi
 
 # }}}
 
