@@ -5,6 +5,7 @@ enfield
 esformatter
 esformatter-braces
 esformatter-quotes
+esformatter-semicolons
 eslint
 js-beautify
 js2coffee
