@@ -103,7 +103,12 @@ Plug 'tpope/vim-vinegar'
 
 " Git {{{
 Plug 'tpope/vim-fugitive'
-"Plug 'airblade/vim-gitgutter'
+" Adds gutter signs and highlights based on git diff
+" [c ]c to jump to prev/next change hunks
+" <leader>hs to stage hunks within cursor
+" <leader>hr to revert hunks within cursor
+" <leader>hv to preview the hunk
+Plug 'airblade/vim-gitgutter'
 " }}}
 
 " Javascript {{{
@@ -549,6 +554,30 @@ let delimitMate_jump_expansion=1
 " Tern {{{
 let g:tern_show_signature_in_pum=1
 let g:tern_show_argument_hints=1
+" }}}
+
+" GitGutter {{{
+" Unimpaired-style toggling for the line highlights
+" cogg Gutter / cogl line highlight
+nnoremap <silent> cogg :GitGutterToggle<CR>
+nnoremap <silent> cogl :GitGutterLineHighlightsToggle<CR>
+
+" Ignore whitespace
+let g:gitgutter_diff_args='-w'
+
+" Use raw grep
+let g:gitgutter_escape_grep=1
+
+" Use highlighting as well as signs
+let g:gitgutter_highlight_lines=1
+
+" Be aggressive about looking for diffs
+let g:gitgutter_realtime=1
+let g:gitgutter_eager=1
+
+" Tweak signs
+let g:gitgutter_sign_modified='±'
+let g:gitgutter_sign_modified_removed='≠'
 " }}}
 
 " Indent Guides {{{
