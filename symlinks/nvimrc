@@ -102,6 +102,21 @@ Plug 'tpope/vim-vinegar'
 " }}}
 
 " Git {{{
+" Run Git commands from within Vim
+" :Gstatus show `git status` in preview window
+" - <C-N>/<C-P> next/prev file
+" - - add/reset file under cursor
+" - ca :Gcommit --amend
+" - cc :Gcommit
+" - D :Gdiff
+" - p :Git add --patch (reset on staged files)
+" - q close status
+" - r reload status
+" :Gcommit for committing
+" :Gblame run blame on current file
+" - <CR> open commit
+" - o/O open commit in split/tab
+" - - reblame commit
 Plug 'tpope/vim-fugitive'
 " Adds gutter signs and highlights based on git diff
 " [c ]c to jump to prev/next change hunks
