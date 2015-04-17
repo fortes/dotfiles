@@ -21,7 +21,6 @@ call plug#begin()
 " liquid
 " coffeescript
 " pangloss/vim-javascript?
-" snippets
 " statusline
 " syntastic?
 " }}}
@@ -495,7 +494,7 @@ augroup javascript_configuration
     autocmd BufRead,BufWritePost *.js silent make! | redraw
   endif
 
-  " Use esformatter to autoformat
+  " Use esformatter to autoformat (gq in Visual mode)
   if executable('esformatter')
     autocmd FileType javascript setlocal formatprg=esformatter
   endif

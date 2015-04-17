@@ -11,14 +11,14 @@ if [ $OS == 'Darwin' ]; then
   fi
   if which neovim &> /dev/null; then
     echo 'Installing latest NeoVim from HEAD'
-    #brew install --HEAD neovim
+    brew install --HEAD neovim
   else
     read -p 'NeoVim already installed. Update from HEAD [yn]? ' -n 1 -r
     echo ''
     if [[ $REPLY =~ [Yy]$ ]]; then
       echo 'Updating to latest NeoVim'
-      #brew update
-      #brew reinstall --HEAD neovim
+      brew update
+      brew reinstall --HEAD neovim
     else
       echo 'Skipping NeoVim update'
     fi
