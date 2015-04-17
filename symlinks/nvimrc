@@ -393,6 +393,9 @@ else
   nnoremap K :silent! grep! "\b<C-R><C-W>\b"<CR>:cwindow<CR><C-L>
 endif
 
+" <leader>s starts a find a replace for word under cursor
+nnoremap <leader>s :%s/\<<C-R><C-W>\>//g<Left><Left>
+
 " Q accepts regex input for searching in project via Ack
 " Inspired by https://robots.thoughtbot.com/faster-grepping-in-vim
 if executable('ack')
