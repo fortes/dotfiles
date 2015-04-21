@@ -494,6 +494,14 @@ nnoremap ; :
 " Hide annoying quit message
 nnoremap <C-c> <C-c>:echo<cr>
 
+" Close quickfix & help with q, Escape, or Control-C
+augroup easy_close
+  autocmd!
+  autocmd BufReadPost * if !&modifiable|nnoremap <buffer> q :q<cr>|endif
+  autocmd BufReadPost * if !&modifiable|nnoremap <buffer> <Esc> :q<cr>|endif
+  autocmd BufReadPost * if !&modifiable|nnoremap <buffer> <C-c> :q<cr>|endif
+augroup END
+
 " Map jj and jk to <ESC> to leave insert mode quickly
 inoremap jj <ESC>
 inoremap jk <ESC>
@@ -520,6 +528,9 @@ vnoremap <leader>c "+yy
 
 " <leader>v to paste from system clipboard in normal mode
 nnoremap <leader>p "+p
+
+" Unimpaired-style toggling of paste mode
+nnoremap cop :set invpaste<cr>
 " }}}
 
 " Neovim/vim split settings {{{
@@ -555,13 +566,6 @@ function! g:OnVimEnter()
       " Check for lint errors on open & write
       autocmd BufRead,BufWritePost *.js silent Neomake|redraw
     endif
-
-    if exists(':TernRename')
-      " <leader>tr to rename variable under cursor
-      autocmd FileType javascript nnoremap <leader>tr :TernRename<cr>
-      " <leader>td to go to definition
-      autocmd FileType javascript nnoremap <leader>td :TernDef<cr>
-    endif
   augroup END
 
   if exists(':ProjectRootCD')
@@ -574,17 +578,24 @@ endfunction
 
 " Filetype configuration {{{
 
-" .md is markdown, not modula
-autocmd BufNewFile,BufReadPost *.md set filetype=markdown
-
-" ES6 is JS
-augroup es6_filetype
+augroup filetype_tweaks
   autocmd!
+
+  " Not all files should wrap automatically
+  autocmd BufNewFile,BufReadPost *.txt,*.md,*.markdown setlocal textwidth=0
+
+  " Enable spell checking in some filetypes
+  autocmd BufNewFile,BufReadPost *.txt,*.md,*.markdown,COMMIT_EDITMSG
+          \ setlocal spell
+
+  " Disable spell checking on unmodifiable files (what's the point?)
+  autocmd BufReadPost * if !&modifiable | setlocal nospell | endif
+
+  " .md is markdown, not modula
+  autocmd BufNewFile,BufReadPost *.md set filetype=markdown
+
+  " ES6 is JS
   autocmd BufRead,BufNewFile *.es6 set filetype=javascript
-augroup END
-
-augroup javascript_configuration
-  autocmd!
 
   " Set up linting for JS
   if executable('eslint')
@@ -639,6 +650,9 @@ let g:markify_info_text = 'ℹ'
 " <C-p> to search files, buffers, and MRU
 let g:ctrlp_map='<c-p>'
 let g:ctrlp_cmd='CtrlPMixed'
+
+" Don't jump to a window that is already open, but do jump to tabs
+let g:ctrlp_switch_buffer = 't'
 
 " <M-p> for just Buffers
 nnoremap <silent> <M-p> :CtrlPBuffer<CR>
