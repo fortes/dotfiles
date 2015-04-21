@@ -10,7 +10,7 @@ endif
 call plug#begin()
 
 " TODO: {{{
-" Plug 'benekastah/neomake'
+Plug 'benekastah/neomake'
 " Plug 'godlygeek/tabular'
 " Plug 'tpope/vim-dispatch'
 " Plug 'tpope/vim-abolish'
@@ -27,7 +27,7 @@ call plug#begin()
 
 Plug 'dhruvasagar/vim-markify'
 " Colors {{{
-Plug 'nanotech/jellybeans.vim'
+Plug 'w0ng/vim-hybrid'
 " Temporary while developing colorscheme
 Plug '~/x/vim-escuro'
 " Shades indent levels
@@ -166,7 +166,7 @@ filetype plugin indent on
 set lazyredraw
 
 " Mapping & keycode timeouts
-set timeoutlen=250
+set timeoutlen=200
 set ttimeout
 set ttimeoutlen=100
 
@@ -379,7 +379,8 @@ set background=dark
 colorscheme industry
 if &t_Co >= 256
   " Upgrade if we have more colors, stays with default if not available
-  silent! colorscheme escuro
+  " silent! colorscheme escuro
+  silent! colorscheme hybrid
 endif
 
 " Enable syntax highlighting by default
@@ -406,12 +407,7 @@ endif
 " K searches for word under cursor in root of project
 " Need to force redraw of screen after, since for some reason grep and opening
 " the quicklist mess everything up
-if exists(':ProjectRootCD')
-  " Search across entire project if possible
-  nnoremap K :ProjectRootCD<CR>:silent! grep! "\b<C-R><C-W>\b"<CR>:cwindow<CR><C-L>
-else
-  nnoremap K :silent! grep! "\b<C-R><C-W>\b"<CR>:cwindow<CR><C-L>
-endif
+nnoremap K :silent! grep! "\b<C-R><C-W>\b"<CR>:cwindow<CR><C-L>
 
 " <leader>s starts a find a replace for word under cursor
 nnoremap <leader>s :%s/\<<C-R><C-W>\>//g<Left><Left>
@@ -423,11 +419,7 @@ if executable('ack')
     command -nargs=+ -complete=file -bar Ack silent! grep! <args>|cwindow|redraw!
   endif
 
-  if exists(':ProjectRootCD')
-    nnoremap Q :ProjectRootCD<CR>:Ack<SPACE>
-  else
-    nnoremap Q :Ack<SPACE>
-  endif
+  nnoremap Q :Ack<SPACE>
 endif
 
 " Ignore case, except when using some uppercase
@@ -483,6 +475,9 @@ if has('nvim')
   " https://github.com/neovim/neovim/wiki/Differences-from-vim
 
   " Terminal key bindings for window switching
+  " Map jj and jk to <ESC> to leave insert mode quickly
+  tnoremap jj <C-\><C-n>
+  tnoremap jk <C-\><C-n>
 else
   " Defaults in Neovim
   set nocompatible
@@ -493,6 +488,36 @@ endif
 " }}}
 
 syntax enable
+
+augroup on_vim_enter
+  autocmd!
+  autocmd VimEnter * call OnVimEnter()
+augroup END
+
+" Called after plugins have loaded {{{
+function! g:OnVimEnter()
+  augroup javascript_after_configuration
+    autocmd!
+    if exists(':Neomake')
+      " Check for lint errors on open & write
+      autocmd BufRead,BufWritePost *.js silent Neomake|redraw
+    endif
+
+    if exists(':TernRename')
+      " <leader>tr to rename variable under cursor
+      autocmd FileType javascript nnoremap <leader>tr :TernRename<cr>
+      " <leader>td to go to definition
+      autocmd FileType javascript nnoremap <leader>td :TernDef<cr>
+    endif
+  augroup END
+
+  if exists(':ProjectRootCD')
+    " Search across entire project when possible
+    nnoremap K :ProjectRootCD<CR>:silent! grep! "\b<C-R><C-W>\b"<CR>:cwindow<CR><C-L>
+    nnoremap Q :ProjectRootCD<CR>:Ack<SPACE>
+  endif
+endfunction
+" }}}
 
 " Filetype configuration {{{
 
@@ -513,8 +538,6 @@ augroup javascript_configuration
     autocmd FileType javascript setlocal makeprg=eslint\ -f\ compact\ %
     autocmd FileType javascript setlocal errorformat=%E%f:\ line\ %l\\,\ col\ %c\\,\ Error\ -\ %m
     autocmd FileType javascript setlocal errorformat+=,%W%f:\ line\ %l\\,\ col\ %c\\,\ Warning\ -\ %m
-    " Check for lint errors on open & write
-    autocmd BufRead,BufWritePost *.js silent make! | redraw
   endif
 
   " Use esformatter to autoformat (gq in Visual mode)
@@ -522,6 +545,7 @@ augroup javascript_configuration
     autocmd FileType javascript setlocal formatprg=esformatter
   endif
 augroup END
+
 " }}}
 
 " Plugin Configuration {{{
@@ -537,6 +561,9 @@ let g:markify_info_text = 'ℹ'
 " <C-p> to search files, buffers, and MRU
 let g:ctrlp_map='<c-p>'
 let g:ctrlp_cmd='CtrlPMixed'
+
+" <M-p> for just Buffers
+nnoremap <silent> <M-p> :CtrlPBuffer<CR>
 
 " Use ag for listing files
 if executable('ag')
