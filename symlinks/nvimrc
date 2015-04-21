@@ -17,7 +17,6 @@ Plug 'benekastah/neomake'
 " Supertab?
 " Plug 'gregsexton/gitv'
 " jsx
-" less
 " liquid
 " coffeescript
 " pangloss/vim-javascript?
@@ -125,6 +124,11 @@ Plug 'tpope/vim-fugitive'
 " <leader>hv to preview the hunk
 Plug 'airblade/vim-gitgutter'
 " }}}
+
+" LESS Support
+Plug 'groenewege/vim-less', {
+\ 'for': ['less']
+\ }
 
 " Javascript {{{
 " JS syntax, supports ES6
@@ -544,8 +548,33 @@ augroup javascript_configuration
   if executable('esformatter')
     autocmd FileType javascript setlocal formatprg=esformatter
   endif
-augroup END
 
+  " Simple folding for JS
+  autocmd FileType javascript setlocal fdm=marker fmr={,}
+
+  " <leader>tr to rename variable under cursor
+  autocmd FileType javascript nnoremap <leader>tr :TernRename<cr>
+  " <leader>td to go to definition
+  autocmd FileType javascript nnoremap <leader>td :TernDef<cr>
+
+  " Use folds in .vimrc
+  autocmd FileType vim set fdm=marker fdl=9
+
+  " Consider '-' part of a world when tab completion, etc in css/less
+  autocmd FileType css setlocal iskeyword+=-
+  autocmd FileType less setlocal iskeyword+=-
+
+  " Simple folding for CSS/LESS
+  autocmd FileType css setlocal fdm=marker fmr={,}
+  autocmd FileType less setlocal fdm=marker fmr={,}
+
+  " Fold via indent in CoffeeScript and Python
+  autocmd FileType coffee setlocal foldmethod=indent
+  autocmd FileType python setlocal foldmethod=indent
+
+  " Python uses 4 spaces
+  autocmd FileType python setlocal shiftwidth=4
+augroup END
 " }}}
 
 " Plugin Configuration {{{
