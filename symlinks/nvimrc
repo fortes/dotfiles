@@ -292,6 +292,55 @@ set wildignore+=build,lib,node_modules,public,_site,third_party
 set wildignore+=*.gif,*.jpg,*.jpeg,*.otf,*.png,*.svg,*.ttf
 " }}}
 
+" Status line {{{
+
+" Show git repo information
+let g:activeStatusLine=" %{StatuslineTag()} "
+" Relative path to file in current buffer
+let g:activeStatusLine.="\ue0b1 %<%f "
+" Use unicode lock symbol if not modifiable, + if modified
+let g:activeStatusLine.="%{&readonly ? \"\ue0a2 \" : &modified ? '+ ' : ''}"
+" Start left align, show filetype
+let g:activeStatusLine.="%= %{&filetype == '' ? 'unknown' : &filetype} "
+" Line/col/percent
+let g:activeStatusLine.="%l:%2c "
+function! StatuslineTag()
+  if exists('b:git_dir')
+    let dir = fnamemodify(b:git_dir[:-6], ':t')
+    return dir." \ue0a0 ".fugitive#head(7)
+  else
+    return fnamemodify(getwinvar(0, 'getcwd', getcwd()), ':t')
+  endif
+endfunction
+
+let g:quickfixStatusLine="%t (%l of %L)"
+let g:quickfixStatusLine.="%{exists('w:quickfix_title')? ' '.w:quickfix_title : ''}"
+let g:quickfixStatusLine.="%=%-15(%l,%c%V%) %P"
+
+" Default status line
+set statusline=g:activeStatusLine
+
+" Use different status line for active vs. inactive buffers
+function! UpdateStatusLine(status)
+  if &filetype=="qf"
+    let &l:statusline=g:quickfixStatusLine
+  elseif &filetype=="help" || &filetype=="netrw"
+    let &l:statusline=&filetype
+  elseif a:status
+    let &l:statusline=g:activeStatusLine
+  else
+    " Just show filename & modified when inactive
+    let &l:statusline='%f %{&modified ? "+" : ""}'
+  endif
+endfunction
+
+augroup status_line
+  autocmd!
+  autocmd BufEnter,TabEnter,WinEnter * call UpdateStatusLine(1)
+  autocmd BufLeave,TabLeave,WinLeave * call UpdateStatusLine(0)
+augroup END
+" }}}
+
 " Editing Behavior {{{
 " Indentation {{{
 " Basic auto indentation
