@@ -1,0 +1,4 @@
+# vim:set ft=conf
+# Use screen-style binding so we can nest a session from OS X
+unbind C-b
+set -g prefix C-a
