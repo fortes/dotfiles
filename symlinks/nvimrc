@@ -10,7 +10,6 @@ endif
 call plug#begin()
 
 " TODO: {{{
-Plug 'benekastah/neomake'
 " Plug 'godlygeek/tabular'
 " Plug 'tpope/vim-dispatch'
 " Plug 'tpope/vim-abolish'
@@ -24,7 +23,6 @@ Plug 'benekastah/neomake'
 " syntastic?
 " }}}
 
-Plug 'dhruvasagar/vim-markify'
 " Colors {{{
 Plug 'w0ng/vim-hybrid'
 " Temporary while developing colorscheme
@@ -98,6 +96,14 @@ Plug 'tpope/vim-vinegar'
 " }}}
 
 " General coding {{{
+" async :make via NeoVim job control, replaces syntastic for showing errors
+" Provides :Neomake and :Neomake!
+" Only load on first use of :Neomake command
+Plug 'benekastah/neomake', {
+\   'on': ['Neomake']
+\ }
+" Use SignColumn to mark lines in Quickfix/Location list
+Plug 'dhruvasagar/vim-markify'
 " }}}
 
 " Git {{{
@@ -170,9 +176,9 @@ filetype plugin indent on
 set lazyredraw
 
 " Mapping & keycode timeouts
-set timeoutlen=200
+set timeoutlen=400
 set ttimeout
-set ttimeoutlen=100
+set ttimeoutlen=200
 
 " Never forget
 if &history < 1000
@@ -466,7 +472,7 @@ endif
 nnoremap K :silent! grep! "\b<C-R><C-W>\b"<CR>:cwindow<CR><C-L>
 
 " <leader>s starts a find a replace for word under cursor
-nnoremap <leader>s :%s/\<<C-R><C-W>\>//g<Left><Left>
+nnoremap <leader>s :%s/\<<C-R><C-W>\>/<C-R><C-W>/g<Left><Left>
 
 " Q accepts regex input for searching in project via Ack
 " Inspired by https://robots.thoughtbot.com/faster-grepping-in-vim
