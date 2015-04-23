@@ -34,6 +34,15 @@ Plug 'nathanaelkane/vim-indent-guides'
 "Plug 'fortes/vim-personal-snippets'
 Plug '~/x/vim-personal-snippets/'
 
+" Mimic the emacs orgmode, provides a ton of commands
+" <Tab> - Cycle visibilty
+" Note: Bindings use <localleader> instead of <leader>, have to use '\'
+" \ct Rotate TODO state of item
+" \cc Toggle checkbox state
+" \cn / \cN New checkbox above / below
+" \si Insert inactive timestamp
+Plug 'jceb/vim-orgmode'
+
 " Editing {{{
 " Auto-creates matching parens, etc
 " <S-Tab> jumps over single delimiter in insert mode
@@ -49,6 +58,9 @@ Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-repeat'
 " Readline-style keybindings everywhere (e.g. <C-a> for beginning of line)
 Plug 'tpope/vim-rsi'
+" Needed for orgmode
+" Makes <C-a> and <C-x> able to increment/decrement dates
+Plug 'tpope/vim-speeddating'
 " Edit surrounding quotes / parents / etc
 " - {Visual}S<arg> surrounds selection
 " - cs/ds<arg1><arg2> change / delete
