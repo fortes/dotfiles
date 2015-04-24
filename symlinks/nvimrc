@@ -668,6 +668,13 @@ let g:markify_warning_text = '⚠'
 let g:markify_info_text = 'ℹ'
 " }}}
 
+" NeoMake {{{
+if executable('eslint')
+  " Use only eslint if it's available
+  let g:neomake_javascript_enabled_makers = ['eslint']
+endif
+" }}}
+
 " CtrlP {{{
 " <C-p> to search files, buffers, and MRU
 let g:ctrlp_map='<c-p>'
