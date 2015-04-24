@@ -328,6 +328,7 @@ let g:activeStatusLine.="%l:%2c "
 function! StatuslineTag()
   if exists('b:git_dir')
     let dir = fnamemodify(b:git_dir[:-6], ':t')
+    " TODO: Use character that works without patched font
     return dir." \ue0a0 ".fugitive#head(7)
   else
     return fnamemodify(getwinvar(0, 'getcwd', getcwd()), ':t')
