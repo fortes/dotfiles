@@ -1,16 +1,18 @@
 directory: /var/media/music
 library: ~/media/music/tools/music.blb
 
-list_format_item: $artist - $album - $track - $title ($genre)
-list_format_album: $albumartist - $album [$original_year] ($genre)
+format_item: $artist - $album - $track - $title ($genre)
+format_album: $albumartist - $album [$original_year] ($genre)
 
 pluginpath: ~/media/music/tools/
 plugins: fetchart mbsync embedart info missing lyrics lastgenre # mbcollection  # check # scrub web bpd chroma
 
 art_filename: folder
 
+ui:
+  color: yes
+
 threaded: yes
-color: yes
 clutter: ['Thumbs.db', '.DS_Store', '*.log', '*.txt', '*.cue', '*.m3u', '*.sfv', '*.nfo']
 
 asciify_paths: yes
