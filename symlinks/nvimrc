@@ -586,7 +586,7 @@ function! g:OnVimEnter()
     autocmd!
     if exists(':Neomake')
       " Check for lint errors on open & write
-      autocmd BufRead,BufWritePost *.js silent Neomake|redraw
+      autocmd BufRead,BufWritePost *.js,*.es6 silent Neomake|redraw
     endif
   augroup END
 
