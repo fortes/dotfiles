@@ -1,6 +1,6 @@
+#!/bin/bash
 set -eo pipefail
 
-#!/bin/bash
 OS=`uname`
 NPM_COMMAND='npm'
 
@@ -148,15 +148,20 @@ if [ $SHELL != $(which zsh) ]; then
     fi
     echo "Switching shell to zsh (will prompt for password)"
     chsh -s $(which zsh)
-  elif [ $PS == "Linux" ]; then
-    echo "TODO: Implement Linux shell switch"
+  elif [ $OS == "Linux" ]; then
+    if [ ! $(isAptPackageInstalled zsh) ]; then
+      echo "Installing zsh via apt (will prompt for password)"
+      sudo -E apt-get install zsh -qfuy
+    fi
+
+    echo "Switching shell to zsh (will prompt for password)"
+    chsh -s $(which zsh)
   fi
 
   echo "Must open a new terminal/log in in order to switch shells"
 else
   echo "✓ Shell is zsh"
 fi
-exit
 
 # Install homebrew packages
 if [ $OS == "Darwin" ]; then
