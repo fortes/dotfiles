@@ -31,6 +31,11 @@ match:
         media: ['CD', 'Digital Media|File']
         original_year: yes
 
+fetchart:
+  # Pick only trusted filenames (cover_names)
+  cautious: yes
+  cover_names: front folder cover
+
 paths:
     default: albums/$albumartist - $album [$original_year]%aunique{albumartist album original_year, albumtype original_year year label catalognum albumdisambig}/$track - $title
     comp: albums/$albumartist - $album [$original_year]%aunique{albumartist album original_year, albumtype original_year year label catalognum albumdisambig}/$track - $title
