@@ -249,7 +249,6 @@ set numberwidth=5
 
 " Support mouse
 set mouse=a
-set ttymouse=xterm2
 
 " Disable visual bell
 set noerrorbells
@@ -565,10 +564,11 @@ if has('nvim')
   tnoremap jj <C-\><C-n>
   tnoremap jk <C-\><C-n>
 else
-  " Defaults in Neovim
+  " Defaults/removed in Neovim
   set nocompatible
   set encoding=utf-8
   set ttyfast
+  set ttymouse=xterm2
 endif
 " }}}
 " }}}
