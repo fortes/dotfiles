@@ -552,6 +552,11 @@ nnoremap <leader>p "+p
 
 " Unimpaired-style toggling of paste mode
 nnoremap cop :set invpaste<cr>
+
+" Easy editing & reloading of .nvimrc
+nnoremap <leader>ev :tabedit $MYVIMRC<cr>
+nnoremap <leader>sv :source $MYVIMRC<cr>
+
 " }}}
 
 " Neovim/vim split settings {{{
