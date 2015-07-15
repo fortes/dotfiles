@@ -471,7 +471,7 @@ nnoremap <silent> <C-L> :nohlsearch<CR><C-L>
 
 " Use ag/ack instead of grep, if available
 if executable('ag')
-  set grepprg=ag\ --nogroup\ --nocolor\ --column\ --smart-case\ --follow
+  set grepprg=ag\ --vimgrep\ $*
   set grepformat=%f:%l:%c:%m
 elseif executable('ack')
   set grepprg=ack\ --nogroup\ --nocolor\ --column\ --smart-case\ --follow\ $*
