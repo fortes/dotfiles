@@ -505,12 +505,8 @@ set incsearch
 " }}}
 
 " Efficiency Shortcuts {{{
-" Use comma as leader
-let mapleader=","
-let g:mapleader=","
-
-" Make ; equivalent to : (faster commands)
-nnoremap ; :
+" Use space as leader
+let mapleader=" "
 
 " Hide annoying quit message
 nnoremap <C-c> <C-c>:echo<cr>
