@@ -190,8 +190,10 @@ export BEETSDIR=$HOME/.beets/
 
 # Add fzf support, if present
 if [ -f ~/.fzf.zsh ]; then
-  # Honor .gitignore by default
-  export FZF_DEFAULT_COMMAND='ag -l -g ""'
+  # Use git to list files if available, otherwise fallback to ag
+  export FZF_DEFAULT_COMMAND='(git ls-tree -r --name-only HEAD || ag -l -g "") 2> /dev/null'
+  export FZF_DEFAULT_OPTS='--black'
+  export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
   source ~/.fzf.zsh
 fi
 
