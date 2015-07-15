@@ -681,9 +681,9 @@ endif
 " }}}
 
 " CtrlP {{{
-" <C-p> to search files, buffers, and MRU
-let g:ctrlp_map='<c-p>'
-let g:ctrlp_cmd='CtrlPMixed'
+" <C-p> to search files
+let g:ctrlp_map='<C-p>'
+let g:ctrlp_cmd='CtrlP'
 
 " Don't jump to a window that is already open, but do jump to tabs
 let g:ctrlp_switch_buffer = 't'
@@ -691,12 +691,23 @@ let g:ctrlp_switch_buffer = 't'
 " <M-p> for just Buffers
 nnoremap <silent> <M-p> :CtrlPBuffer<CR>
 
+" <M-S-p> for MRU
+nnoremap <silent> <M-S-p> :CtrlPMRU<CR>
+
+" Keep more files in MRU
+let g:ctrlp_mruf_max = 100
+
 " Use ag for listing files
 if executable('ag')
-  " Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
-  let g:ctrlp_user_command='ag %s -l --nocolor -g ""'
+  " Use git ls-files if possible for listing files, else fallback to ag
+  let g:ctrlp_user_command= {
+  \ 'types': {
+  \   1: ['.git', 'git --git-dir=%s/.git ls-files -co --exclude-standard']
+  \ },
+  \ 'fallback': 'ag %s -l --nocolor -g ""'
+  \ }
 
-  " ag is fast enough that CtrlP doesn't need to cache
+  " git ls-files & ag are fast enough that CtrlP doesn't need to cache
   let g:ctrlp_use_caching=0
 endif
 " }}}
