@@ -3,7 +3,7 @@
 " Plugins {{{
 if !filereadable(expand('~/.nvim/autoload/plug.vim'))
   echo 'Must install vim-plug, run ~/dotfiles/scripts/nvim-setup.sh'
-  echo 'Run nvim -u NONE to open without .vimrc'
+  echo 'Run nvim -u NONE to open without ' . expand("<sfile>")
   exit
 endif
 
@@ -486,15 +486,13 @@ nnoremap K :silent! grep! "\b<C-R><C-W>\b"<CR>:cwindow<CR><C-L>
 " <leader>s starts a find a replace for word under cursor
 nnoremap <leader>s :%s/\<<C-R><C-W>\>/<C-R><C-W>/g<Left><Left>
 
-" Q accepts regex input for searching in project via Ack
+" Q for grepping and showing results
 " Inspired by https://robots.thoughtbot.com/faster-grepping-in-vim
-if executable('ack')
-  if !exists(':Ack')
-    command -nargs=+ -complete=file -bar Ack silent! grep! <args>|cwindow|redraw!
-  endif
-
-  nnoremap Q :Ack<SPACE>
+if !exists(':Grep')
+  command -nargs=+ -complete=file -bar Grep silent! grep! <args>|cwindow|redraw!
 endif
+
+nnoremap Q :Grep<SPACE>
 
 " Ignore case, except when using some uppercase
 set ignorecase
@@ -594,7 +592,7 @@ function! g:OnVimEnter()
   if exists(':ProjectRootCD')
     " Search across entire project when possible
     nnoremap K :ProjectRootCD<CR>:silent! grep! "\b<C-R><C-W>\b"<CR>:cwindow<CR><C-L>
-    nnoremap Q :ProjectRootCD<CR>:Ack<SPACE>
+    nnoremap Q :ProjectRootCD<CR>:Grep<SPACE>
   endif
 endfunction
 " }}}
