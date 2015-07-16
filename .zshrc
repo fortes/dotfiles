@@ -18,6 +18,9 @@ autoload -Uz vcs_info
 # Enable bash-like command line editing via shortcut (see binding below)
 autoload -U edit-command-line
 
+# Enable bash-like word killing that stops at slashes
+autoload -U select-word-style
+
 # Zsh Options {{{
 
 # Change directory by typing its name like a command (useful with fzf)
@@ -165,6 +168,9 @@ bindkey -e
 zle -N edit-command-line
 bindkey '^xe' edit-command-line
 bindkey '^x^e' edit-command-line
+
+# <C-w> respects slash as a word
+select-word-style bash
 
 # Nicer colors. BSD uses $LSCOLORS, linux uses $LS_COLORS
 export LSCOLORS=gxfxbxbxCxegedabagGxGx

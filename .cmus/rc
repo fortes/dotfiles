@@ -7,8 +7,6 @@ colorscheme zenburn
 # Soft volume control
 set softvol=true
 
-set auto_expand_albums=false
-
 # Scrobber
 set status_display_program=~/dotfiles/scripts/cmus-status.sh
 
