@@ -2,7 +2,9 @@
 
 # Report to last.fm
 # Run last-cmus in background so we don't delay tmux status message
-python ~/dotfiles/scripts/last-cmus.py "$@" &
+if [[ -n $LAST_FM_USERNAME ]]; then
+  python ~/dotfiles/scripts/last-cmus.py "$@" &
+fi
 
 # Send message to tmux (disabled since already in status bar)
 if [ -n $TMUX ]; then
@@ -16,7 +18,7 @@ if [ -n $TMUX ]; then
     # https://github.com/cmus/cmus/wiki/status_display_short_text.sh
     #
     # Output looks like:
-    # status playing file /path/to/file.mp3 artist ArtistName ablum AlbumName ...
+    # status playing file /path/to/file.mp3 artist ArtistName album AlbumName ...
     while [ "$1" != "" ]; do
       case "$1" in
         title)

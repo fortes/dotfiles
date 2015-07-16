@@ -8,8 +8,12 @@ from datetime import datetime, timedelta
 from md5 import md5
 
 # enter your last.fm username/password here
-username = "REPLACEME"
-password = "REPLACEME"
+username = os.environ.get("LAST_FM_USERNAME")
+password = os.environ.get("LAST_FM_PASSWORD")
+
+if not username or not password:
+    print("Must set $LAST_FM_USERNAME and $LAST_FM_PASSWORD")
+    sys.exit(1)
 
 # other globals
 SESSION_ID = None
