@@ -130,7 +130,7 @@ alias dnsflush="dscacheutil -flushcache"
 alias json='python -mjson.tool'
 
 # Colorized cat (nyan)
-alias nyan='pygmentize -O style=default -f console256 -g'
+alias nyan='pygmentize -O style=emacs -f console256 -g'
 
 # Confirm file overwrite
 alias mv='mv -i'
