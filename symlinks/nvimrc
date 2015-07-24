@@ -36,11 +36,10 @@ Plug '~/x/vim-personal-snippets/'
 
 " Mimic the emacs orgmode, provides a ton of commands
 " <Tab> - Cycle visibilty
-" Note: Bindings use <localleader> instead of <leader>, have to use '\'
-" \ct Rotate TODO state of item
-" \cc Toggle checkbox state
-" \cn / \cN New checkbox above / below
-" \si Insert inactive timestamp
+" <leader>ct Rotate TODO state of item
+" <leader>cc Toggle checkbox state
+" <leader>cn / <leader>cN New checkbox above / below
+" <leader>sa Insert timestamp
 Plug 'jceb/vim-orgmode'
 
 " Editing {{{
@@ -131,7 +130,7 @@ Plug 'dhruvasagar/vim-markify'
 " - r reload status
 " :Gcommit for committing
 " :Gblame run blame on current file
-" - <CR> open commit
+" - <cr> open commit
 " - o/O open commit in split/tab
 " - - reblame commit
 Plug 'tpope/vim-fugitive'
@@ -467,7 +466,7 @@ set gdefault
 
 " Highlight search results & clear with <C-L>
 set hlsearch
-nnoremap <silent> <C-L> :nohlsearch<CR><C-L>
+nnoremap <silent> <C-L> :nohlsearch<cr><C-L>
 
 " Use ag/ack instead of grep, if available
 if executable('ag')
@@ -481,7 +480,7 @@ endif
 " K searches for word under cursor in root of project
 " Need to force redraw of screen after, since for some reason grep and opening
 " the quicklist mess everything up
-nnoremap K :silent! grep! "\b<C-R><C-W>\b"<CR>:cwindow<CR><C-L>
+nnoremap K :silent! grep! "\b<C-R><C-W>\b"<cr>:cwindow<cr><C-L>
 
 " <leader>s starts a find a replace for word under cursor
 nnoremap <leader>s :%s/\<<C-R><C-W>\>/<C-R><C-W>/g<Left><Left>
@@ -505,16 +504,24 @@ set incsearch
 " Efficiency Shortcuts {{{
 " Use space as leader
 let mapleader=" "
+let maplocalleader=" "
+
+" Use enter as colon for faster commands
+nnoremap <cr> :
+" Meta-enter in case you need an actual <cr>
+nnoremap <M-cr> <cr>
 
 " Hide annoying quit message
 nnoremap <C-c> <C-c>:echo<cr>
 
 " Close quickfix & help with q, Escape, or Control-C
+" Also, keep default <cr> binding
 augroup easy_close
   autocmd!
   autocmd BufReadPost * if !&modifiable|nnoremap <buffer> q :q<cr>|endif
   autocmd BufReadPost * if !&modifiable|nnoremap <buffer> <Esc> :q<cr>|endif
   autocmd BufReadPost * if !&modifiable|nnoremap <buffer> <C-c> :q<cr>|endif
+  autocmd BufReadPost * if !&modifiable|nnoremap <buffer> <cr> <cr>|endif
 augroup END
 
 " Map jj and jk to <ESC> to leave insert mode quickly
@@ -546,6 +553,12 @@ nnoremap <leader>p "+p
 
 " Unimpaired-style toggling of paste mode
 nnoremap cop :set invpaste<cr>
+
+" Quickly edit current buffer in a new tab (poor-man's maximize)
+nnoremap <leader>te :tabedit %<cr>
+
+" Close a tab
+nnoremap <leader>tc :tabclose<cr>
 
 " Easy editing & reloading of .nvimrc
 nnoremap <leader>ev :tabedit $MYVIMRC<cr>
@@ -591,8 +604,8 @@ function! g:OnVimEnter()
 
   if exists(':ProjectRootCD')
     " Search across entire project when possible
-    nnoremap K :ProjectRootCD<CR>:silent! grep! "\b<C-R><C-W>\b"<CR>:cwindow<CR><C-L>
-    nnoremap Q :ProjectRootCD<CR>:Grep<SPACE>
+    nnoremap K :ProjectRootCD<cr>:silent! grep! "\b<C-R><C-W>\b"<cr>:cwindow<cr><C-L>
+    nnoremap Q :ProjectRootCD<cr>:Grep<SPACE>
   endif
 endfunction
 " }}}
@@ -605,9 +618,9 @@ augroup filetype_tweaks
   " Not all files should wrap automatically
   autocmd BufNewFile,BufReadPost *.txt,*.md,*.markdown,*.json,*.conf,*.ini setlocal textwidth=0
 
-  " Enable spell checking in some filetypes
+  " Enable spell checking & linebreaking at words in some filetypes
   autocmd BufNewFile,BufReadPost *.txt,*.md,*.markdown,COMMIT_EDITMSG
-          \ setlocal spell
+          \ setlocal spell linebreak
 
   " Disable spell checking on unmodifiable files (what's the point?)
   autocmd BufReadPost * if !&modifiable | setlocal nospell | endif
@@ -683,10 +696,10 @@ let g:ctrlp_cmd='CtrlP'
 let g:ctrlp_switch_buffer = 't'
 
 " <M-p> for just Buffers
-nnoremap <silent> <M-p> :CtrlPBuffer<CR>
+nnoremap <silent> <M-p> :CtrlPBuffer<cr>
 
 " <M-S-p> for MRU
-nnoremap <silent> <M-S-p> :CtrlPMRU<CR>
+nnoremap <silent> <M-S-p> :CtrlPMRU<cr>
 
 " Keep more files in MRU
 let g:ctrlp_mruf_max = 100
@@ -716,7 +729,7 @@ let g:UltiSnipsJumpBackwardTrigger="<S-tab>"
 " }}}
 
 " delimitMate {{{
-" <CR> after delimiter does block style
+" <cr> after delimiter does block style
 let delimitMate_expand_cr=2
 " Pressing space after delimiter adds space on both sides
 let delimitMate_expand_space=1
@@ -732,8 +745,8 @@ let g:tern_show_argument_hints=1
 " GitGutter {{{
 " Unimpaired-style toggling for the line highlights
 " cogg Gutter / cogl line highlight
-nnoremap <silent> cogg :GitGutterToggle<CR>
-nnoremap <silent> cogl :GitGutterLineHighlightsToggle<CR>
+nnoremap <silent> cogg :GitGutterToggle<cr>
+nnoremap <silent> cogl :GitGutterLineHighlightsToggle<cr>
 
 " Ignore whitespace
 let g:gitgutter_diff_args='-w'
@@ -772,9 +785,9 @@ let g:indent_guides_guide_size=1
 
 " BufSurf {{{
 " Use [b and ]b (taken over from unimpaired)
-nnoremap [b :silent BufSurfBack<CR>
+nnoremap [b :silent BufSurfBack<cr>
 " Use <M-^>/<M-6> as forward
-nnoremap ]b :silent BufSurfForward<CR>
+nnoremap ]b :silent BufSurfForward<cr>
 " }}}
 
 " Javascript libraries syntax {{{
