@@ -91,7 +91,7 @@ Plug 'dbakker/vim-projectroot'
 " <C-s>/<C-v> open in split / vertical split
 " <C-t> open in tab
 " <tab> autocomplete directory
-Plug 'kien/ctrlp.vim'
+Plug 'ctrlpvim/ctrlp.vim'
 " Browser-like history for buffers (can go back several times to previous bufs)
 Plug 'ton/vim-bufsurf'
 " Adds helpers for UNIX shell commands
@@ -557,6 +557,9 @@ nnoremap cop :set invpaste<cr>
 " Quickly edit current buffer in a new tab (poor-man's maximize)
 nnoremap <leader>te :tabedit %<cr>
 
+" Quickly open tab
+nnoremap <leader>tn :tabnew<cr>
+
 " Close a tab
 nnoremap <leader>tc :tabclose<cr>
 
@@ -604,8 +607,13 @@ function! g:OnVimEnter()
 
   if exists(':ProjectRootCD')
     " Search across entire project when possible
-    nnoremap K :ProjectRootCD<cr>:silent! grep! "\b<C-R><C-W>\b"<cr>:cwindow<cr><C-L>
+    nnoremap K :ProjectRootCD<cr>:silent!
+      \ grep! "\b<C-R><C-W>\b"<cr>:cwindow<cr><C-L>
     nnoremap Q :ProjectRootCD<cr>:Grep<SPACE>
+    " Search in new tab with by holding Ctrl
+    nnoremap <C-K> :ProjectRootCD<cr>:silent!
+      \ grep! "\b<C-R><C-W>\b"<cr>:tabnew<cr>:cwindow<cr><cr><C-L>
+    nnoremap <C-Q> :tabnew<cr>:ProjectRootCD<cr>:Grep<SPACE>
   endif
 endfunction
 " }}}
@@ -616,11 +624,12 @@ augroup filetype_tweaks
   autocmd!
 
   " Not all files should wrap automatically
-  autocmd BufNewFile,BufReadPost *.txt,*.md,*.markdown,*.json,*.conf,*.ini setlocal textwidth=0
+  autocmd BufNewFile,BufReadPost *.txt,*.md,*.markdown,*.json,*.conf,*.ini
+    \ setlocal textwidth=0
 
   " Enable spell checking & linebreaking at words in some filetypes
   autocmd BufNewFile,BufReadPost *.txt,*.md,*.markdown,COMMIT_EDITMSG
-          \ setlocal spell linebreak
+    \ setlocal spell linebreak
 
   " Disable spell checking on unmodifiable files (what's the point?)
   autocmd BufReadPost * if !&modifiable | setlocal nospell | endif
@@ -634,8 +643,10 @@ augroup filetype_tweaks
   " Set up linting for JS
   if executable('eslint')
     autocmd FileType javascript setlocal makeprg=eslint\ -f\ compact\ %
-    autocmd FileType javascript setlocal errorformat=%E%f:\ line\ %l\\,\ col\ %c\\,\ Error\ -\ %m
-    autocmd FileType javascript setlocal errorformat+=,%W%f:\ line\ %l\\,\ col\ %c\\,\ Warning\ -\ %m
+    autocmd FileType javascript setlocal
+      \ errorformat=%E%f:\ line\ %l\\,\ col\ %c\\,\ Error\ -\ %m
+    autocmd FileType javascript setlocal
+      \ errorformat+=,%W%f:\ line\ %l\\,\ col\ %c\\,\ Warning\ -\ %m
   endif
 
   " Use esformatter to autoformat (gq in Visual mode)
