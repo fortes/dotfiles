@@ -24,6 +24,8 @@
   rbl = for-each-ref --sort=committerdate refs/remotes/ --format='%(committerdate:short)  %(refname:short) (%(authorname))'
   # Edit all modified & new files
   edit = "!$EDITOR `git ls-files -m --other --exclude-standard`"
+  # Use fzf to select some modified files to add
+  addm = "!git add `git ls-files -m --other --exclude-standard | fzf -m`"
 [push]
   default = simple
 [pull]
