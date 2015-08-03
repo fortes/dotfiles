@@ -115,6 +115,10 @@ Plug 'benekastah/neomake', {
 \ }
 " Use SignColumn to mark lines in Quickfix/Location list
 Plug 'dhruvasagar/vim-markify'
+" Test.vim: Run tests based on cursor position / file
+Plug 'janko-m/vim-test', {
+\   'for': ['javascript']
+\ }
 " }}}
 
 " Git {{{
@@ -689,6 +693,25 @@ augroup END
 let g:markify_error_text = '✗'
 let g:markify_warning_text = '⚠'
 let g:markify_info_text = 'ℹ'
+" }}}
+
+" Test.vim {{{
+" Run test commands in NeoVim terminal, if available
+if has('nvim')
+  let test#strategy = 'neovim'
+endif
+
+" Use dot reporter by default
+let test#javascript#mocha#options = '--reporter dot'
+" With autochdir, the default regex for tests fails, so just count on `_test.js`
+let test#javascript#mocha#file_pattern = '_test.js'
+
+" <leader>tt to test based on cursor, <leader>twt to watch
+nnoremap <silent> <leader>tt :split<cr>:TestNearest<cr>
+nnoremap <silent> <leader>twt :split<cr>:TestNearest -w<cr>
+" <leader>tf to test current file, <leader> twf to watch
+nnoremap <silent> <leader>tf :split<cr>:TestFile<cr>
+nnoremap <silent> <leader>twf :split<cr>:TestFile -w<cr>
 " }}}
 
 " NeoMake {{{
