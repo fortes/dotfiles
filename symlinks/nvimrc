@@ -146,6 +146,10 @@ Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
 " }}}
 
+" Better CSS syntax
+Plug 'JulesWang/css.vim', {
+\   'for': ['css', 'less']
+\ }
 " LESS Support
 Plug 'groenewege/vim-less', {
 \ 'for': ['less']
@@ -465,7 +469,7 @@ syntax enable
 " }}}
 
 " Searching {{{
-" Match all results in a line by default
+" Match all results in a line by default (/g at end will undo this)
 set gdefault
 
 " Highlight search results & clear with <C-L>
