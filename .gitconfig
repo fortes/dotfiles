@@ -17,17 +17,19 @@
 [alias]
   lg = log --graph --pretty=oneline --abbrev-commit --decorate
   lall = log --graph --pretty=oneline --abbrev-commit --decorate --all
-  pullm = !git fetch origin && git rebase -p origin/master
   ls = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cgreen\\ [%cn]" --decorate
   ll = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cgreen\\ [%cn]" --decorate --numstat
   gbl = for-each-ref --sort=committerdate refs/heads/ --format='%(committerdate:short) %(refname:short)'
   rbl = for-each-ref --sort=committerdate refs/remotes/ --format='%(committerdate:short)  %(refname:short) (%(authorname))'
+  # Fetch and rebase
+  frb = !git fetch --prune && git rebase origin/master
   # Edit all modified & new files
   edit = "!$EDITOR `git ls-files -m --other --exclude-standard`"
   # Use fzf to select some modified files to add
   addm = "!git add `git ls-files -m --other --exclude-standard | fzf -m`"
+  addmp = "!git add -p `git ls-files -m --other --exclude-standard | fzf -m`"
 [push]
-  default = simple
+  default = current
 [pull]
   rebase = true
 [merge]
