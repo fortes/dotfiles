@@ -9,20 +9,6 @@ endif
 
 call plug#begin()
 
-" TODO: {{{
-" Plug 'godlygeek/tabular'
-" Plug 'tpope/vim-dispatch'
-" Plug 'tpope/vim-abolish'
-" Supertab?
-" Plug 'gregsexton/gitv'
-" jsx
-" liquid
-" coffeescript
-" pangloss/vim-javascript?
-" statusline
-" syntastic?
-" }}}
-
 " Colors {{{
 Plug 'w0ng/vim-hybrid'
 " Temporary while developing colorscheme
@@ -43,10 +29,8 @@ Plug '~/x/vim-personal-snippets/'
 Plug 'jceb/vim-orgmode'
 
 " Editing {{{
-" Auto-creates matching parens, etc
-" <S-Tab> jumps over single delimiter in insert mode
-" <C-G>g jumps over contiguous in insert mode
-Plug 'Raimondi/delimitMate'
+" Auto-close parens / quotes, requires no config
+Plug 'cohama/lexima.vim'
 " Snippet support, see configuration below
 Plug 'SirVer/ultisnips'
 " Comment / uncomment things quickly
@@ -83,17 +67,21 @@ Plug 'tpope/vim-unimpaired'
 " File/Buffer Handling {{{
 " Cd into the root of of the project with :ProjectRootCD
 Plug 'dbakker/vim-projectroot'
-" Fuzzy finder, see config below for more
-" <C-p> start fuzzy finder
-" <C-d> toggle between full path and filename search
-" <C-r> Toggle between string and regex mode
-" <C-f>/<C-b> to change search modes
-" <C-s>/<C-v> open in split / vertical split
-" <C-t> open in tab
-" <tab> autocomplete directory
-Plug 'ctrlpvim/ctrlp.vim'
-" Browser-like history for buffers (can go back several times to previous bufs)
-Plug 'ton/vim-bufsurf'
+if executable('fzf')
+  " Use FZF for fuzzy finding if available (see config below)
+  Plug 'junegunn/fzf'
+  Plug 'junegunn/fzf.vim'
+else
+  " Fuzzy finder, see config below for more
+  " <C-p> start fuzzy finder
+  " <C-d> toggle between full path and filename search
+  " <C-r> Toggle between string and regex mode
+  " <C-f>/<C-b> to change search modes
+  " <C-s>/<C-v> open in split / vertical split
+  " <C-t> open in tab
+  " <tab> autocomplete directory
+  Plug 'ctrlpvim/ctrlp.vim'
+end
 " Adds helpers for UNIX shell commands
 " :Remove Delete buffer and file at same time
 " :Unlink Delete file, keep buffer
@@ -202,11 +190,6 @@ set ttimeoutlen=200
 " Never forget
 if &history < 1000
   set history=1000
-endif
-
-" Allow more than 10 tabs at once
-if &tabpagemax < 25
-  set tabpagemax=25
 endif
 
 " Load matchit.vim, but only if the user hasn't installed a newer version.
@@ -409,9 +392,7 @@ if filereadable('/usr/share/dict/words')
   set dictionary+=/usr/share/dict/words
 endif
 
-" Default formatoptions: crqlbon
-" Auto-wrap text and comments using text width
-set formatoptions+=tc
+" Default formatoptions (as of neovim): tcqj
 " Only break the line if wasn't longer than 80 chars when editing began
 " and there is a blank somewhere in the line
 set formatoptions+=lb
@@ -579,8 +560,7 @@ nnoremap <leader>sv :source $MYVIMRC<cr>
 
 " Neovim/vim split settings {{{
 if has('nvim')
-  " Useful reference for Neovim-only features:
-  " https://github.com/neovim/neovim/wiki/Differences-from-vim
+  " Useful reference for Neovim-only features (:help vim-differences)
 
   " Terminal key bindings for window switching
   " Map jj and jk to <ESC> to leave insert mode quickly
@@ -719,43 +699,73 @@ nnoremap <silent> <leader>twf :split<cr>:TestFile -w<cr>
 " }}}
 
 " NeoMake {{{
-if executable('eslint')
+if executable('eslint') || executable('eslint_d')
   " Use only eslint if it's available
-  let g:neomake_javascript_enabled_makers = ['eslint']
+  let g:neomake_javascript_enabled_makers = ['makeprg']
 endif
 " }}}
 
-" CtrlP {{{
-" <C-p> to search files
-let g:ctrlp_map='<C-p>'
-let g:ctrlp_cmd='CtrlP'
+" Fuzzy Finding (FZF/CtrlP) {{{
+if executable('fzf')
+  " FZF {{{
+  " <C-p> or <C-t> to search files
+  nnoremap <silent> <C-t> :FZF -m<cr>
+  nnoremap <silent> <C-p> :FZF -m<cr>
 
-" Don't jump to a window that is already open, but do jump to tabs
-let g:ctrlp_switch_buffer = 't'
+  " <M-p> for open buffers
+  nnoremap <silent> <M-p> :Buffers<cr>
 
-" <M-p> for just Buffers
-nnoremap <silent> <M-p> :CtrlPBuffer<cr>
+  " <M-S-p> for MRU
+  nnoremap <silent> <M-S-p> :History<cr>
 
-" <M-S-p> for MRU
-nnoremap <silent> <M-S-p> :CtrlPMRU<cr>
+  " Use fuzzy completion relative filepaths across directory
+  imap <expr> <c-x><c-f> fzf#vim#complete#path('git ls-files $(git rev-parse --show-toplevel)')
 
-" Keep more files in MRU
-let g:ctrlp_mruf_max = 100
+  " Better command history with q:
+  command! CmdHist call fzf#vim#command_history({'right': '40'})
+  nnoremap q: :CmdHist<CR>
 
-" Use ag for listing files
-if executable('ag')
-  " Use git ls-files if possible for listing files, else fallback to ag
-  let g:ctrlp_user_command= {
-  \ 'types': {
-  \   1: ['.git', 'git --git-dir=%s/.git ls-files -co --exclude-standard']
-  \ },
-  \ 'fallback': 'ag %s -l --nocolor -g ""'
-  \ }
+  " Better search history
+  command! QHist call fzf#vim#search_history({'right': '40'})
+  nnoremap q/ :QHist<CR>
 
-  " git ls-files & ag are fast enough that CtrlP doesn't need to cache
-  let g:ctrlp_use_caching=0
-endif
+  command! -bang -nargs=* Ack call fzf#vim#ag(<q-args>, {'down': '40%', 'options': --no-color'})
+  " }}}
+else
+  " CtrlP {{{
+  " <C-p> to search files
+  let g:ctrlp_map='<C-p>'
+  let g:ctrlp_cmd='CtrlP'
+
+  " Don't jump to a window that is already open, but do jump to tabs
+  let g:ctrlp_switch_buffer = 't'
+
+  " <M-p> for just Buffers
+  nnoremap <silent> <M-p> :CtrlPBuffer<cr>
+
+  " <M-S-p> for MRU
+  nnoremap <silent> <M-S-p> :CtrlPMRU<cr>
+
+  " Keep more files in MRU
+  let g:ctrlp_mruf_max = 100
+
+  " Use ag for listing files
+  if executable('ag')
+    " Use git ls-files if possible for listing files, else fallback to ag
+    let g:ctrlp_user_command= {
+    \ 'types': {
+    \   1: ['.git', 'git --git-dir=%s/.git ls-files -co --exclude-standard']
+    \ },
+    \ 'fallback': 'ag %s -l --nocolor -g ""'
+    \ }
+
+    " git ls-files & ag are fast enough that CtrlP doesn't need to cache
+    let g:ctrlp_use_caching=0
+  endif
+  " }}}
+end
 " }}}
+
 
 " UltiSnips {{{
 " Use tab to expand snippet and move to next target. Shift tab goes back.
@@ -819,13 +829,6 @@ let g:indent_guides_start_level=3
 
 " Skinny guides
 let g:indent_guides_guide_size=1
-" }}}
-
-" BufSurf {{{
-" Use [b and ]b (taken over from unimpaired)
-nnoremap [b :silent BufSurfBack<cr>
-" Use <M-^>/<M-6> as forward
-nnoremap ]b :silent BufSurfForward<cr>
 " }}}
 
 " Javascript libraries syntax {{{
