@@ -1,5 +1,4 @@
 ack
-bash-completion
 chromaprint
 cmus
 elinks
@@ -9,6 +8,7 @@ git
 gpg
 hub
 irssi
+jq
 libyaml
 mediainfo
 mobile-shell
