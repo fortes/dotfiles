@@ -16,17 +16,6 @@ Plug '~/x/vim-escuro'
 " Shades indent levels
 Plug 'nathanaelkane/vim-indent-guides'
 " }}}
-" Temporary while editing
-"Plug 'fortes/vim-personal-snippets'
-Plug '~/x/vim-personal-snippets/'
-
-" Mimic the emacs orgmode, provides a ton of commands
-" <Tab> - Cycle visibilty
-" <leader>ct Rotate TODO state of item
-" <leader>cc Toggle checkbox state
-" <leader>cn / <leader>cN New checkbox above / below
-" <leader>sa Insert timestamp
-Plug 'jceb/vim-orgmode'
 
 " Editing {{{
 " Auto-close parens / quotes, requires no config
@@ -107,6 +96,9 @@ Plug 'junegunn/vim-peekaboo'
 " }}}
 
 " General coding {{{
+" Temporary while editing
+"Plug 'fortes/vim-personal-snippets'
+Plug '~/x/vim-personal-snippets/'
 " async :make via NeoVim job control, replaces syntastic for showing errors
 " Provides :Neomake and :Neomake!
 " Only load on first use of :Neomake command
@@ -146,6 +138,7 @@ Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
 " }}}
 
+" CSS/LESS {{{
 " Better CSS syntax
 Plug 'JulesWang/css.vim', {
 \   'for': ['css', 'less']
@@ -154,6 +147,7 @@ Plug 'JulesWang/css.vim', {
 Plug 'groenewege/vim-less', {
 \ 'for': ['less']
 \ }
+" }}}
 
 " Javascript {{{
 " JS syntax, supports ES6
@@ -219,9 +213,6 @@ endif
 " Highlight textwidth column
 set colorcolumn=+1
 
-" Display as much as possible as last line, instead of just showing @
-set display=lastline
-
 " Auto-close folds below current foldlevel when cursor leaves
 set foldclose=all
 
@@ -249,9 +240,6 @@ set noshowmode
 " Use 5 characters for number well
 set numberwidth=5
 
-" Support mouse
-set mouse=a
-
 " Disable visual bell
 set noerrorbells
 set visualbell t_vb=
@@ -277,18 +265,11 @@ set splitright
 
 " Resize splits when the window is resized
 au VimResized * exe "normal! \<c-w>="
-
-" Make filename tab completion more bash-like
-set wildmenu
-set wildmode=longest,full
 " }}}
 
 " File Handling {{{
 " Automatically cd into the directory of the file we're editing
 set autochdir
-
-" Automatically reload modified files
-set autoread
 
 " Automatically write files on :next, :make, etc
 set autowrite
@@ -366,8 +347,6 @@ augroup END
 
 " Editing Behavior {{{
 " Indentation {{{
-" Basic auto indentation
-set autoindent
 
 " C-style indentation
 set cindent
@@ -382,16 +361,7 @@ set tabstop=2
 
 " Round up indents
 set shiftround
-
-" Backspace should delete tabwidth of characters
-set smarttab
 " }}}
-
-" Remove silly restrictions from backspace
-set backspace=indent,eol,start
-
-" Don't scan included files for keyword completion (too slow)
-set complete-=i
 
 " Keyword completion brings in the dictionary if spell check is enabled
 set complete+=kspell
@@ -412,11 +382,6 @@ set formatoptions+=lb
 set formatoptions-=o
 " Recognize numbered lists and wrap accordingly
 set formatoptions+=n
-" Remove comment leader when joining lines (added in Vim 7.4)
-if version >= 704
-  set formatoptions+=j
-endif
-
 " Show special indicators
 set list
 " Highlight trailing spaces
@@ -465,8 +430,7 @@ syntax enable
 " Match all results in a line by default (/g at end will undo this)
 set gdefault
 
-" Highlight search results & clear with <C-L>
-set hlsearch
+" Clear search highlights with <C-L>
 nnoremap <silent> <C-L> :nohlsearch<cr><C-L>
 
 " Use ag/ack instead of grep, if available
@@ -497,9 +461,6 @@ nnoremap Q :Grep<SPACE>
 " Ignore case, except when using some uppercase
 set ignorecase
 set smartcase
-
-" Show incremental search matches
-set incsearch
 " }}}
 
 " Efficiency Shortcuts {{{
@@ -582,14 +543,57 @@ if has('nvim')
 
   " Terminal key bindings for window switching
   " Map jj and jk to <ESC> to leave insert mode quickly
+  " Also allow <leader><C-c> and <leader><esc>
   tnoremap jj <C-\><C-n>
   tnoremap jk <C-\><C-n>
+  tnoremap <leader><C-c> <C-\><C-n>
+  tnoremap <leader><esc> <C-\><C-n>
+
+  " Automatically go into insert mode when entering terminal window
+  augroup terminal_insert
+    autocmd!
+    autocmd BufEnter * if &buftype == 'terminal' | :startinsert | endif
+  augroup END
 else
   " Defaults/removed in Neovim
-  set nocompatible
+  " Basic auto indentation
+  set autoindent
+  " Automatically reload modified files
+  set autoread
+  " Remove silly restrictions from backspace
+  set backspace=indent,eol,start
+  " Don't scan included files for keyword completion (too slow)
+  set complete-=i
+  " Display as much as possible as last line, instead of just showing @
+  set display=lastline
   set encoding=utf-8
+  " Default formatoptions in vim: crqlbon
+  " Auto-wrap text and comments using text width
+  set formatoptions+=tc
+  " Remove comment leader when joining lines (added in Vim 7.4)
+  if version >= 704
+    set formatoptions+=j
+  endif
+  " Highlight search results
+  set hlsearch
+  " Show incremental search matches
+  set incsearch
+  " Disable langmap for characters from a mapping (on by default in neovim)
+  set langnoremap
+  " Support mouse
+  set mouse=a
+  set nocompatible
+  " Neovim default
+  set sessionoptions-=options
+  " Backspace should delete tabwidth of characters
+  " More tabs at once (match neovim default)
+  set tabpagemax=50
+  set smarttab
   set ttyfast
   set ttymouse=xterm2
+  " Make filename tab completion more bash-like
+  set wildmenu
+  set wildmode=list:longest,full
 endif
 " }}}
 " }}}
@@ -647,8 +651,14 @@ augroup filetype_tweaks
   autocmd BufRead,BufNewFile *.es6 set filetype=javascript
 
   " Set up linting for JS
-  if executable('eslint')
-    autocmd FileType javascript setlocal makeprg=eslint\ -f\ compact\ %
+  if executable('eslint_d') || executable('eslint')
+    " TODO: Re-enable eslint_d, hitting some bugs
+    if executable('eslint_dxxx')
+      autocmd FileType javascript setlocal makeprg=eslint_d\ -f\ compact\ %
+    else
+      autocmd FileType javascript setlocal makeprg=eslint\ -f\ compact\ %
+    endif
+
     autocmd FileType javascript setlocal
           \ errorformat=%E%f:\ line\ %l\\,\ col\ %c\\,\ Error\ -\ %m
     autocmd FileType javascript setlocal
