@@ -31,6 +31,15 @@ Plug 'jceb/vim-orgmode'
 " Editing {{{
 " Auto-close parens / quotes, requires no config
 Plug 'cohama/lexima.vim'
+" Motion via two-character combinations
+" s{char}{char} to move forward to instance of {char}{char}
+" ; for next match
+" <c-o> or `` to go back to starting point
+" s<CR> to repeat last search
+" S to search backwards
+" For text objects, use z (s taken by surround.vim)
+" {action}z{char}{char}
+Plug 'justinmk/vim-sneak'
 " Snippet support, see configuration below
 Plug 'SirVer/ultisnips'
 " Comment / uncomment things quickly
@@ -92,6 +101,9 @@ Plug 'tpope/vim-eunuch'
 " - cg/cl to cd into the 
 " - ! to use the file in a command
 Plug 'tpope/vim-vinegar'
+" Show register contents when using " or @ in normal mode
+" Also shows when hitting <c-r> in insert mode
+Plug 'junegunn/vim-peekaboo'
 " }}}
 
 " General coding {{{
@@ -148,6 +160,10 @@ Plug 'groenewege/vim-less', {
 Plug 'othree/yajs.vim', {
 \   'for': ['javascript']
 \ }
+" Better indentation
+Plug 'gavocanov/vim-js-indent', {
+\   'for': ['javascript']
+\ }
 " JS syntax for common libraries
 Plug 'othree/javascript-libraries-syntax.vim', {
 \   'for': ['javascript']
@@ -166,10 +182,6 @@ Plug 'moll/vim-node', {
 call plug#end()
 " }}}
 " }}}
-
-" TODO:
-" - clipboard setup?
-" - VimResized event?
 
 " Vanilla Configuration (no plugins) {{{
 
@@ -534,11 +546,17 @@ vnoremap K <nop>
 " Never use ZZ, too dangerous
 nnoremap ZZ <nop>
 
-" <leader>c to copy to system clipboard in visual mode
-vnoremap <leader>c "+yy
-
-" <leader>v to paste from system clipboard in normal mode
+" Prefix copy/paste commands w/ leader to use system clipboard
+" Copy from clipboard
+vnoremap <leader>y "+y
+nnoremap <leader>Y "+yg_
+nnoremap <leader>y "+y
+nnoremap <leader>yy "+yy
+" Paste from clipboard
+nnoremap <leader>P "+P
 nnoremap <leader>p "+p
+vnoremap <leader>P "+P
+vnoremap <leader>p "+p
 
 " Unimpaired-style toggling of paste mode
 nnoremap cop :set invpaste<cr>
@@ -632,9 +650,11 @@ augroup filetype_tweaks
   if executable('eslint')
     autocmd FileType javascript setlocal makeprg=eslint\ -f\ compact\ %
     autocmd FileType javascript setlocal
-      \ errorformat=%E%f:\ line\ %l\\,\ col\ %c\\,\ Error\ -\ %m
+          \ errorformat=%E%f:\ line\ %l\\,\ col\ %c\\,\ Error\ -\ %m
     autocmd FileType javascript setlocal
-      \ errorformat+=,%W%f:\ line\ %l\\,\ col\ %c\\,\ Warning\ -\ %m
+          \ errorformat+=%W%f:\ line\ %l\\,\ col\ %c\\,\ Warning\ -\ %m
+    " Ignore lines that don't match the above
+    autocmd FileType javascript setlocal errorformat+=%-G%.%#
   endif
 
   " Use esformatter to autoformat (gq in Visual mode)
@@ -776,13 +796,10 @@ let g:UltiSnipsJumpForwardTrigger="<tab>"
 let g:UltiSnipsJumpBackwardTrigger="<S-tab>"
 " }}}
 
-" delimitMate {{{
-" <cr> after delimiter does block style
-let delimitMate_expand_cr=2
-" Pressing space after delimiter adds space on both sides
-let delimitMate_expand_space=1
-" Goes past closing expansions when on next line
-let delimitMate_jump_expansion=1
+" Autopairs {{{
+" Remove default mapping to toggle autopairs and use Unimpaired-style
+" toggling
+let g:AutoPairsShortcutToggle='coa'
 " }}}
 
 " Tern {{{
