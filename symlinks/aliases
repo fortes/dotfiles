@@ -1,0 +1,46 @@
+# vim: ft=sh
+OS=`uname`
+
+# Easy timezones for places I care about
+alias lisbon='TZ="Europe/Lisbon" date'
+alias nyc='TZ="America/New_York" date'
+alias sf='TZ="America/Los_Angeles" date'
+alias rio='TZ="America/Sao_Paulo" date'
+alias tokyo='TZ="Asia/Tokyo" date'
+alias utc='TZ="UTC" date'
+
+# Get readable list of network IPs
+alias ips="ifconfig -a | perl -nle'/(\d+\.\d+\.\d+\.\d+)/ && print $1'"
+alias myip="dig +short myip.opendns.com @resolver1.opendns.com"
+alias mygeo="curl -w \"\\n\" http://api.hackertarget.com/geoip/\?q=\`myip\`"
+
+# Flush DNS cache
+alias dnsflush="dscacheutil -flushcache"
+
+# JSON Viewing view python
+alias json='python -mjson.tool'
+
+# Colorized cat (nyan)
+if which pygmentize > /dev/null; then
+  alias nyan='pygmentize -O style=emacs -f console256 -g'
+fi
+
+# Confirm file overwrite
+alias mv='mv -i'
+
+# CD into root of git project
+alias pcd="cd \$(git rev-parse --show-toplevel 2>/dev/null || echo '.')"
+
+# CD into a directory within the project, selecting via fzf
+if which fzf > /dev/null; then
+  alias cdp="cd \$(git ls-files \$(git rev-parse --show-toplevel) | xargs -n1 dirname | sort | uniq | fzf || echo '.')"
+fi
+
+# Map ls to be colorful
+if [ $OS = "Darwin" ]; then
+  alias ls='ls -GpFh'
+  alias la='ls -AGpFh'
+else
+  alias ls='ls --color=auto -GpFh'
+  alias ls='ls --color=auto -AGpFh'
+fi

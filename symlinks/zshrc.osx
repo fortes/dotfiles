@@ -7,16 +7,7 @@ fi
 
 # MAC manipulators, via jashkenas. Replace MAC in second line local MAC address
 # You can get the MAC address via: `ifconfig en0 | ack ether | cut -f2 -d' '`
-if [[ $MAC_ADDRESS ]]; then
+if [ -n "$MAC_ADDRESS" ]; then
   alias random_mac='sudo ifconfig en0 ether `openssl rand -hex 6 | sed "s/\(..\)/\1:/g; s/.$//"`'
   alias restore_mac='sudo ifconfig en0 ether $MAC_ADDRESS'
 fi
-
-# Make sure brew's site-packages are in the path
-export PYTHONPATH=$(brew --prefix)/lib/python2.7/site-packages:$PYTHONPATH
-
-# Add NPM-installed items to path
-export PATH=/usr/local/share/npm/bin:$PATH
-
-# Prefer local bins before system, for homebrew
-export PATH=/usr/local/bin:/usr/local/sbin:$PATH

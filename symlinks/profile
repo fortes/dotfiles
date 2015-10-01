@@ -1,0 +1,61 @@
+# vim:ft=sh
+
+# Use NeoVim if we have it
+if which nvim > /dev/null; then
+  VISUAL=nvim
+else
+  VISUAL=vim
+fi
+EDITOR=$VISUAL
+export EDITOR VISUAL
+
+# VirtualEnv {{{
+# virtualenv should use Distribute instead of legacy setuptools
+export VIRTUALENV_DISTRIBUTE=true
+# Centralized location for new virtual environments
+export PIP_VIRTUALENV_BASE=$HOME/virtualenvs
+
+# Activate default virtual env, if not already in an env
+if [ -z $VIRTUAL_ENV ] && [ -d $PIP_VIRTUALENV_BASE/default ]; then
+  # This will modify the prompt, so do it before setting the prompt
+  source $PIP_VIRTUALENV_BASE/default/bin/activate
+fi
+# }}}
+
+# Change default beets configuration path
+export BEETSDIR=$HOME/.beets
+
+# Load aliases
+if [ -f $HOME/.aliases ]; then
+  source $HOME/.aliases
+fi
+
+if which fzf > /dev/null; then
+  # If available, we use git to list files from the root directory (not from the
+  # current directory as in other fzf cases). Otherwise, fallback to ag
+  export FZF_DEFAULT_COMMAND='(git ls-files -co --exclude-standard $(git rev-parse --show-toplevel) || ag -l -g "") 2> /dev/null'
+  export FZF_DEFAULT_OPTS="--black --extended"
+  export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+fi
+
+# User npm programs in path
+if ! echo ":$PATH:" | grep -q ":$HOME/npm/bin:"; then
+  export PATH="$HOME/npm/bin:$PATH"
+fi
+
+# OS overrides
+OS=`uname`
+if [ "$OS" = "Darwin" ]; then
+  if [ -f $HOME/.profile.osx ]; then
+    source $HOME/.profile.osx
+  fi
+elif [ "$OS" = "Linux" ]; then
+  if [ -f $HOME/.profile.linux ]; then
+    source $HOME/.profile.linux
+  fi
+fi
+
+# Local overrides if present
+if [ -f $HOME/.profile.local ]; then
+  source $HOME/.profile.local
+fi

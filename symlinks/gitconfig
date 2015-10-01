@@ -1,19 +1,5 @@
-[include]
-  path=.gitconfig.local
-[color]
-  branch = auto
-  diff = auto
-  interactive = auto
-  status = auto
-  ui = auto
-[apply]
-  whitespace = fix
-[core]
-  excludesfile = ~/.gitignore
-  autocrlf = input
-  editor = $EDITOR
-  whitespace = fix,space-before-tab,tab-in-indent,trailing-space
-  pager = less -r
+# vim: ft=conf
+
 [alias]
   lg = log --graph --pretty=oneline --abbrev-commit --decorate
   lall = log --graph --pretty=oneline --abbrev-commit --decorate --all
@@ -29,15 +15,32 @@
   # Use fzf to select some modified files to add
   addm = "!git add `git ls-files -m --other --exclude-standard | fzf -m`"
   addmp = "!git add -p `git ls-files -m --other --exclude-standard | fzf -m`"
-[push]
-  default = current
-[pull]
-  rebase = true
-[merge]
-  defaultToUpstream = true
+[apply]
+  whitespace = fix
 [branch]
   autosetupmerge = true
-[rebase]
-  autosquash = true
+[color]
+  branch = auto
+  diff = auto
+  interactive = auto
+  status = auto
+  ui = auto
+[core]
+  excludesfile = ~/.gitignore
+  autocrlf = input
+  editor = $EDITOR
+  whitespace = fix,space-before-tab,tab-in-indent,trailing-space
+  pager = less -r
 [help]
   autocorrect = 1
+[merge]
+  defaultToUpstream = true
+[pull]
+  rebase = true
+[push]
+  default = current
+[rebase]
+  autosquash = true
+# Local modifications / auth
+[include]
+  path=.gitconfig.local

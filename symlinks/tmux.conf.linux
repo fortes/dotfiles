@@ -1,4 +1,9 @@
 # vim:set ft=conf
 # Use screen-style binding so we can nest a session from OS X
 unbind C-b
+unbind-key b
+
 set -g prefix C-a
+
+# Prefix twice to send prefix
+bind-key a send-prefix

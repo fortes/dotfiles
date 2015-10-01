@@ -1,4 +1,5 @@
-# See http://editorconfig.org/
+# vim:ft=conf
+# See http://editorconfig.org/ for context
 
 # This is the topmost file
 root = true

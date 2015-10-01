@@ -1,0 +1,44 @@
+# Don't put duplicate lines into history
+HISTCONTROL=ignoredup
+# Set history length
+HISTSIZE=1000
+HISTFILESIZE=2000
+
+# Enable options:
+shopt -s cdspell
+shopt -s cdable_vars
+shopt -s checkhash
+shopt -s checkwinsize
+shopt -s sourcepath
+shopt -s no_empty_cmd_completion
+shopt -s cmdhist
+shopt -s histappend histreedit histverify
+if [ "${BASH_VERSION%.*}" \> "4.2" ]; then
+  # Not supported in OS X version of bash
+  shopt -s autocd
+  shopt -s globstar
+fi
+
+# check the window size after each command and, if necessary,
+# update the values of LINES and COLUMNS.
+shopt -s checkwinsize
+
+# Load OS-specific files
+if [ $OS == "Darwin" ]; then
+  if [ -f ~/.bashrc.osx ]; then
+    source ~/.bashrc.osx
+  fi
+elif [ $OS == "Linux" ]; then
+  if [ -f ~/.bashrc.linux ]; then
+    source ~/.bashrc.linux
+  fi
+fi
+
+if [ -f ~/.fzf.bash ]; then
+  source ~/.fzf.bash
+fi
+
+# Load local file if present
+if [ -f ~/.bashrc.local ]; then
+  source ~/.bashrc.local
+fi
