@@ -138,6 +138,9 @@ alias mv='mv -i'
 # CD into root of git project
 alias pcd="cd \$(git rev-parse --show-toplevel 2>/dev/null || echo '.')"
 
+# CD into a directory within the project, selecting via fzf
+alias cdp="cd \$(git ls-files \$(git rev-parse --show-toplevel) | xargs -n1 dirname | sort | uniq | fzf || echo '.')"
+
 # Map ls to be colorful
 if [[ $OS == "Darwin" ]]; then
   alias ls='ls -GpFh'
@@ -155,6 +158,7 @@ fi
 if which nvim > /dev/null; then
   alias vim=nvim
   alias vi=nvim
+  alias vimdiff='nvim -d'
   export VISUAL=nvim
 else
   export VISUAL=vim
@@ -199,7 +203,7 @@ if [ -f ~/.fzf.zsh ]; then
   # If available, we use git to list files from the root directory (not from the
   # current directory as in other fzf cases). Otherwise, fallback to ag
   export FZF_DEFAULT_COMMAND='(git ls-files -co --exclude-standard $(git rev-parse --show-toplevel)|| ag -l -g "") 2> /dev/null'
-  export FZF_DEFAULT_OPTS='--black'
+  export FZF_DEFAULT_OPTS='--black --extended'
   export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
   source ~/.fzf.zsh
 fi
