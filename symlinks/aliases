@@ -42,5 +42,5 @@ if [ $OS = "Darwin" ]; then
   alias la='ls -AGpFh'
 else
   alias ls='ls --color=auto -GpFh'
-  alias ls='ls --color=auto -AGpFh'
+  alias la='ls --color=auto -AGpFh'
 fi
