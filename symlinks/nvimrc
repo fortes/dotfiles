@@ -198,6 +198,12 @@ augroup terminal_insert
   autocmd!
   autocmd BufEnter * if &buftype == 'terminal' | :startinsert | endif
 augroup END
+
+" Our setup makes sure to properly install the neovim python helper. Skip checks
+" for better startup speed
+let g:python_host_skip_check = 1
+" Don't have Python3 installed, disable checking altogether for startup perf
+let g:loaded_python3_provider = 1
 " }}}
 
 if &t_Co >= 256
