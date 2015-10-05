@@ -1,5 +1,5 @@
 #!/bin/sh
-set -euf
+set -ef
 
 OS=`uname`
 CMARK='✓'
