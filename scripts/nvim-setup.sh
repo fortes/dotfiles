@@ -5,12 +5,12 @@ source $HOME/dotfiles/scripts/helpers.sh
 if ! which nvim > /dev/null; then
   echo "$XMARK Neovim not installed"
 
-  if [ $OS == 'Darwin' ]; then
+  if [ "$OS" = 'Darwin' ]; then
     echo "  $ARROW Adding NeoVim tap to Homebrew"
     brew tap neovim/homebrew-neovim > /dev/null 2> /dev/null
     echo "  $ARROW Installing latest NeoVim from HEAD"
     brew install --HEAD neovim 2> /dev/null
-  elif [ $OS == 'Linux' ]; then
+  elif [ $OS = 'Linux' ]; then
     echo "  $ARROW Adding NeoVim PPA (requires sudo)"
     sudo add-apt-repository ppa:neovim-ppa/unstable
     echo "  $ARROW Updating apt & installing neovim"
@@ -23,7 +23,7 @@ if ! which nvim > /dev/null; then
     sudo update-alternatives --install /usr/bin/editor editor /usr/bin/nvim 60
   fi
 else
-  if [ $OS == "Darwin" ]; then
+  if [ "$OS" == "Darwin" ]; then
     read -p "NeoVim already installed. Update from HEAD [yn]? " -n 1 -r
     echo ""
     if [[ $REPLY =~ [Yy]$ ]]; then

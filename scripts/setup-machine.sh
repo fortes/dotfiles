@@ -38,7 +38,7 @@ elif [ $OS == "Linux" ]; then
   # fi
   # echo "Git and build tools installed"
 
-  PPA_ADDED=0
+  PPA_ADDED=''
   # if [ ! -f /etc/apt/sources.list.d/chris-lea-node_js-trusty.list ]; then
   #   echo "Adding Node PPA (requires sudo)"
   #   PPA_ADDED=1
@@ -61,7 +61,8 @@ elif [ $OS == "Linux" ]; then
   # fi
 
   # Update sources if we added a PPA
-  if [ $PPA_ADDED ]; then
+  if [ -n $PPA_ADDED ]; then
+    echo "  $ARROW New PPA added. Updating apt sources"
     sudo -E apt-get -q update > /dev/null
   fi
 fi
@@ -156,6 +157,9 @@ mkdir -p $HOME/.ssh
 
 # Setup shell
 ($HOME/dotfiles/scripts/zsh-setup.sh)
+
+# FZF
+($HOME/dotfiles/scripts/fzf-setup.sh)
 
 # Neovim setup
 ($HOME/dotfiles/scripts/nvim-setup.sh)
