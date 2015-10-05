@@ -5,6 +5,10 @@ OS=`uname`
 
 source $HOME/dotfiles/scripts/helpers.sh
 
+if [ -z "${HEADLESS-}" ]; then
+  HEADLESS=''
+fi
+
 # Install Homebrew
 if [ $OS == "Darwin" ]; then
   # Brew cask
@@ -47,7 +51,7 @@ elif [ $OS == "Linux" ]; then
   #   sudo -E add-apt-repository -y ppa:jon-severinsson/ffmpeg > /dev/null
   # fi
 
-  # if [ ! $HEADLESS ]; then
+  # if [ ! -n $HEADLESS ]; then
   #   if [ ! -f /etc/apt/sources.list.d/google-chrome.list ]; then
   #     echo "Adding Chrome PPA (requires sudo)"
   #     PPA_ADDED=1
@@ -123,7 +127,7 @@ if [ $OS == "Darwin" ]; then
 elif [ $OS == "Linux" ]; then
   # Different apt packages if we don't have a GUI
   PACKAGE_FILE=$HOME/dotfiles/scripts/apt-packages
-  if [ $HEADLESS ]; then
+  if [ -n $HEADLESS ]; then
     PACKAGE_FILE=$HOME/dotfiles/scripts/apt-packages-headless
   fi
 
