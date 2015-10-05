@@ -4,6 +4,7 @@ git
 libssl-dev
 mosh
 nodejs
+npm
 python-virtualenv
 silversearcher-ag
 tmux

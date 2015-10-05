@@ -10,6 +10,7 @@ libssl-dev
 mosh
 mp3val
 nodejs
+npm
 openssh-server
 python-virtualenv
 silversearcher-ag
