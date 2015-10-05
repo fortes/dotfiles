@@ -2,5 +2,8 @@
 
 if which setxbmap > /dev/null; then
   # Use Caps Lock as another Control Key
-  setxbmap -layout us -option ctrl:nocaps
+  setxkbmap -layout us -option ctrl:nocaps
+
+  # Swap Alt and Windows Keys
+  setxkbmap -layout us -option altwin:left_meta_win
 fi
