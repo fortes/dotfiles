@@ -12,6 +12,7 @@ mp3val
 nodejs
 npm
 openssh-server
+python-dev
 python-virtualenv
 silversearcher-ag
 tmux
