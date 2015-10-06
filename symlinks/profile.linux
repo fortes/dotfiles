@@ -7,3 +7,27 @@ if which setxbmap > /dev/null; then
   # Swap Alt and Windows Keys
   setxkbmap -layout us -option altwin:left_meta_win
 fi
+
+# Setup ssh-agent. This starts automatically with X, but not via ssh
+# Mostly from http://mah.everybody.org/docs/ssh
+SSH_ENV="$HOME/.ssh/environment"
+
+function start_agent {
+  ssh-agent -k 2> /dev/null
+  echo "$ARROW Starting new SSH agent..."
+  ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
+  echo "$CMARK ssh-agent started"
+  chmod 600 "${SSH_ENV}"
+  source "${SSH_ENV}" > /dev/null
+  ssh-add
+}
+
+# Source SSH settings, if applicable
+if [ -f "${SSH_ENV}" ]; then
+  source "${SSH_ENV}" > /dev/null
+  if ! ps ${SSH_AGENT_PID}; then
+    start_agent
+  fi
+else
+  start_agent
+fi
