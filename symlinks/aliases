@@ -44,3 +44,8 @@ else
   alias ls='ls --color=auto -GpFh'
   alias la='ls --color=auto -AGpFh'
 fi
+
+# Load local file if present
+if [ -f ~/.aliases.local ]; then
+  source ~/.aliases.local
+fi
