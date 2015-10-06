@@ -12,7 +12,8 @@ call plug#begin()
 " Colors {{{
 Plug 'w0ng/vim-hybrid'
 " Temporary while developing colorscheme
-Plug '~/x/vim-escuro'
+" Plug 'fortes/vim-escuro'
+" Plug '~/x/vim-escuro'
 " Shades indent levels
 Plug 'nathanaelkane/vim-indent-guides'
 " }}}
@@ -96,9 +97,9 @@ Plug 'junegunn/vim-peekaboo'
 " }}}
 
 " General coding {{{
+Plug 'fortes/vim-personal-snippets'
 " Temporary while editing
-"Plug 'fortes/vim-personal-snippets'
-Plug '~/x/vim-personal-snippets/'
+"Plug '~/x/vim-personal-snippets/'
 " async :make via NeoVim job control, replaces syntastic for showing errors
 " Provides :Neomake and :Neomake!
 " Only load on first use of :Neomake command
