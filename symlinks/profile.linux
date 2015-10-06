@@ -10,22 +10,24 @@ fi
 
 # Setup ssh-agent. This starts automatically with X, but not via ssh
 # Mostly from http://mah.everybody.org/docs/ssh
-SSH_ENV="$HOME/.ssh/environment"
+if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
+  SSH_ENV="$HOME/.ssh/environment"
 
-function start_agent {
-  ssh-agent -k 2> /dev/null
-  ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
-  chmod 600 "${SSH_ENV}"
-  source "${SSH_ENV}" > /dev/null
-  ssh-add
-}
+  function start_agent {
+    ssh-agent -k 2> /dev/null
+    ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
+    chmod 600 "${SSH_ENV}"
+    source "${SSH_ENV}" > /dev/null
+    ssh-add
+  }
 
-# Source SSH settings, if applicable
-if [ -f "${SSH_ENV}" ]; then
-  source "${SSH_ENV}" > /dev/null
-  if ! ps ${SSH_AGENT_PID} > /dev/null; then
+  # Source SSH settings, if applicable
+  if [ -f "${SSH_ENV}" ]; then
+    source "${SSH_ENV}" > /dev/null
+    if ! ps ${SSH_AGENT_PID} > /dev/null; then
+      start_agent
+    fi
+  else
     start_agent
   fi
-else
-  start_agent
 fi
