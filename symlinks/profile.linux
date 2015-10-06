@@ -1,7 +1,5 @@
 # vim: ft=sh
 
-source $HOME/dotfiles/scripts/helpers.sh
-
 if which setxbmap > /dev/null; then
   # Use Caps Lock as another Control Key
   setxkbmap -layout us -option ctrl:nocaps
@@ -16,9 +14,7 @@ SSH_ENV="$HOME/.ssh/environment"
 
 function start_agent {
   ssh-agent -k 2> /dev/null
-  echo "$ARROW Starting new SSH agent..."
   ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
-  echo "$CMARK ssh-agent started"
   chmod 600 "${SSH_ENV}"
   source "${SSH_ENV}" > /dev/null
   ssh-add
