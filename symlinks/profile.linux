@@ -1,5 +1,7 @@
 # vim: ft=sh
 
+source $HOME/dotfiles/scripts/helpers.sh
+
 if which setxbmap > /dev/null; then
   # Use Caps Lock as another Control Key
   setxkbmap -layout us -option ctrl:nocaps
@@ -25,7 +27,7 @@ function start_agent {
 # Source SSH settings, if applicable
 if [ -f "${SSH_ENV}" ]; then
   source "${SSH_ENV}" > /dev/null
-  if ! ps ${SSH_AGENT_PID}; then
+  if ! ps ${SSH_AGENT_PID} > /dev/null; then
     start_agent
   fi
 else
