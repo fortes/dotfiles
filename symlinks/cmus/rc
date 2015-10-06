@@ -7,6 +7,9 @@ colorscheme zenburn
 # Soft volume control
 set softvol=true
 
+# Enable mouse
+set mouse=true
+
 # Scrobber
 set status_display_program=~/dotfiles/scripts/cmus-status.sh
 

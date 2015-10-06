@@ -1,5 +1,10 @@
 # vim: ft=sh
 
+# Locally-installed packages belong in path
+if ! echo ":$PATH:" | grep -q ":$HOME/opt/bin:"; then
+  export PATH="$HOME/opt/bin:$PATH"
+fi
+
 if which setxbmap > /dev/null; then
   # Use Caps Lock as another Control Key
   setxkbmap -layout us -option ctrl:nocaps

@@ -158,6 +158,11 @@ mkdir -p $HOME/.ssh
 # Setup shell
 ($HOME/dotfiles/scripts/zsh-setup.sh)
 
+# cmus
+if [ -z $HEADLESS ]; then
+  ($HOME/dotfiles/scripts/cmus-setup.sh)
+fi
+
 # FZF
 ($HOME/dotfiles/scripts/fzf-setup.sh)
 

@@ -1,6 +1,5 @@
 build-essential
 chromium-browser
-cmus
 curl
 exfat-fuse
 exfat-utils
