@@ -54,8 +54,8 @@ isAptPPAInstalled() {
   else
     return 1
   fi
-
 }
 
-export -f isHomebrewPackageInstalled isAptPackageInstalled
+export -f isHomebrewPackageInstalled isAptPackageInstalled \
+  isHomebrewTapInstalled isAptPPAInstalled
 # }}}
