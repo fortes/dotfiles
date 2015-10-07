@@ -18,7 +18,7 @@ source $HOME/virtualenvs/default/bin/activate
 
 # Install python packages
 for p in $(cat $HOME/dotfiles/scripts/python-packages); do
-  if ! pip list | grep $p > /dev/null; then
+  if ! pip list | grep -i $p > /dev/null; then
     echo "  $ARROW installing package $p"
     pip install -q -U $p
   fi
