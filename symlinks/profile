@@ -14,12 +14,6 @@ export EDITOR VISUAL
 export VIRTUALENV_DISTRIBUTE=true
 # Centralized location for new virtual environments
 export PIP_VIRTUALENV_BASE=$HOME/virtualenvs
-
-# Activate default virtual env, if not already in an env
-if [ -z $VIRTUAL_ENV ] && [ -d $PIP_VIRTUALENV_BASE/default ]; then
-  # This will modify the prompt, so do it before setting the prompt
-  source $PIP_VIRTUALENV_BASE/default/bin/activate
-fi
 # }}}
 
 # Change default beets configuration path

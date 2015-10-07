@@ -6,6 +6,12 @@ HISTSIZE=1000
 SAVEHIST=$HISTSIZE
 HISTFILE=~/.history
 
+# Activate default virtual env, if not already in an env
+if [ -z $VIRTUAL_ENV ] && [ -d $PIP_VIRTUALENV_BASE/default ]; then
+  # This will modify the prompt, so do it before setting the prompt
+  source $PIP_VIRTUALENV_BASE/default/bin/activate
+fi
+
 # Easier color output
 autoload -U colors && colors
 
