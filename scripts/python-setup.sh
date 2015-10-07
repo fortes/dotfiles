@@ -18,9 +18,15 @@ source $HOME/virtualenvs/default/bin/activate
 
 # Install python packages
 for p in $(cat $HOME/dotfiles/scripts/python-packages); do
-  if ! pip list | grep -i $p > /dev/null; then
-    echo "  $ARROW installing package $p"
+  # Deal with direct from GitHub installs
+  if (echo $p | grep -q github.com); then
+    package_name=`echo $p | rev | cut -d/ -f1 | rev | cut -d. -f1`
+  else
+    package_name=$p
+  fi
+  if ! pip show $package_name > /dev/null; then
+    echo "  $ARROW installing package $package_name"
     pip install -q -U $p
   fi
 done
-echo "$CMARK python packages installed"
+echo "$CMARK All python packages installed"
