@@ -8,11 +8,14 @@ if ! which fzf > /dev/null; then
   if [ "$OS" = 'Darwin' ]; then
     echo "  $ARROW Installing FZF"
     brew reinstall --HEAD fzf
-  else
+  elif [ ! -d $HOME/.fzf ]; then
     echo "  $ARROW Installing FZF"
-    git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+    git clone --depth 1 https://github.com/junegunn/fzf.git $HOME/.fzf
     echo "  $ARROW Running FZF install script"
-    (~/.fzf/install)
+    ($HOME/.fzf/install)
+  else
+    echo "$XMARK FZF not installed but installation directory already present"
+    exit 1
   fi
 fi
 

@@ -14,6 +14,7 @@ openssh-server
 python-dev
 python-virtualenv
 silversearcher-ag
+software-properties-common
 tmux
 unzip
 vlc
