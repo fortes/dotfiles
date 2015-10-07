@@ -1,8 +1,5 @@
-ack
-chromaprint
 cmus
 elinks
-ffmpeg
 fzf
 git
 gpg
@@ -10,13 +7,9 @@ hub
 irssi
 jq
 libyaml
-mediainfo
 mobile-shell
-mp3val
 node
-phantomjs
 reattach-to-user-namespace
 tmux
-vim
 wget
 zsh

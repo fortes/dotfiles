@@ -27,7 +27,7 @@ elif [ $OS == "Linux" ]; then
   fi
 
   # Make sure not to get stuck on any prompts
-  export DEBIAN_FRONTEND=noninteractive
+  DEBIAN_FRONTEND=noninteractive
 
   # if ! which git > /dev/null; then
   #   echo "Installing pre-requisites first (requires sudo)"
@@ -61,10 +61,10 @@ elif [ $OS == "Linux" ]; then
   # fi
 
   # Update sources if we added a PPA
-  if [ -n $PPA_ADDED ]; then
-    echo "  $ARROW New PPA added. Updating apt sources"
-    sudo -E apt-get -q update > /dev/null
-  fi
+  # if [ -n $PPA_ADDED ]; then
+  #   echo "  $ARROW New PPA added. Updating apt sources"
+  #   sudo -E apt-get -q update > /dev/null
+  # fi
 fi
 
 # Mac OS Settings
@@ -88,43 +88,37 @@ if [ $OS == "Darwin" ]; then
     pip install -q --upgrade setuptools
     pip install -q --upgrade pip
     pip install -q --upgrade virtualenv
-    echo "Python installed"
+    echo "$CMARK Python installed"
 
     # Python3 bonus
     brew install python3 --with-brewed-openssl
     pip3 install -q --upgrade setuptools
     pip3 install -q --upgrade pip
-    echo "Python3 installed"
+    echo "$CMARK Python3 installed"
   fi
 
   brew doctor
   brew update
   for p in $(cat $HOME/dotfiles/scripts/brew-packages); do
     if [ ! -n "$(brew list $p 2> /dev/null)" ]; then
+      echo "$XMARK $p not installed"
+      echo "  $ARROW Installing $p via brew"
       brew install $p
-
-      if [$p == 'fzf']; then
-        echo "Setting up fzf"
-        $(brew info fzf | grep /install)
-      fi
-
-      # Update source paths, etc
-      . $HOME/.bashrc
     fi
   done
-  echo "Homebrew packages installed"
+  echo "$CMARK Homebrew packages installed"
 
   # Install cask packages
   brew cask doctor
   brew cask update
   for p in $(cat $HOME/dotfiles/scripts/cask-packages); do
     if [ ! -n "$(brew cask list $p 2> /dev/null)" ]; then
+      echo "$XMARK $p not installed"
+      echo "  $ARROW Installing $p via brew"
       brew cask install $p
-      # Update source paths, etc
-      source ~/.profile
     fi
   done
-  echo "Cask packages installed"
+  echo "$CMARK Cask packages installed"
 elif [ $OS == "Linux" ]; then
   # Different apt packages if we don't have a GUI
   PACKAGE_FILE=$HOME/dotfiles/scripts/apt-packages
@@ -140,11 +134,11 @@ elif [ $OS == "Linux" ]; then
     fi
     echo "$CMARK $p installed"
   done
-
-  # Update source paths, etc
-  source ~/.profile
   echo "$CMARK apt packages installed"
 fi
+
+# Update source paths, etc
+source ~/.profile
 
 ($HOME/dotfiles/scripts/python-setup.sh)
 
