@@ -251,10 +251,8 @@ let g:markify_info_text = 'ℹ'
 " }}}
 
 " Test.vim {{{
-" Run test commands in NeoVim terminal, if available
-if has('nvim')
-  let test#strategy = 'neovim'
-endif
+" Run test commands in NeoVim terminal
+let test#strategy = 'neovim'
 
 " Use dot reporter by default
 let test#javascript#mocha#options = '--reporter dot'
@@ -271,7 +269,7 @@ nnoremap <silent> <leader>twf :split<cr>:TestFile -w<cr>
 
 " NeoMake {{{
 if executable('eslint') || executable('eslint_d')
-  " Use only eslint if it's available
+  " Use eslint if it's available
   let g:neomake_javascript_enabled_makers = ['makeprg']
 endif
 " }}}

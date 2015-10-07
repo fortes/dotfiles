@@ -1,7 +1,9 @@
 # TODO: Check which of these are needed
 
 # Default terminal color depth is pathetic
-export TERM=xterm-256color
+if [ "$TERM" = "xterm" ]; then
+  export TERM=xterm-256color
+fi
 
 # if [ -z $SSH_AGENT_PID ]; then
 #   eval `ssh-agent -s` > /dev/null
