@@ -186,6 +186,10 @@ endif
 " Neovim-only config {{{
 " Useful reference for Neovim-only features (:help vim-differences)
 
+" Terminal {{{
+" Quickly open a shell below current window
+nnoremap <leader>sh :below 10sp term://$SHELL<cr>
+
 " Terminal key bindings for window switching
 " Map jj and jk to <ESC> to leave insert mode quickly
 " Also allow <leader><C-c> and <leader><esc>
@@ -199,6 +203,7 @@ augroup terminal_insert
   autocmd!
   autocmd BufEnter * if &buftype == 'terminal' | :startinsert | endif
 augroup END
+" }}}
 
 " Our setup makes sure to properly install the neovim python helper. Skip checks
 " for better startup speed
