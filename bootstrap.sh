@@ -50,7 +50,7 @@ elif [ $OS = "Linux" ] && which apt-get > /dev/null; then
   # Make sure git is in there
   if ! which git > /dev/null; then
     echo "Installing git (requires sudo)..."
-    sudo apt-get install -qfuy git
+    sudo apt-get -qfuy install git
   fi
   echo "$CMARK Git installed"
 else

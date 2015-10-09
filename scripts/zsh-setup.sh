@@ -22,7 +22,7 @@ if [ "$(which zsh)" != "$SHELL" ]; then
     if [ ! $(isAptPackageInstalled zsh) ]; then
       echo "  $XMARK zsh not installed"
       echo "    $ARROW Installing zsh via apt (will prompt for password)..."
-      sudo -E apt-get install zsh -qfuy
+      sudo -E apt-get -qfuy install zsh
     fi
   else
     echo "  $XMARK Unsupported OS. Install zsh on your own"

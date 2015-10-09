@@ -130,7 +130,7 @@ elif [ $OS == "Linux" ]; then
     if ! isAptPackageInstalled $p; then
       echo "$XMARK Apt package $p not installed"
       echo "  $ARROW Installing $p (requires sudo)"
-      sudo -E apt-get install -qfuy $p > /dev/null
+      sudo -E apt-get -qfuy install $p > /dev/null
     fi
     echo "$CMARK $p installed"
   done

@@ -9,7 +9,7 @@ if [ "$OS" = 'Linux' ] && ! which cmus > /dev/null; then
   INSTALL_DIR="$LOCAL_DIR/source/cmus"
 
   echo "$ARROW Installing build dependencies (requires sudo)"
-  sudo apt-get install -qfuy libmad0-dev libao-dev libncursesw5-dev
+  sudo apt-get -qfuy install libmad0-dev libao-dev libncursesw5-dev
 
   mkdir -p $INSTALL_DIR
 
