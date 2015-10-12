@@ -1,8 +1,8 @@
 # vim: ft=sh
 
 # Locally-installed packages belong in path
-if ! echo ":$PATH:" | grep -q ":$HOME/opt/bin:"; then
-  export PATH="$HOME/opt/bin:$PATH"
+if ! echo ":$PATH:" | grep -q ":$HOME/.local/bin:"; then
+  export PATH="$HOME/.local/bin:$PATH"
 fi
 
 if which setxbmap > /dev/null; then
