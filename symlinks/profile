@@ -19,11 +19,6 @@ export PIP_VIRTUALENV_BASE=$HOME/virtualenvs
 # Change default beets configuration path
 export BEETSDIR=$HOME/.beets
 
-# Load aliases
-if [ -f $HOME/.aliases ]; then
-  source $HOME/.aliases
-fi
-
 if which fzf > /dev/null; then
   # If available, we use git to list files from the root directory (not from the
   # current directory as in other fzf cases). Otherwise, fallback to ag
