@@ -222,7 +222,7 @@ endfunction
 
 augroup status_line
   autocmd!
-  autocmd BufEnter,TabEnter,VimEnter,WinEnter * call UpdateStatusLine(1)
+  autocmd BufWinEnter,BufEnter,TabEnter,VimEnter,WinEnter * call UpdateStatusLine(1)
   autocmd BufLeave,TabLeave,WinLeave * call UpdateStatusLine(0)
 augroup END
 " }}}
