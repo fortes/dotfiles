@@ -34,8 +34,10 @@ if !has('nvim')
   set hlsearch
   " Show incremental search matches
   set incsearch
-  " Disable langmap for characters from a mapping (on by default in neovim)
-  set langnoremap
+  if version >= 704
+    " Disable langmap for characters from a mapping (on by default in neovim)
+    set langnoremap
+  endif
   " Support mouse
   set mouse=a
   " The future is now!
@@ -179,10 +181,14 @@ set wildignore+=*.gif,*.jpg,*.jpeg,*.otf,*.png,*.svg,*.ttf
 " }}}
 
 " Status line {{{
-" Show git repo information (if available)
-let g:activeStatusLine=" %{StatuslineTag()} "
+if version >= 704
+  " Show git repo information (if available)
+  let g:activeStatusLine=" %{StatuslineTag()} » "
+else
+  let g:activeStatusLine=" "
+endif
 " Relative path to file in current buffer
-let g:activeStatusLine.="» %<%f "
+let g:activeStatusLine.="%<%f "
 " Exclamation mark if not modifiable, + if modified
 let g:activeStatusLine.="%{&readonly ? \"! \" : &modified ? '+ ' : ''}"
 " Start left align, show filetype
@@ -299,7 +305,7 @@ set showbreak=«
 " Colors & Syntax Highlighting {{{
 " Base install has some lame themes, this one is OK, I guess
 set background=dark
-colorscheme industry
+silent! colorscheme industry
 
 " Enable syntax highlighting by default
 syntax enable
