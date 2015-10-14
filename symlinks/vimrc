@@ -329,20 +329,20 @@ if executable('ag')
 endif
 
 " Helper for visual search
-function! s:VSetSearch(cmdtype)
+function! s:VisualSetSearch(cmdtype)
   let temp = @s
   norm! gv"sy
   let @/ = '\V' . substitute(escape(@s, a:cmdtype.'\'), '\n', '\\n', 'g')
   let @s = temp
 endfunction
 
-function s:VAgSearch()
+function! s:VisualAgSearch()
   norm! gv"sy
 endfunction
 
 " */# in visual mode searches for selected text, similar to normal mode
-vnoremap * :<C-u>call <SID>VSetSearch('/')<cr>/<C-R>=@/<cr><cr>
-vnoremap # :<C-u>call <SID>VSetSearch('#')<cr>/<C-R>=@/<cr><cr>
+vnoremap * :<C-u>call <SID>VisualSetSearch('/')<cr>/<C-R>=@/<cr><cr>
+vnoremap # :<C-u>call <SID>VisualSetSearch('#')<cr>/<C-R>=@/<cr><cr>
 
 " K searches for word under cursor in root of project (remove default binding)
 " Need to force redraw of screen after, since for some reason grep and opening
