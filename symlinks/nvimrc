@@ -266,10 +266,10 @@ let test#javascript#mocha#file_pattern = '_test.js'
 
 " <leader>tt to test based on cursor, <leader>twt to watch
 nnoremap <silent> <leader>tt :split<cr>:TestNearest<cr>
-nnoremap <silent> <leader>twt :split<cr>:TestNearest -w<cr>
+nnoremap <silent> <leader>twt :split<cr>:TestNearest -w<cr><c-\><c-n><c-w><c-k>
 " <leader>tf to test current file, <leader> twf to watch
 nnoremap <silent> <leader>tf :split<cr>:TestFile<cr>
-nnoremap <silent> <leader>twf :split<cr>:TestFile -w<cr>
+nnoremap <silent> <leader>twf :split<cr>:TestFile -w<cr><c-\><c-n><c-w><c-k>
 " }}}
 
 " NeoMake {{{
