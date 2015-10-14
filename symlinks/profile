@@ -9,6 +9,9 @@ fi
 EDITOR=$VISUAL
 export EDITOR VISUAL
 
+# Tell ls to use colors by default (only works on Mac/BSD)
+export CLICOLOR=1
+
 # VirtualEnv {{{
 # virtualenv should use Distribute instead of legacy setuptools
 export VIRTUALENV_DISTRIBUTE=true
