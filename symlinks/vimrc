@@ -328,11 +328,26 @@ if executable('ag')
   set grepformat=%f:%l:%c:%m
 endif
 
+" Helper for visual search
+function! s:VSetSearch(cmdtype)
+  let temp = @s
+  norm! gv"sy
+  let @/ = '\V' . substitute(escape(@s, a:cmdtype.'\'), '\n', '\\n', 'g')
+  let @s = temp
+endfunction
+
+function s:VAgSearch()
+  norm! gv"sy
+endfunction
+
+" */# in visual mode searches for selected text, similar to normal mode
+vnoremap * :<C-u>call <SID>VSetSearch('/')<cr>/<C-R>=@/<cr><cr>
+vnoremap # :<C-u>call <SID>VSetSearch('#')<cr>/<C-R>=@/<cr><cr>
+
 " K searches for word under cursor in root of project (remove default binding)
 " Need to force redraw of screen after, since for some reason grep and opening
 " the quicklist mess everything up
-nnoremap K :silent! grep! "\b<C-R><C-W>\b"<cr>:cwindow<cr><C-L>
-vnoremap K :silent! grep! "\b<C-R><C-W>\b"<cr>:cwindow<cr><C-L>
+nnoremap K :silent! grep! "\b<C-R><C-W>\b"<cr>:copen<cr><C-L>
 
 " <leader>s starts a find a replace for word under cursor
 nnoremap <leader>s :%s/\<<C-R><C-W>\>/<C-R><C-W>/g<Left><Left>
@@ -340,7 +355,7 @@ nnoremap <leader>s :%s/\<<C-R><C-W>\>/<C-R><C-W>/g<Left><Left>
 " Q for grepping and showing results
 " Inspired by https://robots.thoughtbot.com/faster-grepping-in-vim
 if !exists(':Grep')
-  command -nargs=+ -complete=file -bar Grep silent! grep! <args>|cwindow|redraw!
+  command -nargs=+ -complete=file -bar Grep silent! grep! <args>|copen|redraw!
 endif
 
 " Never use Ex-mode, map to Grep command instead
