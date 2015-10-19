@@ -5,7 +5,7 @@ format_item: $artist - $album - $track - $title ($genre)
 format_album: $albumartist - $album [$original_year] ($genre)
 
 pluginpath: ~/media/music/tools/
-plugins: fetchart mbsync embedart info missing lyrics lastgenre check
+plugins: fetchart mbsync embedart info missing lyrics lastgenre badfiles types
 
 art_filename: folder
 
@@ -18,18 +18,18 @@ clutter: ['Thumbs.db', '.DS_Store', '*.log', '*.txt', '*.cue', '*.m3u', '*.sfv',
 asciify_paths: yes
 
 import:
-    write: yes
-    move: yes
-    resume: no
-    incremental: no
-    languages: ['en']
-    default_action: 'skip'
+  write: yes
+  move: yes
+  resume: no
+  incremental: no
+  languages: ['en']
+  default_action: 'skip'
 
 match:
-    preferred:
-        countries: ['US', 'GB|UK', 'XW', 'XE']
-        media: ['CD', 'Digital Media|File']
-        original_year: yes
+  preferred:
+    countries: ['US', 'GB|UK', 'XW', 'XE']
+    media: ['CD', 'Digital Media|File']
+    original_year: yes
 
 fetchart:
   # Pick only trusted filenames (cover_names)
@@ -37,22 +37,19 @@ fetchart:
   cover_names: front folder cover
 
 paths:
-    default: albums/$albumartist - $album [$original_year]%aunique{albumartist album original_year, albumtype original_year year label catalognum albumdisambig}/$track - $title
-    comp: albums/$albumartist - $album [$original_year]%aunique{albumartist album original_year, albumtype original_year year label catalognum albumdisambig}/$track - $title
-    singleton: non-albums/$artist/$original_year - $title
-
-scrub:
-    auto: no
+  default: albums/$albumartist - $album [$original_year]%aunique{albumartist album original_year, albumtype original_year year label catalognum albumdisambig}/$track - $title
+  comp: albums/$albumartist - $album [$original_year]%aunique{albumartist album original_year, albumtype original_year year label catalognum albumdisambig}/$track - $title
+  singleton: non-albums/$artist/$original_year - $title
 
 lyrics:
-    google_API_key: REPLACEME
+  auto: yes
 
 lastgenre:
-    fallback: 'Unknown'
-    source: artist
-    count: 3
-    whitelist: ~/media/music/tools/genres.txt
-    canonical: ~/media/music/tools/genres-tree.yaml
+  fallback: 'Unknown'
+  source: artist
+  count: 3
+  whitelist: ~/media/music/tools/genres.txt
+  canonical: ~/media/music/tools/genres-tree.yaml
 
-check:
-    backup: no
+types:
+  rating: int
