@@ -4,7 +4,7 @@ OS=`uname`
 # Remember stuff
 HISTSIZE=1000
 SAVEHIST=$HISTSIZE
-HISTFILE=~/.history
+HISTFILE=$HOME/.history
 
 # Activate default virtual env. Checking $VIRTUAL_ENV does not work here since
 # tmux sessions will get the env variable, but not the $PATH changes.
@@ -127,22 +127,22 @@ if [ -f $HOME/.aliases ]; then
 fi
 
 # Add fzf support, if present
-if [ -f ~/.fzf.zsh ]; then
-  source ~/.fzf.zsh
+if [ -f $HOME/.fzf.zsh ]; then
+  source $HOME/.fzf.zsh
 fi
 
 # Load OS-specific files
 if [ $OS = "Darwin" ]; then
-  if [ -f ~/.zshrc.osx ]; then
-    source ~/.zshrc.osx
+  if [ -f $HOME/.zshrc.osx ]; then
+    source $HOME/.zshrc.osx
   fi
 elif [ $OS = "Linux" ]; then
-  if [ -f ~/.zshrc.linux ]; then
-    source ~/.zshrc.linux
+  if [ -f $HOME/.zshrc.linux ]; then
+    source $HOME/.zshrc.linux
   fi
 fi
 
 # Load local file if present
-if [ -f ~/.zshrc.local ]; then
-  source ~/.zshrc.local
+if [ -f $HOME/.zshrc.local ]; then
+  source $HOME/.zshrc.local
 fi

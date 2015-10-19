@@ -1,44 +1,68 @@
-# Don't put duplicate lines into history
-HISTCONTROL=ignoredup
-# Set history length
-HISTSIZE=1000
+# Don't put duplicate lines into history, ignore commands w/ initial space
+HISTCONTROL=ignoredup:ignorespace
+# History file location & size
+HISTFILE=$HOME/.history
 HISTFILESIZE=2000
+HISTSIZE=1000
 
-# Enable options:
+# Bash options: {{{
+# Auto-correct typos
 shopt -s cdspell
-shopt -s cdable_vars
+# Check hash before executing
 shopt -s checkhash
+# Check window size after each command, and update $LINES and $COLUMNS
 shopt -s checkwinsize
-shopt -s sourcepath
-shopt -s no_empty_cmd_completion
+# Save all lines of multiline commands
 shopt -s cmdhist
+# Include filenames that begin with '.' in filename expansion
+shopt -s dotglob
+# Append to history list. Allow editing of history substitution in readline
+# buffer
 shopt -s histappend histreedit histverify
+# Don't search path for completions when on an empty line
+shopt -s no_empty_cmd_completion
+# Case insensitive filename matching
+shopt -s nocaseglob
+# Not supported in ancient OS X version of bash
 if [ "${BASH_VERSION%.*}" \> "4.2" ]; then
-  # Not supported in OS X version of bash
+  # CD into dir as command
   shopt -s autocd
+  # Warn about stopped jobs before exiting
+  shopt -s checkjobs
+  # Replace directory names when doing tab completion
+  shopt -s direxpand
+  # Spell check on directory names
+  shopt -s dirspell
+  # Use ** for nice filename matching
   shopt -s globstar
 fi
+# }}}
 
-# check the window size after each command and, if necessary,
-# update the values of LINES and COLUMNS.
-shopt -s checkwinsize
+# Simple prompt user@host:pwd $
+PS1="\[\e[31m\]\u@\h\[\e[m\]:\[\e[33m\]\w\[\e[m\] \$ "
+
+# FZF keybindings
+if [ -f $HOME/.fzf.bash ]; then
+  source $HOME/.fzf.bash
+fi
+
+# Load aliases
+if [ -f $HOME/.aliases ]; then
+  source $HOME/.aliases
+fi
 
 # Load OS-specific files
 if [ "$OS" = "Darwin" ]; then
-  if [ -f ~/.bashrc.osx ]; then
-    source ~/.bashrc.osx
+  if [ -f $HOME/.bashrc.osx ]; then
+    source $HOME/.bashrc.osx
   fi
 elif [ "$OS" = "Linux" ]; then
-  if [ -f ~/.bashrc.linux ]; then
-    source ~/.bashrc.linux
+  if [ -f $HOME/.bashrc.linux ]; then
+    source $HOME/.bashrc.linux
   fi
-fi
-
-if [ -f ~/.fzf.bash ]; then
-  source ~/.fzf.bash
 fi
 
 # Load local file if present
-if [ -f ~/.bashrc.local ]; then
-  source ~/.bashrc.local
+if [ -f $HOME/.bashrc.local ]; then
+  source $HOME/.bashrc.local
 fi
