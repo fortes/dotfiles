@@ -47,10 +47,6 @@ if [ ! -f $HOME/.nvim/autoload/plug.vim ]; then
   echo "  $CMARK vim-plug installed"
   echo "  $ARROW Installing plugins..."
   nvim +PlugInstall +qall
-else
-  echo "  $CMARK vim-plug installed"
-  echo "  $ARROW Updating plugins..."
-  nvim +PlugUpgrade +PlugUpdate +qall
 fi
 
 echo "$CMARK NeoVim setup complete"
