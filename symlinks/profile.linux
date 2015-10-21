@@ -1,10 +1,5 @@
 # vim: ft=sh
 
-# Locally-installed packages belong in path
-if ! echo ":$PATH:" | grep -q ":$HOME/.local/bin:"; then
-  export PATH="$HOME/.local/bin:$PATH"
-fi
-
 if which setxbmap > /dev/null; then
   # Use Caps Lock as another Control Key
   setxkbmap -layout us -option ctrl:nocaps
@@ -18,17 +13,17 @@ fi
 if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
   SSH_ENV="$HOME/.ssh/environment"
 
-  function start_agent {
+  start_agent () {
     ssh-agent -k 2> /dev/null
     ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
     chmod 600 "${SSH_ENV}"
-    source "${SSH_ENV}" > /dev/null
+    . "${SSH_ENV}" > /dev/null
     ssh-add
   }
 
   # Source SSH settings, if applicable
   if [ -f "${SSH_ENV}" ]; then
-    source "${SSH_ENV}" > /dev/null
+    . "${SSH_ENV}" > /dev/null
     if ! ps ${SSH_AGENT_PID} > /dev/null; then
       start_agent
     fi

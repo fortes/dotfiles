@@ -1,17 +1,14 @@
+# vim: ft=zsh
+
 # For platform-specific conditions
 OS=`uname`
 
-# Remember stuff
-HISTSIZE=1000
-SAVEHIST=$HISTSIZE
-HISTFILE=$HOME/.history
-
-# Activate default virtual env. Checking $VIRTUAL_ENV does not work here since
-# tmux sessions will get the env variable, but not the $PATH changes.
-if [ -d $PIP_VIRTUALENV_BASE/default ]; then
-  # This will modify the prompt, so do it before setting the prompt
-  source $PIP_VIRTUALENV_BASE/default/bin/activate
+# Load base config
+if [ -f $HOME/.shrc ]; then
+  source $HOME/.shrc
 fi
+
+# Zsh Modules {{{
 
 # Easier color output
 autoload -U colors && colors
@@ -27,6 +24,8 @@ autoload -U edit-command-line
 
 # Enable bash-like word killing that stops at slashes
 autoload -U select-word-style
+
+# }}}
 
 # Zsh Options {{{
 
@@ -113,30 +112,26 @@ bindkey '^x^e' edit-command-line
 # <C-w> respects slash as a word
 select-word-style bash
 
-# Nicer colors. BSD uses $LSCOLORS, linux uses $LS_COLORS
-export LSCOLORS=gxfxbxbxCxegedabagGxGx
-export LS_COLORS='di=36;40:ln=35;40:so=31;40:pi=31;40:ex=1;32;40:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=36;01:ow=36;01:'
-
 # Use same ls colors for completion, zsh uses linux-style colors
 zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
 # }}}
+
+# Add fzf support, if present
+if [ -f ~/.fzf.zsh ]; then
+  source ~/.fzf.zsh
+fi
 
 # Load aliases
 if [ -f $HOME/.aliases ]; then
   source $HOME/.aliases
 fi
 
-# Add fzf support, if present
-if [ -f $HOME/.fzf.zsh ]; then
-  source $HOME/.fzf.zsh
-fi
-
 # Load OS-specific files
-if [ $OS = "Darwin" ]; then
+if [[ $OS == "Darwin" ]]; then
   if [ -f $HOME/.zshrc.osx ]; then
     source $HOME/.zshrc.osx
   fi
-elif [ $OS = "Linux" ]; then
+elif [[ $OS == "Linux" ]]; then
   if [ -f $HOME/.zshrc.linux ]; then
     source $HOME/.zshrc.linux
   fi

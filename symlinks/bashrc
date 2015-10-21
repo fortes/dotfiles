@@ -1,9 +1,14 @@
+# vim: ft=sh
+
+# For platform-specific conditions
+OS=`uname`
+
 # Don't put duplicate lines into history, ignore commands w/ initial space
 HISTCONTROL=ignoredup:ignorespace
-# History file location & size
-HISTFILE=$HOME/.history
-HISTFILESIZE=2000
-HISTSIZE=1000
+
+if [ -f $HOME/.shrc ]; then
+  source $HOME/.shrc
+fi
 
 # Bash options: {{{
 # Auto-correct typos
@@ -42,21 +47,16 @@ fi
 PS1="\[\e[31m\]\u@\h\[\e[m\]:\[\e[33m\]\w\[\e[m\] \$ "
 
 # FZF keybindings
-if [ -f $HOME/.fzf.bash ]; then
-  source $HOME/.fzf.bash
-fi
-
-# Load aliases
-if [ -f $HOME/.aliases ]; then
-  source $HOME/.aliases
+if [ -f ~/.fzf.bash ]; then
+  source ~/.fzf.bash
 fi
 
 # Load OS-specific files
-if [ "$OS" = "Darwin" ]; then
+if [[ $OS == "Darwin" ]]; then
   if [ -f $HOME/.bashrc.osx ]; then
     source $HOME/.bashrc.osx
   fi
-elif [ "$OS" = "Linux" ]; then
+elif [[ $OS == "Linux" ]]; then
   if [ -f $HOME/.bashrc.linux ]; then
     source $HOME/.bashrc.linux
   fi

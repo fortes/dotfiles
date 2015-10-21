@@ -13,10 +13,8 @@ export EDITOR VISUAL
 export CLICOLOR=1
 
 # VirtualEnv {{{
-# virtualenv should use Distribute instead of legacy setuptools
-export VIRTUALENV_DISTRIBUTE=true
 # Centralized location for new virtual environments
-export PIP_VIRTUALENV_BASE=$HOME/virtualenvs
+export VIRTUAL_ENV_DEFAULT_DIR=$HOME/.local/virtualenv
 # }}}
 
 # Change default beets configuration path
@@ -30,24 +28,24 @@ if which fzf > /dev/null; then
   export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 fi
 
-# User npm programs in path
-if ! echo ":$PATH:" | grep -q ":$HOME/npm/bin:"; then
-  export PATH="$HOME/npm/bin:$PATH"
+# Locally-installed packages belong in path
+if ! echo ":$PATH:" | grep -q ":$HOME/.local/bin:"; then
+  export PATH="$HOME/.local/bin:$PATH"
 fi
 
 # OS overrides
 OS=`uname`
 if [ "$OS" = "Darwin" ]; then
   if [ -f $HOME/.profile.osx ]; then
-    source $HOME/.profile.osx
+    . $HOME/.profile.osx
   fi
 elif [ "$OS" = "Linux" ]; then
   if [ -f $HOME/.profile.linux ]; then
-    source $HOME/.profile.linux
+    . $HOME/.profile.linux
   fi
 fi
 
 # Local overrides if present
 if [ -f $HOME/.profile.local ]; then
-  source $HOME/.profile.local
+  . $HOME/.profile.local
 fi

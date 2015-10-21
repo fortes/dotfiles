@@ -54,5 +54,5 @@ fi
 
 # Load local file if present
 if [ -f ~/.aliases.local ]; then
-  source ~/.aliases.local
+  . ~/.aliases.local
 fi
