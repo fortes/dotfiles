@@ -97,8 +97,8 @@ if [ $OS == "Darwin" ]; then
     echo "$CMARK Python3 installed"
   fi
 
-  brew doctor
   brew update
+  brew doctor
   for p in $(cat $HOME/dotfiles/scripts/brew-packages); do
     if [ ! -n "$(brew list $p 2> /dev/null)" ]; then
       echo "$XMARK $p not installed"
