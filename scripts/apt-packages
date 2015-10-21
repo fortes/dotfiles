@@ -19,5 +19,5 @@ tmux
 unzip
 vlc
 wget
-xsel
+xclip
 zsh

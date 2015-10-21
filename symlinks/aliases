@@ -45,6 +45,13 @@ else
   alias la='ls --color=auto -AGpFh'
 fi
 
+# Shortcuts for copying from tmux clipboard to system clipboard
+if which pbcopy > /dev/null; then
+  alias tcopy='tmux save-buffer - | pbcopy'
+elif which xclip > /dev/null; then
+  alias tcopy='tmux save-buffer - | xclip -i -sel clipboard'
+fi
+
 # Load local file if present
 if [ -f ~/.aliases.local ]; then
   source ~/.aliases.local
