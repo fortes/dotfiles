@@ -174,8 +174,8 @@ endif
 Plug 'moll/vim-node', {
 \   'for': ['javascript']
 \ }
-call plug#end()
 " }}}
+call plug#end()
 " }}}
 
 " Load Vanilla (no-plugin) config
