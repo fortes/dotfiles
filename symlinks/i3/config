@@ -139,3 +139,4 @@ bar {
 for_window [class="Chromium"] border none
 # Hide title bar for terminals
 for_window [class="X-terminal-emulator"] border pixel 1
+for_window [class="Roxterm"] border pixel 1
