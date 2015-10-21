@@ -14,16 +14,20 @@ if ! which npm > /dev/null; then
   exit 1
 fi
 
+NPM_PREFIX=$HOME/.local
+
 # Create storage directory for npm packages
-if [ ! -d $HOME/npm ]; then
+if [ ! -d $NPM_PREFIX ]; then
   echo "$ARROW Creating npm directory"
-  mkdir -p $HOME/npm
+  mkdir -p $NPM_PREFIX
 fi
 
-echo "$ARROW setting npm prefix to $HOME/npm"
-npm config set prefix $HOME/npm
-echo "  $INFO must 'source ~/.profile' / restart to take effect"
-source ~/.profile
+if ! npm get prefix | grep -qx $NPM_PREFIX; then
+  echo "$ARROW setting npm prefix to $NPM_PREFIX"
+  npm config set prefix $NPM_PREFIX
+  echo "  $INFO must 'source ~/.profile' or restart to take effect"
+  source $HOME/.profile
+fi
 
 # Cache output since npm list can be slow
 NPM_PACKAGES=$(npm list -g --depth 0)
