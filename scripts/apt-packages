@@ -13,6 +13,7 @@ npm
 openssh-server
 python-dev
 python-virtualenv
+roxterm
 silversearcher-ag
 software-properties-common
 tmux
