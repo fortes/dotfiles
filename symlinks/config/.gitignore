@@ -1,0 +1,4 @@
+# This directory gets noisy, so must opt-in
+*
+
+!roxterm.sourceforge.net/*
