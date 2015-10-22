@@ -2,10 +2,11 @@
 set -ef -o pipefail
 source $HOME/dotfiles/scripts/helpers.sh
 
-if [ "$OS" == "Linux" ]; then
+if which update-alternatives > /dev/null; then
   if which nodejs > /dev/null && ! which node > /dev/null; then
     echo "$ARROW Updating alternatives to set symlinks for nodejs to node"
     sudo update-alternatives --install /usr/bin/node node $(which nodejs) 10
+    echo "$CMARK System alternatives updated"
   fi
 fi
 
