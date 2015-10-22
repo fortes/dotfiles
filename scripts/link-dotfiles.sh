@@ -20,11 +20,16 @@ while getopts fh o; do
 done
 
 ERRORS=''
-for file in $HOME/dotfiles/symlinks/*; do
+for file in $DOTFILES/symlinks/*; do
   target=$HOME/.`basename $file`
-  if [ -e $target ] || [ -L $target ]; then
-    if ! diff -q $target $file > /dev/null 2> /dev/null; then
-      if [ -n "$FORCE" ]; then
+  if [ -e $target ]; then
+    if [[ "$(readlink $target)" != $file ]]; then
+      if [ -d $target ]; then
+        echo "  $ARROW moving existing files in $target/"
+        mv $target/* $file/. && rmdir $target
+        ln -s $file $target
+        echo "$CMARK $target linked"
+      elif [ -n "$FORCE" ]; then
         old_path=$HOME/old.`basename $file`
         >&2 echo "$XMARK $target already exists!"
         >&2 echo "  $ARROW Moved $target to $old_path"
@@ -39,6 +44,12 @@ for file in $HOME/dotfiles/symlinks/*; do
     echo "$CMARK $target linked"
   fi
 done
+
+if [ ! -f $DOTFILES/symlinks/ssh/config ]; then
+  echo "  $ARROW Creating ~/.ssh/config"
+  cp $DOTFILES/symlinks/ssh/config.sample $DOTFILES/symlinks/ssh/config
+  echo "$CMARK ~/.ssh/config created"
+fi
 
 if [ -n "$ERRORS" ]; then
   # Use printf instead of echo since we have a trailing newline

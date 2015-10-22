@@ -1,0 +1,10 @@
+# vim: ft=sshconfig
+
+# Ignore SSH keys unless specified in Host subsection, this prevents from
+# leaking to random hosts
+IdentitiesOnly yes
+
+Host github.com
+  Hostname github.com
+  User git
+  IdentityFile ~/.ssh/id_rsa

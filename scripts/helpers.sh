@@ -4,6 +4,7 @@
 OS=`uname`
 
 export OS
+export DOTFILES=$HOME/dotfiles
 # }}}
 
 # Colorful characters {{{
