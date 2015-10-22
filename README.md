@@ -27,7 +27,7 @@ Then you'll still have to do the following manual steps:
 2. If you're me (which you're not), set the remote url for this repo in order to push:
 
   ```
-  git remote set-url origin git@github.com:fortes/dotfiles.git
+  cd $HOME/dotfiles && git remote set-url origin git@github.com:fortes/dotfiles.git
   ```
 
 3. Setup `.gitconfig.local`:
