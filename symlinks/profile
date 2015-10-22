@@ -1,5 +1,8 @@
 # vim:ft=sh
 
+# Sentinel value to know we've loaded this file
+export PROFILE_LOADED=1
+
 # Use NeoVim if we have it
 if which nvim > /dev/null; then
   VISUAL=nvim

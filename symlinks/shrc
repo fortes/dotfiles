@@ -1,5 +1,10 @@
 # vim: ft=sh
 
+# Make sure we have always loaded ~/.profile
+if [ -z $PROFILE_LOADED ]; then
+  . $HOME/.profile
+fi
+
 # Remember stuff
 HISTFILE=$HOME/.history
 HISTFILESIZE=2000
