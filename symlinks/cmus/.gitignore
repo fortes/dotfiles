@@ -1,5 +1,2 @@
-autosave
-cache
-command-history
-*.pl
-search-history
+*
+!rc

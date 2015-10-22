@@ -19,7 +19,7 @@ if [ "$(which zsh)" != "$SHELL" ]; then
       sudo sh -c 'which zsh >> /etc/shells'
     fi
   elif [ $OS == "Linux" ]; then
-    if [ ! $(isAptPackageInstalled zsh) ]; then
+    if ! isAptPackageInstalled zsh; then
       echo "  $XMARK zsh not installed"
       echo "    $ARROW Installing zsh via apt (will prompt for password)..."
       sudo -E apt-get -qfuy install zsh
@@ -31,7 +31,7 @@ if [ "$(which zsh)" != "$SHELL" ]; then
 
   if [ "$USER" = "ubuntu" ]; then
     echo "$XMARK Cannot change shell on password-less users (e.g. EC2 default)"
-    exit 1
+    exit 0
   else
     echo "  $ARROW Switching shell to zsh (will prompt for password)"
     chsh -s $(which zsh)
