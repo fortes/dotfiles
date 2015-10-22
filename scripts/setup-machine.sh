@@ -137,17 +137,15 @@ elif [ $OS == "Linux" ]; then
   echo "$CMARK apt packages installed"
 fi
 
+# Link missing dotfiles
+($HOME/dotfiles/scripts/link-dotfiles.sh -f)
+
 # Update source paths, etc
 source ~/.profile
 
 ($HOME/dotfiles/scripts/python-setup.sh)
 
 ($HOME/dotfiles/scripts/node-setup.sh)
-
-# Make sure ~/.ssh exists
-mkdir -p $HOME/.ssh
-# Link missing dotfiles
-($HOME/dotfiles/scripts/link-dotfiles.sh -f)
 
 # Setup shell
 ($HOME/dotfiles/scripts/zsh-setup.sh)
