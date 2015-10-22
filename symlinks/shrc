@@ -12,7 +12,7 @@ export LS_COLORS='di=36;40:ln=35;40:so=31;40:pi=31;40:ex=1;32;40:bd=34;46:cd=34;
 
 # Activate default virtual env. Checking $VIRTUAL_ENV does not work here since
 # tmux sessions will get the env variable, but not the $PATH changes.
-if [ -d $VIRTUAL_ENV_DEFAULT_DIR ]; then
+if [ -f $VIRTUAL_ENV_DEFAULT_DIR/bin/activate ]; then
   # This will modify the prompt, so do it before setting the prompt
   . $VIRTUAL_ENV_DEFAULT_DIR/bin/activate
 fi

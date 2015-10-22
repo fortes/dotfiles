@@ -24,22 +24,13 @@ Then you'll still have to do the following manual steps:
 
 1. Add your ssh keys into `~/.ssh`
 
-2. Setup `~/.ssh/config` with at least:
-
-  ```
-  Host github.com
-    Hostname github.com
-    User git
-    IdentityFile ~/.ssh/id_rsa
-  ```
-
-3. If you're me (which you're not), set the remote url for this repo in order to push:
+2. If you're me (which you're not), set the remote url for this repo in order to push:
 
   ```
   git remote set-url origin git@github.com:fortes/dotfiles.git
   ```
 
-4. Setup `.gitconfig.local`:
+3. Setup `.gitconfig.local`:
 
   ````
   [user]
@@ -58,7 +49,6 @@ TODO: Automate these steps.
 
 ### Ubuntu
 
-* Install curl: `sudo apt-get -q -y install curl` (not on all systems)
 * Map Caps Lock to Control
 * Install ssh keys to `.ssh/authorized_keys`
 
