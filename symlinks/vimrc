@@ -426,6 +426,9 @@ nnoremap <leader>tc :tabclose<cr>
 " Easy editing & reloading of .nvimrc
 nnoremap <leader>ev :tabedit $MYVIMRC<cr>
 nnoremap <leader>sv :source $MYVIMRC<cr>
+
+" Sort lines within braces with <leader>s{
+nnoremap <leader>s{ vi{:sort<cr>
 " }}}
 " }}}
 
