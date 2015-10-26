@@ -5,10 +5,6 @@ OS=`uname`
 
 source $HOME/dotfiles/scripts/helpers.sh
 
-if [ -z "${HEADLESS-}" ]; then
-  HEADLESS=''
-fi
-
 # Install Homebrew
 if [ $OS == "Darwin" ]; then
   # Brew cask
@@ -111,7 +107,7 @@ if [ $OS == "Darwin" ]; then
   echo "$CMARK Cask packages installed"
 elif [ $OS == "Linux" ]; then
   # Different apt packages if we don't have a GUI
-  if [ -z $HEADLESS ]; then
+  if [ ! -z $HEADLESS ]; then
     PACKAGE_FILE=$HOME/dotfiles/scripts/apt-packages-headless
   else
     PACKAGE_FILE=$HOME/dotfiles/scripts/apt-packages
