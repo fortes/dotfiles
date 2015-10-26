@@ -43,4 +43,4 @@
   autosquash = true
 # Local modifications / auth
 [include]
-  path=.gitconfig.local
+  path=~/.gitconfig.local

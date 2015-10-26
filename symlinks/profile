@@ -20,9 +20,6 @@ export CLICOLOR=1
 export VIRTUAL_ENV_DEFAULT_DIR=$HOME/.local/virtualenv
 # }}}
 
-# Change default beets configuration path
-export BEETSDIR=$HOME/.beets
-
 if which fzf > /dev/null; then
   # If available, we use git to list files from the root directory (not from the
   # current directory as in other fzf cases). Otherwise, fallback to ag

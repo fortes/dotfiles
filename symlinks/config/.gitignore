@@ -1,5 +1,10 @@
 # This directory gets noisy, so must opt-in
 *
 
+!.gitignore
+!beets
+!cmus
+!i3
+!git
 !nvim
 !roxterm.sourceforge.net
