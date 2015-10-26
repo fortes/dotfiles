@@ -44,15 +44,15 @@ TODO: Automate these steps.
 
 ### Mac
 
-* Map Caps Lock to Control
+* [Map Caps Lock to Control](http://www.emacswiki.org/emacs/MovingTheCtrlKey)
 * Install ssh keys to `.ssh/authorized_keys`
 
 ### Ubuntu
 
-* Map Caps Lock to Control
 * Install ssh keys to `.ssh/authorized_keys`
 
 #### TODO
 
 * Mac settings & preferences
 * Better colorschemes
+* Consider using a different Homebrew prefix due to El Capitan changes.
