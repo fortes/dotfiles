@@ -14,26 +14,24 @@ fi
 # First, we need to make sure we have the bare minimums to install things on
 # this system
 if [ $OS = "Darwin" ]; then
+  # First time running Make on MacOS requires agreeing to a license agreement,
+  # which you must agree to via sudo.
+  #
+  # If run make after doing the agreement (or on a sane system), you'll get a
+  # message that looks like:
+  #
+  #   make: *** No targets specified and no makefile found. Stop.
+  #
+  # Note that this goes out on stderr, so we pipe stderr to stdout to grep
+  if [ -n "$(make 2>&1 > /dev/null | grep -v 'no makefile')" ]; then
+    echo "$XMARK Must agree to license agreement"
+    echo "Run 'sudo make' then try this script again"
+    exit 1
+  fi
+
   # For Mac OS, that means we need to get Homebrew installed, along with the
   # XCode build tools, if necessary
   if ! which brew > /dev/null; then
-    # First time running Make on MacOS requires agreeing to a license agreement,
-    # which you must agree to via sudo.
-    #
-    # If run make after doing the agreement (or on a sane system), you'll get a
-    # message that looks like:
-    #
-    #   make: *** No targets specified and no makefile found. Stop.
-    #
-    # Note that this goes out on stderr, so we pipe stderr to stdout
-    # TODO: Fix this, since the error code from make is non-zero, so it'll never
-    # get triggered. Need to do another method.
-    if [ -n "$(make 2>&1 > /dev/null | grep -v 'no makefile')" ]; then
-      echo "$XMARK Must agree to license agreement"
-      echo "Run 'sudo make' then try this script again"
-      exit 1
-    fi
-
     # Install Homebrew
     echo "Homebrew not installed. Installing (will take a while) ..."
     ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"
