@@ -41,6 +41,16 @@ isHomebrewPackageInstalled() {
   fi
 }
 
+# TODO: Allow taking a list of packages
+installHomebrewPackageIfMissing() {
+  if ! isHomebrewPackageInstalled $1; then
+    echo "$XMARK $1 not installed"
+    echo "  $ARROW Installing $1 via brew"
+    brew install $1
+  fi
+  echo "$CMARK $1 installed"
+}
+
 isAptPackageInstalled() {
   if dpkg -s $1 > /dev/null 2> /dev/null; then
     return 0
@@ -57,6 +67,16 @@ isAptPPAInstalled() {
   fi
 }
 
-export -f isHomebrewPackageInstalled isAptPackageInstalled \
-  isHomebrewTapInstalled isAptPPAInstalled
+# TODO: Allow taking a list of packages
+installAptPackageIfMissing() {
+  if ! isAptPackageInstalled $1; then
+    echo "$XMARK Apt package $1 not installed"
+    echo "  $ARROW Installing $1 (requires sudo)"
+    sudo -E apt-get -qfuy install $1 > /dev/null
+  fi
+  echo "$CMARK $1 installed"
+}
+
+export -f isHomebrewPackageInstalled isHomebrewTapInstalled \
+  installAptPackageIfMissing installHomebrewPackageIfMissing
 # }}}

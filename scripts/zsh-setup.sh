@@ -18,12 +18,8 @@ if [ "$(which zsh)" != "$SHELL" ]; then
       echo "Adding homebrew zsh to accepted shell list (requires sudo)"
       sudo sh -c 'which zsh >> /etc/shells'
     fi
-  elif [ $OS == "Linux" ]; then
-    if ! isAptPackageInstalled zsh; then
-      echo "  $XMARK zsh not installed"
-      echo "    $ARROW Installing zsh via apt (will prompt for password)..."
-      sudo -E apt-get -qfuy install zsh
-    fi
+  elif which apt-get > /dev/null; then
+    installAptPackageIfMissing zsh
   else
     echo "  $XMARK Unsupported OS. Install zsh on your own"
     exit 1

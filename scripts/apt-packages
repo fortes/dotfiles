@@ -4,7 +4,9 @@ curl
 exfat-fuse
 exfat-utils
 ffmpeg
+fonts-inconsolata
 git
+i3
 libssl-dev
 mosh
 mp3val
@@ -21,4 +23,5 @@ unzip
 vlc
 wget
 xclip
+xorg
 zsh

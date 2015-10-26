@@ -10,7 +10,7 @@ if ! which nvim > /dev/null; then
     brew tap neovim/homebrew-neovim > /dev/null 2> /dev/null
     echo "  $ARROW Installing latest NeoVim from HEAD"
     brew install --HEAD neovim 2> /dev/null
-  elif [ $OS = 'Linux' ]; then
+  elif which apt-get > /dev/null; then
     echo "  $ARROW Adding NeoVim PPA (requires sudo)"
     sudo add-apt-repository ppa:neovim-ppa/unstable
     echo "  $ARROW Updating apt & installing neovim"
@@ -24,6 +24,9 @@ if ! which nvim > /dev/null; then
       sudo update-alternatives --install /usr/bin/editor editor /usr/bin/nvim 60
       echo "  $CMARK System editor alternatives updated"
     fi
+  else
+    echo "$XMARK Platform not supported"
+    exit 1
   fi
 else
   if [ "$OS" == "Darwin" ]; then

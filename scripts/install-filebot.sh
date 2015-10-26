@@ -1,4 +1,6 @@
-set -euo pipefail
+#!/bin/bash
+set -euf
+source $HOME/dotfiles/scripts/helpers.sh
 
 if ! which apt-get 2> /dev/null; then
   echo "Currently only works on Ubuntu systems"
@@ -8,7 +10,9 @@ fi
 # Make sure not to get stuck on any prompts
 DEBIAN_FRONTEND=noninteractive
 
-FILEBOT_DEB_URL='http://downloads.sourceforge.net/project/filebot/filebot/FileBot_4.2/filebot_4.2_amd64.deb?r=&ts=1407563882&use_mirror=iweb'
+installAptPackageIfMissing openjdk-8-jre
+
+FILEBOT_DEB_URL='http://downloads.sourceforge.net/project/filebot/filebot/FileBot_4.6/filebot_4.6_amd64.deb'
 
 if ! dpkg -s filebot > /dev/null; then
   pushd /tmp > /dev/null

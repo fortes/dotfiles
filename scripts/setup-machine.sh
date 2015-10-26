@@ -83,28 +83,18 @@ fi
 # Install homebrew packages
 if [ $OS == "Darwin" ]; then
   # Install python with up-to-date OpenSSL
-  if [ ! -n "$(brew list python 2> /dev/null)" ]; then
+  if ! isHomebrewPackageInstalled python; then
     brew install python --with-brewed-openssl
     pip install -q --upgrade setuptools
     pip install -q --upgrade pip
     pip install -q --upgrade virtualenv
     echo "$CMARK Python installed"
-
-    # Python3 bonus
-    brew install python3 --with-brewed-openssl
-    pip3 install -q --upgrade setuptools
-    pip3 install -q --upgrade pip
-    echo "$CMARK Python3 installed"
   fi
 
   brew update
   brew doctor
   for p in $(cat $HOME/dotfiles/scripts/brew-packages); do
-    if [ ! -n "$(brew list $p 2> /dev/null)" ]; then
-      echo "$XMARK $p not installed"
-      echo "  $ARROW Installing $p via brew"
-      brew install $p
-    fi
+    installHomebrewPackageIfMissing $p
   done
   echo "$CMARK Homebrew packages installed"
 
@@ -121,18 +111,14 @@ if [ $OS == "Darwin" ]; then
   echo "$CMARK Cask packages installed"
 elif [ $OS == "Linux" ]; then
   # Different apt packages if we don't have a GUI
-  PACKAGE_FILE=$HOME/dotfiles/scripts/apt-packages
-  if [ -n $HEADLESS ]; then
+  if [ -z $HEADLESS ]; then
     PACKAGE_FILE=$HOME/dotfiles/scripts/apt-packages-headless
+  else
+    PACKAGE_FILE=$HOME/dotfiles/scripts/apt-packages
   fi
 
   for p in $(cat $PACKAGE_FILE); do
-    if ! isAptPackageInstalled $p; then
-      echo "$XMARK Apt package $p not installed"
-      echo "  $ARROW Installing $p (requires sudo)"
-      sudo -E apt-get -qfuy install $p > /dev/null
-    fi
-    echo "$CMARK $p installed"
+    installAptPackageIfMissing $p
   done
   echo "$CMARK apt packages installed"
 fi
