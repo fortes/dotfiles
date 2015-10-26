@@ -12,8 +12,13 @@ HISTSIZE=1000
 SAVEHIST=$HISTSIZE
 
 # Nicer colors. BSD uses $LSCOLORS, linux uses $LS_COLORS
-export LSCOLORS=gxfxbxbxCxegedabagGxGx
-export LS_COLORS='di=36;40:ln=35;40:so=31;40:pi=31;40:ex=1;32;40:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=36;01:ow=36;01:'
+OS=`uname`
+if [ "$OS" = "Linux" ]; then
+  export LS_COLORS='di=36;40:ln=35;40:so=31;40:pi=31;40:ex=1;32;40:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=36;01:ow=36;01:'
+else
+  export LSCOLORS=gxfxbxbxCxegedabagGxGx
+fi
+unset OS
 
 # Activate default virtual env. Checking $VIRTUAL_ENV does not work here since
 # tmux sessions will get the env variable, but not the $PATH changes.
