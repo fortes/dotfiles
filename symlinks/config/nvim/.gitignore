@@ -1,0 +1,4 @@
+# Ignore everything but our init.vim (.nvimrc)
+*
+!.gitignore
+!init.vim

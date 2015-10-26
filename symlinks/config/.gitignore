@@ -1,4 +1,5 @@
 # This directory gets noisy, so must opt-in
 *
 
+!nvim
 !roxterm.sourceforge.net

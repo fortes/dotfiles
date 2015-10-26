@@ -1,7 +1,7 @@
 " vim:fdm=marker et fdl=2 ft=vim sts=2 sw=2 ts=2
 
 " Plugins {{{
-if !filereadable(expand('~/.nvim/autoload/plug.vim'))
+if !filereadable(expand('~/.config/nvim/autoload/plug.vim'))
   echo 'Must install vim-plug, run ~/dotfiles/scripts/nvim-setup.sh'
   echo 'Run nvim -u NONE to open without ' . expand("<sfile>")
   exit

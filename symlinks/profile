@@ -36,6 +36,9 @@ if ! echo ":$PATH:" | grep -q ":$HOME/.local/bin:"; then
   export PATH="$HOME/.local/bin:$PATH"
 fi
 
+# Store config files in default location
+export XDG_CONFIG_HOME=$HOME/.config
+
 # OS overrides
 OS=`uname`
 if [ "$OS" = "Darwin" ]; then
