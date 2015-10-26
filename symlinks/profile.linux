@@ -1,6 +1,6 @@
 # vim: ft=sh
 
-if which setxbmap > /dev/null; then
+if which setxkbmap > /dev/null; then
   # Use Caps Lock as another Control Key
   setxkbmap -layout us -option ctrl:nocaps
 
