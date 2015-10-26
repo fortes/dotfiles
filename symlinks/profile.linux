@@ -1,6 +1,6 @@
 # vim: ft=sh
 
-if which setxkbmap > /dev/null; then
+if [ ! -z $DISPLAY ] && which setxkbmap > /dev/null; then
   # Use Caps Lock as another Control Key
   setxkbmap -layout us -option ctrl:nocaps
 
