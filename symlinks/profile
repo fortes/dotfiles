@@ -33,7 +33,9 @@ if ! echo ":$PATH:" | grep -q ":$HOME/.local/bin:"; then
   export PATH="$HOME/.local/bin:$PATH"
 fi
 
-# Store config files in default location
+# Store config/cache files in default locations, but declare variables for use
+# on platforms that don't (ahem, Mac OS)
+export XDG_CACHE_HOME=$HOME/.cache
 export XDG_CONFIG_HOME=$HOME/.config
 
 # OS overrides

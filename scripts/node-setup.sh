@@ -15,7 +15,10 @@ if ! which npm > /dev/null; then
   exit 1
 fi
 
+# Make sure we have correct value for $XDG_CACHE_HOME
+source ~/.profile
 NPM_PREFIX=$HOME/.local
+NPM_CACHE_DIR=$XDG_CACHE_HOME/npm
 
 # Create storage directory for npm packages
 if [ ! -d $NPM_PREFIX ]; then
@@ -26,9 +29,14 @@ fi
 if ! npm get prefix | grep -qx $NPM_PREFIX; then
   echo "$ARROW setting npm prefix to $NPM_PREFIX"
   npm config set prefix $NPM_PREFIX
-  echo "  $INFO must 'source ~/.profile' or restart to take effect"
-  source $HOME/.profile
 fi
+unset NPM_PREFIX
+
+if ! npm get cache | grep -qx $NPM_CACHE_DIR; then
+  echo "$ARROW setting npm cache to $NPM_CACHE_DIR"
+  npm config set cache $NPM_CACHE_DIR
+fi
+unset NPM_CACHE_DIR
 
 # Cache output since npm list can be slow
 NPM_PACKAGES=$(npm list -g --depth 0)
