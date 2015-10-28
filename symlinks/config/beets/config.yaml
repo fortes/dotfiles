@@ -16,6 +16,7 @@ threaded: yes
 clutter: ['Thumbs.db', '.DS_Store', '*.log', '*.txt', '*.cue', '*.m3u', '*.sfv', '*.nfo']
 
 asciify_paths: yes
+max_filename_length: 60
 
 import:
   write: yes
