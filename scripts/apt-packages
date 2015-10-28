@@ -11,6 +11,7 @@ i3
 libssl-dev
 mosh
 mp3val
+mpv
 nodejs
 npm
 openssh-server
@@ -21,7 +22,6 @@ silversearcher-ag
 software-properties-common
 tmux
 unzip
-vlc
 wget
 xclip
 xorg
