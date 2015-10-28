@@ -1,6 +1,7 @@
 build-essential
 curl
 git
+git-extras
 libssl-dev
 mosh
 nodejs

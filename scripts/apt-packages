@@ -6,6 +6,7 @@ exfat-utils
 ffmpeg
 fonts-inconsolata
 git
+git-extras
 i3
 libssl-dev
 mosh
