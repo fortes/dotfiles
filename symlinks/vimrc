@@ -75,6 +75,9 @@ filetype plugin indent on
 " Don't redraw while executing macros, etc
 set lazyredraw
 
+" Wait just under a second before CursorHold is fired
+set updatetime=750
+
 " Mapping & keycode timeouts
 set timeoutlen=600
 set ttimeout
@@ -348,6 +351,8 @@ vnoremap # :<C-u>call <SID>VisualSetSearch('#')<cr>/<C-R>=@/<cr><cr>
 " Need to force redraw of screen after, since for some reason grep and opening
 " the quicklist mess everything up
 nnoremap K :silent! grep! "\b<C-R><C-W>\b"<cr>:copen<cr><C-L>
+" Disable manual command. TODO: Make this search similar to */# in visual mode
+vnoremap K <nop>
 
 " <leader>s starts a find a replace for word under cursor
 nnoremap <leader>s :%s/\<<C-R><C-W>\>/<C-R><C-W>/g<Left><Left>
