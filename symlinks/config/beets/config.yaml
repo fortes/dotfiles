@@ -2,7 +2,7 @@ directory: /var/media/music
 library: ~/media/music/tools/music.blb
 
 format_item: $artist - $album - $track - $title ($genre)
-format_album: $albumartist - $album [$original_year] ($genre)
+format_album: "[$original_year] $albumartist - $album ($genre)"
 
 pluginpath: ~/media/music/tools/
 plugins: fetchart mbsync embedart info missing lyrics lastgenre badfiles types
@@ -16,7 +16,7 @@ threaded: yes
 clutter: ['Thumbs.db', '.DS_Store', '*.log', '*.txt', '*.cue', '*.m3u', '*.sfv', '*.nfo']
 
 asciify_paths: yes
-max_filename_length: 60
+max_filename_length: 120
 
 import:
   write: yes
@@ -38,9 +38,9 @@ fetchart:
   cover_names: front folder cover
 
 paths:
-  default: albums/$albumartist - $album [$original_year]%aunique{albumartist album original_year, albumtype original_year year label catalognum albumdisambig}/$track - $title
-  comp: albums/$albumartist - $album [$original_year]%aunique{albumartist album original_year, albumtype original_year year label catalognum albumdisambig}/$track - $title
-  singleton: non-albums/$artist/$original_year - $title
+  default: albums/$albumartist - [$original_year] $album%aunique{albumartist album original_year, albumtype albumdisambig year label catalognum}/$track - $title
+  comp: albums/$albumartist - [$original_year] $album%aunique{albumartist album original_year, albumtype albumdisambig year label catalognum}/$track - $title
+  singleton: non-albums/$artist/[$original_year] $title
 
 lyrics:
   auto: yes

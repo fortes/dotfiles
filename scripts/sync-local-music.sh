@@ -17,7 +17,7 @@ else
 fi
 
 echo "Copying files"
-rsync -avzP --force --delete-after --include="*\[$YEAR]" --include="*.mp3" \
+rsync -n -avzP --force --delete-after --include="*- \[$YEAR] *" --include="*.mp3" \
 --include="*.jpg" --exclude="*" $REMOTE_MUSIC_SERVER:$REMOTE_MUSIC_PATH \
 $LOCAL_MUSIC_DIR/albums/$YEAR
 
