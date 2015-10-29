@@ -1,6 +1,9 @@
 # vim: ft=conf
 # http://i3wm.org/docs/userguide.html for reference
 
+# Plain background
+exec --no-startup-id xsetroot -solid "#666666"
+
 set $mod Mod1
 
 # Use Inconsolata instead of the nasty default
