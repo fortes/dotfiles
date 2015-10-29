@@ -3,7 +3,7 @@ set -euf
 source $HOME/dotfiles/scripts/helpers.sh
 
 # Ubuntu cmus is ancient
-if [ "$OS" = 'Linux' ] && ! which cmus > /dev/null; then
+if which apt-get > /dev/null && ! which cmus > /dev/null; then
   LATEST_URL="https://github.com/cmus/cmus/archive/v2.7.1.tar.gz"
   LOCAL_DIR=$HOME/.local
   INSTALL_DIR="$LOCAL_DIR/source/cmus"
