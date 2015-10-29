@@ -292,8 +292,8 @@ if executable('fzf')
   " <M-S-p> for MRU
   nnoremap <silent> <M-S-p> :History<cr>
 
-  " Use fuzzy completion relative filepaths across directory
-  imap <expr> <c-x><c-f> fzf#vim#complete#path('git ls-files $(git rev-parse --show-toplevel)')
+  " Use fuzzy completion relative filepaths across directory with <c-x><c-j>
+  imap <expr> <c-x><c-j> fzf#vim#complete#path('git ls-files $(git rev-parse --show-toplevel)')
 
   " Better command history with q:
   command! CmdHist call fzf#vim#command_history({'right': '40'})
