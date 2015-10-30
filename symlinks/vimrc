@@ -325,13 +325,6 @@ set smartcase
 " Clear search highlights with <C-L>
 nnoremap <silent> <C-L> :nohlsearch<cr><C-L>
 
-" Use ag instead of grep, if available
-if executable('ag')
-  " Use smart case, match whole words, and output in vim-friendly format
-  set grepprg=ag\ -S\ -Q\ --vimgrep\ $*
-  set grepformat=%f:%l:%c:%m
-endif
-
 " Helper for visual search
 function! s:VisualSetSearch(cmdtype)
   let temp = @s
@@ -344,25 +337,41 @@ endfunction
 vnoremap * :<C-u>call <SID>VisualSetSearch('/')<cr>/<C-R>=@/<cr><cr>
 vnoremap # :<C-u>call <SID>VisualSetSearch('#')<cr>/<C-R>=@/<cr><cr>
 
-" K searches for word under cursor in root of project (remove default binding)
-" Need to force redraw of screen after, since for some reason grep and opening
-" the quicklist mess everything up
-nnoremap K :silent! grep! "<C-R><C-W>"<cr>:copen<cr><C-L>
-" Grep for visual selection, just like in normal mode. Note that this clears /
-" uses the `s` register
-vnoremap K :<C-u>norm! gv"sy<cr>:silent! grep! "<C-R>s"<cr>:copen<cr><C-L>
-
 " <leader>s starts a find a replace for word under cursor
 nnoremap <leader>s :%s/\<<C-R><C-W>\>/<C-R><C-W>/g<Left><Left>
 
-" Q for grepping and showing results
-" Inspired by https://robots.thoughtbot.com/faster-grepping-in-vim
-if !exists(':Grep')
-  command -nargs=+ -complete=file -bar Grep silent! grep! <args>|copen|redraw!
-endif
+" K searches for word under cursor in root of project (remove default binding)
+nnoremap K :silent! lgrep! "<C-R><C-W>"<cr>
+" Grep for visual selection, just like in normal mode. Note that this clears /
+" uses the `s` register
+vnoremap K :<C-u>norm! gv"sy<cr>:silent! lgrep! "<C-R>s"<cr>
 
-" Never use Ex-mode, map to Grep command instead
-nnoremap Q :Grep<SPACE>
+" Never use Ex-mode, map to search command instead
+nnoremap Q :lgrep!<SPACE>
+
+" Automatically open quickfix/location list after grep/make
+augroup auto_quickfix
+  autocmd!
+  " Make sure to redraw to avoid strange render bugs
+  autocmd QuickFixCmdPost lgrep lwindow|redraw!
+  autocmd QuickFixCmdPost grep,make cwindow|redraw!
+augroup END
+
+" Use ag instead of grep, if available
+if executable('ag')
+  " Use smart case, match whole words, and output in vim-friendly format
+  set grepprg=ag\ -S\ -Q\ --vimgrep\ $*
+  set grepformat=%f:%l:%c:%m
+else
+  " Mimic ag settings (literal, recursive, ignore common directories)
+  set grepprg=grep\ -FIinrw\ --exclude-dir=.git\ --exclude-dir=node_modules
+
+  " Unlike ag, grep needs to have a file path after the search command. Add that
+  " in for the K bindings (default to current directory)
+  nnoremap K :lgrep! "<C-R><C-W>" .<cr>
+  vnoremap K :<C-u>norm! gv"sy<cr>:lgrep! "<C-R>s" .<cr>
+  nnoremap Q :lgrep!<SPACE><SPACE>.<LEFT><LEFT>
+endif
 " }}}
 
 " Efficiency Shortcuts {{{
@@ -382,10 +391,11 @@ nnoremap <C-c> <C-c>:echo<cr>
 " Also, keep default <cr> binding
 augroup easy_close
   autocmd!
-  autocmd BufReadPost * if !&modifiable|nnoremap <buffer> q :q<cr>|endif
-  autocmd BufReadPost * if !&modifiable|nnoremap <buffer> <Esc> :q<cr>|endif
-  autocmd BufReadPost * if !&modifiable|nnoremap <buffer> <C-c> :q<cr>|endif
-  autocmd BufReadPost * if !&modifiable|nnoremap <buffer> <cr> <cr>|endif
+  autocmd FileType help,qf nnoremap <buffer> q :q<cr>
+  autocmd FileType help,qf nnoremap <buffer> <Esc> :q<cr>
+  autocmd FileType help,qf nnoremap <buffer> <C-c> :q<cr>
+  " Undo <cr> -> : shortcut
+  autocmd FileType help,qf nnoremap <buffer> <cr> <cr>
 augroup END
 
 " Map jj and jk to <ESC> to leave insert mode quickly
@@ -439,6 +449,9 @@ nnoremap <leader>s{ vi{:sort<cr>
 augroup filetype_tweaks
   autocmd!
 
+  " .md is markdown, not modula
+  autocmd BufNewFile,BufReadPost *.md set filetype=markdown
+
   " Not all files should wrap automatically
   autocmd BufNewFile,BufReadPost *.txt,*.md,*.markdown,*.json,*.conf,*.ini
     \ setlocal textwidth=0
@@ -449,9 +462,6 @@ augroup filetype_tweaks
 
   " Disable spell checking on unmodifiable files (what's the point?)
   autocmd BufReadPost * if !&modifiable | setlocal nospell | endif
-
-  " .md is markdown, not modula
-  autocmd BufNewFile,BufReadPost *.md set filetype=markdown
 
   " ES6 is JS
   autocmd BufRead,BufNewFile *.es6 set filetype=javascript
@@ -496,6 +506,14 @@ augroup filetype_tweaks
 
   " Python uses 4 spaces
   autocmd FileType python setlocal shiftwidth=4
+
+  " Don't wrap in quickfix, and don't show in buffer list
+  autocmd FileType qf setlocal nowrap textwidth=0 nobuflisted
+  " Open in splits/tabs via s/v/t, partially cribbed from:
+  " https://github.com/romainl/vim-qf/blob/master/after/ftplugin/qf.vim
+  autocmd FileType qf nnoremap <buffer> s <C-W><CR><C-W>x<C-W>k
+  autocmd FileType qf nnoremap <buffer> v <C-W><CR><C-W>L<C-W>p<C-W>J<C-w>p
+  autocmd FileType qf nnoremap <buffer> t <C-W><CR><C-W>T
 augroup END
 " }}}
 

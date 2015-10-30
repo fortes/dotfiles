@@ -236,13 +236,9 @@ function! g:OnVimEnter()
 
   if exists(':ProjectRootCD')
     " Search across entire project when possible
-    nnoremap K :ProjectRootCD<cr>:silent!
-      \ grep! "\b<C-R><C-W>\b"<cr>:cwindow<cr><C-L>
-    nnoremap Q :ProjectRootCD<cr>:Grep<SPACE>
-    " Search in new tab with by holding Ctrl
-    nnoremap <C-K> :ProjectRootCD<cr>:silent!
-      \ grep! "\b<C-R><C-W>\b"<cr>:tabnew<cr>:cwindow<cr><cr><C-L>
-    nnoremap <C-Q> :tabnew<cr>:ProjectRootCD<cr>:Grep<SPACE>
+    nnoremap K :ProjectRootCD<cr>:silent! lgrep! "<C-R><C-W>"<cr>
+    vnoremap K :<C-u>norm! gv"sy<cr>:ProjectRootCD<cr>:silent! lgrep! "<C-R>s"<cr>
+    nnoremap Q :ProjectRootCD<cr>:lgrep!<SPACE>
   endif
 endfunction
 " }}}
