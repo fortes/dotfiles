@@ -484,6 +484,15 @@ augroup filetype_tweaks
     autocmd FileType javascript setlocal errorformat+=%-G%.%#
   endif
 
+  " Linting for LESS
+  if executable('lessc')
+    autocmd FileType less setlocal makeprg=lessc\ --lint\ --no-color\ %
+    autocmd FileType less setlocal
+          \ errorformat=%E%.%#Error:\ %m\ in\ %f\ on\ line\ %l\\,\ column\ %c:
+    " Ignore unmatched lines
+    autocmd FileType less setlocal errorformat+=%-G%.%#
+  endif
+
   " Use esformatter to autoformat (gq in Visual mode)
   if executable('esformatter')
     autocmd FileType javascript setlocal formatprg=esformatter

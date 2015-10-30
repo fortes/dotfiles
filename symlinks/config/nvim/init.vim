@@ -226,11 +226,11 @@ augroup END
 
 " Called after plugins have loaded {{{
 function! g:OnVimEnter()
-  augroup javascript_after_configuration
+  augroup neomake_configuration
     autocmd!
     if exists(':Neomake')
-      " Check for lint errors on open & write
-      autocmd BufRead,BufWritePost *.js,*.es6 silent! Neomake|redraw
+      " Check for lint errors on open & write for supported filetypes
+      autocmd BufRead,BufWritePost *.js,*.es6,*.less silent! Neomake
     endif
   augroup END
 
