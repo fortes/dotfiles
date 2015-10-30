@@ -230,7 +230,7 @@ function! g:OnVimEnter()
     autocmd!
     if exists(':Neomake')
       " Check for lint errors on open & write for supported filetypes
-      autocmd BufRead,BufWritePost *.js,*.es6,*.less silent! Neomake
+      autocmd BufRead,BufWritePost *.js,*.es6,*.less silent! Neomake!
     endif
   augroup END
 
@@ -275,8 +275,12 @@ augroup END
 
 " NeoMake {{{
 if executable('eslint') || executable('eslint_d')
-  " Use eslint if it's available
+  " Use eslint/eslint_d if it's available
   let g:neomake_javascript_enabled_makers = ['makeprg']
+endif
+
+if executable('lessc')
+  let g:neomake_less_enabled_makers = ['makeprg']
 endif
 " }}}
 
