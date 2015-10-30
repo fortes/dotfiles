@@ -264,12 +264,17 @@ let test#javascript#mocha#options = '--reporter dot'
 " With autochdir, the default regex for tests fails, so just count on `_test.js`
 let test#javascript#mocha#file_pattern = '_test.js'
 
-" <leader>tt to test based on cursor, <leader>twt to watch
-nnoremap <silent> <leader>tt :split<cr>:TestNearest<cr>
-nnoremap <silent> <leader>twt :split<cr>:TestNearest -w<cr><c-\><c-n><c-w><c-k>
-" <leader>tf to test current file, <leader> twf to watch
-nnoremap <silent> <leader>tf :split<cr>:TestFile<cr>
-nnoremap <silent> <leader>twf :split<cr>:TestFile -w<cr><c-\><c-n><c-w><c-k>
+" Only works in JS for now
+augroup test_shortcuts
+  autocmd!
+
+  " <leader>tt to test based on cursor, <leader>twt to watch
+  autocmd FileType javascript nnoremap <buffer> <silent> <leader>tt :split<cr>:TestNearest<cr>
+  autocmd FileType javascript nnoremap <buffer> <silent> <leader>twt :split<cr>:TestNearest -w<cr><c-\><c-n><c-w><c-k>
+  " <leader>tf to test current file, <leader> twf to watch
+  autocmd FileType javascript nnoremap <buffer> <silent> <leader>tf :split<cr>:TestFile<cr>
+  autocmd FileType javascript nnoremap <buffer> <silent> <leader>twf :split<cr>:TestFile -w<cr><c-\><c-n><c-w><c-k>
+augroup END
 " }}}
 
 " NeoMake {{{
@@ -363,9 +368,9 @@ augroup tern_shortcuts
   autocmd!
 
   " <leader>tr to rename variable under cursor via Tern
-  autocmd FileType javascript nnoremap <leader>tr :TernRename<cr>
+  autocmd FileType javascript nnoremap <buffer> <leader>tr :TernRename<cr>
   " <leader>td to go to definition
-  autocmd FileType javascript nnoremap <leader>td :TernDef<cr>
+  autocmd FileType javascript nnoremap <buffer> <leader>td :TernDef<cr>
 augroup END
 " }}}
 
