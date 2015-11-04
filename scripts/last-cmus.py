@@ -338,6 +338,8 @@ class LastCmus(object):
         # run LIVE if the current song isnt in the status
         if self.status_content != self.combine(): 
             self.run()
+        else:
+            print "Skipped scrobbing because still on same song: %s" % self.status_content
 
         # write status
         self.write_file()
@@ -352,10 +354,11 @@ class LastCmus(object):
             fo = open(self.status, "r")
             self.status_content = fo.read()
             fo.close()
-    
+
     def combine(self):
-        combine = self.data["artist"] + ":" + self.data["title"]
-        return combine
+        if self.data.has_key("artist") and self.data.has_key("title"):
+            return self.data["artist"] + ":" + self.data["title"]
+        return None
 
     # get song information from command-line arguments
     def get_song_info(self):
@@ -363,14 +366,22 @@ class LastCmus(object):
             self.data[sys.argv[pos]] = sys.argv[pos + 1].decode('utf-8')
 
     def run(self):
-        if self.data.has_key("artist") and self.data.has_key("title"):
+        if self.data.has_key("artist") and self.data.has_key("title") and self.data.has_key("album") and self.data.has_key("musicbrainz_trackid"):
             #track = self.data["artist"] + " - " + self.data["title"]
             # Start the last.fm session
             now = int(time.mktime(datetime.now().timetuple()))
             login(username, password, hashpw=True)
-            submit(self.data["artist"], self.data["title"], now, source="P", length=3*60+32)
-            print flush()
-    
+            submit(self.data["artist"], self.data["title"], now, source="P", length=3*60+32, album=self.data["album"], mbid=self.data["musicbrainz_trackid"])
+            if flush():
+                print "Scrobbled: %s - %s" % (self.data["artist"], self.data["title"])
+            else:
+                print "Could not scrobble: %s - %s" % (self.data["artist"], self.data["title"])
+                sys.exit(1)
+        else:
+            print "Did not submit due to missing data:"
+            print self.data
+            sys.exit(1)
+
     def run_test(self):
         if self.data.has_key("artist") and self.data.has_key("title"):
             fo = open("~/debug.txt", "a")
@@ -380,4 +391,3 @@ class LastCmus(object):
 if __name__ == "__main__":
     lc = LastCmus()
     lc.update_status()
-
