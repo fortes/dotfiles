@@ -20,18 +20,16 @@ export CLICOLOR=1
 export VIRTUAL_ENV_DEFAULT_DIR=$HOME/.local/virtualenv
 # }}}
 
-if which fzf > /dev/null; then
-  # If available, we use git to list files from the root directory (not from the
-  # current directory as in other fzf cases). Otherwise, fallback to ag
-  export FZF_DEFAULT_COMMAND='(git ls-files -co --exclude-standard $(git rev-parse --show-toplevel) || ag -l -g "") 2> /dev/null'
-  export FZF_DEFAULT_OPTS="--black --extended"
-  export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-fi
-
 # Locally-installed packages belong in path
 if ! echo ":$PATH:" | grep -q ":$HOME/.local/bin:"; then
   export PATH="$HOME/.local/bin:$PATH"
 fi
+
+# If available, we use git to list files from the root directory (not from the
+# current directory as in other fzf cases). Otherwise, fallback to ag
+export FZF_DEFAULT_COMMAND='(git ls-files -co --exclude-standard $(git rev-parse --show-toplevel) || ag -l -g "") 2> /dev/null'
+export FZF_DEFAULT_OPTS="--extended"
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
 # Store config/cache files in default locations, but declare variables for use
 # on platforms that don't (ahem, Mac OS)
