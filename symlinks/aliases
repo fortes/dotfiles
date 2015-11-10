@@ -36,6 +36,9 @@ if which fzf > /dev/null; then
   alias cdp="cd \$(git ls-files \$(git rev-parse --show-toplevel) | xargs -n1 dirname | sort | uniq | fzf || echo '.')"
 fi
 
+# Add current project NPM to path
+alias npath="export PATH=$(npm bin):$PATH"
+
 # Map ls to be colorful
 if [ $OS = "Darwin" ]; then
   alias ls='ls -GpFh'
