@@ -235,10 +235,11 @@ function! g:OnVimEnter()
   augroup END
 
   if exists(':ProjectRootCD')
-    " Search across entire project when possible
-    nnoremap K :ProjectRootCD<cr>:silent! lgrep! "<C-R><C-W>"<cr>
-    vnoremap K :<C-u>norm! gv"sy<cr>:ProjectRootCD<cr>:silent! lgrep! "<C-R>s"<cr>
-    nnoremap Q :ProjectRootCD<cr>:lgrep!<SPACE>
+    " Search across entire project when possible. Use quickfix by default since
+    " linters will clobber the search results otherwise.
+    nnoremap K :ProjectRootCD<cr>:silent! grep! "<C-R><C-W>"<cr>
+    vnoremap K :<C-u>norm! gv"sy<cr>:ProjectRootCD<cr>:silent! grep! "<C-R>s"<cr>
+    nnoremap Q :ProjectRootCD<cr>:grep!<SPACE>
   endif
 endfunction
 " }}}
@@ -249,6 +250,9 @@ endfunction
 let g:markify_error_text = '✗'
 let g:markify_warning_text = '⚠'
 let g:markify_info_text = 'ℹ'
+
+" Clear out markify symbols with <c-l>
+nnoremap <silent> <C-L> :MarkifyClear<cr>:nohlsearch<cr><C-L>
 " }}}
 
 " Test.vim {{{
