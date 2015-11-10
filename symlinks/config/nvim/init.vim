@@ -190,6 +190,9 @@ endif
 " Quickly open a shell below current window
 nnoremap <leader>sh :below 10sp term://$SHELL<cr>
 
+" Send selection to term below
+vnoremap <leader>sp :<C-u>norm! gv"sy<cr><c-w>j<c-\><c-n>pa<cr><c-\><c-n><c-w>k
+
 " Terminal key bindings for window switching
 " Map jj and jk to <ESC> to leave insert mode quickly
 " Also allow <leader><C-c> and <leader><esc>
