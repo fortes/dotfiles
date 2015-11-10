@@ -4,8 +4,6 @@ git
 git-extras
 libssl-dev
 mosh
-nodejs
-npm
 python-dev
 python-virtualenv
 silversearcher-ag

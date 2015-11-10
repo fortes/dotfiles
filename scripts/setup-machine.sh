@@ -24,43 +24,6 @@ elif [ $OS == "Linux" ]; then
 
   # Make sure not to get stuck on any prompts
   DEBIAN_FRONTEND=noninteractive
-
-  # if ! which git > /dev/null; then
-  #   echo "Installing pre-requisites first (requires sudo)"
-  #   sudo -E apt-get update -q > /dev/null && \
-  #   sudo -E apt-get dist-upgrade -qfuy > /dev/null && \
-  #   sudo -E apt-get install -qfuy git build-essential \
-  #     libssl-dev python-software-properties > /dev/null
-  # fi
-  # echo "Git and build tools installed"
-
-  PPA_ADDED=''
-  # if [ ! -f /etc/apt/sources.list.d/chris-lea-node_js-trusty.list ]; then
-  #   echo "Adding Node PPA (requires sudo)"
-  #   PPA_ADDED=1
-  #   sudo -E add-apt-repository -y ppa:chris-lea/node.js > /dev/null
-  # fi
-
-  # if [ ! -f /etc/apt/sources.list.d/jon-severinsson-ffmpeg-trusty.list ]; then
-  #   echo "Adding ffmpeg PPA (requires sudo)"
-  #   PPA_ADDED=1
-  #   sudo -E add-apt-repository -y ppa:jon-severinsson/ffmpeg > /dev/null
-  # fi
-
-  # if [ ! -n $HEADLESS ]; then
-  #   if [ ! -f /etc/apt/sources.list.d/google-chrome.list ]; then
-  #     echo "Adding Chrome PPA (requires sudo)"
-  #     PPA_ADDED=1
-  #     wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add - > /dev/null
-  #     sudo -E sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
-  #   fi
-  # fi
-
-  # Update sources if we added a PPA
-  # if [ -n $PPA_ADDED ]; then
-  #   echo "  $ARROW New PPA added. Updating apt sources"
-  #   sudo -E apt-get -q update > /dev/null
-  # fi
 fi
 
 # Mac OS Settings
@@ -106,14 +69,14 @@ if [ $OS == "Darwin" ]; then
   done
   echo "$CMARK Cask packages installed"
 elif [ $OS == "Linux" ]; then
-  # Different apt packages if we don't have a GUI
-  if [ ! -z $HEADLESS ]; then
-    PACKAGE_FILE=$HOME/dotfiles/scripts/apt-packages-headless
+  if [ -z $HEADLESS ]; then
+    # GUI-only packages
+    PACKAGES=`cat $HOME/dotfiles/scripts/apt-packages* | sort`
   else
-    PACKAGE_FILE=$HOME/dotfiles/scripts/apt-packages
+    PACKAGES=`cat $HOME/dotfiles/scripts/apt-packages-headless`
   fi
 
-  for p in $(cat $PACKAGE_FILE); do
+  for p in $PACKAGES; do
     installAptPackageIfMissing $p
   done
   echo "$CMARK apt packages installed"
