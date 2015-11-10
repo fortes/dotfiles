@@ -4,7 +4,8 @@
 !.gitignore
 !beets
 !cmus
-!i3
 !git
+!i3
+!i3status
 !nvim
 !roxterm.sourceforge.net

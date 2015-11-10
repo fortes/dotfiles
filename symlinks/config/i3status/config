@@ -1,0 +1,9 @@
+general {
+  colors = true
+}
+
+order += "time"
+
+time {
+  format = "%m-%d %H:%M"
+}
