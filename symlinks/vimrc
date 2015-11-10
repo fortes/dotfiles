@@ -145,8 +145,8 @@ set showcmd
 set splitbelow
 set splitright
 
-" Start wildmenu when tab-completing, then tab through completion options
-set wildmode=longest:full,full
+" Reasonable tab completion
+set wildmode=full
 
 " Resize splits when the window is resized
 augroup on_vim_resized
@@ -161,6 +161,12 @@ set autochdir
 
 " Automatically write files on :next, :make, etc
 set autowrite
+
+" Automatically save on all changes
+augroup auto_save
+  autocmd!
+  autocmd InsertLeave,TextChanged * silent! write
+augroup END
 
 " Support mac files
 set fileformats+=mac
