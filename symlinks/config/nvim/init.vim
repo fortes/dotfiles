@@ -151,8 +151,11 @@ Plug 'groenewege/vim-less', {
 " }}}
 
 " Javascript {{{
-" JS syntax, supports ES6
-Plug 'othree/yajs.vim', {
+" JSX support
+Plug 'pangloss/vim-javascript', {
+\   'for': ['javascript']
+\ }
+Plug 'mxw/vim-jsx', {
 \   'for': ['javascript']
 \ }
 " Better indentation
@@ -425,6 +428,12 @@ let g:indent_guides_guide_size=1
 " Javascript libraries syntax {{{
 let g:used_javascript_libs='react'
 " }}}
+
+" vim-jsx config {{{
+" Don't require .jsx extension
+let g:jsx_ext_required=0
+" }}}
+
 " }}}
 
 " Local Settings {{{
