@@ -12,7 +12,7 @@ if ! which docker > /dev/null; then
   echo "$ARROW Docker not installed. Adding respository (requires sudo)"
   DISTRO=`lsb_release -s -c`
   sudo apt-key adv --keyserver hkp://pgp.mit.edu:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
-  sudo add-apt-repository 'deb https://apt.dockerproject.org/repo ubuntu-${DISTRO} main'
+  sudo add-apt-repository "deb https://apt.dockerproject.org/repo ubuntu-${DISTRO} main"
   unset DISTRO
 
   echo "$ARROW Installing Docker (requires sudo)"
