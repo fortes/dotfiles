@@ -69,11 +69,11 @@ if [ $OS == "Darwin" ]; then
   done
   echo "$CMARK Cask packages installed"
 elif [ $OS == "Linux" ]; then
+  PACKAGES=`cat $HOME/dotfiles/scripts/apt-packages-headless`
   if [ -z $HEADLESS ]; then
     # GUI-only packages
-    PACKAGES=`cat $HOME/dotfiles/scripts/apt-packages* | sort`
-  else
-    PACKAGES=`cat $HOME/dotfiles/scripts/apt-packages-headless`
+    PACKAGES="$PACKAGES
+$(cat $HOME/dotfiles/scripts/apt-packages)"
   fi
 
   for p in $PACKAGES; do
