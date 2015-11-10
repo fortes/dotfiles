@@ -12,8 +12,11 @@ font pango:Inconsolata 10
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
 
-# start a terminal
+# start a terminal with mod-enter
 bindsym $mod+Return exec i3-sensible-terminal
+
+# start a browser with mod-shift-enter
+bindsym $mod+Shift+Return exec sensible-browser
 
 # kill focused window
 bindsym $mod+Shift+q kill
@@ -132,10 +135,15 @@ mode "resize" {
 
 bindsym $mod+r mode "resize"
 
-# Start i3bar to display a workspace bar (plus the system information i3status
-# finds out, if available)
+# Bar shows workspaces and status, but only displayed when hitting Mod key
 bar {
+  font pango:Inconsolata 14
+  hidden_state hide
+  mode hide
+  modifier $mod
+  position top
   status_command i3status
+  tray_output primary
 }
 
 # No title bar or borders for Chrome windows since they have the tab bar
