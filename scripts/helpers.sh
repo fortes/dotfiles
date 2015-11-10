@@ -8,10 +8,17 @@ export DOTFILES=$HOME/dotfiles
 # }}}
 
 # Colorful characters {{{
-ARROW='↪'
-CMARK='✓'
-INFO='ℹ'
-XMARK='✖'
+if [ $TERM = 'linux' ]; then
+  ARROW='>'
+  CMARK='v '
+  INFO='i '
+  XMARK='x '
+else
+  ARROW='↪'
+  CMARK='✓'
+  INFO='ℹ'
+  XMARK='✖'
+fi
 
 if [ -t 1 ]; then
   # Use colors in terminal
