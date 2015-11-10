@@ -17,14 +17,14 @@ else
 fi
 
 echo "Copying files"
-rsync -n -avzP --force --delete-after --include="*- \[$YEAR] *" --include="*.mp3" \
+rsync -avzP --force --delete-after --include="*- \[$YEAR] *" --include="*.mp3" \
 --include="*.jpg" --exclude="*" $REMOTE_MUSIC_SERVER:$REMOTE_MUSIC_PATH \
 $LOCAL_MUSIC_DIR/albums/$YEAR
 
 echo "Generating album list for $YEAR"
 # Generate this outside of the command since the variables won't pass through
 BEETS_COMMAND="source ~/virtualenvs/default/bin/activate; \
-beet -c ~/.beets/config.yaml ls -a year:$YEAR -f'%time{\$added, %Y-%U} \
+beet -c ~/.config/beets/config.yaml ls -a year:$YEAR -f'%time{\$added, %Y-%U} \
 \$month \$albumartist - \$album (\$genre)'"
 ssh $REMOTE_MUSIC_SERVER $BEETS_COMMAND | sort -r > $LOCAL_MUSIC_DIR/albums/albums-"$YEAR".txt
 
