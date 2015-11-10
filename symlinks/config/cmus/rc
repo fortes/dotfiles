@@ -1,9 +1,3 @@
-# Default to correct working directory
-cd ~/Music
-
-# Slightly less nasty colors
-colorscheme zenburn
-
 # Soft volume control
 set softvol=true
 
@@ -20,6 +14,8 @@ set format_trackwin=%3n %t%= [%g] %-4y
 set format_trackwin_va=%3n %t (%a)%= [%g] %-4y
 
 # Filters
+fset instrumental=~g instrumental
+fset grime=~g grime
 fset 2015=date=2015
 fset 2014=date=2014
 fset 2013=date=2013
