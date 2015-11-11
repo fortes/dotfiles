@@ -186,6 +186,13 @@ if filereadable(expand("~/.vimrc"))
   source ~/.vimrc
 endif
 
+" Re-generate spelling files if modified
+for d in glob(fnamemodify($MYVIMRC, ':h').'/spell/*.add', 1, 1)
+  if getftime(d) > getftime(d.'.spl')
+    exec 'mkspell! ' . fnameescape(d)
+  endif
+endfor
+
 " Neovim-only config {{{
 " Useful reference for Neovim-only features (:help vim-differences)
 
