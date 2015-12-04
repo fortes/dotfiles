@@ -3,6 +3,8 @@ esformatter-braces
 esformatter-quotes
 esformatter-semicolons
 eslint
+eslint-plugin-mocha
+eslint-plugin-react
 eslint_d
 js-beautify
 node-inspector
