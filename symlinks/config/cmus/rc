@@ -7,11 +7,19 @@ set mouse=true
 # Scrobber
 set status_display_program=~/dotfiles/scripts/cmus-status.sh
 
-# Include genre in playlist view
-set format_playlist= %-20%A %-20%l %3n %t %= [%g] %-4y
-set format_playlist_va= %-20%A %-20%l %3n %t (%a)%= [%g] %-4y
-set format_trackwin=%3n %t%= [%g] %-4y
-set format_trackwin_va=%3n %t (%a)%= [%g] %-4y
+# Sort order
+set lib_sort=albumartist date album discnumber tracknumber title
+
+set format_current= %a - %l [%y] - %03n - %t%= %g
+set format_playlist= %-20%A %-20%l %t %= %g %y
+set format_playlist_va= %-20%A %-20%l %t (%a) %= %g %y
+set format_title=%a - %l - %t
+set format_trackwin_album= %l [%y]
+set format_trackwin=   %03n %t%= [%g] %d
+set format_trackwin_va=   %03n %t (%a)%= [%g] %d
+# Include year in tree view
+set format_treewin=  %l [%y]
+set format_treewin_artist=%a
 
 # Filters
 fset instrumental=~g instrumental
