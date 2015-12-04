@@ -499,6 +499,11 @@ augroup filetype_tweaks
     autocmd FileType less setlocal errorformat+=%-G%.%#
   endif
 
+  " Linting for shell scripts
+  if executable('shellcheck')
+    autocmd FileType sh setlocal makeprg=shellcheck\ -f\ gcc\ %
+  endif
+
   " Use esformatter to autoformat (gq in Visual mode)
   if executable('esformatter')
     autocmd FileType javascript setlocal formatprg=esformatter

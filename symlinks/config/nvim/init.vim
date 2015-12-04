@@ -299,6 +299,10 @@ endif
 if executable('lessc')
   let g:neomake_less_enabled_makers = ['makeprg']
 endif
+
+if executable('shellcheck')
+  let g:neomake_sh_enabled_makers = ['makeprg']
+endif
 " }}}
 
 " Fuzzy Finding (FZF/CtrlP) {{{
