@@ -32,9 +32,12 @@ if [ $OS = "Darwin" ]; then
   # For Mac OS, that means we need to get Homebrew installed, along with the
   # XCode build tools, if necessary
   if ! which brew > /dev/null; then
+    # El Capitan no longer lets /usr/local be writable, change that
+    echo "Changing ownership of /usr/local to $(whoami) (requires sudo)"
+    sudo chown -R $(whoami):admin /usr/local
     # Install Homebrew
     echo "Homebrew not installed. Installing (will take a while) ..."
-    ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"
+    ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
   fi
   echo "$CMARK Homebrew installed"
 
