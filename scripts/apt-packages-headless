@@ -3,6 +3,7 @@ curl
 git
 git-extras
 libssl-dev
+lsb-release
 mosh
 python-dev
 python-virtualenv

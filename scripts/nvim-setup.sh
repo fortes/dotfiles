@@ -11,8 +11,13 @@ if ! which nvim > /dev/null; then
     echo "  $ARROW Installing latest NeoVim from HEAD"
     brew install --HEAD neovim 2> /dev/null
   elif which apt-get > /dev/null; then
+    # Debian can use the Ubuntu PPAs, but map to xenial (unstable)
+    if lsb_release -d 2> /dev/null | grep -iq "ubuntu"; then
+      sudo add-apt-repository -y ppa:neovim-ppa/unstable
+    else
+      sudo add-apt-repository -y "deb https://ppa.launchpad.net/neovim-ppa/unstable ubuntu xenial main"
+    fi
     echo "  $ARROW Adding NeoVim PPA (requires sudo)"
-    sudo add-apt-repository ppa:neovim-ppa/unstable
     echo "  $ARROW Updating apt & installing neovim"
     sudo apt-get -q update
     sudo apt-get -qfuy install neovim
