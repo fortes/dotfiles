@@ -29,6 +29,7 @@ if [ -t 1 ]; then
 fi
 
 export CMARK XMARK
+source "$HOME/.profile.local"
 # }}}
 
 # Helper functions {{{

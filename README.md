@@ -14,23 +14,25 @@ If for some reason, you don't have `curl` installed (why?):
 bash <(wget -qO- https://raw.github.com/fortes/dotfiles/master/bootstrap.sh)
 ```
 
-If the machine doesn't have a GUI (i.e. EC2), do the following:
+## Setup
+
+Once you've run setup, you'll still have to do the following manual steps:
+
+1. Generate this machine's SSH keys:
 
 ```
-HEADLESS=1 bash <(curl -fsSL https://raw.github.com/fortes/dotfiles/master/bootstrap.sh)
+ssh-keygen -t rsa -b 4096 -C "$MACHINE_NAME"
 ```
 
-Then you'll still have to do the following manual steps:
+2. Add any additional ssh keys into `~/.ssh`
 
-1. Add your ssh keys into `~/.ssh`
-
-2. If you're me (which you're not), set the remote url for this repo in order to push:
+3. If you're me (which you're not), set the remote url for this repo in order to push:
 
   ```
   cd $HOME/dotfiles && git remote set-url origin git@github.com:fortes/dotfiles.git
   ```
 
-3. Setup `.gitconfig.local`:
+4. Setup `.gitconfig.local`:
 
   ````
   [user]
@@ -45,14 +47,22 @@ TODO: Automate these steps.
 ### Mac
 
 * [Map Caps Lock to Control](http://www.emacswiki.org/emacs/MovingTheCtrlKey)
-* Install ssh keys to `.ssh/authorized_keys`
+* Setup Mac settings
 
 ### Ubuntu
 
-* Install ssh keys to `.ssh/authorized_keys`
+### EC2
+
+Manually set shell to zsh by editing `/etc/passwd`.
+
+### Chromebook
+
+* Map Caps Lock to Control: Should come through with user account though.
+* Set root password via `crosh`
+* Copy chroots from backup files
+* Create chroots
 
 #### TODO
 
 * Mac settings & preferences
 * Better colorschemes
-* Consider using a different Homebrew prefix due to El Capitan changes.
