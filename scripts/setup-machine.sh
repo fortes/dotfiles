@@ -1,8 +1,8 @@
 #!/bin/bash
 set -eo pipefail
 
-OS=`uname`
-
+# Make sure to load OS/Distro/etc variables
+source $HOME/.profile.local
 source $HOME/dotfiles/scripts/helpers.sh
 
 # Install Homebrew
@@ -11,11 +11,14 @@ if [ $OS == "Darwin" ]; then
   if ! isHomebrewTapInstalled caskroom/cask; then
     echo "$XMARK Caskroom not setup"
     echo "  $ARROW Tapping & installing caskroom"
-    # brew tap caskroom/cask
-    # brew install brew-cask
-    # brew cask
+    brew tap caskroom/cask
+    brew install brew-cask
+    brew cask
   fi
   echo "$CMARK Homebrew cask setup"
+elif [ $DISTRO = "Chromebook" ]; then
+  echo "$XMARK Chromebook setup not complete yet"
+  return 1
 elif [ $OS == "Linux" ]; then
   if ! which apt-get > /dev/null; then
     echo "$XMARK Non-apt setup not supported"

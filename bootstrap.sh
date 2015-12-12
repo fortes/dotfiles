@@ -16,10 +16,10 @@ OS=$(uname)
 
 if [ "$OS" = "Linux" ]; then
   # Distinguish betweent Debian & Ubuntu
-  if which apt-get > /dev/null; then
+  if which apt-get > /dev/null 2>&1; then
     # Must have lsb_release installed for Debian/Ubuntu beforehand. Seems
     # to come on EC2 images, but not in chromebook chroots.
-    if ! which lsb_release > /dev/null; then
+    if ! which lsb_release > /dev/null 2>&1; then
       echo "Installing lsb-release (requires sudo)"
       sudo apt-get -qfuy install lsb-release
     fi
@@ -31,7 +31,7 @@ if [ "$OS" = "Linux" ]; then
       DISTRO="Debian"
     fi
     VERSION=$(lsb_release -s -c)
-  elif [ "$DEVICETYPE" = "CHROMEBOOK" ]; then
+  elif [ "$(whoami)" = "chronos" ]; then
     DISTRO="Chromebook"
     VERSION="Unknown"
   else
@@ -129,7 +129,7 @@ if [ "$OS" = "Darwin" ]; then
     brew install git
   fi
   echo "$CMARK Git installed"
-elif [ "$OS" = "Linux" ] && which apt-get > /dev/null; then
+elif [ "$OS" = "Linux" ] && which apt-get > /dev/null 2>&1; then
   # Make sure git is in there
   if ! which git > /dev/null; then
     echo "Installing git (requires sudo)..."
@@ -140,7 +140,7 @@ elif [ "$DISTRO" = "Chromebook" ]; then
   echo "Downloading crouton script to $HOME"
   wget "https://goo.gl/fd3zc" -O "$HOME/crouton"
   echo "Installing crouton bin tools (requires sudo)"
-  sudo "$HOME/crouton" -b
+  sudo sh "$HOME/crouton" -b
 else
   echo "$XMARK Sorry, but your system ($OS) is not supported"
   exit 1
@@ -158,6 +158,7 @@ if [ $DISTRO = "Chromebook" ]; then
 
   if [ ! -d "$DOTFILES" ]; then
     wget "$DOTFILES_TARBALL" -O "$HOME/dotfiles.tar.gz"
+    mkdir -p "$DOTFILES"
     echo "Downloading latest dotfiles to $DOTFILES"
     tar zxf "$HOME/dotfiles.tar.gz" -C "$DOTFILES" --strip-components=1
     rm "$HOME/dotfiles.tar.gz"
@@ -169,7 +170,7 @@ else
     git clone http://github.com/fortes/dotfiles "$DOTFILES" > /dev/null
   else
     echo "Pulling latest dotfiles..."
-    (cd "$DOTFILES" && git pull 2>&1 2> /dev/null || true)
+    (cd "$DOTFILES" && git pull 2> /dev/null || true)
   fi
 fi
 echo "$CMARK ~/dotfiles present"
