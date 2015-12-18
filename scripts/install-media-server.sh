@@ -45,7 +45,7 @@ echo "------------------------------------------------------"
 exit
 
 # This is for the media center UI (not fully implemented yet)
-# if [ ! $HEADLESS ]; then
+# if [ ! $IS_HEADLESS ]; then
 #   # Add plex into apt sources list
 #   if [ ! -f /etc/apt/sources.list.d/plexapp-plexht-trusty.list ]; then
 #     echo "Adding Plex apt source (requires sudo)"

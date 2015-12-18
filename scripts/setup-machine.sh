@@ -73,7 +73,7 @@ if [ $OS == "Darwin" ]; then
   echo "$CMARK Cask packages installed"
 elif [ $OS == "Linux" ]; then
   PACKAGES=`cat $HOME/dotfiles/scripts/apt-packages-headless`
-  if [ -z $HEADLESS ]; then
+  if [ -z $IS_HEADLESS ]; then
     # GUI-only packages
     PACKAGES="$PACKAGES
 $(cat $HOME/dotfiles/scripts/apt-packages)"
@@ -99,7 +99,7 @@ source ~/.profile
 ($HOME/dotfiles/scripts/zsh-setup.sh)
 
 # cmus
-if [ -z $HEADLESS ]; then
+if [ -z $IS_HEADLESS ]; then
   ($HOME/dotfiles/scripts/cmus-setup.sh)
 fi
 
