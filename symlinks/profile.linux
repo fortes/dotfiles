@@ -8,10 +8,10 @@ if [ ! -z $DISPLAY ] && command -v setxkbmap > /dev/null; then
   setxkbmap -layout us -option altwin:left_meta_win
 fi
 
-if command -v keychain &>/dev/null; then
-  # TODO: Use keychain instead of the ssh_agent stuff below
-  # Can also use keychain for gpg-agent, should set that up too
-fi
+# if command -v keychain &>/dev/null; then
+#   # TODO: Use keychain instead of the ssh_agent stuff below
+#   # Can also use keychain for gpg-agent, should set that up too
+# fi
 
 # Setup ssh-agent. This starts automatically with X, but not via ssh
 # Mostly from http://mah.everybody.org/docs/ssh
