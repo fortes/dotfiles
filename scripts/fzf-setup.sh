@@ -1,10 +1,10 @@
-#/bin/bash
+#!/bin/bash
 set -euf -o pipefail
-source $HOME/dotfiles/scripts/helpers.sh
+source "$HOME/dotfiles/scripts/helpers.sh"
 
 FZF_SOURCE_DIR=$HOME/.local/source/fzf
 
-if ! which fzf > /dev/null; then
+if ! command -v fzf > /dev/null; then
   echo "$XMARK FZF not installed"
 
   if [ "$OS" = 'Darwin' ]; then
@@ -13,11 +13,11 @@ if ! which fzf > /dev/null; then
     echo "  $ARROW Running FZF install script"
     $(brew info fzf | grep /install) --no-completion --key-bindings \
       --no-update-rc
-  elif [ ! -d $FZF_SOURCE_DIR ]; then
+  elif [ ! -d "$FZF_SOURCE_DIR" ]; then
     echo "  $ARROW Installing FZF"
-    git clone --depth 1 https://github.com/junegunn/fzf.git $FZF_SOURCE_DIR
+    git clone --depth 1 https://github.com/junegunn/fzf.git "$FZF_SOURCE_DIR"
     echo "  $ARROW Running FZF install script"
-    ($FZF_SOURCE_DIR/install --no-completion --key-bindings --no-update-rc)
+    ("$FZF_SOURCE_DIR/install" --no-completion --key-bindings --no-update-rc)
   else
     echo "$XMARK FZF not installed but installation directory already present"
     exit 1

@@ -1,11 +1,16 @@
 # vim: ft=sh
 
-if [ ! -z $DISPLAY ] && which setxkbmap > /dev/null; then
+if [ ! -z $DISPLAY ] && command -v setxkbmap > /dev/null; then
   # Use Caps Lock as another Control Key
   setxkbmap -layout us -option ctrl:nocaps
 
   # Swap Alt and Windows Keys
   setxkbmap -layout us -option altwin:left_meta_win
+fi
+
+if command -v keychain &>/dev/null; then
+  # TODO: Use keychain instead of the ssh_agent stuff below
+  # Can also use keychain for gpg-agent, should set that up too
 fi
 
 # Setup ssh-agent. This starts automatically with X, but not via ssh

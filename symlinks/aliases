@@ -21,7 +21,7 @@ alias dnsflush="dscacheutil -flushcache"
 alias json='python -mjson.tool'
 
 # Colorized cat (nyan)
-if which pygmentize > /dev/null; then
+if command -v pygmentize > /dev/null; then
   alias nyan='pygmentize -O style=emacs -f console256 -g'
 fi
 
@@ -32,7 +32,7 @@ alias mv='mv -i'
 alias pcd="cd \$(git rev-parse --show-toplevel 2>/dev/null || echo '.')"
 
 # CD into a directory within the project, selecting via fzf
-if which fzf > /dev/null; then
+if command -v fzf > /dev/null; then
   alias cdp="cd \$(git ls-files \$(git rev-parse --show-toplevel) | xargs -n1 dirname | sort | uniq | fzf || echo '.')"
 fi
 
@@ -49,9 +49,9 @@ else
 fi
 
 # Shortcuts for copying from tmux clipboard to system clipboard
-if which pbcopy > /dev/null; then
+if command -v pbcopy > /dev/null; then
   alias tcopy='tmux save-buffer - | pbcopy'
-elif which xclip > /dev/null; then
+elif command -v xclip > /dev/null; then
   alias tcopy='tmux save-buffer - | xclip -i -sel clipboard'
 fi
 

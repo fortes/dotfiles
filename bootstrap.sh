@@ -16,10 +16,10 @@ OS=$(uname)
 
 if [ "$OS" = "Linux" ]; then
   # Distinguish betweent Debian & Ubuntu
-  if which apt-get > /dev/null 2>&1; then
+  if command -v apt-get > /dev/null; then
     # Must have lsb_release installed for Debian/Ubuntu beforehand. Seems
     # to come on EC2 images, but not in chromebook chroots.
-    if ! which lsb_release > /dev/null 2>&1; then
+    if ! command -v lsb_release > /dev/null; then
       echo "Installing lsb-release (requires sudo)"
       sudo apt-get -qfuy install lsb-release
     fi
@@ -105,7 +105,7 @@ if [ "$OS" = "Darwin" ]; then
   #   make: *** No targets specified and no makefile found. Stop.
   #
   # Note that this goes out on stderr, so we pipe stderr to stdout to grep
-  if make > /dev/null 2>&1 | grep -qv 'no makefile'; then
+  if make 2>&1 | grep -qv 'no makefile'; then
     echo "$XMARK Must agree to license agreement"
     echo "Run 'sudo make' then try this script again"
     exit 1
@@ -113,7 +113,7 @@ if [ "$OS" = "Darwin" ]; then
 
   # For Mac OS, that means we need to get Homebrew installed, along with the
   # XCode build tools, if necessary
-  if ! which brew > /dev/null; then
+  if ! command -v brew > /dev/null; then
     # El Capitan no longer lets /usr/local be writable, change that
     echo "Changing ownership of /usr/local to $(whoami) (requires sudo)"
     sudo chown -R "$(whoami):admin" /usr/local
@@ -124,14 +124,14 @@ if [ "$OS" = "Darwin" ]; then
   echo "$CMARK Homebrew installed"
 
   # Finally, make sure we have git
-  if ! which git > /dev/null; then
+  if ! command -v git > /dev/null; then
     echo "Installing git ..."
     brew install git
   fi
   echo "$CMARK Git installed"
-elif [ "$OS" = "Linux" ] && which apt-get > /dev/null 2>&1; then
+elif [ "$OS" = "Linux" ] && command -v apt-get > /dev/null; then
   # Make sure git is in there
-  if ! which git > /dev/null; then
+  if ! command -v git > /dev/null; then
     echo "Installing git (requires sudo)..."
     sudo apt-get -qfuy install git
   fi
@@ -170,7 +170,7 @@ else
     git clone http://github.com/fortes/dotfiles "$DOTFILES" > /dev/null
   else
     echo "Pulling latest dotfiles..."
-    (cd "$DOTFILES" && git pull 2> /dev/null || true)
+    (cd "$DOTFILES"; git pull 2> /dev/null || true)
   fi
 fi
 echo "$CMARK ~/dotfiles present"

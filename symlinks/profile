@@ -4,7 +4,7 @@
 export PROFILE_LOADED=1
 
 # Use NeoVim if we have it
-if which nvim > /dev/null; then
+if command -v nvim > /dev/null; then
   VISUAL=nvim
 else
   VISUAL=vim

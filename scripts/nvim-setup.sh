@@ -1,8 +1,8 @@
 #!/bin/bash
 set -euf -o pipefail
-source $HOME/dotfiles/scripts/helpers.sh
+source "$HOME/dotfiles/scripts/helpers.sh"
 
-if ! which nvim > /dev/null; then
+if ! command -v nvim > /dev/null; then
   echo "$XMARK Neovim not installed"
 
   if [ "$OS" = 'Darwin' ]; then
@@ -10,7 +10,7 @@ if ! which nvim > /dev/null; then
     brew tap neovim/homebrew-neovim > /dev/null 2> /dev/null
     echo "  $ARROW Installing latest NeoVim from HEAD"
     brew install --HEAD neovim 2> /dev/null
-  elif which apt-get > /dev/null; then
+  elif command -v apt-get > /dev/null; then
     # Debian can use the Ubuntu PPAs, but map to xenial (unstable)
     if lsb_release -d 2> /dev/null | grep -iq "ubuntu"; then
       sudo add-apt-repository -y ppa:neovim-ppa/unstable
@@ -22,7 +22,7 @@ if ! which nvim > /dev/null; then
     sudo apt-get -q update
     sudo apt-get -qfuy install neovim
 
-    if which update-alternatives > /dev/null; then
+    if command -v update-alternatives > /dev/null; then
       echo "    $ARROW Updating system editor alternatives to set symlinks"
       sudo update-alternatives --install /usr/bin/vi vi /usr/bin/nvim 60
       sudo update-alternatives --install /usr/bin/vim vim /usr/bin/nvim 60
@@ -50,10 +50,10 @@ fi
 echo "$CMARK Neovim installed"
 NVIM_CONFIG_DIR=$XDG_CONFIG_HOME/nvim
 
-if [ ! -f $NVIM_CONFIG_DIR/autoload/plug.vim ]; then
+if [ ! -f "$NVIM_CONFIG_DIR/autoload/plug.vim" ]; then
   echo "  $XMARK vim-plug not installed"
   echo "    $ARROW Installing vim-plug"
-  curl -fLo $NVIM_CONFIG_DIR/autoload/plug.vim --create-dirs \
+  curl -fLo "$NVIM_CONFIG_DIR/autoload/plug.vim" --create-dirs \
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim \
     2> /dev/null
   echo "  $CMARK vim-plug installed"

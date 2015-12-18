@@ -1,21 +1,21 @@
-#/bin/bash
+#!/bin/bash
 set -ef -o pipefail
-source $HOME/dotfiles/scripts/helpers.sh
+source "$HOME/dotfiles/scripts/helpers.sh"
 
-if ! which apt-get > /dev/null; then
+if ! command -v apt-get > /dev/null; then
   echo "$XMARK Setup only supported on Ubuntu systems for now"
   exit 1
 fi
 
 # Add the Docker repo GPG key
-if ! which docker > /dev/null; then
+if ! command -v docker > /dev/null; then
   echo "$ARROW Docker not installed. Adding respository (requires sudo)"
   if lsb_release -d 2> /dev/null | grep -iq "ubuntu"; then
     DISTRO='ubuntu'
   else
     DISTRO='debian'
   fi
-  RELEASE=`lsb_release -s -c`
+  RELEASE=$(lsb_release -s -c)
   sudo apt-key adv --keyserver hkp://pgp.mit.edu:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
   sudo add-apt-repository "deb https://apt.dockerproject.org/repo ${DISTRO}-${RELEASE} main"
 
@@ -28,10 +28,10 @@ if ! which docker > /dev/null; then
 fi
 
 echo "$ARROW Checking if ufw is running (may require sudo)"
-if which ufw > /dev/null && sudo ufw status | grep -qw active; then
-  FWD_POLICY_STRING="DEFAULT_FORWARD_POLICY=\"ACCEPT\""
-  if ! grep -qw $FWD_POLICY_STRING; then
-    echo "$ARROW Setting $FWD_POLICY_STRING (requires sudo)"
+if command -v ufw > /dev/null && sudo ufw status | grep -qw active; then
+  FWD_POLICY_STRING=(DEFAULT_FORWARD_POLICY="ACCEPT")
+  if ! grep -qw "${FWD_POLICY_STRING[@]}"; then
+    echo "$ARROW Setting" "${FWD_POLICY_STRING[@]}" "(requires sudo)"
     sudo sed -i.bak \
       's/DEFAULT_FORWARD_POLICY="[a-zA-Z]"/'.DEFAULT_FORWARD_POLICY.'/g' \
       /etc/default/ufw
