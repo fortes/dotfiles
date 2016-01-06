@@ -27,6 +27,16 @@ if [ -f $VIRTUAL_ENV_DEFAULT_DIR/bin/activate ]; then
   . $VIRTUAL_ENV_DEFAULT_DIR/bin/activate
 fi
 
+# Make sure the terminal type we're using is supported (tmux-256color doesn't
+# work everywhere yet)
+if ! infocmp $TERM > /dev/null 2>&1; then
+  if [[ "$TERM" = "tmux-256color" ]]; then
+    export TERM="screen-256color"
+  else
+    export TERM="xterm-256color"
+  fi
+fi
+
 # Load aliases
 if [ -f $HOME/.aliases ]; then
   . $HOME/.aliases
