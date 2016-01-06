@@ -3,14 +3,8 @@ elinks
 fzf
 git
 git-extras
-gpg
-hub
-irssi
-jq
-libyaml
 mobile-shell
 node
-reattach-to-user-namespace
 shellcheck
 tmux
 wget

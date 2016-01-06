@@ -1,10 +1,12 @@
 build-essential
 curl
+elinks
 git
 git-extras
 libssl-dev
 lsb-release
 mosh
+openssh-server
 python-dev
 python-virtualenv
 shellcheck
