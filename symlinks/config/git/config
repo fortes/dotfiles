@@ -1,4 +1,4 @@
-# vim: ft=conf
+# vim: ft=gitconfig
 
 [alias]
   lg = log --graph --pretty=oneline --abbrev-commit --decorate

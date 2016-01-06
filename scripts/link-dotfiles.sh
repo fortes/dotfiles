@@ -22,33 +22,39 @@ done
 ERRORS=''
 for file in $DOTFILES/symlinks/*; do
   target=$HOME/.`basename $file`
-  if [ -e $target ]; then
+  if [ -e "$target" ]; then
     if [[ "$(readlink $target)" != $file ]]; then
-      if [ -d $target ]; then
+      if [ -d "$target" ]; then
         echo "  $ARROW moving existing files in $target/"
-        mv $target/* $file/. && rmdir $target
-        ln -s $file $target
+        mv "$target/*" "$file/." && rmdir "$target"
+        ln -s "$file" "$target"
         echo "$CMARK $target linked"
       elif [ -n "$FORCE" ]; then
         old_path=$HOME/old.`basename $file`
         >&2 echo "$XMARK $target already exists!"
         >&2 echo "  $ARROW Moved $target to $old_path"
-        mv $target $old_path && ln -s $file $target
+        mv "$target" "$old_path" && ln -s "$file" "$target"
         echo "$CMARK $target linked"
       else
         ERRORS="$ERRORS$XMARK $target already exists and differs\n"
       fi
     fi
   else
-    ln -s $file $target
+    ln -s "$file" "$target"
     echo "$CMARK $target linked"
   fi
 done
 
-if [ ! -f $DOTFILES/symlinks/ssh/config ]; then
+if [ ! -f "$DOTFILES/symlinks/ssh/config" ]; then
   echo "  $ARROW Creating ~/.ssh/config"
-  cp $DOTFILES/symlinks/ssh/config.sample $DOTFILES/symlinks/ssh/config
+  cp "$DOTFILES/symlinks/ssh/config.sample" "$DOTFILES/symlinks/ssh/config"
   echo "$CMARK ~/.ssh/config created"
+fi
+
+if [ ! -f "$HOME/.gitconfig.local" ]; then
+  echo "  $ARROW Creating ~/.gitconfig.local"
+  cp "$DOTFILES/symlinks/config/git/config.local.sample" "$HOME/.gitconfig.local"
+  echo "$CMARK ~/.gitconfig.local created"
 fi
 
 if [ -n "$ERRORS" ]; then
