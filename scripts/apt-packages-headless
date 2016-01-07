@@ -1,3 +1,4 @@
+apt-transport-https
 build-essential
 curl
 elinks
@@ -12,6 +13,7 @@ python-virtualenv
 shellcheck
 silversearcher-ag
 software-properties-common
+sudo
 tmux
 unzip
 wget

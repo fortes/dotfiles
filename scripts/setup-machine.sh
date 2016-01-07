@@ -71,12 +71,12 @@ if [ $OS == "Darwin" ]; then
     fi
   done
   echo "$CMARK Cask packages installed"
-elif [ $OS == "Linux" ]; then
-  PACKAGES=`cat $HOME/dotfiles/scripts/apt-packages-headless`
-  if [ -z $IS_HEADLESS ]; then
+elif [ "$OS" == "Linux" ]; then
+  PACKAGES=$(cat $HOME/dotfiles/scripts/apt-packages-headless)
+  if [ "$IS_HEADLESS" != 1 ]; then
     # GUI-only packages
     PACKAGES="$PACKAGES
-$(cat $HOME/dotfiles/scripts/apt-packages)"
+    $(cat $HOME/dotfiles/scripts/apt-packages)"
   fi
 
   for p in $PACKAGES; do
@@ -100,7 +100,7 @@ source ~/.bashrc
 ($HOME/dotfiles/scripts/zsh-setup.sh)
 
 # cmus
-if [ -z $IS_HEADLESS ]; then
+if [ "$IS_HEADLESS" != 1 ]; then
   ($HOME/dotfiles/scripts/cmus-setup.sh)
 fi
 

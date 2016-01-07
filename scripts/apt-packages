@@ -8,4 +8,5 @@ mp3val
 mpv
 roxterm
 xclip
-xorg
+xinit
+xserver-xorg

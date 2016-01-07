@@ -14,6 +14,8 @@ If for some reason, you don't have `curl` installed (why?):
 bash <(wget -qO- https://raw.github.com/fortes/dotfiles/master/bootstrap.sh)
 ```
 
+You may need to add `--no-check-certificate` for the `wget` call, but that's kinda dangerous.
+
 ## Setup
 
 Once you've run setup, you'll still have to do the following manual steps:
