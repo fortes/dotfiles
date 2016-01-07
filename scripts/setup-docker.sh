@@ -10,14 +10,9 @@ fi
 # Add the Docker repo GPG key
 if ! command -v docker > /dev/null; then
   echo "$ARROW Docker not installed. Adding respository (requires sudo)"
-  if lsb_release -d 2> /dev/null | grep -iq "ubuntu"; then
-    DISTRO='ubuntu'
-  else
-    DISTRO='debian'
-  fi
   RELEASE=$(lsb_release -s -c)
   sudo apt-key adv --keyserver hkp://pgp.mit.edu:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
-  sudo add-apt-repository "deb https://apt.dockerproject.org/repo ${DISTRO}-${RELEASE} main"
+  sudo add-apt-repository "deb https://apt.dockerproject.org/repo ${DISTRO,,}-${RELEASE} main"
 
   unset DISTRO
   unset RELEASE
