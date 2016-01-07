@@ -10,7 +10,7 @@ else
       echo "$ARROW Adding $DISTRO nodesource PPA (requires sudo)"
       curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | \
         sudo apt-key add -
-      sudo add-apt-repository "deb https://deb.nodesource.com/node_5.x ${DISTRO,,} main"
+      sudo add-apt-repository "deb https://deb.nodesource.com/node_5.x ${VERSION,,} main"
 
       sudo apt-get update
       echo "$ARROW Installing node (requires sudo)"
