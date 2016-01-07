@@ -130,6 +130,9 @@ if [ "$OS" = "Darwin" ]; then
   fi
   echo "$CMARK Git installed"
 elif [ "$OS" = "Linux" ] && command -v apt-get > /dev/null; then
+  # Don't want installs to wait on user interaction
+  export DEBIAN_FRONTEND=noninteractive
+
   # Make sure git is in there
   if ! command -v git > /dev/null; then
     echo "Installing git (requires sudo)..."

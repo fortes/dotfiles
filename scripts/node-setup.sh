@@ -11,7 +11,6 @@ else
       curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | \
         sudo apt-key add -
       sudo add-apt-repository "deb https://deb.nodesource.com/node_5.x ${DISTRO,,} main"
-      unset DISTRO
 
       sudo apt-get update
       echo "$ARROW Installing node (requires sudo)"
