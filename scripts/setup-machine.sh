@@ -90,6 +90,7 @@ fi
 
 # Update source paths, etc
 source ~/.profile
+source ~/.bashrc
 
 ($HOME/dotfiles/scripts/python-setup.sh)
 
