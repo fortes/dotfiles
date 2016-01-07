@@ -18,6 +18,9 @@ bindsym $mod+Return exec i3-sensible-terminal
 # start a browser with mod-shift-enter
 bindsym $mod+Shift+Return exec sensible-browser
 
+# lock screen with mod-shift-z
+bindsym $mod+Shift+z exec i3lock -d -c 333333 -e -f
+
 # kill focused window
 bindsym $mod+Shift+q kill
 
@@ -150,10 +153,16 @@ bar {
   tray_output primary
 }
 
-# No title bar or borders for Chrome windows since they have the tab bar
-for_window [class="(?i)chromium"] border none
-# Hide title bar for terminals
-for_window [class="(?i)roxterm"] border pixel 1
-for_window [class="UXTerm"] border pixel 1
+# No title bar or borders for browsers (works for Chrome & Firefox)
+for_window [window_role="browser"] border none
+
+# Hide title bar for terminals, which seem to have no unifying class / role :(
+for_window [class="(?i)xterm"] border pixel 1
 for_window [class="X-terminal-emulator"] border pixel 1
-for_window [class="xterm"] border pixel 1
+
+# Dialogs should open floating by default
+for_window [window_role="pop-up"] floating enable
+for_window [window_role="task_dialog"] floating enable
+
+# Chrome task manager should float
+for_window [title="Task Manager - Chromium"] floating enable
