@@ -6,6 +6,7 @@ git-extras
 mobile-shell
 node
 shellcheck
+ssh-copy-id
 tmux
 the_silver_searcher
 wget
