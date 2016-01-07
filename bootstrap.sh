@@ -52,7 +52,7 @@ fi
 # Cheap way to check if we're on a machine with an active GUI, note that this
 # will give a false positive if logged into the virtual console, but that's
 # likely what the caller wants if they bothered to go the vconsole.
-if [ -z "$DISPLAY" ]; then
+if [ -z "$DISPLAY" ] && [ "$OS" != "Darwin" ]; then
   IS_HEADLESS=1
 else
   IS_HEADLESS=0
