@@ -89,11 +89,13 @@ precmd () {
   vcs_info
 }
 
-# user@host: in red in OSX, green otherwise
+# user@host: in red in OSX, green on linux (cyan when connecting via SSH)
 if [[ $OS == "Darwin" ]]; then
   PS1='%{%F{red}%}%n@%m%f:'
-else
+elif [ -z "$SSH_TTY" ]; then
   PS1='%{%F{green}%}%n@%m%f:'
+else
+  PS1='%{%F{cyan}%}%n@%m%f:'
 fi
 # full directory name in yellow
 PS1+='%{%F{yellow}%}%~%f'
