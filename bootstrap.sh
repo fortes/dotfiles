@@ -79,8 +79,8 @@ if [ ! -f "$LOCAL_PROFILE" ]; then
     echo "export IS_EC2=$IS_EC2"
     echo ""
     echo "# Add machine-specific items below"
-    echo "# LAST_FM_USERNAME=xxx"
-    echo "# LAST_FM_PASSWORD=xxx"
+    echo "# export LAST_FM_USERNAME=xxx"
+    echo "# export LAST_FM_PASSWORD=xxx"
     echo "# etc ..."
   } > "$LOCAL_PROFILE"
 
