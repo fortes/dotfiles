@@ -37,7 +37,9 @@ if command -v fzf > /dev/null; then
 fi
 
 # Add current project NPM to path
-alias npath="export PATH=$(npm bin):$PATH"
+if command -v npm > /dev/null; then
+  alias npath='export PATH=$(npm bin):$PATH'
+fi
 
 # Map ls to be colorful
 if [ $OS = "Darwin" ]; then
