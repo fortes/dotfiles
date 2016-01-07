@@ -5,7 +5,7 @@ format_item: $artist - $album - $track - $title ($genre)
 format_album: "[$original_year] $albumartist - $album ($genre)"
 
 pluginpath: ~/media/music/tools/
-plugins: fetchart mbsync embedart info missing lyrics lastgenre badfiles types
+plugins: fetchart mbsync embedart info missing lyrics lastgenre badfiles types replaygain edit
 
 art_filename: folder
 
@@ -54,3 +54,6 @@ lastgenre:
 
 types:
   rating: int
+
+replaygain:
+  auto: yes
