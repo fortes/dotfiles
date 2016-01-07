@@ -15,7 +15,7 @@ fi
 if ! grep -q backports /etc/apt/sources.list; then
   echo "$XMARK Backports not in sources.list"
   echo "  $ARROW Adding backports to in sources.list (requires sudo)"
-  sudo add-apt-respository \
+  sudo add-apt-repository \
     "deb http://http.debian.net/debian jessie-backports main"
   echo "$CMARK Backports in sources.list, updating sources"
   sudo apt-get update
