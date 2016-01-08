@@ -4,6 +4,7 @@ curl
 elinks
 git
 git-extras
+keychain
 libssl-dev
 lsb-release
 mosh

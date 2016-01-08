@@ -8,31 +8,7 @@ if [ ! -z $DISPLAY ] && command -v setxkbmap > /dev/null; then
   setxkbmap -layout us -option altwin:left_meta_win
 fi
 
-# if command -v keychain &>/dev/null; then
-#   # TODO: Use keychain instead of the ssh_agent stuff below
-#   # Can also use keychain for gpg-agent, should set that up too
-# fi
-
-# Setup ssh-agent. This starts automatically with X, but not via ssh
-# Mostly from http://mah.everybody.org/docs/ssh
-if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
-  SSH_ENV="$HOME/.ssh/environment"
-
-  start_agent () {
-    ssh-agent -k 2> /dev/null
-    ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
-    chmod 600 "${SSH_ENV}"
-    . "${SSH_ENV}" > /dev/null
-    ssh-add
-  }
-
-  # Source SSH settings, if applicable
-  if [ -f "${SSH_ENV}" ]; then
-    . "${SSH_ENV}" > /dev/null
-    if ! ps ${SSH_AGENT_PID} > /dev/null; then
-      start_agent
-    fi
-  else
-    start_agent
-  fi
+if command -v keychain &>/dev/null; then
+  # Don't prompt for password
+  eval `keychain --eval --noask --agents ssh`
 fi
