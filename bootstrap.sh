@@ -133,9 +133,28 @@ elif [ "$OS" = "Linux" ] && command -v apt-get > /dev/null; then
   # Don't want installs to wait on user interaction
   export DEBIAN_FRONTEND=noninteractive
 
+  if ! command -v add-apt-repository > /dev/null; then
+    echo "Installing software-properties-common (requires sudo)"
+    sudo apt-get -qfuy install software-properties-common
+  fi
+
+  if [ "$DISTRO" = "Debian" ]; then
+    echo "Adding contrib & non-free to sources (requires sudo)"
+    sudo add-apt-repository -y contrib > /dev/null
+    sudo add-apt-repository -y non-free > /dev/null
+  elif [ "$DISTRO" = "Ubuntu" ]; then
+    echo "Adding restricted, universe, and multiverse to sources (requires sudo)"
+    sudo add-apt-repository -y restricted > /dev/null
+    sudo add-apt-repository -y universe > /dev/null
+    sudo add-apt-repository -y multiverse > /dev/null
+  fi
+
   # Make sure git is in there
   if ! command -v git > /dev/null; then
     echo "Installing git (requires sudo)..."
+    # If git isn't here, then this is the first time running, likely need to
+    # update all sources
+    sudo apt-get update
     sudo apt-get -qfuy install git
   fi
   echo "$CMARK Git installed"
