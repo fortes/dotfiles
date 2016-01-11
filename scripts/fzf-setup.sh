@@ -24,7 +24,7 @@ echo "$CMARK FZF installed"
 if [ "$OS" = 'Darwin' ]; then
   echo "  $ARROW Running FZF install script"
   $(brew info fzf | grep /install) --no-completion --key-bindings \
-    --no-update-rc
+    --no-update-rc > /dev/null
 elif [ -d "$FZF_SOURCE_DIR" ]; then
   echo "  $ARROW Running FZF install script"
   ("$FZF_SOURCE_DIR/install" --no-completion --key-bindings --no-update-rc)
