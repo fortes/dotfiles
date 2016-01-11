@@ -158,10 +158,6 @@ Plug 'pangloss/vim-javascript', {
 Plug 'mxw/vim-jsx', {
 \   'for': ['javascript']
 \ }
-" Better indentation
-Plug 'gavocanov/vim-js-indent', {
-\   'for': ['javascript']
-\ }
 " JS syntax for common libraries
 Plug 'othree/javascript-libraries-syntax.vim', {
 \   'for': ['javascript']
