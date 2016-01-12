@@ -30,15 +30,21 @@ Then add the key into GitHub and wherever else (use `pbcopy < ~/.ssh/id_rsa` on 
 
 2. Add any additional ssh keys into `~/.ssh`
 
-3. If you're me (which you're not), set the remote url for this repo in order to push:
+3. Authorize your public keys on the new machine:
+
+```
+ssh-import-id gh:fortes
+```
+
+4. If you're me (which you're not), set the remote url for this repo in order to push:
 
   ```
   cd $HOME/dotfiles && git remote set-url origin git@github.com:fortes/dotfiles.git
   ```
 
-4. Add your favorites into `.ssh/config`
+5. Add your favorite servers into `.ssh/config`
 
-5. Setup `.gitconfig.local`:
+6. Setup `.gitconfig.local`:
 
   ````
   [user]
