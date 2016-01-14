@@ -72,6 +72,8 @@ if [ $OS == "Darwin" ]; then
   done
   echo "$CMARK Cask packages installed"
 elif [ "$OS" == "Linux" ]; then
+  ($HOME/dotfiles/scripts/debian-keyboard.sh)
+
   PACKAGES=$(cat $HOME/dotfiles/scripts/apt-packages-headless)
   if [ "$IS_HEADLESS" != 1 ]; then
     # GUI-only packages

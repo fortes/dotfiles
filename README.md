@@ -36,7 +36,9 @@ Then add the key into GitHub and wherever else (use `pbcopy < ~/.ssh/id_rsa` on 
   cd $HOME/dotfiles && git remote set-url origin git@github.com:fortes/dotfiles.git
   ```
 
-4. Setup `.gitconfig.local`:
+4. Add your favorites into `.ssh/config`
+
+5. Setup `.gitconfig.local`:
 
   ````
   [user]
@@ -48,12 +50,12 @@ Then add the key into GitHub and wherever else (use `pbcopy < ~/.ssh/id_rsa` on 
 
 TODO: Automate these steps.
 
+### Debian / Ubuntu
+
 ### Mac
 
 * [Map Caps Lock to Control](http://www.emacswiki.org/emacs/MovingTheCtrlKey)
 * Setup Mac settings
-
-### Ubuntu
 
 ### EC2
 
