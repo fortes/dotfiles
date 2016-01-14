@@ -52,6 +52,9 @@ TODO: Automate these steps.
 
 ### Debian / Ubuntu
 
+* Depending on the machine, you may need `pavucontrol` in order to unmute your audio output via GUI.
+** Alternatively, find the name of the desired output via `pacmd list-sinks` then run `pacmd set-default-sink $SINK_NAME`
+
 ### Mac
 
 * [Map Caps Lock to Control](http://www.emacswiki.org/emacs/MovingTheCtrlKey)

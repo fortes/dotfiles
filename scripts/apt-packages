@@ -1,9 +1,11 @@
+alsa-utils
 chromium
 exfat-fuse
 exfat-utils
 fonts-inconsolata
 i3
 mpv
+pulseaudio
 roxterm
 xclip
 xinit
