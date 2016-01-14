@@ -4,6 +4,7 @@ curl
 elinks
 git
 git-extras
+htop
 keychain
 libssl-dev
 lsb-release
