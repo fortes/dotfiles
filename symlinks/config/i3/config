@@ -19,7 +19,7 @@ bindsym $mod+Return exec i3-sensible-terminal
 bindsym $mod+Shift+Return exec sensible-browser
 
 # lock screen with mod-shift-z
-bindsym $mod+Shift+z exec i3lock -d -c 333333 -e -f
+bindsym $mod+Shift+z exec --no-startup-id /usr/bin/i3lock -d -c 333333 -e
 
 # kill focused window
 bindsym $mod+Shift+q kill
@@ -163,6 +163,7 @@ for_window [class="X-terminal-emulator"] border pixel 1
 # Dialogs should open floating by default
 for_window [window_role="pop-up"] floating enable
 for_window [window_role="task_dialog"] floating enable
+for_window [title="(?i)authy"] floating enable
 
 # Chrome task manager should float
 for_window [title="Task Manager - Chromium"] floating enable
