@@ -27,7 +27,8 @@ if [ "$OS" = 'Darwin' ]; then
     --no-update-rc > /dev/null
 elif [ -d "$FZF_SOURCE_DIR" ]; then
   echo "  $ARROW Running FZF install script"
-  ("$FZF_SOURCE_DIR/install" --no-completion --key-bindings --no-update-rc)
+  "$FZF_SOURCE_DIR/install" --no-completion --key-bindings --no-update-rc \
+    > /dev/null
 fi
 
 echo "$CMARK FZF setup"
