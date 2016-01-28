@@ -22,6 +22,13 @@ if ! command -v docker > /dev/null; then
   sudo apt-get -qqfuy --no-install-recommends install docker-engine
 fi
 
+if [ ! -f "/etc/sudoers.d/$USER-docker" ]; then
+  echo "$ARROW Allowing $USER to run docker without sudo prompt (requires sudo)"
+  echo "fortes  ALL=(ALL) NOPASSWD: /usr/bin/docker" |
+    sudo tee &> /dev/null "/etc/sudoers.d/$USER-docker"
+fi
+echo "$CMARK Sudo-less docker setup"
+
 echo "$ARROW Checking if ufw is running (may require sudo)"
 if command -v ufw > /dev/null && sudo ufw status | grep -qw active; then
   FWD_POLICY_STRING=(DEFAULT_FORWARD_POLICY="ACCEPT")
