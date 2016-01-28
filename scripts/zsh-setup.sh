@@ -6,31 +6,29 @@ source "$HOME/dotfiles/scripts/helpers.sh"
 if [ "$(command -v zsh)" != "$SHELL" ]; then
   echo "$XMARK Shell is not zsh"
   if [ "$OS" == "Darwin" ]; then
-    # Run latest zsh from homebrew
-    if ! isHomebrewPackageInstalled zsh; then
-      echo "  $XMARK zsh not installed"
-      echo "    $ARROW Installing homebrew zsh..."
-      brew install zsh
-    fi
-    echo "  $CMARK zsh installed"
+    # Get latest zsh from homebrew
+    installHomebrewPackagesIfMissing zsh
+    ZSH_LOCATION="$(command -v zsh)"
 
-    if grep -q "$(command -v zsh)" /etc/shells; then
+    if ! grep -q "$ZSH_LOCATION" /etc/shells; then
       echo "Adding homebrew zsh to accepted shell list (requires sudo)"
-      sudo sh -c 'command -v zsh >> /etc/shells'
+      sudo sh -c "$ZSH_LOCATION >> /etc/shells"
     fi
   elif command -v apt-get > /dev/null; then
-    installAptPackageIfMissing zsh
+    installAptPackagesIfMissing zsh
   else
     echo "  $XMARK Unsupported OS. Install zsh on your own"
     exit 1
   fi
 
-  if [ "$USER" = "ubuntu" ]; then
+  ZSH_LOCATION="$(command -v zsh)"
+
+  if [ "$IS_EC2" = 1 ] || [ "$IS_DOCKER" = 1 ]; then
     echo "$XMARK Cannot change shell on password-less users (e.g. EC2 default)"
     exit 0
   else
     echo "  $ARROW Switching shell to zsh (will prompt for password)"
-    chsh -s "$(command -v zsh)"
+    chsh -s "$ZSH_LOCATION"
 
     echo "$CMARK zsh shell will be active in a terminals/login"
     exit 0

@@ -51,42 +51,81 @@ isHomebrewPackageInstalled() {
   fi
 }
 
-# TODO: Allow taking a list of packages
-installHomebrewPackageIfMissing() {
-  if ! isHomebrewPackageInstalled $1; then
-    echo "$XMARK $1 not installed"
-    echo "  $ARROW Installing $1 via brew"
-    brew install $1
+isHomebrewCaskPackageInstalled() {
+  if brew cask list $1 > /dev/null 2> /dev/null; then
+    return 0
+  else
+    return 1
   fi
-  echo "$CMARK $1 installed"
+}
+
+installHomebrewCaskPackagesIfMissing() {
+  PACKAGES=''
+
+  for package in $@; do
+    if ! isHomebrewCaskPackageInstalled "$package"; then
+      echo "$XMARK Cask package $package not installed"
+      PACKAGES="$PACKAGES $package"
+    else
+      echo "$CMARK Cask package $package installed"
+    fi
+  done
+
+  if [ "$PACKAGES" != "" ]; then
+    PACKAGES=$(echo $PACKAGES | xargs)
+    echo "  $ARROW Installing $PACKAGES (requires sudo)"
+    brew cask install $PACKAGES
+    echo "$CMARK $PACKAGES installed"
+  fi
+}
+
+installHomebrewPackagesIfMissing() {
+  PACKAGES=''
+
+  for package in $@; do
+    if ! isHomebrewPackageInstalled "$package"; then
+      echo "$XMARK Brew package $package not installed"
+      PACKAGES="$PACKAGES $package"
+    else
+      echo "$CMARK Brew package $package installed"
+    fi
+  done
+
+  if [ "$PACKAGES" != "" ]; then
+    PACKAGES=$(echo $PACKAGES | xargs)
+    echo "  $ARROW Installing $PACKAGES (requires sudo)"
+    brew install $PACKAGES
+    echo "$CMARK $PACKAGES installed"
+  fi
 }
 
 isAptPackageInstalled() {
-  if dpkg -s $1 > /dev/null 2> /dev/null; then
+  if dpkg -s "$1" > /dev/null 2> /dev/null; then
     return 0
   else
     return 1
   fi
 }
 
-isAptPPAInstalled() {
-  if ls /etc/apt/sources.list.d | grep $1 > /dev/null; then
-    return 0
-  else
-    return 1
-  fi
-}
+installAptPackagesIfMissing() {
+  PACKAGES=''
 
-# TODO: Allow taking a list of packages
-installAptPackageIfMissing() {
-  if ! isAptPackageInstalled $1; then
-    echo "$XMARK Apt package $1 not installed"
-    echo "  $ARROW Installing $1 (requires sudo)"
-    sudo -E apt-get -qqfuy --no-install-recommends install $1 > /dev/null
+  for package in $@; do
+    if ! isAptPackageInstalled "$package"; then
+      echo "$XMARK Apt package $package not installed"
+      PACKAGES="$PACKAGES $package"
+    else
+      echo "$CMARK Apt package $package installed"
+    fi
+  done
+
+  if [  "$PACKAGES" != "" ]; then
+    echo "  $ARROW Installing $PACKAGES (requires sudo)"
+    sudo -E apt-get -qqfuy --no-install-recommends install $PACKAGES > /dev/null
+    echo "$CMARK $PACKAGES installed"
   fi
-  echo "$CMARK $1 installed"
 }
 
 export -f isHomebrewPackageInstalled isHomebrewTapInstalled \
-  installAptPackageIfMissing installHomebrewPackageIfMissing
+  installAptPackagesIfMissing installHomebrewPackagesIfMissing
 # }}}

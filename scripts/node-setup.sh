@@ -3,7 +3,7 @@ set -ef -o pipefail
 source $HOME/dotfiles/scripts/helpers.sh
 
 if [ "$DISTRO" = "Mac" ]; then
-  installHomebrewPackageIfMissing node
+  installHomebrewPackagesIfMissing node
 else
   if ! command -v nodejs > /dev/null; then
     if command -v apt-get > /dev/null; then
@@ -14,7 +14,7 @@ else
 
       sudo apt-get update
       echo "$ARROW Installing node (requires sudo)"
-      installAptPackageIfMissing nodejs
+      installAptPackagesIfMissing nodejs
 
       if command -v update-alternatives > /dev/null; then
         if ! command -v node > /dev/null; then

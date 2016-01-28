@@ -7,7 +7,7 @@ if ! command -v apt-get 2> /dev/null; then
   exit 1
 fi
 
-installAptPackageIfMissing openjdk-8-jre
+installAptPackagesIfMissing openjdk-8-jre
 
 FILEBOT_DEB_URL='http://downloads.sourceforge.net/project/filebot/filebot/FileBot_4.6/filebot_4.6_amd64.deb'
 
