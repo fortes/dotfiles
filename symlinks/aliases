@@ -57,6 +57,17 @@ elif command -v xclip > /dev/null; then
   alias tcopy='tmux save-buffer - | xclip -i -sel clipboard'
 fi
 
+# Load platform files if present
+if [[ $OS == "Darwin" ]]; then
+  if [ -f $HOME/.aliases.osx ]; then
+    . $HOME/.aliases.osx
+  fi
+elif [[ $OS == "Linux" ]]; then
+  if [ -f $HOME/.aliases.linux ]; then
+    . $HOME/.aliases.linux
+  fi
+fi
+
 # Load local file if present
 if [ -f ~/.aliases.local ]; then
   . ~/.aliases.local
