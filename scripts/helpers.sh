@@ -29,7 +29,9 @@ if [ -t 1 ]; then
 fi
 
 export CMARK XMARK
-source "$HOME/.profile.local"
+if [ -r "$HOME/.profile.local" ]; then
+  source "$HOME/.profile.local"
+fi
 # }}}
 
 # Helper functions {{{
@@ -80,7 +82,7 @@ installAptPackageIfMissing() {
   if ! isAptPackageInstalled $1; then
     echo "$XMARK Apt package $1 not installed"
     echo "  $ARROW Installing $1 (requires sudo)"
-    sudo -E apt-get -qfuy install $1 > /dev/null
+    sudo -E apt-get -qqfuy --no-install-recommends install $1 > /dev/null
   fi
   echo "$CMARK $1 installed"
 }
