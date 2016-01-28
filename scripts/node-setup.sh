@@ -60,12 +60,20 @@ unset NPM_CACHE_DIR
 
 # Cache output since npm list can be slow
 NPM_PACKAGES=$(npm list -g --depth 0)
-for p in $(cat "$HOME/dotfiles/scripts/npm-packages"); do
+PACKAGES=''
+for p in $(xargs < "$HOME/dotfiles/scripts/npm-packages"); do
   if ! echo "$NPM_PACKAGES" | grep -q "$p@"; then
     echo "$XMARK npm package $p not installed"
-    echo "  $ARROW Installing global npm package $p"
-    npm install -g -q "$p"
+    PACKAGES="$PACKAGES $p"
+  else
+    echo "$CMARK $p installed"
   fi
-  echo "$CMARK $p installed"
 done
+
+if [ "$PACKAGES" != "" ]; then
+  echo "  $ARROW Installing global npm packages$PACKAGES"
+  npm install -g -q $PACKAGES
+  echo "$CMARK $PACKAGES installed"
+fi
+
 echo "$CMARK All npm packages installed"

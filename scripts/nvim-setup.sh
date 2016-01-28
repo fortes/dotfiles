@@ -13,9 +13,9 @@ if ! command -v nvim > /dev/null; then
   elif command -v apt-get > /dev/null; then
     # Debian can use the Ubuntu PPAs, but map to xenial (unstable)
     if [ "$DISTRO" = "Ubuntu" ]; then
-      sudo add-apt-repository -y ppa:neovim-ppa/unstable
+      sudo add-apt-repository -y ppa:neovim-ppa/unstable > /dev/null
     else
-      sudo add-apt-repository -y "deb http://ppa.launchpad.net/neovim-ppa/unstable/ubuntu xenial main"
+      sudo add-apt-repository -y "deb http://ppa.launchpad.net/neovim-ppa/unstable/ubuntu xenial main" > /dev/null
     fi
     echo "  $ARROW Adding NeoVim PPA (requires sudo)"
     echo "  $ARROW Updating apt & installing neovim"

@@ -47,9 +47,7 @@ if [ "$OS" == "Darwin" ]; then
   # Install python with up-to-date OpenSSL
   if ! isHomebrewPackageInstalled python; then
     brew install python --with-brewed-openssl
-    pip install -q --upgrade setuptools
-    pip install -q --upgrade pip
-    pip install -q --upgrade virtualenv
+    pip install -q --upgrade setuptools pip virtualenv
     echo "$CMARK Python installed"
   fi
 
@@ -64,7 +62,9 @@ if [ "$OS" == "Darwin" ]; then
     "$(xargs < "$HOME/dotfiles/scripts/cask-packages")"
   echo "$CMARK Cask packages installed"
 elif [ "$OS" == "Linux" ]; then
-  ("$HOME/dotfiles/scripts/debian-keyboard.sh" || true)
+  if [ "$IS_EC2" != 1 ] && [ "$IS_DOCKER" != 1 ]; then
+    ("$HOME/dotfiles/scripts/debian-keyboard.sh" || true)
+  fi
 
   PACKAGES=$(xargs < "$HOME/dotfiles/scripts/apt-packages-headless")
   if [ "$IS_HEADLESS" != 1 ]; then
