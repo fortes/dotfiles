@@ -64,7 +64,7 @@ if [ "$OS" == "Darwin" ]; then
     "$(xargs < "$HOME/dotfiles/scripts/cask-packages")"
   echo "$CMARK Cask packages installed"
 elif [ "$OS" == "Linux" ]; then
-  ("$HOME/dotfiles/scripts/debian-keyboard.sh")
+  ("$HOME/dotfiles/scripts/debian-keyboard.sh" || true)
 
   PACKAGES=$(xargs < "$HOME/dotfiles/scripts/apt-packages-headless")
   if [ "$IS_HEADLESS" != 1 ]; then
