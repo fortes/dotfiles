@@ -4,7 +4,7 @@ source "$HOME/dotfiles/scripts/helpers.sh"
 
 if [ "$OS" = "Linux" ]; then
   echo "$ARROW (Re-)installing beets and dependencies (requires sudo)"
-  sudo apt-get -qfuy install mp3val
+  sudo apt-get -qqfuy --no-install-recommends install mp3val
   pip install -U beautifulsoup4 beets flask pyacoustid pylast requests
   echo "$CMARK Everything installed"
 else

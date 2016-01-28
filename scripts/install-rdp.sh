@@ -11,22 +11,22 @@ export DEBIAN_FRONTEND=noninteractive
 if dpkg -s ubuntu-desktop > /dev/null 2> /dev/null; then
   # Can't use gnome in Ubuntu 14.04 because it doesn't work without hw
   # acceleration, so we install xfce which we will then use for our session
-  sudo -E apt-get -qfuy install xfce4
+  sudo -E apt-get -qqfuy --no-install-recommends install xfce4
 elif ! dpkg -s xubuntu-desktop > /dev/null 2> /dev/null; then
   # With no GUI yet, let's just use Xubuntu, which is relatively lightweight
   echo "Installing xubuntu-desktop (requires sudo and takes a long time)"
   sudo -E apt-get -q update
-  sudo -E apt-get -qfuy install xubuntu-desktop
+  sudo -E apt-get -qqfuy --no-install-recommends install xubuntu-desktop
 fi
 
 if ! dpkg -s vnc4server > /dev/null 2> /dev/null; then
   echo "Installing vnc4server (requires sudo)"
-  sudo -E apt-get -qfuy install vnc4server
+  sudo -E apt-get -qqfuy --no-install-recommends install vnc4server
 fi
 
 if ! dpkg -s xrdp > /dev/null 2> /dev/null; then
   echo "Installing xrdp (requires sudo)"
-  sudo -E apt-get -qfuy install xrdp
+  sudo -E apt-get -qqfuy --no-install-recommends install xrdp
 fi
 
 if [ ! -f $HOME/.xsession ]; then

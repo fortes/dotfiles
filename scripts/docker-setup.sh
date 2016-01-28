@@ -19,7 +19,7 @@ if ! command -v docker > /dev/null; then
 
   echo "$ARROW Installing Docker (requires sudo)"
   sudo apt-get -q update
-  sudo apt-get -qfuy install docker-engine
+  sudo apt-get -qqfuy --no-install-recommends install docker-engine
 fi
 
 echo "$ARROW Checking if ufw is running (may require sudo)"

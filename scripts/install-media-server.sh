@@ -16,7 +16,7 @@ APT_PREREQUISITES=(avahi-utils)
 for p in "${APT_PREREQUISITES[0]}"; do
   if ! dpkg -s $p > /dev/null; then
     echo "Installing missing package $p (requires sudo)"
-    sudo -E apt-get -qfuy install $p
+    sudo -E apt-get -qqfuy --no-install-recommends install $p
   fi
 done
 
@@ -60,7 +60,7 @@ exit
 #   if ! dpkg -s plexhometheater > /dev/null; then
 #     echo "Installing Plex Home Theatre (requires sudo)"
 #     sudo -E apt-get -q update
-#     sudo -E apt-get -qfuy install plexhometheater
+#     sudo -E apt-get -qqfuy --no-install-recommends install plexhometheater
 #   fi
 # fi
 
@@ -70,7 +70,7 @@ exit
 #   sudo wget -q -O /etc/apt/sources.list.d/mopidy.list \
 #     https://apt.mopidy.com/mopidy.list
 #   sudo apt-get update -q
-#   sudo apt-get install -qfuy mopidy mopidy-scrobbler mopidy-soundcloud \
+#   sudo apt-get install -qqfuy --no-install-recommends mopidy mopidy-scrobbler mopidy-soundcloud \
 #     mopidy-beets
 #   echo "Starting mopidy service"
 #   sudo service mopidy start

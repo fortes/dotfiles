@@ -10,7 +10,7 @@ DEBIAN_FRONTEND=noninteractive
 
 # Install
 echo 'Installing (requires sudo)'
-sudo -E apt-get -qfuy install samba
+sudo -E apt-get -qqfuy --no-install-recommends install samba
 # Set password
 echo "Setting passwd"
 sudo -E smbpasswd -a fortes

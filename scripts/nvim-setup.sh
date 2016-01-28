@@ -20,7 +20,7 @@ if ! command -v nvim > /dev/null; then
     echo "  $ARROW Adding NeoVim PPA (requires sudo)"
     echo "  $ARROW Updating apt & installing neovim"
     sudo apt-get -q update
-    sudo apt-get -qfuy install neovim
+    sudo apt-get -qqfuy --no-install-recommends install neovim
 
     if command -v update-alternatives > /dev/null; then
       echo "    $ARROW Updating system editor alternatives to set symlinks"
