@@ -66,6 +66,13 @@ else
   IS_EC2=0
 fi
 
+# Slightly hacky way to see if we are within a Docker container
+if [ -f /.dockerinit ]; then
+  IS_DOCKER=1
+else
+  IS_DOCKER=0
+fi
+
 # Write variables to file
 LOCAL_PROFILE="$HOME/.profile.local"
 if [ ! -f "$LOCAL_PROFILE" ]; then
@@ -77,6 +84,7 @@ if [ ! -f "$LOCAL_PROFILE" ]; then
     echo "export VERSION=$VERSION"
     echo "export IS_HEADLESS=$IS_HEADLESS"
     echo "export IS_EC2=$IS_EC2"
+    echo "export IS_DOCKER=$IS_DOCKER"
     echo ""
     echo "# Add machine-specific items below"
     echo "# export LAST_FM_USERNAME=xxx"
