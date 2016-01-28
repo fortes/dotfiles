@@ -11,7 +11,7 @@ fi
 if ! command -v docker > /dev/null; then
   echo "$ARROW Docker not installed. Adding respository (requires sudo)"
   sudo apt-key adv --keyserver hkp://pgp.mit.edu:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
-  sudo add-apt-repository "deb https://apt.dockerproject.org/repo ${DISTRO,,}-${VERSION} main"
+  sudo add-apt-repository -y "deb https://apt.dockerproject.org/repo ${DISTRO,,}-${VERSION} main"
 
   echo "$ARROW Installing Docker (requires sudo)"
   sudo apt-get -q update
