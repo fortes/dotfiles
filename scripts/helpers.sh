@@ -1,14 +1,14 @@
 # vim: fdm=marker
 
 # Common Variables {{{
-OS=`uname`
+OS=$(uname)
 
 export OS
 export DOTFILES=$HOME/dotfiles
 # }}}
 
 # Colorful characters {{{
-if [ $TERM = 'linux' ]; then
+if [ "$TERM" = 'linux' ]; then
   ARROW='>'
   CMARK='v '
   INFO='i '
@@ -36,7 +36,7 @@ fi
 
 # Helper functions {{{
 isHomebrewTapInstalled() {
-  if brew tap | grep -i $1 > /dev/null; then
+  if brew tap | grep -i "$1" > /dev/null; then
     return 0
   else
     return 1
@@ -44,7 +44,7 @@ isHomebrewTapInstalled() {
 }
 
 isHomebrewPackageInstalled() {
-  if brew list $1 > /dev/null 2> /dev/null; then
+  if brew list "$1" > /dev/null 2> /dev/null; then
     return 0
   else
     return 1
@@ -52,7 +52,7 @@ isHomebrewPackageInstalled() {
 }
 
 isHomebrewCaskPackageInstalled() {
-  if brew cask list $1 > /dev/null 2> /dev/null; then
+  if brew cask list "$1" > /dev/null 2> /dev/null; then
     return 0
   else
     return 1
@@ -72,9 +72,9 @@ installHomebrewCaskPackagesIfMissing() {
   done
 
   if [ "$PACKAGES" != "" ]; then
-    PACKAGES=$(echo $PACKAGES | xargs)
-    echo "  $ARROW Installing $PACKAGES (requires sudo)"
-    brew cask install $PACKAGES
+    PACKAGES=$(echo "$PACKAGES" | xargs)
+    echo "  $ARROW Installing$PACKAGES (requires sudo)"
+    brew cask install "$PACKAGES"
     echo "$CMARK $PACKAGES installed"
   fi
 }
@@ -92,7 +92,7 @@ installHomebrewPackagesIfMissing() {
   done
 
   if [ "$PACKAGES" != "" ]; then
-    PACKAGES=$(echo $PACKAGES | xargs)
+    PACKAGES=$(echo "$PACKAGES" | xargs)
     echo "  $ARROW Installing $PACKAGES (requires sudo)"
     brew install $PACKAGES
     echo "$CMARK $PACKAGES installed"
@@ -121,7 +121,7 @@ installAptPackagesIfMissing() {
 
   if [  "$PACKAGES" != "" ]; then
     echo "  $ARROW Installing $PACKAGES (requires sudo)"
-    sudo -E apt-get -qqfuy --no-install-recommends install $PACKAGES > /dev/null
+    sudo -E apt-get -qqfuy install $PACKAGES > /dev/null
     echo "$CMARK $PACKAGES installed"
   fi
 }

@@ -21,7 +21,7 @@ if [ "$OS" = "Linux" ]; then
     # to come on EC2 images, but not in chromebook chroots.
     if ! command -v lsb_release > /dev/null; then
       echo "Installing lsb-release (requires sudo)"
-      sudo apt-get -qqfuy --no-install-recommends install lsb-release
+      sudo apt-get -qqfuy install lsb-release
     fi
 
     if lsb_release -d | grep -iq "ubuntu"; then
@@ -143,7 +143,7 @@ elif [ "$OS" = "Linux" ] && command -v apt-get > /dev/null; then
 
   if ! command -v add-apt-repository > /dev/null; then
     echo "Installing software-properties-common (requires sudo)"
-    sudo apt-get -qqfuy --no-install-recommends install software-properties-common
+    sudo apt-get -qqfuy install software-properties-common
   fi
 
   if [ "$DISTRO" = "Debian" ]; then
@@ -163,7 +163,7 @@ elif [ "$OS" = "Linux" ] && command -v apt-get > /dev/null; then
     # If git isn't here, then this is the first time running, likely need to
     # update all sources
     sudo apt-get -q update
-    sudo apt-get -qqfuy --no-install-recommends install git
+    sudo apt-get -qqfuy install git
   fi
   echo "$CMARK Git installed"
 elif [ "$DISTRO" = "Chromebook" ]; then
