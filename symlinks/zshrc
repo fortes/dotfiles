@@ -89,9 +89,15 @@ precmd () {
   vcs_info
 }
 
-# user@host: in red in OSX, green on linux (cyan when connecting via SSH)
+# user@host: different colors based on setup
+# - red: OS X
+# - yellow: Debian chroot (crouton)
+# - cyan: SSH
+# - green linux
 if [[ $OS == "Darwin" ]]; then
   PS1='%{%F{red}%}%n@%m%f:'
+elif [[ -r /etc/debian_chroot ]]; then
+  PS1='%{%F{yellow}%}%n@%m%f:'
 elif [ -z "$SSH_TTY" ]; then
   PS1='%{%F{green}%}%n@%m%f:'
 else
