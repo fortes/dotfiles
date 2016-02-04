@@ -24,7 +24,7 @@ unset OS
 # tmux sessions will get the env variable, but not the $PATH changes.
 if [ -f $VIRTUAL_ENV_DEFAULT_DIR/bin/activate ]; then
   # This will modify the prompt, so do it before setting the prompt
-  . $VIRTUAL_ENV_DEFAULT_DIR/bin/activate
+  VIRTUAL_ENV_DISABLE_PROMPT=1 . $VIRTUAL_ENV_DEFAULT_DIR/bin/activate
 fi
 
 # Make sure the terminal type we're using is supported (tmux-256color doesn't
