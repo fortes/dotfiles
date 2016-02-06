@@ -66,6 +66,12 @@ else
   IS_EC2=0
 fi
 
+if command -v croutonversion > /dev/null; then
+  IS_CROUTON=1
+else
+  IS_CROUTON=0
+fi
+
 # Slightly hacky way to see if we are within a Docker container
 if [ -f /.dockerinit ]; then
   IS_DOCKER=1
@@ -82,9 +88,10 @@ if [ ! -f "$LOCAL_PROFILE" ]; then
     echo "export OS=$OS"
     echo "export DISTRO=$DISTRO"
     echo "export VERSION=$VERSION"
-    echo "export IS_HEADLESS=$IS_HEADLESS"
-    echo "export IS_EC2=$IS_EC2"
+    echo "export IS_CROUTON=$IS_CROUTON"
     echo "export IS_DOCKER=$IS_DOCKER"
+    echo "export IS_EC2=$IS_EC2"
+    echo "export IS_HEADLESS=$IS_HEADLESS"
     echo ""
     echo "# Add machine-specific items below"
     echo "# export LAST_FM_USERNAME=xxx"
