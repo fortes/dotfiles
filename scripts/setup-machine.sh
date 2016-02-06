@@ -66,6 +66,10 @@ elif [ "$OS" == "Linux" ]; then
     ("$HOME/dotfiles/scripts/debian-keyboard.sh" || true)
   fi
 
+  if [ "$IS_CROUTON" == 1 ]; then
+    "$HOME/dotfiles/scripts/locale-gen.sh"
+  fi
+
   PACKAGES=$(xargs < "$HOME/dotfiles/scripts/apt-packages-headless")
   if [ "$IS_HEADLESS" != 1 ]; then
     # GUI-only packages
