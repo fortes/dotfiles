@@ -7,6 +7,11 @@ if ! command -v apt-get > /dev/null; then
   exit 1
 fi
 
+if [[ "$IS_CROUTON" == 1 ]]; then
+  echo "$XMARK Crouton does not support Docker"
+  exit 1
+fi
+
 # Add the Docker repo GPG key
 if ! command -v docker > /dev/null; then
   echo "$ARROW Docker not installed. Adding respository (requires sudo)"
