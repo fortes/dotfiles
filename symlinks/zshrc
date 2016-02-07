@@ -94,9 +94,9 @@ precmd () {
 # - yellow: Debian chroot (crouton)
 # - cyan: SSH
 # - green linux
-if [[ $OS == "Darwin" ]]; then
+if [[ "$OS" == "Darwin" ]]; then
   PS1='%{%F{red}%}%n@%m%f:'
-elif [[ -r /etc/debian_chroot ]]; then
+elif [[ "$IS_CROUTON" == 1 ]]; then
   PS1='%{%F{yellow}%}%n@%m%f:'
 elif [ -z "$SSH_TTY" ]; then
   PS1='%{%F{green}%}%n@%m%f:'
