@@ -31,6 +31,8 @@
   editor = $EDITOR
   whitespace = fix,space-before-tab,tab-in-indent,trailing-space
   pager = less -r
+[diff]
+  algorithm = patience
 [help]
   autocorrect = 1
 [merge]
