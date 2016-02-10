@@ -152,10 +152,10 @@ Plug 'groenewege/vim-less', {
 
 " Javascript {{{
 " JSX support
-Plug 'pangloss/vim-javascript', {
+Plug 'othree/yajs.vim', {
 \   'for': ['javascript']
 \ }
-Plug 'mxw/vim-jsx', {
+Plug 'gavocanov/vim-js-indent', {
 \   'for': ['javascript']
 \ }
 " JS syntax for common libraries

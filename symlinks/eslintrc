@@ -1,16 +1,16 @@
 # vim: set filetype=yaml
 # Not using ES6 yet
 ecmaFeatures:
-  arrowFunctions: false
+  arrowFunctions: true
   binaryLiterals: false
-  blockBindings: false
-  classes: false
-  defaultParams: false
-  destructuring: false
+  blockBindings: true
+  classes: true
+  defaultParams: true
+  destructuring: true
   forOf: false
   generators: false
   modules: false
-  objectLiteralComputedProperties: false
+  objectLiteralComputedProperties: true
   objectLiteralDuplicateProperties: false
   objectLiteralShorthandMethods: false
   objectLiteralShorthandProperties: false
@@ -19,7 +19,7 @@ ecmaFeatures:
   regexYFlag: false
   spread: false
   superInFunctions: false
-  templateStrings: false
+  templateStrings: true
   unicodeCodePointEscapes: false
   globalReturn: false
   jsx: false
