@@ -262,7 +262,7 @@ endfunction
 " Use nicer symbols
 let g:markify_error_text = '✗'
 let g:markify_warning_text = '⚠'
-let g:markify_info_text = 'ℹ'
+let g:markify_info_text = '↳'
 
 " Clear out markify symbols with <c-l>
 nnoremap <silent> <C-L> :MarkifyClear<cr>:nohlsearch<cr><C-L>

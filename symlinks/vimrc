@@ -381,6 +381,12 @@ endif
 " }}}
 
 " Efficiency Shortcuts {{{
+" Save automatically all the time
+augroup autosave
+  autocmd!
+  autocmd CursorHoldI,InsertLeave <buffer> silent! :update
+augroup END
+
 " Use space as leader
 let mapleader=" "
 let maplocalleader=" "
