@@ -1,4 +1,6 @@
 apt-transport-https
+avahi-daemon
+avahi-discover
 build-essential
 curl
 elinks
