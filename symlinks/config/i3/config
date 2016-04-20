@@ -55,11 +55,9 @@ bindsym $mod+Shift+Down move down
 bindsym $mod+Shift+Up move up
 bindsym $mod+Shift+Right move right
 
-# tmux-like bindings for split in horizontal orientation
-bindsym $mod+- split h
-
-# tmux-like bindings for split in vertical orientation
-bindsym $mod+Shift+backslash split v
+# tmux-like bindings for split in vertical/horizontal orientation
+bindsym $mod+Shift+minus split v
+bindsym $mod+Shift+backslash split h
 
 # enter fullscreen mode for the focused container
 bindsym $mod+f fullscreen
@@ -96,6 +94,9 @@ bindsym $mod+0 workspace 10
 # mod-tab to cycle through workspaces
 bindsym $mod+Tab workspace next
 bindsym $mod+Shift+Tab workspace prev
+
+# Automatically return to last container when moving to containers by number
+workspace_auto_back_and_forth yes
 
 # move focused container to workspace
 bindsym $mod+Shift+1 move container to workspace 1
