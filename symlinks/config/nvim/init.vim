@@ -407,8 +407,8 @@ let g:gitgutter_diff_args='-w'
 " Use raw grep
 let g:gitgutter_escape_grep=1
 
-" Use highlighting as well as signs
-let g:gitgutter_highlight_lines=1
+" Don't highlight lines by default (use cogl to toggle)
+let g:gitgutter_highlight_lines=0
 
 " Be aggressive about looking for diffs
 let g:gitgutter_realtime=1
