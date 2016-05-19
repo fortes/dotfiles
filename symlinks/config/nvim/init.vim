@@ -19,6 +19,8 @@ Plug 'nathanaelkane/vim-indent-guides'
 " }}}
 
 " Editing {{{
+" Accent autocompletion via <C-X><C-U> or gx in normal mode
+Plug 'airblade/vim-accent'
 " Auto-close parens / quotes, requires no config
 Plug 'cohama/lexima.vim'
 " Motion via two-character combinations
