@@ -117,6 +117,14 @@ bindsym $mod+Shift+r restart
 # exit i3 (logs you out of your X session)
 bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'Exit i3?.' -b 'Yes' 'i3-msg exit'"
 
+# Use multimedia/Fx keys for sound
+bindsym XF86AudioMute exec --no-startup-id amixer set Master toggle
+bindsym F8 exec --no-startup-id amixer set Master toggle
+bindsym XF86AudioLowerVolume exec --no-startup-id amixer set Master 5%-
+bindsym F9 exec --no-startup-id amixer set Master 5%-
+bindsym XF86AudioRaiseVolume exec --no-startup-id amixer set Master 5%+
+bindsym F10 exec --no-startup-id amixer set Master 5%+
+
 # resize window (you can also use the mouse for that)
 mode "resize" {
   # These bindings trigger as soon as you enter the resize mode
