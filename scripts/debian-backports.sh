@@ -8,11 +8,13 @@ if [ "$DISTRO" = "Debian" ]; then
     exit 1
   fi
 
-  if ! grep -q backports /etc/apt/sources.list; then
+  # Instructions from https://backports.debian.org/Instructions/
+  BACKPORTS_FILE=/etc/apt/sources.list.d/jessie-backports.list
+  if [ ! -f $BACKPORTS_FILE ]; then
     echo "$XMARK Backports not in sources.list"
     echo "  $ARROW Adding backports to in sources.list (requires sudo)"
-    sudo add-apt-repository \
-      "deb http://http.debian.net/debian jessie-backports main"
+    echo "deb http://ftp.debian.org/debian jessie-backports main" | \
+      sudo tee $BACKPORTS_FILE
     echo "$CMARK Backports in sources.list, updating sources"
     sudo apt-get update
   fi
