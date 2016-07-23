@@ -160,7 +160,7 @@ augroup END
 set autochdir
 
 " Automatically write files on :next, :make, etc
-set autowrite
+set autowriteall
 
 " Automatically save on all changes
 augroup auto_save
@@ -384,7 +384,7 @@ endif
 " Save automatically all the time
 augroup autosave
   autocmd!
-  autocmd CursorHoldI,InsertLeave <buffer> silent! :update
+  autocmd FocusLost,InsertLeave <buffer> silent! :update
 augroup END
 
 " Use space as leader
