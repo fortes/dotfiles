@@ -34,7 +34,7 @@ if !has('nvim')
   set hlsearch
   " Show incremental search matches
   set incsearch
-  if version >= 704
+  if has('langmap') && (v:version > 704 || v:version == 704 && has('patch502'))
     " Disable langmap for characters from a mapping (on by default in neovim)
     set langnoremap
   endif
