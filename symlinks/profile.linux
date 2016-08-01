@@ -10,5 +10,5 @@ fi
 
 if command -v keychain &>/dev/null; then
   # Don't prompt for password
-  eval `keychain --eval --noask --agents ssh 2> /dev/null`
+  eval `keychain --eval --noask --agents ssh,gpg 2> /dev/null`
 fi
