@@ -26,7 +26,11 @@ for file in $DOTFILES/symlinks/*; do
     if [[ "$(readlink $target)" != $file ]]; then
       if [ -d "$target" ]; then
         echo "  $ARROW moving existing files in $target/"
-        mv "$target/*" "$file/." && rmdir "$target"
+        for ofile in $target/*; do
+          echo "    $ARROW moving $ofile"
+          mv "$ofile" "$file/."
+        done
+        rmdir "$target"
         ln -s "$file" "$target"
         echo "$CMARK $target linked"
       elif [ -n "$FORCE" ]; then
@@ -44,6 +48,7 @@ for file in $DOTFILES/symlinks/*; do
     echo "$CMARK $target linked"
   fi
 done
+exit
 
 if [ ! -f "$DOTFILES/symlinks/ssh/config" ]; then
   echo "  $ARROW Creating ~/.ssh/config"
