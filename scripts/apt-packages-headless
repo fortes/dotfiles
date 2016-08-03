@@ -1,6 +1,7 @@
 apt-transport-https
 avahi-daemon
 avahi-discover
+bash-completion
 build-essential
 curl
 elinks
