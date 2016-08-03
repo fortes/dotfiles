@@ -1,0 +1,44 @@
+# Include system defaults
+$include /etc/inputrc
+
+# Use vi mode
+set editing-mode vi
+
+# Keep vi insert mode tolerable with common shortcuts
+set keymap vi-insert
+"jj": vi-movement-mode
+"jk": vi-movement-mode
+"\C-a": beginning-of-line
+"\C-e": end-of-line
+"\C-l": clear-screen
+"\C-n": history-search-forward
+"\C-p": history-search-backward
+"\C-x\C-e": edit-and-execute-command
+Control-j: menu-complete
+Control-k: menu-complete-backward
+
+# Stop the ringing
+set bell-style none
+# Show colors when doing completion
+set colored-stats on
+# Use case-insensitive filename matching
+set completion-ignore-case on
+# Hide what's already been completed with ...
+set completion-prefix-display-length 1
+# Treat _ and - as equivalent when matching
+set completion-map-case on
+# Confirm if we really want completion past this many results
+set completion-query-items 300
+# Append on directories when completing
+set mark-directories on
+# Append slash on completed symlinks
+set mark-symlinked-directories on
+# Show what mode we are in (see if insert or command mode)
+set show-mode-in-prompt on
+# Show multiple matches right away
+set show-all-if-ambiguous on
+set show-all-if-unmodified on
+# Better matching when within a word
+set skip-completed-text on
+# Include file type in completion
+set visible-stats on
