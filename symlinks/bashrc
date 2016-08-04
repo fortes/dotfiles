@@ -44,7 +44,24 @@ fi
 # }}}
 
 # Simple prompt user@host:pwd $
-PS1="\[\e[31m\]\u@\h\[\e[m\]:\[\e[33m\]\w\[\e[m\] \$ "
+BASE_PROMPT="\[\e[31m\]\u@\h\[\e[m\]:\[\e[33m\]\w\[\e[m\]"
+JOB_COUNT="\[\e[1;34m\][\j]\[\e[m\] "
+# Add job count if non-zero
+export PROMPT_COMMAND='HAS_JOBS=$(jobs -p) '
+PS1="$BASE_PROMPT ""\${HAS_JOBS:+$JOB_COUNT}"
+
+if [ -f /etc/bash_completion.d/git-prompt ]; then
+  # Show colored hint about dirty state
+  export GIT_PS1_SHOWCOLORHINTS=1
+  # Show staged/unstaged changes marker
+  export GIT_PS1_SHOWDIRTYSTATE=1
+  # Show a $ next to branch name if something stashed
+  export GIT_PS1_SHOWSTASHSTATE=1
+  # Note untracked files
+  export GIT_PS1_SHOWUNTRACKEDFILES=1
+  source /etc/bash_completion.d/git-prompt
+  export PROMPT_COMMAND="HAS_JOBS=\`jobs -p\`; __git_ps1 \"$BASE_PROMPT\" \" \${HAS_JOBS:+$JOB_COUNT }\""
+fi
 
 # FZF keybindings
 if [ -f ~/.fzf.bash ]; then
