@@ -1,4 +1,0 @@
-# Default terminal color depth is pathetic
-if [[ $TERM == "xterm" ]]; then
-  export TERM=xterm-256color
-fi

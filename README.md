@@ -68,7 +68,7 @@ TODO: Automate these steps.
 
 ### EC2
 
-Manually set shell to zsh by editing `/etc/passwd`.
+* None?
 
 ### Chromebook
 

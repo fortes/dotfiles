@@ -91,9 +91,6 @@ source ~/.bashrc
 
 ("$HOME/dotfiles/scripts/node-setup.sh")
 
-# Setup shell
-("$HOME/dotfiles/scripts/zsh-setup.sh")
-
 # cmus
 if [ "$IS_HEADLESS" != 1 ]; then
   ("$HOME/dotfiles/scripts/cmus-setup.sh")
