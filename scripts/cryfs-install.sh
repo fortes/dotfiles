@@ -12,19 +12,19 @@ if [ ! -f "$APT_LIST_FILEPATH" ]; then
   echo "$ARROW Adding cryfs apt key (requires sudo)"
 
   # Add apt key
-  wget -O - https://www.cryfs.org/apt.key | sudo apt-key add -
+  wget -q -O - https://www.cryfs.org/apt.key | sudo apt-key add -
 
   echo "$ARROW Adding cryfs repository to sources.list (requires sudo)"
   echo "deb http://apt.cryfs.org/debian jessie main" | \
     sudo tee "$APT_LIST_FILEPATH"
 
   echo "$ARROW Updating sources (requires sudo)"
-  sudo apt-get update
+  sudo apt-get -q update
 fi
 
 if ! command -v cryfs > /dev/null; then
   echo "$ARROW Installing (requires sudo)"
-  sudo apt-get -y install cryfs
+  sudo apt-get -qqfuy install cryfs
 fi
 
 echo "$CMARK cryfs installed"

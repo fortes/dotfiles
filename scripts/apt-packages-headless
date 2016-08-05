@@ -5,6 +5,8 @@ bash-completion
 build-essential
 curl
 elinks
+encfs
+fuse
 git
 git-extras
 htop
