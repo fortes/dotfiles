@@ -174,10 +174,30 @@ elif [ "$OS" = "Linux" ] && command -v apt-get > /dev/null; then
   fi
   echo "$CMARK Git installed"
 elif [ "$DISTRO" = "Chromebook" ]; then
-  echo "Downloading crouton script to $HOME"
-  wget "https://goo.gl/fd3zc" -O "$HOME/crouton"
-  echo "Installing crouton bin tools (requires sudo)"
-  sudo sh "$HOME/crouton" -b
+  # Chromebook is pretty restricted, so let's do the bare minimum here and rely
+  # on crouton for the rest
+  DOTFILES_TARBALL="https://github.com/fortes/dotfiles/archive/master.tar.gz"
+  if [ -d "$DOTFILES" ]; then
+    rm -rf "$HOME/dotfiles"
+  fi
+
+  wget "$DOTFILES_TARBALL" -O "$HOME/dotfiles.tar.gz"
+  mkdir -p "$DOTFILES"
+  echo "$ARROW Downloading latest dotfiles to $DOTFILES"
+  tar zxf "$HOME/dotfiles.tar.gz" -C "$DOTFILES" --strip-components=1
+  rm "$HOME/dotfiles.tar.gz"
+  echo "$CMARK dotfiles updated"
+
+  echo "$ARROW Downloading crouton script to ~/Downloads/"
+  wget "https://goo.gl/fd3zc" -O "$HOME/Downloads/crouton" -q
+  echo "$ARROW Installing crouton bin tools (requires sudo)"
+  sudo sh "$HOME/Downloads/crouton" -b
+
+  echo "$ARROW Linking dotfiles"
+  (bash "$HOME/dotfiles/scripts/link-dotfiles.sh" -f)
+
+  echo "$CMARK Limited crosh setup complete"
+  exit
 else
   echo "$XMARK Sorry, but your system ($OS) is not supported"
   exit 1

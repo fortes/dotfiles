@@ -1,5 +1,5 @@
 #!/bin/bash
-source $HOME/dotfiles/scripts/helpers.sh
+source "$HOME/dotfiles/scripts/helpers.sh"
 
 show_help() {
   cat << EOF
@@ -23,7 +23,7 @@ ERRORS=''
 for file in $DOTFILES/symlinks/*; do
   target=$HOME/.`basename $file`
   if [ -e "$target" ]; then
-    if [[ "$(readlink $target)" != $file ]]; then
+    if [[ "$(readlink $target)" != "$file" ]]; then
       if [ -d "$target" ]; then
         echo "  $ARROW moving existing files in $target/"
         for ofile in $target/*; do
@@ -64,8 +64,8 @@ fi
 
 if [ -n "$ERRORS" ]; then
   # Use printf instead of echo since we have a trailing newline
-  >&2 printf "$ERRORS"
-  >&2 printf "\nOverwrite old files with '${0##*/} -f'\n"
+  >&2 printf "%s" "$ERRORS"
+  >&2 printf "\nOverwrite old files with '%s'\n" "${0##*/} -f"
   exit 1
 else
   echo "$CMARK All dotfiles files linked"
