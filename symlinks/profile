@@ -20,11 +20,6 @@ export CLICOLOR=1
 export VIRTUAL_ENV_DEFAULT_DIR=$HOME/.local/virtualenv
 # }}}
 
-# Locally-installed packages belong in path
-if echo ":$PATH:" | grep -vq ":$HOME/.local/bin:"; then
-  export PATH="$HOME/.local/bin:$PATH"
-fi
-
 # If available, we use git to list files from the root directory (not from the
 # current directory as in other fzf cases). Otherwise, fallback to ag
 export FZF_DEFAULT_COMMAND='(git ls-files -co --exclude-standard $(git rev-parse --show-toplevel) || ag -l -g "") 2> /dev/null'

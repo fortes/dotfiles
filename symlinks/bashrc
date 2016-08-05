@@ -35,6 +35,11 @@ if [ -f $VIRTUAL_ENV_DEFAULT_DIR/bin/activate ]; then
   VIRTUAL_ENV_DISABLE_PROMPT=1 . $VIRTUAL_ENV_DEFAULT_DIR/bin/activate
 fi
 
+# Locally-installed packages belong in path
+if echo ":$PATH:" | grep -vq ":$HOME/.local/bin:"; then
+  export PATH="$HOME/.local/bin:$PATH"
+fi
+
 # Make sure the terminal type we're using is supported (tmux-256color doesn't
 # work everywhere yet)
 if ! infocmp $TERM > /dev/null 2>&1; then
