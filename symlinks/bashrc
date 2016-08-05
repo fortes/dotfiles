@@ -6,6 +6,9 @@ case $- in
       *) return;;
 esac
 
+# Glorious editor
+set -o vi
+
 # Make sure we have always loaded ~/.profile
 if [ -z $PROFILE_LOADED ]; then
   source $HOME/.profile
