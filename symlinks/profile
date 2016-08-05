@@ -21,7 +21,7 @@ export VIRTUAL_ENV_DEFAULT_DIR=$HOME/.local/virtualenv
 # }}}
 
 # Locally-installed packages belong in path
-if ! echo ":$PATH:" | grep -q ":$HOME/.local/bin:"; then
+if echo ":$PATH:" | grep -vq ":$HOME/.local/bin:"; then
   export PATH="$HOME/.local/bin:$PATH"
 fi
 
@@ -36,19 +36,24 @@ export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export XDG_CACHE_HOME=$HOME/.cache
 export XDG_CONFIG_HOME=$HOME/.config
 
+# Helper function for sourcing a file only if it exists
+function sourceIfExists() {
+  for file in $@; do
+    if [ -f "$file" ]; then
+      source "$file"
+    fi
+  done
+}
+
+export -f sourceIfExists
+
 # OS overrides
 OS=`uname`
 if [ "$OS" = "Darwin" ]; then
-  if [ -f $HOME/.profile.osx ]; then
-    . $HOME/.profile.osx
-  fi
+  sourceIfExists "$HOME/.profile.osx"
 elif [ "$OS" = "Linux" ]; then
-  if [ -f $HOME/.profile.linux ]; then
-    . $HOME/.profile.linux
-  fi
+  sourceIfExists "$HOME/.profile.linux"
 fi
 
-# Local overrides if present
-if [ -f $HOME/.profile.local ]; then
-  . $HOME/.profile.local
-fi
+# Local overrides
+sourceIfExists "$HOME/.profile.local"

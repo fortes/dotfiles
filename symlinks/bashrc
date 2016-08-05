@@ -1,56 +1,105 @@
 # vim: ft=sh
 
+# If not running interactively, don't do anything
+case $- in
+    *i*) ;;
+      *) return;;
+esac
+
+# Make sure we have always loaded ~/.profile
+if [ -z $PROFILE_LOADED ]; then
+  source $HOME/.profile
+fi
+
+# make less more friendly for non-text input files, see lesspipe(1)
+[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+
 # For platform-specific conditions
 OS=`uname`
 
+# Remember a lot of stuff
+HISTFILE=$HOME/.bash_history
+HISTFILESIZE=5000
+HISTSIZE=2000
+SAVEHIST=$HISTSIZE
 # Don't put duplicate lines into history, ignore commands w/ initial space
-HISTCONTROL=ignoredup:ignorespace
+HISTCONTROL=ignoreboth:erasedups
 
-if [ -f $HOME/.shrc ]; then
-  source $HOME/.shrc
+# Activate default virtual env. Checking $VIRTUAL_ENV does not work here since
+# tmux sessions will get the env variable, but not the $PATH changes.
+if [ -f $VIRTUAL_ENV_DEFAULT_DIR/bin/activate ]; then
+  # This will modify the prompt, so do it before setting the prompt
+  VIRTUAL_ENV_DISABLE_PROMPT=1 . $VIRTUAL_ENV_DEFAULT_DIR/bin/activate
 fi
 
-# Bash options: {{{
-# Auto-correct typos
-shopt -s cdspell
+# Make sure the terminal type we're using is supported (tmux-256color doesn't
+# work everywhere yet)
+if ! infocmp $TERM > /dev/null 2>&1; then
+  if [[ "$TERM" = "tmux-256color" ]]; then
+    export TERM="screen-256color"
+  else
+    export TERM="xterm-256color"
+  fi
+fi
+
+# Nicer colors. BSD uses $LSCOLORS, linux uses $LS_COLORS
+OS=`uname`
+if [ "$OS" = "Linux" ]; then
+  export LS_COLORS='di=36;40:ln=35;40:so=31;40:pi=31;40:ex=1;32;40:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=36;01:ow=36;01:'
+else
+  export LSCOLORS=gxfxbxbxCxegedabagGxGx
+fi
+unset OS
+
+# Bash Options {{{
+# cd without typing cd
+shopt -qs autocd
+# Auto-correct directory typos
+shopt -qs cdspell
 # Check hash before executing
-shopt -s checkhash
+shopt -qs checkhash
+# Check for stopped jobs before exiting
+shopt -qs checkjobs
 # Check window size after each command, and update $LINES and $COLUMNS
 shopt -s checkwinsize
 # Save all lines of multiline commands
 shopt -s cmdhist
+# Expand directory names when doing file completion
+shopt -qs direxpand
+# Fix typos for directories in completion
+shopt -qs dirspell
 # Include filenames that begin with '.' in filename expansion
-shopt -s dotglob
+shopt -qs dotglob
+# Extended pattern matching
+shopt -qs extglob
+# Allow escape sequencing within ${parameter} expansions
+shopt -qs extquote
+# Support ** for expansion
+shopt -qs globstar
 # Append to history list. Allow editing of history substitution in readline
-# buffer
-shopt -s histappend histreedit histverify
+shopt -qs histappend histreedit histverify
+# Do hostname completion on words that contain @
+shopt -qs hostcomplete
 # Don't search path for completions when on an empty line
 shopt -s no_empty_cmd_completion
-# Case insensitive filename matching
-shopt -s nocaseglob
-# Not supported in ancient OS X version of bash
-if [ "${BASH_VERSION%.*}" \> "4.2" ]; then
-  # CD into dir as command
-  shopt -s autocd
-  # Warn about stopped jobs before exiting
-  shopt -s checkjobs
-  # Replace directory names when doing tab completion
-  shopt -s direxpand
-  # Spell check on directory names
-  shopt -s dirspell
-  # Use ** for nice filename matching
-  shopt -s globstar
-fi
+# Case insensitive glob matching and case statements
+shopt -s nocaseglob nocasematch
 # }}}
 
-# Simple prompt user@host:pwd $
-BASE_PROMPT="\[\e[31m\]\u@\h\[\e[m\]:\[\e[33m\]\w\[\e[m\]"
-JOB_COUNT="\[\e[1;34m\][\j]\[\e[m\] "
+# Hide normal username
+if [ `whoami` != 'fortes' ]; then
+  BASE_PROMPT="\[\e[34m\]\u@\[\e[m\]"
+else
+  BASE_PROMPT=""
+fi
+# [user@]host:pwd $
+BASE_PROMPT="$BASE_PROMPT\[\e[34m\]\h\[\e[m\]:\[\e[33m\]\w\[\e[m\]"
+JOB_COUNT="\[\e[36m\][\j]\[\e[m\]\033[0m "
 # Add job count if non-zero
 export PROMPT_COMMAND='HAS_JOBS=$(jobs -p) '
 PS1="$BASE_PROMPT ""\${HAS_JOBS:+$JOB_COUNT}"
 
-if [ -f /etc/bash_completion.d/git-prompt ]; then
+if [ -r /etc/bash_completion.d/git-prompt ]; then
   # Show colored hint about dirty state
   export GIT_PS1_SHOWCOLORHINTS=1
   # Show staged/unstaged changes marker
@@ -60,26 +109,24 @@ if [ -f /etc/bash_completion.d/git-prompt ]; then
   # Note untracked files
   export GIT_PS1_SHOWUNTRACKEDFILES=1
   source /etc/bash_completion.d/git-prompt
-  export PROMPT_COMMAND="HAS_JOBS=\`jobs -p\`; __git_ps1 \"$BASE_PROMPT\" \" \${HAS_JOBS:+$JOB_COUNT }\""
+  export PROMPT_COMMAND="HAS_JOBS=\`jobs -p\`; __git_ps1 \"$BASE_PROMPT\" \" \${HAS_JOBS:+$JOB_COUNT }\" \" %s\""
 fi
 
 # FZF keybindings
-if [ -f ~/.fzf.bash ]; then
-  source ~/.fzf.bash
-fi
+sourceIfExists "$HOME/.fzf.bash"
+
+# Load system bash completion
+sourceIfExists /usr/share/bash-completion/bash_completion
+
+# Load aliases
+sourceIfExists "$HOME/.aliases"
 
 # Load OS-specific files
 if [[ $OS == "Darwin" ]]; then
-  if [ -f $HOME/.bashrc.osx ]; then
-    source $HOME/.bashrc.osx
-  fi
+  sourceIfExists "$HOME/.bashrc.osx"
 elif [[ $OS == "Linux" ]]; then
-  if [ -f $HOME/.bashrc.linux ]; then
-    source $HOME/.bashrc.linux
-  fi
+  sourceIfExists "$HOME/.bashrc.linux"
 fi
 
-# Load local file if present
-if [ -f $HOME/.bashrc.local ]; then
-  source $HOME/.bashrc.local
-fi
+# Load local file
+sourceIfExists "$HOME/.bashrc.local"
