@@ -32,8 +32,6 @@ Plug 'cohama/lexima.vim'
 " For text objects, use z (s taken by surround.vim)
 " {action}z{char}{char}
 Plug 'justinmk/vim-sneak'
-" Snippet support, see configuration below
-Plug 'SirVer/ultisnips'
 " Comment / uncomment things quickly
 " {Visual}gc comment / uncomment selection
 " - gc{motion} comment / uncomment lines for motion
@@ -99,9 +97,6 @@ Plug 'junegunn/vim-peekaboo'
 " }}}
 
 " General coding {{{
-Plug 'fortes/vim-personal-snippets'
-" Temporary while editing
-"Plug '~/x/vim-personal-snippets/'
 " async :make via NeoVim job control, replaces syntastic for showing errors
 " Provides :Neomake and :Neomake!
 " Only load on first use of :Neomake command
@@ -366,15 +361,6 @@ else
   endif
   " }}}
 end
-" }}}
-
-" UltiSnips {{{
-" Use tab to expand snippet and move to next target. Shift tab goes back.
-" <C-k> lists available snippets for the file
-let g:UltiSnipsExpandTrigger="<tab>"
-let g:UltiSnipsListSnippets="<C-k>"
-let g:UltiSnipsJumpForwardTrigger="<tab>"
-let g:UltiSnipsJumpBackwardTrigger="<S-tab>"
 " }}}
 
 " Autopairs {{{
