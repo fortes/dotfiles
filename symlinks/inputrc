@@ -14,6 +14,8 @@ set keymap vi-insert
 "\C-n": history-search-forward
 "\C-p": history-search-backward
 "\C-x\C-e": edit-and-execute-command
+# Auto expand history
+Space: magic-space
 Control-j: menu-complete
 Control-k: menu-complete-backward
 
