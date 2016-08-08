@@ -1,9 +1,9 @@
 #!/bin/bash
 echo "Downloading latest rclone"
-TEMP_DIR=$(mktemp -d)
+TEMP_DIR=$(mktemp -d /tmp/rcloneXXX)
 pushd "$TEMP_DIR" > /dev/null
-wget -q -O /tmp/rclone.zip "http://downloads.rclone.org/rclone-current-linux-amd64.zip"
-unzip -j /tmp/rclone.zip
+wget -q -O "$TEMP_DIR/rclone.zip" "http://downloads.rclone.org/rclone-current-linux-amd64.zip"
+unzip -j "$TEMP_DIR/rclone.zip"
 chmod +x rclone
 mv rclone "$HOME/.local/bin/."
 popd > /dev/null
