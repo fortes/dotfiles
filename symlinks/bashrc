@@ -28,13 +28,6 @@ SAVEHIST=$HISTSIZE
 # Don't put duplicate lines into history, ignore commands w/ initial space
 HISTCONTROL=ignoreboth:erasedups
 
-# Activate default virtual env. Checking $VIRTUAL_ENV does not work here since
-# tmux sessions will get the env variable, but not the $PATH changes.
-if [ -f $VIRTUAL_ENV_DEFAULT_DIR/bin/activate ]; then
-  # This will modify the prompt, so do it before setting the prompt
-  VIRTUAL_ENV_DISABLE_PROMPT=1 . $VIRTUAL_ENV_DEFAULT_DIR/bin/activate
-fi
-
 # Locally-installed packages belong in path
 if echo ":$PATH:" | grep -vq ":$HOME/.local/bin:"; then
   export PATH="$HOME/.local/bin:$PATH"
@@ -125,6 +118,15 @@ sourceIfExists "$HOME/.fzf.bash"
 
 # Load system bash completion
 sourceIfExists /usr/share/bash-completion/bash_completion
+
+# Activate default virtual env. Checking $VIRTUAL_ENV does not work here since
+# tmux sessions will get the env variable, but not the $PATH changes.
+# Note that we do this after manipulating the path (and loading fzf), otherwise
+# we will lose all path changes on deactivation
+if [ -f $VIRTUAL_ENV_DEFAULT_DIR/bin/activate ]; then
+  # This will modify the prompt, so do it before setting the prompt
+  VIRTUAL_ENV_DISABLE_PROMPT=1 . $VIRTUAL_ENV_DEFAULT_DIR/bin/activate
+fi
 
 # Load aliases
 sourceIfExists "$HOME/.aliases"
