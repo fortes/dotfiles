@@ -91,7 +91,7 @@ shopt -s nocaseglob nocasematch
 if [ `whoami` != 'fortes' ]; then
   BASE_PROMPT="\[\e[34m\]\u@\[\e[m\]"
 else
-  BASE_PROMPT=""
+  BASE_PROMPT="\["
 fi
 # [user@]host:pwd $
 BASE_PROMPT="$BASE_PROMPT\[\e[34m\]\h\[\e[m\]:\[\e[33m\]\w\[\e[m\]"
