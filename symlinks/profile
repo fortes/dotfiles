@@ -26,6 +26,16 @@ export FZF_DEFAULT_COMMAND='(git ls-files -co --exclude-standard $(git rev-parse
 export FZF_DEFAULT_OPTS="--extended"
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
+# Case insensitive by default
+export FZF_COMPLETION_OPTS='-i'
+
+# Use ag for faster default find command for listing candidates
+if [ -d "$HOME/.local/source/fzf/" ]; then
+  _fzf_compgen_path() {
+    ag -g "" "$1"
+  }
+fi
+
 # Store config/cache files in default locations, but declare variables for use
 # on platforms that don't (ahem, Mac OS)
 export XDG_CACHE_HOME=$HOME/.cache
