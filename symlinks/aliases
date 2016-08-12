@@ -31,9 +31,15 @@ alias mv='mv -i'
 # CD into root of git project
 alias pcd="cd \$(git rev-parse --show-toplevel 2>/dev/null || echo '.')"
 
-# CD into a directory within the project, selecting via fzf
 if command -v fzf > /dev/null; then
+  # CD into a directory within the project, selecting via fzf
   alias cdp="cd \$(git ls-files \$(git rev-parse --show-toplevel) | xargs -n1 dirname | sort | uniq | fzf || echo '.')"
+
+  # Fuzzy find to show/edit lastpass entry
+  alias lshow="lpass show \$(lpass ls | fzf | awk '{print \$(NF)}' | sed 's/\]//g')"
+  alias ledit="lpass edit \$(lpass ls | fzf | awk '{print \$(NF)}' | sed 's/\]//g')"
+  # Backup LastPass database, sadly there is no import in command line tool
+  alias lbackup="lpass export | gpg --symmetric > lpass-backup.gpg"
 fi
 
 # Add current project NPM to path

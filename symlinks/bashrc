@@ -119,6 +119,8 @@ sourceIfExists "$HOME/.fzf.bash"
 # Load system bash completion
 sourceIfExists /usr/share/bash-completion/bash_completion
 
+sourceIfExists "$HOME/.local/completions.d/*"
+
 # Activate default virtual env. Checking $VIRTUAL_ENV does not work here since
 # tmux sessions will get the env variable, but not the $PATH changes.
 # Note that we do this after manipulating the path (and loading fzf), otherwise
