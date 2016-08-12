@@ -4,6 +4,7 @@ avahi-discover
 bash-completion
 build-essential
 curl
+dnsutils
 elinks
 encfs
 fuse
