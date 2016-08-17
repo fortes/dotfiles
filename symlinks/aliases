@@ -35,11 +35,16 @@ if command -v fzf > /dev/null; then
   # CD into a directory within the project, selecting via fzf
   alias cdp="cd \$(git ls-files \$(git rev-parse --show-toplevel) | xargs -n1 dirname | sort | uniq | fzf || echo '.')"
 
-  # Fuzzy find to show/edit lastpass entry
-  alias lshow="lpass show \$(lpass ls | fzf | awk '{print \$(NF)}' | sed 's/\]//g')"
-  alias ledit="lpass edit \$(lpass ls | fzf | awk '{print \$(NF)}' | sed 's/\]//g')"
-  # Backup LastPass database, sadly there is no import in command line tool
-  alias lbackup="lpass export | gpg --symmetric > lpass-backup.gpg"
+  if command -v lpass > /dev/null; then
+    # Fuzzy find to show/edit lastpass entry
+    alias lshow="lpass show \$(lpass ls | fzf | awk '{print \$(NF)}' | sed 's/\]//g')"
+    alias ledit="lpass edit \$(lpass ls | fzf | awk '{print \$(NF)}' | sed 's/\]//g')"
+    # Backup LastPass database, sadly there is no import in command line tool
+    alias lbackup="lpass export | gpg --symmetric > lpass-backup.gpg"
+  fi
+
+  # Fuzzy find for killing processes
+  alias fkill="kill \$(ps afx | fzf | cut -f1 -d' ')"
 fi
 
 # Add current project NPM to path
