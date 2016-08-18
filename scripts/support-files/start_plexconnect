@@ -1,4 +1,0 @@
-#!/bin/sh
-test -f /etc/default/plexconnect && . /etc/default/plexconnect
-
-(cd /usr/local/plexconnect/; ./PlexConnect.py)

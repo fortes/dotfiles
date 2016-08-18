@@ -1,7 +1,0 @@
-# default script for Plex Media Server
-
-# the user that PMS should run as, defaults to 'plex'
-# note that if you change this you might need to move
-# the Application Support directory to not lose your
-# media library
-PLEX_CONNECT_USER=plexconnect
