@@ -12,6 +12,11 @@ fi
 EDITOR=$VISUAL
 export EDITOR VISUAL
 
+if command -v most > /dev/null; then
+  export PAGER=most
+  export MANPAGER=most
+fi
+
 # Tell ls to use colors by default (only works on Mac/BSD)
 export CLICOLOR=1
 

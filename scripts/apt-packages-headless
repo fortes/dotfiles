@@ -15,6 +15,7 @@ keychain
 libssl-dev
 lsb-release
 mosh
+most
 openssh-server
 python3-dev
 python3-virtualenv
