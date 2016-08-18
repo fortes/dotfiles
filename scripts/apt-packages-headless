@@ -1,4 +1,5 @@
 apt-transport-https
+autossh
 avahi-daemon
 avahi-discover
 bash-completion

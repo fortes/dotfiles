@@ -52,6 +52,9 @@ if command -v npm > /dev/null; then
   alias npath='export PATH=$(npm bin):$PATH'
 fi
 
+# Autossh as a way to keep ports open
+alias autossh-forward="autossh -M 0 -f -T -N"
+
 # Map ls to be colorful
 if [ $OS = "Darwin" ]; then
   alias ls='ls -GpFh'
