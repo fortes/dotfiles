@@ -5,18 +5,7 @@ set -eo pipefail
 source "$HOME/.profile.local"
 source "$HOME/dotfiles/scripts/helpers.sh"
 
-# Install Homebrew
-if [ "$OS" == "Darwin" ]; then
-  # Brew cask
-  if ! isHomebrewTapInstalled caskroom/cask; then
-    echo "$XMARK Cask not setup"
-    echo "  $ARROW Tapping & installing caskroom"
-    brew tap caskroom/cask
-    brew install brew-cask
-    brew cask
-  fi
-  echo "$CMARK Homebrew cask setup"
-elif [ "$DISTRO" = "Chromebook" ]; then
+if [ "$DISTRO" = "Chromebook" ]; then
   echo "$XMARK Chromebook setup not complete yet"
   return 1
 elif [ "$OS" == "Linux" ]; then
@@ -29,56 +18,22 @@ elif [ "$OS" == "Linux" ]; then
   export DEBIAN_FRONTEND=noninteractive
 fi
 
-# Mac OS Settings
- if [ "$OS" == "Darwin" ]; then
-   # Show percent remaining for battery
-   defaults write com.apple.menuextra.battery ShowPercent -string "YES"
-
-   # Don't require password right away after sleep
-   defaults write com.apple.screensaver askForPassword -int 1
-   defaults write com.apple.screensaver askForPasswordDelay -int 300
-
-   # Show all filename extensions in Finder
-   defaults write NSGlobalDomain AppleShowAllExtensions -bool true
- fi
-
-# Install homebrew packages
-if [ "$OS" == "Darwin" ]; then
-  # Install python with up-to-date OpenSSL
-  if ! isHomebrewPackageInstalled python; then
-    brew install python --with-brewed-openssl
-    pip install -q --upgrade setuptools pip virtualenv
-    echo "$CMARK Python installed"
-  fi
-
-  brew update > /dev/null
-  installHomebrewPackagesIfMissing \
-    "$(xargs <  "$HOME/dotfiles/scripts/brew-packages")"
-  echo "$CMARK Homebrew packages installed"
-
-  # Install cask packages
-  brew cask update > /dev/null
-  installHomebrewCaskPackagesIfMissing \
-    "$(xargs < "$HOME/dotfiles/scripts/cask-packages")"
-  echo "$CMARK Cask packages installed"
-elif [ "$OS" == "Linux" ]; then
-  if [ "$IS_EC2" != 1 ] && [ "$IS_DOCKER" != 1 ]; then
-    ("$HOME/dotfiles/scripts/debian-keyboard.sh" || true)
-  fi
-
-  if [ "$IS_CROUTON" == 1 ]; then
-    "$HOME/dotfiles/scripts/locale-gen.sh"
-  fi
-
-  PACKAGES=$(xargs < "$HOME/dotfiles/scripts/apt-packages-headless")
-  if [ "$IS_HEADLESS" != 1 ]; then
-    # GUI-only packages
-    PACKAGES="$PACKAGES $(xargs < "$HOME/dotfiles/scripts/apt-packages")"
-  fi
-
-  installAptPackagesIfMissing "$PACKAGES"
-  echo "$CMARK apt packages installed"
+if [ "$IS_EC2" != 1 ] && [ "$IS_DOCKER" != 1 ]; then
+  ("$HOME/dotfiles/scripts/debian-keyboard.sh" || true)
 fi
+
+if [ "$IS_CROUTON" == 1 ]; then
+  "$HOME/dotfiles/scripts/locale-gen.sh"
+fi
+
+PACKAGES=$(xargs < "$HOME/dotfiles/scripts/apt-packages-headless")
+if [ "$IS_HEADLESS" != 1 ]; then
+  # GUI-only packages
+  PACKAGES="$PACKAGES $(xargs < "$HOME/dotfiles/scripts/apt-packages")"
+fi
+
+installAptPackagesIfMissing "$PACKAGES"
+echo "$CMARK apt packages installed"
 
 # Link missing dotfiles
 ("$HOME/dotfiles/scripts/link-dotfiles.sh" -f)

@@ -40,9 +40,8 @@ if [ "$OS" = "Linux" ]; then
     VERSION="Unknown"
   fi
 elif [ "$OS" = "Darwin" ]; then
-  # TODO: Detect version
-  DISTRO="Mac"
-  VERSION="El Capitan"
+  echo "$XMARK Mac OS X no longer supported"
+  exit 1
 else
   # What strange machine is this running on?
   DISTRO="Unknown"
@@ -52,7 +51,7 @@ fi
 # Cheap way to check if we're on a machine with an active GUI, note that this
 # will give a false positive if logged into the virtual console, but that's
 # likely what the caller wants if they bothered to go the vconsole.
-if [ -z "$DISPLAY" ] && [ "$OS" != "Darwin" ]; then
+if [ -z "$DISPLAY" ]; then
   IS_HEADLESS=1
 else
   IS_HEADLESS=0
@@ -110,41 +109,7 @@ DOTFILES="$HOME/dotfiles"
 
 # First, we need to make sure we have the bare minimums to install things on
 # this system
-if [ "$OS" = "Darwin" ]; then
-  # First time running Make on MacOS requires agreeing to a license agreement,
-  # which you must agree to via sudo.
-  #
-  # If run make after doing the agreement (or on a sane system), you'll get a
-  # message that looks like:
-  #
-  #   make: *** No targets specified and no makefile found. Stop.
-  #
-  # Note that this goes out on stderr, so we pipe stderr to stdout to grep
-  if make 2>&1 | grep -qv 'no makefile'; then
-    echo "$XMARK Must agree to license agreement"
-    echo "Run 'sudo make' then try this script again"
-    exit 1
-  fi
-
-  # For Mac OS, that means we need to get Homebrew installed, along with the
-  # XCode build tools, if necessary
-  if ! command -v brew > /dev/null; then
-    # El Capitan no longer lets /usr/local be writable, change that
-    echo "Changing ownership of /usr/local to $(whoami) (requires sudo)"
-    sudo chown -R "$(whoami):admin" /usr/local
-    # Install Homebrew
-    echo "Homebrew not installed. Installing (will take a while) ..."
-    ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-  fi
-  echo "$CMARK Homebrew installed"
-
-  # Finally, make sure we have git
-  if ! command -v git > /dev/null; then
-    echo "Installing git ..."
-    brew install git
-  fi
-  echo "$CMARK Git installed"
-elif [ "$OS" = "Linux" ] && command -v apt-get > /dev/null; then
+if [ "$OS" = "Linux" ] && command -v apt-get > /dev/null; then
   # Don't want installs to wait on user interaction
   export DEBIAN_FRONTEND=noninteractive
 

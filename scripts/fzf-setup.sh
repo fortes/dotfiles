@@ -7,10 +7,7 @@ FZF_SOURCE_DIR=$HOME/.local/source/fzf
 if ! command -v fzf > /dev/null; then
   echo "$XMARK FZF not installed"
 
-  if [ "$OS" = 'Darwin' ]; then
-    echo "  $ARROW Installing FZF"
-    brew reinstall --HEAD fzf
-  elif [ ! -d "$FZF_SOURCE_DIR" ]; then
+  if [ ! -d "$FZF_SOURCE_DIR" ]; then
     echo "  $ARROW Installing FZF"
     git clone --depth 1 https://github.com/junegunn/fzf.git "$FZF_SOURCE_DIR"
   else
@@ -21,11 +18,7 @@ fi
 
 echo "$CMARK FZF installed"
 
-if [ "$OS" = 'Darwin' ]; then
-  echo "  $ARROW Running FZF install script"
-  $(brew info fzf | grep /install) --completion --key-bindings \
-    --no-update-rc > /dev/null
-elif [ -d "$FZF_SOURCE_DIR" ]; then
+if [ -d "$FZF_SOURCE_DIR" ]; then
   echo "$ARROW Updating FZF"
   pushd "$FZF_SOURCE_DIR" > /dev/null
   git pull > /dev/null

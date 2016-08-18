@@ -52,34 +52,23 @@ if command -v npm > /dev/null; then
   alias npath='export PATH=$(npm bin):$PATH'
 fi
 
+if command -v docker > /dev/null; then
+  # Always use docker with sudo
+  alias docker="sudo docker"
+fi
+
 # Autossh as a way to keep ports open
 alias autossh-forward="autossh -M 0 -f -T -N"
 
 # Map ls to be colorful
-if [ $OS = "Darwin" ]; then
-  alias ls='ls -GpFh'
-  alias la='ls -AGpFh'
-else
-  alias ls='ls --color=auto -GpFh'
-  alias la='ls --color=auto -AGpFh'
-fi
+alias ls='ls --color=auto -GpFh'
+alias la='ls --color=auto -AGpFh'
 
 # Shortcuts for copying from tmux clipboard to system clipboard
 if command -v pbcopy > /dev/null; then
   alias tcopy='tmux save-buffer - | pbcopy'
 elif command -v xclip > /dev/null; then
   alias tcopy='tmux save-buffer - | xclip -i -sel clipboard'
-fi
-
-# Load platform files if present
-if [[ $OS == "Darwin" ]]; then
-  if [ -f $HOME/.aliases.osx ]; then
-    . $HOME/.aliases.osx
-  fi
-elif [[ $OS == "Linux" ]]; then
-  if [ -f $HOME/.aliases.linux ]; then
-    . $HOME/.aliases.linux
-  fi
 fi
 
 # Load local file if present

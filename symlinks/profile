@@ -17,9 +17,6 @@ if command -v most > /dev/null; then
   export MANPAGER=most
 fi
 
-# Tell ls to use colors by default (only works on Mac/BSD)
-export CLICOLOR=1
-
 # VirtualEnv {{{
 # Centralized location for new virtual environments
 export VIRTUAL_ENV_DEFAULT_DIR=$HOME/.local/virtualenv
@@ -41,11 +38,6 @@ if [ -d "$HOME/.local/source/fzf/" ]; then
   }
 fi
 
-# Store config/cache files in default locations, but declare variables for use
-# on platforms that don't (ahem, Mac OS)
-export XDG_CACHE_HOME=$HOME/.cache
-export XDG_CONFIG_HOME=$HOME/.config
-
 # Helper function for sourcing a file only if it exists
 function sourceIfExists() {
   for file in $@; do
@@ -57,12 +49,19 @@ function sourceIfExists() {
 
 export -f sourceIfExists
 
-# OS overrides
-OS=`uname`
-if [ "$OS" = "Darwin" ]; then
-  sourceIfExists "$HOME/.profile.osx"
-elif [ "$OS" = "Linux" ]; then
-  sourceIfExists "$HOME/.profile.linux"
+if [ ! -z $DISPLAY ] && command -v setxkbmap > /dev/null; then
+  # Use Caps Lock as another Control Key
+  setxkbmap -layout us -option ctrl:nocaps
+
+  # Swap Alt and Windows Keys
+  setxkbmap -layout us -option altwin:left_meta_win
+fi
+
+if command -v keychain &>/dev/null; then
+  # Don't prompt for password to load id_rsa if not already loaded
+  eval `keychain --eval --noask --agents ssh 2> /dev/null`
+else
+  sourceIfExists "$HOME/.bashrc.ssh-agent"
 fi
 
 # Local overrides

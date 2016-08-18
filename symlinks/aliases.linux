@@ -1,3 +1,0 @@
-# vim:ft=sh
-# Always use docker with sudo
-alias docker="sudo docker"

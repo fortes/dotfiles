@@ -43,13 +43,8 @@ if ! infocmp $TERM > /dev/null 2>&1; then
   fi
 fi
 
-# Nicer colors. BSD uses $LSCOLORS, linux uses $LS_COLORS
-OS=`uname`
-if [ "$OS" = "Linux" ]; then
-  export LS_COLORS='di=36;40:ln=35;40:so=31;40:pi=31;40:ex=1;32;40:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=36;01:ow=36;01:'
-else
-  export LSCOLORS=gxfxbxbxCxegedabagGxGx
-fi
+# Nicer colors
+export LS_COLORS='di=36;40:ln=35;40:so=31;40:pi=31;40:ex=1;32;40:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=36;01:ow=36;01:'
 unset OS
 
 # Bash Options {{{
@@ -132,13 +127,6 @@ fi
 
 # Load aliases
 sourceIfExists "$HOME/.aliases"
-
-# Load OS-specific files
-if [[ $OS == "Darwin" ]]; then
-  sourceIfExists "$HOME/.bashrc.osx"
-elif [[ $OS == "Linux" ]]; then
-  sourceIfExists "$HOME/.bashrc.linux"
-fi
 
 # Load local file
 sourceIfExists "$HOME/.bashrc.local"

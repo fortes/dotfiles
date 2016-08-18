@@ -5,12 +5,7 @@ source "$HOME/dotfiles/scripts/helpers.sh"
 if ! command -v nvim > /dev/null; then
   echo "$XMARK Neovim not installed"
 
-  if [ "$OS" = 'Darwin' ]; then
-    echo "  $ARROW Adding NeoVim tap to Homebrew"
-    brew tap neovim/homebrew-neovim > /dev/null 2> /dev/null
-    echo "  $ARROW Installing latest NeoVim from HEAD"
-    brew install --HEAD neovim 2> /dev/null
-  elif command -v apt-get > /dev/null; then
+  if command -v apt-get > /dev/null; then
     # Debian can use the Ubuntu PPAs, but map to xenial (unstable)
     if [ "$DISTRO" = "Ubuntu" ]; then
       sudo add-apt-repository -y ppa:neovim-ppa/unstable > /dev/null
@@ -32,18 +27,6 @@ if ! command -v nvim > /dev/null; then
   else
     echo "$XMARK Platform not supported"
     exit 1
-  fi
-else
-  if [ "$OS" == "Darwin" ]; then
-    read -p "NeoVim already installed. Update from HEAD [yn]? " -n 1 -r
-    echo ""
-    if [[ $REPLY =~ [Yy]$ ]]; then
-      echo "  $ARROW Updating to latest NeoVim"
-      brew update
-      brew reinstall --HEAD neovim
-    else
-      echo "Skipping NeoVim update"
-    fi
   fi
 fi
 

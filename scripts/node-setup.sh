@@ -2,31 +2,27 @@
 set -ef -o pipefail
 source "$HOME/dotfiles/scripts/helpers.sh"
 
-if [ "$DISTRO" = "Mac" ]; then
-  installHomebrewPackagesIfMissing node
-else
-  if ! command -v nodejs > /dev/null; then
-    if command -v apt-get > /dev/null; then
-      echo "$ARROW Adding $DISTRO nodesource PPA (requires sudo)"
-      curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | \
-        sudo apt-key add -
-      sudo add-apt-repository -y "deb https://deb.nodesource.com/node_6.x ${VERSION,,} main"
+if ! command -v nodejs > /dev/null; then
+  if command -v apt-get > /dev/null; then
+    echo "$ARROW Adding $DISTRO nodesource PPA (requires sudo)"
+    curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | \
+      sudo apt-key add -
+    sudo add-apt-repository -y "deb https://deb.nodesource.com/node_6.x ${VERSION,,} main"
 
-      sudo apt-get update
-      echo "$ARROW Installing node (requires sudo)"
-      installAptPackagesIfMissing nodejs
+    sudo apt-get update
+    echo "$ARROW Installing node (requires sudo)"
+    installAptPackagesIfMissing nodejs
 
-      if command -v update-alternatives > /dev/null; then
-        if ! command -v node > /dev/null; then
-          echo "$ARROW Updating alternatives to set symlinks for nodejs to node"
-          sudo update-alternatives --install /usr/bin/node node "$(command -v nodejs)" 10
-          echo "$CMARK System alternatives updated"
-        fi
+    if command -v update-alternatives > /dev/null; then
+      if ! command -v node > /dev/null; then
+        echo "$ARROW Updating alternatives to set symlinks for nodejs to node"
+        sudo update-alternatives --install /usr/bin/node node "$(command -v nodejs)" 10
+        echo "$CMARK System alternatives updated"
       fi
-    else
-      echo "$XMARK Unsupported platform for node install"
-      exit 1
     fi
+  else
+    echo "$XMARK Unsupported platform for node install"
+    exit 1
   fi
 fi
 

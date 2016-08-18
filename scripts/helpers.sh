@@ -35,70 +35,6 @@ fi
 # }}}
 
 # Helper functions {{{
-isHomebrewTapInstalled() {
-  if brew tap | grep -i "$1" > /dev/null; then
-    return 0
-  else
-    return 1
-  fi
-}
-
-isHomebrewPackageInstalled() {
-  if brew list "$1" > /dev/null 2> /dev/null; then
-    return 0
-  else
-    return 1
-  fi
-}
-
-isHomebrewCaskPackageInstalled() {
-  if brew cask list "$1" > /dev/null 2> /dev/null; then
-    return 0
-  else
-    return 1
-  fi
-}
-
-installHomebrewCaskPackagesIfMissing() {
-  PACKAGES=''
-
-  for package in $@; do
-    if ! isHomebrewCaskPackageInstalled "$package"; then
-      echo "$XMARK Cask package $package not installed"
-      PACKAGES="$PACKAGES $package"
-    else
-      echo "$CMARK Cask package $package installed"
-    fi
-  done
-
-  if [ "$PACKAGES" != "" ]; then
-    PACKAGES=$(echo "$PACKAGES" | xargs)
-    echo "  $ARROW Installing$PACKAGES (requires sudo)"
-    brew cask install "$PACKAGES"
-    echo "$CMARK $PACKAGES installed"
-  fi
-}
-
-installHomebrewPackagesIfMissing() {
-  PACKAGES=''
-
-  for package in $@; do
-    if ! isHomebrewPackageInstalled "$package"; then
-      echo "$XMARK Brew package $package not installed"
-      PACKAGES="$PACKAGES $package"
-    else
-      echo "$CMARK Brew package $package installed"
-    fi
-  done
-
-  if [ "$PACKAGES" != "" ]; then
-    PACKAGES=$(echo "$PACKAGES" | xargs)
-    echo "  $ARROW Installing $PACKAGES (requires sudo)"
-    brew install $PACKAGES
-    echo "$CMARK $PACKAGES installed"
-  fi
-}
-
 isAptPackageInstalled() {
   if dpkg -s "$1" > /dev/null 2> /dev/null; then
     return 0
@@ -126,6 +62,5 @@ installAptPackagesIfMissing() {
   fi
 }
 
-export -f isHomebrewPackageInstalled isHomebrewTapInstalled \
-  installAptPackagesIfMissing installHomebrewPackagesIfMissing
+export -f installAptPackagesIfMissing
 # }}}
