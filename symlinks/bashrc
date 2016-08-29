@@ -82,15 +82,29 @@ shopt -s no_empty_cmd_completion
 shopt -s nocaseglob nocasematch
 # }}}
 
+BLACK="\[$(tput setaf 0)\]"
+RED="\[$(tput setaf 1)\]"
+GREEN="\[$(tput setaf 2)\]"
+YELLOW="\[$(tput setaf 3)\]"
+BLUE="\[$(tput setaf 4)\]"
+MAGENTA="\[$(tput setaf 5)\]"
+CYAN="\[$(tput setaf 6)\]"
+WHITE="\[$(tput setaf 7)\]"
+BOLD="\[$(tput bold)\]"
+DIM="\[$(tput dim)\]"
+UNDERLINE="\[$(tput smul)\]"
+STANDOUT="\[$(tput smso)\]"
+RESET="\[$(tput sgr0)\]"
+
 # Hide normal username
 if [ `whoami` != 'fortes' ]; then
-  BASE_PROMPT="\[\e[34m\]\u@\[\e[m\]"
+  BASE_PROMPT="$RED\u@"
 else
-  BASE_PROMPT="\["
+  BASE_PROMPT=""
 fi
 # [user@]host:pwd $
-BASE_PROMPT="$BASE_PROMPT\[\e[34m\]\h\[\e[m\]:\[\e[33m\]\w\[\e[m\]"
-JOB_COUNT="\[\e[36m\][\j]\[\e[m\]\033[0m "
+BASE_PROMPT="$BASE_PROMPT$CYAN\h:$YELLOW\w$RESET"
+JOB_COUNT="$BOLD$BLUE[\j]$RESET "
 # Add job count if non-zero
 export PROMPT_COMMAND='HAS_JOBS=$(jobs -p) '
 PS1="$BASE_PROMPT ""\${HAS_JOBS:+$JOB_COUNT}"
@@ -105,7 +119,7 @@ if [ -r /etc/bash_completion.d/git-prompt ]; then
   # Note untracked files
   export GIT_PS1_SHOWUNTRACKEDFILES=1
   source /etc/bash_completion.d/git-prompt
-  export PROMPT_COMMAND="HAS_JOBS=\`jobs -p\`; __git_ps1 \"$BASE_PROMPT\" \" \${HAS_JOBS:+$JOB_COUNT }\" \" %s\""
+  export PROMPT_COMMAND="HAS_JOBS=\`jobs -p\`; __git_ps1 \"$BASE_PROMPT\" \" \${HAS_JOBS:+$JOB_COUNT }\" \" %s$RESET\""
 fi
 
 # FZF keybindings
