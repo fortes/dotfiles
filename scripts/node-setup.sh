@@ -31,10 +31,8 @@ if ! command -v npm > /dev/null; then
   exit 1
 fi
 
-# Make sure we have correct value for $XDG_CACHE_HOME
-source ~/.profile
 NPM_PREFIX=$HOME/.local
-NPM_CACHE_DIR=$XDG_CACHE_HOME/npm
+NPM_CACHE_DIR=$HOME/.cache/npm
 
 # Create storage directory for npm packages
 if [ ! -d "$NPM_PREFIX" ]; then
