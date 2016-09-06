@@ -40,6 +40,9 @@ if command -v fzf-tmux > /dev/null; then
     alias ledit="lpass edit \$(lpass ls | fzf-tmux | awk '{print \$(NF)}' | sed 's/\]//g')"
     # Backup LastPass database, sadly there is no import in command line tool
     alias lbackup="lpass export | gpg --symmetric > lpass-backup.gpg"
+
+    # Use lpass to fill in password for encfs
+    alias encfs-lpass="lshow --password | encfs -S"
   fi
 
   # Fuzzy find for killing processes
