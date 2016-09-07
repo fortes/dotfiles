@@ -26,5 +26,6 @@ sshfs
 sudo
 tmux
 unzip
+vifm
 virtualenv
 wget
