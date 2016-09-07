@@ -66,22 +66,10 @@ Plug 'tpope/vim-unimpaired'
 " }}}
 
 " File/Buffer Handling {{{
-" Cd into the root of of the project with :ProjectRootCD
-Plug 'dbakker/vim-projectroot'
+" Use FZF for fuzzy finding if available (see config below)
 if executable('fzf')
-  " Use FZF for fuzzy finding if available (see config below)
   Plug 'junegunn/fzf'
   Plug 'junegunn/fzf.vim'
-else
-  " Fuzzy finder, see config below for more
-  " <C-p> start fuzzy finder
-  " <C-d> toggle between full path and filename search
-  " <C-r> Toggle between string and regex mode
-  " <C-f>/<C-b> to change search modes
-  " <C-s>/<C-v> open in split / vertical split
-  " <C-t> open in tab
-  " <tab> autocomplete directory
-  Plug 'ctrlpvim/ctrlp.vim'
 end
 " Adds helpers for UNIX shell commands
 " :Remove Delete buffer and file at same time
@@ -242,14 +230,6 @@ function! g:OnVimEnter()
       autocmd BufRead,BufWritePost *.js,*.es6,*.less,*.sh silent! Neomake
     endif
   augroup END
-
-  if exists(':ProjectRootCD')
-    " Search across entire project when possible. Use quickfix by default since
-    " linters will clobber the search results otherwise.
-    nnoremap K :ProjectRootCD<cr>:silent! grep! "<C-R><C-W>"<cr>
-    vnoremap K :<C-u>norm! gv"sy<cr>:ProjectRootCD<cr>:silent! grep! "<C-R>s"<cr>
-    nnoremap Q :ProjectRootCD<cr>:grep!<SPACE>
-  endif
 endfunction
 " }}}
 
@@ -301,10 +281,11 @@ if executable('shellcheck')
 endif
 " }}}
 
-" Fuzzy Finding (FZF/CtrlP) {{{
+" Fuzzy Finding (FZF) {{{
 if executable('fzf')
-  " FZF {{{
   " <C-p> or <C-t> to search files
+  " Open in split via control-x / control-v
+  " Select/Deselect all via alt-a / alt-d
   nnoremap <silent> <C-t> :FZF -m<cr>
   nnoremap <silent> <C-p> :FZF -m<cr>
 
@@ -314,67 +295,38 @@ if executable('fzf')
   " <M-S-p> for MRU
   nnoremap <silent> <M-S-p> :History<cr>
 
+  " Fuzzy line completion
+  imap <c-x><c-l> <plug>(fzf-complete-line)
+
   " Use fuzzy completion relative filepaths across directory with <c-x><c-j>
   imap <expr> <c-x><c-j> fzf#vim#complete#path('git ls-files $(git rev-parse --show-toplevel)')
 
-  " Better command history with q:
+  " Better command history with h:
   command! CmdHist call fzf#vim#command_history({'right': '40'})
-  nnoremap q: :CmdHist<CR>
+  nnoremap h: :CmdHist<CR>
 
-  " Better search history
+  " Better search history with h/
   command! QHist call fzf#vim#search_history({'right': '40'})
-  nnoremap q/ :QHist<CR>
+  nnoremap h/ :QHist<CR>
 
-  command! -bang -nargs=* Ack call fzf#vim#ag(<q-args>, {'down': '40%', 'options': --no-color'})
-  " }}}
-else
-  " CtrlP {{{
-  " <C-p> to search files
-  let g:ctrlp_map='<C-p>'
-  let g:ctrlp_cmd='CtrlP'
+  " Search from git root via :Rag (Root Ag)
+  command! -nargs=* Rag call fzf#vim#ag(<q-args>, extend(FindGitRootCD(), g:fzf#vim#default_layout))
 
-  " Don't jump to a window that is already open, but do jump to tabs
-  let g:ctrlp_switch_buffer = 't'
-
-  " <M-p> for just Buffers
-  nnoremap <silent> <M-p> :CtrlPBuffer<cr>
-
-  " <M-S-p> for MRU
-  nnoremap <silent> <M-S-p> :CtrlPMRU<cr>
-
-  " Keep more files in MRU
-  let g:ctrlp_mruf_max = 100
-
-  " Use ag for listing files
-  if executable('ag')
-    " Use git ls-files if possible for listing files, else fallback to ag
-    let g:ctrlp_user_command= {
-    \ 'types': {
-    \   1: ['.git', 'git --git-dir=%s/.git ls-files -co --exclude-standard']
-    \ },
-    \ 'fallback': 'ag %s -l --nocolor -g ""'
-    \ }
-
-    " git ls-files & ag are fast enough that CtrlP doesn't need to cache
-    let g:ctrlp_use_caching=0
-  endif
-  " }}}
+  " Use fuzzy searching for K & Q, select items to go into quickfix
+  nnoremap K :Rag <C-R><C-W><cr>
+  vnoremap K :<C-u>norm! gv"sy<cr>:silent! Rag <C-R>s<cr>
+  nnoremap Q :Rag<SPACE>
 end
 " }}}
 
 " UltiSnips {{{
 " Use tab to expand snippet and move to next target. Shift tab goes back.
-" <C-k> lists available snippets for the file
 let g:UltiSnipsExpandTrigger="<tab>"
-let g:UltiSnipsListSnippets="<C-k>"
+" <C-k> fuzzy-finds available snippets for the file with FZF
+" let g:UltiSnipsListSnippets="<C-k>"
+inoremap <C-k> <C-o>:Snippets<cr>
 let g:UltiSnipsJumpForwardTrigger="<tab>"
 let g:UltiSnipsJumpBackwardTrigger="<S-tab>"
-" }}}
-
-" Autopairs {{{
-" Remove default mapping to toggle autopairs and use Unimpaired-style
-" toggling
-let g:AutoPairsShortcutToggle='coa'
 " }}}
 
 " Tern {{{

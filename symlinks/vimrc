@@ -346,14 +346,33 @@ vnoremap # :<C-u>call <SID>VisualSetSearch('#')<cr>/<C-R>=@/<cr><cr>
 " <leader>s starts a find a replace for word under cursor
 nnoremap <leader>s :%s/\<<C-R><C-W>\>/<C-R><C-W>/g<Left><Left>
 
+" Change to git root of current file (if in a repo)
+function! FindGitRootCD()
+  let root = systemlist('git -C ' . expand('%:p:h') . ' rev-parse --show-toplevel')[0]
+  if v:shell_error
+    return ''
+  else
+    return {'dir': root}
+endfunction
+
+function! GitRootCD()
+  let result = FindGitRootCD()
+  if type(result) == type({})
+    execute 'cd' fnameescape(result['dir'])
+    echo 'Now in '.result['dir']
+  else
+    echo 'Not in git repo!'
+  endif
+endfunction
+command! GitRootCD :call GitRootCD()
+
 " K searches for word under cursor in root of project (remove default binding)
-nnoremap K :silent! lgrep! "<C-R><C-W>"<cr>
+nnoremap K :GitRootCD<cr>:silent! lgrep! "<C-R><C-W>"<cr>
 " Grep for visual selection, just like in normal mode. Note that this clears /
 " uses the `s` register
-vnoremap K :<C-u>norm! gv"sy<cr>:silent! lgrep! "<C-R>s"<cr>
-
-" Never use Ex-mode, map to search command instead
-nnoremap Q :lgrep!<SPACE>
+vnoremap K :<C-u>norm! gv"sy<cr>:GitRootCD<cr>:silent! lgrep! "<C-R>s"<cr>
+" Never use Ex-mode, map to project search command instead
+nnoremap Q :GitRootCD<cr>:lgrep!<SPACE>
 
 " Automatically open quickfix/location list after grep/make
 augroup auto_quickfix
