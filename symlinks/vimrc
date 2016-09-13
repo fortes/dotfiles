@@ -162,10 +162,12 @@ set autochdir
 " Automatically write files on :next, :make, etc
 set autowriteall
 
-" Automatically save on all changes
 augroup auto_save
   autocmd!
-  autocmd InsertLeave,TextChanged * silent! write
+  " Frequently save automatically
+  autocmd BufLeave,FocusLost,InsertLeave,TextChanged * silent! write
+  " Check for file changes
+  autocmd BufEnter,BufWinEnter,CursorHold,FocusGained * silent! checktime
 augroup END
 
 " Support mac files
@@ -187,6 +189,8 @@ set wildignore+=.git
 set wildignore+=build,lib,node_modules,public,_site,third_party
 " Ignore images and fonts
 set wildignore+=*.gif,*.jpg,*.jpeg,*.otf,*.png,*.svg,*.ttf
+" Ignore case when completing
+set wildignorecase
 " }}}
 
 " Status line {{{
@@ -518,9 +522,9 @@ augroup filetype_tweaks
   if executable('eslint_d') || executable('eslint')
     " Use faster eslint_d if possible
     if executable('eslint_d')
-      autocmd FileType javascript setlocal makeprg=eslint_d\ -f\ compact\ %
+      autocmd FileType javascript setlocal makeprg=eslint_d\ --fix\ -f\ compact\ %
     else
-      autocmd FileType javascript setlocal makeprg=eslint\ -f\ compact\ %
+      autocmd FileType javascript setlocal makeprg=eslint\ --fix\ -f\ compact\ %
     endif
 
     " Parse eslint errors correctly

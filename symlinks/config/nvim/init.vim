@@ -228,6 +228,7 @@ function! g:OnVimEnter()
     if exists(':Neomake')
       " Check for lint errors on open & write for supported filetypes
       autocmd BufRead,BufWritePost *.js,*.es6,*.less,*.sh silent! Neomake
+      autocmd User NeomakeFinished checktime
     endif
   augroup END
 endfunction
