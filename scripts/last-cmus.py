@@ -362,7 +362,7 @@ class LastCmus(object):
         if self.status_content != self.combine():
             self.run()
         else:
-            print "Skipped scrobbing because still on same song: %s" % self.status_content
+            print("Skipped scrobbing because still on same song: %s" % self.status_content)
 
         # write status
         self.write_file()
@@ -398,13 +398,13 @@ class LastCmus(object):
             submit(self.data["artist"], self.data["title"], now, source="P", length=3 *
                    60 + 32, album=self.data["album"], mbid=self.data["musicbrainz_trackid"])
             if flush():
-                print "Scrobbled: %s - %s" % (self.data["artist"], self.data["title"])
+                print("Scrobbled: %s - %s" % (self.data["artist"], self.data["title"]))
             else:
-                print "Could not scrobble: %s - %s" % (self.data["artist"], self.data["title"])
+                print("Could not scrobble: %s - %s" % (self.data["artist"], self.data["title"]))
                 sys.exit(1)
         else:
-            print "Did not submit due to missing data:"
-            print self.data
+            print("Did not submit due to missing data:")
+            print(self.data)
             sys.exit(1)
 
     def run_test(self):
