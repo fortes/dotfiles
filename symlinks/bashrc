@@ -17,6 +17,9 @@ fi
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
+# Clear C-w binding in order to re-bind in .inputrc
+stty werase undef
+
 # For platform-specific conditions
 OS=`uname`
 

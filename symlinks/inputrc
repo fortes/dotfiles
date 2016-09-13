@@ -8,11 +8,13 @@ set editing-mode vi
 set keymap vi-insert
 "jj": vi-movement-mode
 "jk": vi-movement-mode
-"\C-a": beginning-of-line
-"\C-e": end-of-line
-"\C-l": clear-screen
-"\C-n": history-search-forward
-"\C-p": history-search-backward
+Control-a: beginning-of-line
+Control-e: end-of-line
+Control-l: clear-screen
+Control-n: history-search-forward
+Control-p: history-search-backward
+# Default is unix-word-rubout
+Control-w: unix-filename-rubout
 "\C-x\C-e": edit-and-execute-command
 # Auto expand history
 Space: magic-space
