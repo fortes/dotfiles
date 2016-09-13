@@ -249,21 +249,22 @@ nnoremap <silent> <C-L> :MarkifyClear<cr>:nohlsearch<cr><C-L>
 " Run test commands in NeoVim terminal
 let test#strategy = 'neovim'
 
-" Use dot reporter by default
-let test#javascript#mocha#options = '--reporter dot'
-" With autochdir, the default regex for tests fails, so just count on `_test.js`
-let test#javascript#mocha#file_pattern = '_test.js'
+let test#javascript#mocha#options = {
+  \ 'nearest': '--reporter list',
+  \ 'file': '--reporter dot',
+  \ 'suite': '--reporter dot',
+  \ }
 
 " Only works in JS for now
 augroup test_shortcuts
   autocmd!
 
   " <leader>tt to test based on cursor, <leader>twt to watch
-  autocmd FileType javascript nnoremap <buffer> <silent> <leader>tt :split<cr>:TestNearest<cr>
-  autocmd FileType javascript nnoremap <buffer> <silent> <leader>twt :split<cr>:TestNearest -w<cr><c-\><c-n><c-w><c-k>
+  autocmd FileType javascript nnoremap <buffer> <silent> <leader>tt :TestNearest<cr>
+  autocmd FileType javascript nnoremap <buffer> <silent> <leader>twt :TestNearest -w<cr><c-\><c-n><c-w><c-k>
   " <leader>tf to test current file, <leader> twf to watch
-  autocmd FileType javascript nnoremap <buffer> <silent> <leader>tf :split<cr>:TestFile<cr>
-  autocmd FileType javascript nnoremap <buffer> <silent> <leader>twf :split<cr>:TestFile -w<cr><c-\><c-n><c-w><c-k>
+  autocmd FileType javascript nnoremap <buffer> <silent> <leader>tf :TestFile<cr>
+  autocmd FileType javascript nnoremap <buffer> <silent> <leader>twf :TestFile -w<cr><c-\><c-n><c-w><c-k>
 augroup END
 " }}}
 
