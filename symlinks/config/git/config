@@ -10,8 +10,9 @@
   # Edit all modified & new files
   edit = "!$EDITOR `git ls-files -m --other --exclude-standard`"
   editm = "!$EDITOR `git ls-files -m --other --exclude-standard | fzf-tmux -m`"
-  # Checkout fuzzy-find branch
+  # Checkout/delete fuzzy-find branch
   cb = "!git checkout $(git branch -vv | fzf-tmux | sed 's/*//' | awk '{print $1}')"
+  db = "!git branch -d $(git branch -vv | fzf-tmux -m | sed 's/*//' | awk '{print $1}')"
   # Use fzf to select some modified files to add
   addm = "!git add `git ls-files -m --other --exclude-standard | fzf-tmux -m`"
   addmp = "!git add -p `git ls-files -m --other --exclude-standard | fzf-tmux -m`"
