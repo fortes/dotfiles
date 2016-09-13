@@ -294,25 +294,27 @@ if executable('fzf')
   " <M-p> for open buffers
   nnoremap <silent> <M-p> :Buffers<cr>
 
-  " <M-S-p> for MRU
+  " <M-S-p> for MRU & v:oldfiles
   nnoremap <silent> <M-S-p> :History<cr>
 
-  " Fuzzy line completion
-  imap <c-x><c-l> <plug>(fzf-complete-line)
+  " Fuzzy line completion via <c-x><c-m> instead of <c-x><c-l>
+  imap <c-x><c-m> <plug>(fzf-complete-line)
 
   " Use fuzzy completion relative filepaths across directory with <c-x><c-j>
   imap <expr> <c-x><c-j> fzf#vim#complete#path('git ls-files $(git rev-parse --show-toplevel)')
 
-  " Better command history with h:
-  command! CmdHist call fzf#vim#command_history({'right': '40'})
-  nnoremap h: :CmdHist<CR>
+  " Better command history with <leader>:
+  nnoremap <leader>: :History:<CR>
 
-  " Better search history with h/
-  command! QHist call fzf#vim#search_history({'right': '40'})
-  nnoremap h/ :QHist<CR>
+  " Better search history with <leader>/
+  nnoremap <leader>/ :History/<CR>
+
+  " Fuzzy search help <leader>?
+  nnoremap <leader>? :Helptags<CR>
 
   " Search from git root via :Rag (Root Ag)
-  command! -nargs=* Rag call fzf#vim#ag(<q-args>, extend(FindGitRootCD(), g:fzf#vim#default_layout))
+  autocmd VimEnter * command! -nargs=* Rag
+    \ call fzf#vim#ag(<q-args>, extend(FindGitRootCD(), g:fzf#vim#default_layout))
 
   " Use fuzzy searching for K & Q, select items to go into quickfix
   nnoremap K :Rag <C-R><C-W><cr>
