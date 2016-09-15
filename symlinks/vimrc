@@ -416,8 +416,10 @@ let maplocalleader=" "
 
 " Use enter as colon for faster commands
 nnoremap <cr> :
+vnoremap <cr> :
 " Meta-enter in case you need an actual <cr>
 nnoremap <M-cr> <cr>
+vnoremap <M-cr> <cr>
 
 " Hide annoying quit message
 nnoremap <C-c> <C-c>:echo<cr>

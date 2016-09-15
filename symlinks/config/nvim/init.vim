@@ -281,6 +281,9 @@ endif
 if executable('shellcheck')
   let g:neomake_sh_enabled_makers = ['makeprg']
 endif
+
+" Open list automatically when there are errors
+let g:neomake_open_list = 2
 " }}}
 
 " Fuzzy Finding (FZF) {{{
