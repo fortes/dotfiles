@@ -359,7 +359,7 @@ class LastCmus(object):
         self.read_file()
 
         # run LIVE if the current song isnt in the status
-        if self.status_content != self.combine():
+        if self.status_content != self.combine().encode('utf-8'):
             self.run()
         else:
             print("Skipped scrobbing because still on same song: %s" % self.status_content)
@@ -369,8 +369,7 @@ class LastCmus(object):
 
     def write_file(self):
         fo = open(self.status, "w")
-        fo.write("%s:%s" %
-                 (self.data["artist"], self.data["title"].encode('utf-8')))
+        fo.write("%s:%s" % (self.data["artist"].encode('utf-8'), self.data["title"].encode('utf-8')))
         fo.close()
 
     def read_file(self):
@@ -397,10 +396,12 @@ class LastCmus(object):
             login(username, password, hashpw=True)
             submit(self.data["artist"], self.data["title"], now, source="P", length=3 *
                    60 + 32, album=self.data["album"], mbid=self.data["musicbrainz_trackid"])
+            artist = self.data["artist"].encode("ascii", "ignore")
+            title = self.data["title"].encode("ascii", "ignore")
             if flush():
-                print("Scrobbled: %s - %s" % (self.data["artist"], self.data["title"]))
+                print(u'Scrobbled: %s - %s' % (artist, title))
             else:
-                print("Could not scrobble: %s - %s" % (self.data["artist"], self.data["title"]))
+                print(u'Could not scrobble: %s - %s' % (artist, title))
                 sys.exit(1)
         else:
             print("Did not submit due to missing data:")
