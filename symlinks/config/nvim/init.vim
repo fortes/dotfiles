@@ -251,7 +251,7 @@ let test#strategy = 'neovim'
 
 let test#javascript#mocha#options = {
   \ 'nearest': '--reporter list',
-  \ 'file': '--reporter dot',
+  \ 'file': '--reporter list',
   \ 'suite': '--reporter dot',
   \ }
 
