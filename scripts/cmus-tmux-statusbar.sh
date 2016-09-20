@@ -2,11 +2,11 @@
 if [[ $1 =~ ^[[:digit:]]+$ ]]; then
   MAX_TITLE_WIDTH=$1
 else
-  MAX_TITLE_WIDTH=70
+  MAX_TITLE_WIDTH=$(($(tmux display -p '#{pane_width}') - 80))
 fi
 
 if cmus-remote -Q > /dev/null 2> /dev/null; then
-  CMUS_STATUS=`cmus-remote -Q`
+  CMUS_STATUS=$(cmus-remote -Q)
   STATUS=$(echo "$CMUS_STATUS" | grep status | head -n 1 | cut -d' ' -f2-)
   ARTIST=$(echo "$CMUS_STATUS" | grep 'tag artist' | head -n 1 | cut -d' ' -f3-)
   TITLE=$(echo "$CMUS_STATUS" | grep 'tag title' | cut -d' ' -f3-)
