@@ -456,18 +456,6 @@ inoremap <C-U> <C-G>u<C-U>
 " Never use ZZ, too dangerous
 nnoremap ZZ <nop>
 
-" Prefix copy/paste commands w/ leader to use system clipboard
-" Copy from clipboard
-vnoremap <leader>y "+y
-nnoremap <leader>Y "+yg_
-nnoremap <leader>y "+y
-nnoremap <leader>yy "+yy
-" Paste from clipboard
-nnoremap <leader>P "+P
-nnoremap <leader>p "+p
-vnoremap <leader>P "+P
-vnoremap <leader>p "+p
-
 " Use tab and shift-tab to cycle through windows.
 nnoremap <Tab> <C-W>w
 nnoremap <S-Tab> <C-W>W
@@ -497,6 +485,30 @@ nnoremap <leader>sv :source $MYVIMRC<cr>
 " Sort lines within braces with <leader>s{
 nnoremap <leader>s{ vi{:sort<cr>
 " }}}
+
+" Copy yank buffer to system clipboard
+" Use OSC52 to put things into the system clipboard, works over SSH!
+function! Osc52Yank()
+  let buffer=system('base64 -w0', @0)
+  let buffer=substitute(buffer, "\n$", "", "")
+  let buffer='\e]52;c;'.buffer.'\x07'
+
+  " Need special escaping if within tmux
+  if $TMUX != ''
+    let buffer='\ePtmux;\e'.buffer.'\e\\'
+  endif
+
+  " Must output to /dev/tty, otherwise the escape codes don't make it out to the
+  " terminal
+  silent exe "!echo -ne ".shellescape(buffer)." > /dev/tty"
+endfunction
+
+command! Osc52CopyYank call Osc52Yank()
+
+" Copy yank register to system
+nnoremap <leader>y :Osc52CopyYank<cr>
+" Copy selection to system clipboard
+vnoremap <leader>y :<C-u>norm! gvy<cr>:Osc52CopyYank<cr>
 " }}}
 
 " Filetype configuration {{{
