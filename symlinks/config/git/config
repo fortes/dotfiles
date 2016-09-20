@@ -16,6 +16,7 @@
   # Use fzf to select some modified files to add
   addm = "!git add `git ls-files -m --other --exclude-standard | fzf-tmux -m`"
   addmp = "!git add -p `git ls-files -m --other --exclude-standard | fzf-tmux -m`"
+  bclean = "!git branch --merged | grep -v '*' | xargs -n 1 git branch -d"
 [apply]
   whitespace = fix
 [branch]
