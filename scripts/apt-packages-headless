@@ -25,6 +25,7 @@ software-properties-common
 sshfs
 sudo
 tmux
+tree
 unzip
 vifm
 virtualenv
