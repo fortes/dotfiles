@@ -389,7 +389,7 @@ augroup END
 " Use ag instead of grep, if available
 if executable('ag')
   " Use smart case, match whole words, and output in vim-friendly format
-  set grepprg=ag\ -S\ -Q\ --vimgrep\ $*
+  set grepprg=ag\ -S\ -Q\ --nogroup\ --nocolor\ --column\ $*
   set grepformat=%f:%l:%c:%m
 else
   " Mimic ag settings (literal, recursive, ignore common directories)
@@ -571,6 +571,9 @@ augroup filetype_tweaks
 
   " Simple folding for JS
   autocmd FileType javascript setlocal fdm=marker fmr={,}
+
+  " Find .js files when using `gf` (useful with require)
+  autocmd FileType javascript setlocal suffixesadd=.js
 
   " Use folds in .vimrc
   autocmd FileType vim set fdm=marker fdl=9
