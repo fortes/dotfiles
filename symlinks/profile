@@ -55,6 +55,9 @@ if [ ! -z $DISPLAY ] && command -v setxkbmap > /dev/null; then
 
   # Swap Alt and Windows Keys
   setxkbmap -layout us -option altwin:left_meta_win
+else
+  # Use yank command for clipboard access via SSH
+  LPASS_CLIPBOARD_COMMAND=yank
 fi
 
 if command -v keychain &>/dev/null; then
