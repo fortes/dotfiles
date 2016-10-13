@@ -31,6 +31,12 @@ export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 # Case insensitive by default
 export FZF_COMPLETION_OPTS='-i'
 
+if [ -z "$XDG_CONFIG_HOME" ]; then
+  export XDG_CACHE_HOME="$HOME/.cache"
+  export XDG_CONFIG_HOME="$HOME/.config"
+  export XDG_DATA_HOME="$HOME/.local/share"
+fi
+
 # Use ag for faster default find command for listing candidates
 if [ -d "$HOME/.local/source/fzf/" ]; then
   _fzf_compgen_path() {
@@ -49,7 +55,7 @@ function sourceIfExists() {
 
 export -f sourceIfExists
 
-if [ ! -z $DISPLAY ] && command -v setxkbmap > /dev/null; then
+if [ ! -z "$DISPLAY" ] && command -v setxkbmap > /dev/null; then
   # Use Caps Lock as another Control Key
   setxkbmap -layout us -option ctrl:nocaps
 
@@ -57,12 +63,12 @@ if [ ! -z $DISPLAY ] && command -v setxkbmap > /dev/null; then
   setxkbmap -layout us -option altwin:left_meta_win
 else
   # Use yank command for clipboard access via SSH
-  LPASS_CLIPBOARD_COMMAND=yank
+  export LPASS_CLIPBOARD_COMMAND=yank
 fi
 
 if command -v keychain &>/dev/null; then
   # Don't prompt for password to load id_rsa if not already loaded
-  eval `keychain --eval --noask --agents ssh --quiet`
+  eval "$(keychain --eval --noask --agents ssh --quiet)"
 else
   sourceIfExists "$HOME/.bashrc.ssh-agent"
 fi
