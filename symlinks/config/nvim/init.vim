@@ -23,6 +23,8 @@ Plug 'nathanaelkane/vim-indent-guides'
 Plug 'airblade/vim-accent'
 " Auto-close parens / quotes, requires no config
 Plug 'cohama/lexima.vim'
+" Make it easier to find the cursor after searching
+Plug 'inside/vim-search-pulse'
 " Motion via two-character combinations
 " s{char}{char} to move forward to instance of {char}{char}
 " ; for next match
@@ -63,6 +65,8 @@ Plug 'tpope/vim-surround'
 " - >p paste and indent
 " - <p paste and deindent
 Plug 'tpope/vim-unimpaired'
+" Complete words from tmux with <C-x><C-u>
+Plug 'wellle/tmux-complete.vim'
 " }}}
 
 " File/Buffer Handling {{{
