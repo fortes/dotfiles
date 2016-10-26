@@ -169,9 +169,6 @@ Plug 'moll/vim-node', {
 \ }
 " }}}
 
-" Misc Filetypes {{{
-Plug 'google/vim-jsonnet'
-" }}}
 call plug#end()
 " }}}
 
