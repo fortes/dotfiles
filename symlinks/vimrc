@@ -110,6 +110,11 @@ set foldnestmax=5
 set foldopen+=jump
 " }}}
 
+" Enable live substitution
+if exists('&inccommand')
+  set inccommand=split
+endif
+
 " Always show statusline
 set laststatus=2
 
