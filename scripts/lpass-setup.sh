@@ -17,7 +17,7 @@ if ! command -v lpass > /dev/null; then
   SOURCE_DIR="$LOCAL_DIR/source/lastpass-cli"
   if [ ! -d "$SOURCE_DIR" ]; then
     echo "$ARROW Cloning repository"
-    git clone git@github.com:lastpass/lastpass-cli.git "$SOURCE_DIR"
+    git clone https://github.com/lastpass/lastpass-cli.git "$SOURCE_DIR"
     pushd "$SOURCE_DIR" > /dev/null
   else
     pushd "$SOURCE_DIR" > /dev/null
