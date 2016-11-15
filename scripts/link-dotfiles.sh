@@ -48,7 +48,6 @@ for file in $DOTFILES/symlinks/*; do
     echo "$CMARK $target linked"
   fi
 done
-exit
 
 if [ ! -f "$DOTFILES/symlinks/ssh/config" ]; then
   echo "  $ARROW Creating ~/.ssh/config"
