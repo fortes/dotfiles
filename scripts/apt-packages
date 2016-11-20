@@ -2,7 +2,10 @@ alsa-utils
 chromium
 exfat-fuse
 exfat-utils
+fonts-dejavu
+fonts-droid
 fonts-inconsolata
+fonts-noto
 i3
 mpv
 pulseaudio
