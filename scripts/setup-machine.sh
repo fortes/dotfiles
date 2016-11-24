@@ -32,6 +32,16 @@ if [ "$IS_HEADLESS" != 1 ]; then
   PACKAGES="$PACKAGES $(xargs < "$HOME/dotfiles/scripts/apt-packages")"
 fi
 
+# Map git to correct remote
+pushd "$HOME/dotfiles" > /dev/null
+if ! git remote -v | grep -q -F "git@github.com"; then
+  echo "$XMARK Dotfiles repo git remote not set"
+  git remote set-url origin git@github.com:fortes/dotfiles.git
+fi
+echo "$CMARK Dotfiles repo git remote set"
+
+popd > /dev/null
+
 installAptPackagesIfMissing "$PACKAGES"
 echo "$CMARK apt packages installed"
 

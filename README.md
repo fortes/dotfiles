@@ -36,15 +36,9 @@ Then add the key into GitHub and wherever else
 ssh-import-id gh:fortes
 ```
 
-4. If you're me (which you're not), set the remote url for this repo in order to push:
+4. Add your favorite servers into `.ssh/config`
 
-  ```
-  cd $HOME/dotfiles && git remote set-url origin git@github.com:fortes/dotfiles.git
-  ```
-
-5. Add your favorite servers into `.ssh/config`
-
-6. Setup `.gitconfig.local`:
+5. Setup `.gitconfig.local`:
 
   ````
   [user]
