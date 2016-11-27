@@ -45,6 +45,12 @@ popd > /dev/null
 installAptPackagesIfMissing "$PACKAGES"
 echo "$CMARK apt packages installed"
 
+if [ "$IS_HEADLESS" != 1 ]; then
+  # Set default browser
+  echo "$ARROW Setting default browser to chromium"
+  sudo update-alternatives --set x-www-browser "$(which chromium)"
+fi
+
 # Link missing dotfiles
 ("$HOME/dotfiles/scripts/link-dotfiles.sh" -f)
 
