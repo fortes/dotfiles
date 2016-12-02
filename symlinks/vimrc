@@ -580,6 +580,11 @@ augroup filetype_tweaks
   " Find .js files when using `gf` (useful with require)
   autocmd FileType javascript setlocal suffixesadd=.js
 
+  " Alphabetic sort for import in JS (use on paragraph via leader si)
+  autocmd FileType javascript command!
+    \  -range=% Isort :<line1>,<line2>sort/^const {\=/
+  autocmd FileType javascript nnoremap <leader>s{ vip:Isort<cr>
+
   " Use folds in .vimrc
   autocmd FileType vim set fdm=marker fdl=9
 
