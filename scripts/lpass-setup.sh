@@ -25,10 +25,11 @@ if ! command -v lpass > /dev/null; then
     git pull
   fi
 
-  make
+  cmake .
   # Install everything locally so we don't need sudo
-  COMPDIR="$LOCAL_DIR/completions.d" PREFIX="$LOCAL_DIR" BINDIR="$LOCAL_DIR/bin" \
-    make install
+  cmake -DCMAKE_INSTALL_PREFIX="$LOCAL_DIR" \
+    -DBASH_COMPLETION_COMPLETIONSDIR="$LOCAL_DIR/completions.d"
+  make && make install
   popd > /dev/null
 fi
 
