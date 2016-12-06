@@ -17,6 +17,7 @@ libssl-dev
 lsb-release
 mosh
 most
+ncdu
 openssh-server
 python3-dev
 shellcheck
