@@ -3,15 +3,14 @@ chromium
 exfat-fuse
 exfat-utils
 fonts-dejavu
-fonts-droid
 fonts-inconsolata
 fonts-noto
 i3
+lilyterm
 mpv
 pulseaudio
-roxterm
 scrot
+wicd-curses
 xclip
 xinit
 xserver-xorg
-wicd-curses

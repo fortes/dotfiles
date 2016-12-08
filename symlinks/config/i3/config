@@ -166,7 +166,7 @@ bar {
 for_window [window_role="browser"] border none
 
 # Hide title bar for terminals, which seem to have no unifying class / role :(
-for_window [class="(?i)xterm"] border pixel 1
+for_window [class="(?i)(lily|x)?term"] border pixel 1
 for_window [class="X-terminal-emulator"] border pixel 1
 
 # Dialogs should open floating by default
