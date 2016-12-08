@@ -39,6 +39,9 @@ set mark-directories on
 set mark-symlinked-directories on
 # Show what mode we are in (see if insert or command mode)
 set show-mode-in-prompt on
+# Bash 4.4 allows setting custom mode strings. Blank for insert, ! for cmd
+set vi-ins-mode-string
+set vi-cmd-mode-string !
 # Show multiple matches right away
 set show-all-if-ambiguous on
 set show-all-if-unmodified on
