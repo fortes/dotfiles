@@ -9,10 +9,8 @@ esac
 # Glorious editor
 set -o vi
 
-# Make sure we have always loaded ~/.profile
-if [ -z $PROFILE_LOADED ]; then
-  source $HOME/.profile
-fi
+# Make sure we have always loaded ~/.profile, which can get lost due to
+source $HOME/.profile
 
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"

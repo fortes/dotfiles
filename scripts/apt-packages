@@ -6,9 +6,9 @@ fonts-dejavu
 fonts-inconsolata
 fonts-noto
 i3
-lilyterm
 mpv
 pulseaudio
+qterminal
 scrot
 wicd-curses
 xclip
