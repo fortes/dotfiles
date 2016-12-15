@@ -71,16 +71,6 @@ source ~/.profile
 source ~/.bashrc
 
 ("$HOME/dotfiles/scripts/python-setup.sh")
-
 ("$HOME/dotfiles/scripts/node-setup.sh")
-
-# cmus
-if [ "$IS_HEADLESS" != 1 ]; then
-  ("$HOME/dotfiles/scripts/cmus-setup.sh")
-fi
-
-# FZF
 ("$HOME/dotfiles/scripts/fzf-setup.sh")
-
-# Neovim setup
 ("$HOME/dotfiles/scripts/nvim-setup.sh")

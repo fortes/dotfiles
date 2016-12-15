@@ -1,5 +1,8 @@
 alsa-utils
 chromium
+cmake
+cmus
+dbus-x11
 exfat-fuse
 exfat-utils
 fonts-dejavu
@@ -11,6 +14,6 @@ pulseaudio
 qterminal
 scrot
 wicd-curses
-xclip
 xinit
+xsel
 xserver-xorg

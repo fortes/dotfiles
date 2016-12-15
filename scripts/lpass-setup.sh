@@ -10,8 +10,8 @@ fi
 
 if ! command -v lpass > /dev/null; then
   echo "$ARROW Installing build dependencies (requires sudo)"
-  installAptPackagesIfMissing openssl libcurl3 libxml2 libxml2-dev \
-    libcurl4-openssl-dev pinentry-curses
+  installAptPackagesIfMissing cmake openssl libcurl3 libxml2 libxml2-dev \
+    libcurl4-openssl-dev pkg-config pinentry-curses
 
   LOCAL_DIR=$HOME/.local
 

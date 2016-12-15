@@ -5,6 +5,8 @@ avahi-discover
 bash-completion
 build-essential
 curl
+cryfs
+dbus
 dnsutils
 elinks
 encfs
@@ -15,10 +17,13 @@ htop
 keychain
 libssl-dev
 lsb-release
+mergerfs
 mosh
 ncdu
+neovim
 python3-dev
 python3-pip
+rclone
 scrypt
 shellcheck
 silversearcher-ag
