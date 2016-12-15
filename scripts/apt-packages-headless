@@ -18,11 +18,11 @@ lsb-release
 mosh
 most
 ncdu
-openssh-server
 python3-dev
 shellcheck
 silversearcher-ag
 software-properties-common
+ssh
 sshfs
 sudo
 tmux
