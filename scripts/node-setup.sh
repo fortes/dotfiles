@@ -2,34 +2,35 @@
 set -ef -o pipefail
 source "$HOME/dotfiles/scripts/helpers.sh"
 
-if ! command -v nodejs > /dev/null; then
-  if command -v apt-get > /dev/null; then
-    echo "$ARROW Adding $DISTRO nodesource PPA (requires sudo)"
-    curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | \
-      sudo apt-key add -
-    sudo add-apt-repository -y "deb https://deb.nodesource.com/node_6.x ${VERSION,,} main"
+NODE_SOURCES_FILE=/etc/apt/sources.list.d/node.list
+if [ ! -f "$NODE_SOURCES_FILE" ]; then
+  echo "$XMARK Node not in sources.list"
+  echo "  $ARROW Adding node to in sources.list (requires sudo)"
+  curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | \
+    sudo apt-key add -
 
-    sudo apt-get update
-    echo "$ARROW Installing node (requires sudo)"
-    installAptPackagesIfMissing nodejs
-
-    if command -v update-alternatives > /dev/null; then
-      if ! command -v node > /dev/null; then
-        echo "$ARROW Updating alternatives to set symlinks for nodejs to node"
-        sudo update-alternatives --install /usr/bin/node node "$(command -v nodejs)" 10
-        echo "$CMARK System alternatives updated"
-      fi
-    fi
-  else
-    echo "$XMARK Unsupported platform for node install"
-    exit 1
-  fi
+  # TODO: Switch over to stretch, once ready
+  echo "deb https://deb.nodesource.com/node_6.x jessie main" | \
+    sudo tee "$NODE_SOURCES_FILE"
+  sudo apt-get update -qq
 fi
+
+echo "$ARROW Installing node (requires sudo)"
+installAptPackagesIfMissing nodejs
+
+if ! update-alternatives --get-selections | grep -v -q "^node"; then
+  echo "$ARROW Updating alternatives to set symlinks for nodejs to node"
+  sudo update-alternatives --install /usr/bin/node node \
+    "$(command -v nodejs)" 10
+fi
+echo "$CMARK Node system alternatives set"
 
 if ! command -v npm > /dev/null; then
-  echo "$XMARK node/npm must be installed first"
+  echo "$XMARK npm not installed"
+  installAptPackagesIfMissing npm
   exit 1
 fi
+echo "$CMARK npm installed"
 
 NPM_PREFIX=$HOME/.local
 NPM_CACHE_DIR=$HOME/.cache/npm
