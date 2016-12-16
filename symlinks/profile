@@ -52,17 +52,6 @@ function sourceIfExists() {
 
 export -f sourceIfExists
 
-if [ ! -z "$DISPLAY" ] && command -v setxkbmap > /dev/null; then
-  # Use Caps Lock as another Control Key
-  setxkbmap -layout us -option ctrl:nocaps
-
-  # Swap Alt and Windows Keys
-  setxkbmap -layout us -option altwin:left_meta_win
-
-  # Xmodmap gets cleared when setxkbmap runs
-  xmodmap "$HOME/.Xmodmap.crouton"
-fi
-
 # Use yank command for clipboard access via SSH or system clipboard
 export LPASS_CLIPBOARD_COMMAND=yank
 
