@@ -1,8 +1,5 @@
 # vim:ft=sh
 
-# Sentinel value to know we've loaded this file
-export PROFILE_LOADED=1
-
 # Use NeoVim if we have it
 if command -v nvim > /dev/null; then
   VISUAL=nvim
@@ -61,10 +58,13 @@ if [ ! -z "$DISPLAY" ] && command -v setxkbmap > /dev/null; then
 
   # Swap Alt and Windows Keys
   setxkbmap -layout us -option altwin:left_meta_win
-else
-  # Use yank command for clipboard access via SSH
-  export LPASS_CLIPBOARD_COMMAND=yank
+
+  # Xmodmap gets cleared when setxkbmap runs
+  xmodmap "$HOME/.Xmodmap.crouton"
 fi
+
+# Use yank command for clipboard access via SSH or system clipboard
+export LPASS_CLIPBOARD_COMMAND=yank
 
 if command -v keychain &>/dev/null; then
   # Don't prompt for password to load id_rsa if not already loaded
