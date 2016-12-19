@@ -6,7 +6,7 @@ YARN_SOURCES_FILE=/etc/apt/sources.list.d/yarn.list
 if [ ! -f $YARN_SOURCES_FILE ]; then
   echo "$XMARK Yarn not in sources.list"
   echo "  $ARROW Adding yarn to in sources.list (requires sudo)"
-  sudo apt-key adv --keyserver pgp.mit.edu --recv 9D41F3C3
+  curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
   echo "deb https://dl.yarnpkg.com/debian/ stable main" | \
     sudo tee "$YARN_SOURCES_FILE"
   sudo apt-get update -qq
