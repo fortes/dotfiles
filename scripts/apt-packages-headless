@@ -19,6 +19,7 @@ mosh
 most
 ncdu
 python3-dev
+python3-pip
 shellcheck
 silversearcher-ag
 software-properties-common

@@ -14,11 +14,6 @@ if command -v most > /dev/null; then
   export MANPAGER=most
 fi
 
-# VirtualEnv {{{
-# Centralized location for new virtual environments
-export VIRTUAL_ENV_DEFAULT_DIR=$HOME/.local/virtualenv
-# }}}
-
 # If available, we use git to list files from the root directory (not from the
 # current directory as in other fzf cases). Otherwise, fallback to ag
 export FZF_DEFAULT_COMMAND='(git ls-files -co --exclude-standard $(git rev-parse --show-toplevel) || ag -l -g "") 2> /dev/null'
