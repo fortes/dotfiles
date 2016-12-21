@@ -25,6 +25,9 @@ if [ -z "$XDG_CONFIG_HOME" ]; then
   export XDG_DATA_HOME="$HOME/.local/share"
 fi
 
+# Use local directory for n
+export N_PREFIX="$HOME/.local"
+
 # Use ag for faster default find command for listing candidates
 if [ -d "$HOME/.local/source/fzf/" ]; then
   _fzf_compgen_path() {

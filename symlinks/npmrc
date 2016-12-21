@@ -1,0 +1,2 @@
+prefix=${HOME}/.local
+cache=${HOME}/.cache/npm

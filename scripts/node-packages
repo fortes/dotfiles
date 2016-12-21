@@ -3,7 +3,5 @@ eslint-plugin-mocha
 eslint-plugin-react
 eslint_d
 git-recent
-js-beautify
-node-inspector
-nodemon
 prettier
+n

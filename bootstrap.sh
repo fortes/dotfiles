@@ -137,7 +137,7 @@ if [ "$OS" = "Linux" ] && command -v apt-get > /dev/null; then
     echo "Installing git (requires sudo)..."
     # If git isn't here, then this is the first time running, likely need to
     # update all sources
-    sudo apt-get -q update
+    sudo apt-get -qq update
     sudo apt-get -qqfuy install git
   fi
   echo "$CMARK Git installed"
