@@ -1,5 +1,7 @@
-#/bin/bash
+#!/bin/bash
 set -ef -o pipefail
+# shellcheck source=/home/fortes/dotfiles/scripts/helpers.sh
+# shellcheck disable=SC1091
 source "$HOME/dotfiles/scripts/helpers.sh"
 
 if [ ! -f /etc/default/keyboard ]; then
@@ -15,7 +17,10 @@ if ! grep -q "ctrl:nocaps" /etc/default/keyboard; then
     echo "$ARROW Using crouton keyboard (requires sudo)"
     sudo sed -i.bak 's/^XKBMODEL=".*"$/XKBMODEL="chromebook"/' /etc/default/keyboard
   fi
-  sudo dpkg-reconfigure -phigh console-setup
+
+  if isAptPackageInstalled console-setup; then
+    sudo dpkg-reconfigure -phigh console-setup
+  fi
 fi
 
 echo "$CMARK Caps Lock mapped to control"

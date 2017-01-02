@@ -63,4 +63,5 @@ installAptPackagesIfMissing() {
 }
 
 export -f installAptPackagesIfMissing
+export -f isAptPackageInstalled
 # }}}
