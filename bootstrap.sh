@@ -67,6 +67,9 @@ fi
 
 if command -v croutonversion > /dev/null; then
   IS_CROUTON=1
+  if croutonversion | grep -q xorg; then
+    IS_HEADLESS=0
+  fi
 else
   IS_CROUTON=0
 fi
