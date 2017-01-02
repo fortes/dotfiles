@@ -10,6 +10,15 @@ set status_display_program=~/dotfiles/scripts/cmus-status.sh
 # Sort order
 set lib_sort=albumartist date album discnumber tracknumber title
 
+# Play current album by default
+set aaa_mode=album
+# Buffer a bunch, which is useful when playing over sshfs
+set buffer_seconds=90
+# Enable replaygain
+set replaygain=album-preferred
+set replaygain_limit=true
+set replaygain_preamp=6
+
 set format_current= %a - %l [%y] - %03n - %t%= %g
 set format_playlist= %-20%A %-20%l %t %= %g %y
 set format_playlist_va= %-20%A %-20%l %t (%a) %= %g %y
