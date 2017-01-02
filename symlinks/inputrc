@@ -23,6 +23,8 @@ Control-k: menu-complete-backward
 
 # Stop the ringing
 set bell-style none
+# Blink open parens when closing
+set blink-matching-paren on
 # Show colors when doing completion
 set colored-stats on
 # Use case-insensitive filename matching
@@ -39,9 +41,11 @@ set mark-directories on
 set mark-symlinked-directories on
 # Show what mode we are in (see if insert or command mode)
 set show-mode-in-prompt on
+# Don't duplicate text that already matches when completing from inside the word
+set skip-completed-text off
 # Bash 4.4 allows setting custom mode strings. Blank for insert, ! for cmd
 set vi-ins-mode-string
-set vi-cmd-mode-string !
+set vi-cmd-mode-string [cmd]
 # Show multiple matches right away
 set show-all-if-ambiguous on
 set show-all-if-unmodified on
