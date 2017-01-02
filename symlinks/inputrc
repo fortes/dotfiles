@@ -43,9 +43,9 @@ set mark-symlinked-directories on
 set show-mode-in-prompt on
 # Don't duplicate text that already matches when completing from inside the word
 set skip-completed-text off
-# Bash 4.4 allows setting custom mode strings. Blank for insert, ! for cmd
+# Bash 4.4 allows setting custom mode strings. Blank for insert, [cmd] for cmd
 set vi-ins-mode-string
-set vi-cmd-mode-string [cmd]
+set vi-cmd-mode-string \033[1;33m[cmd]\033[0m
 # Show multiple matches right away
 set show-all-if-ambiguous on
 set show-all-if-unmodified on
