@@ -24,6 +24,18 @@ fi
 
 if [ "$IS_CROUTON" == 1 ]; then
   "$HOME/dotfiles/scripts/locale-gen.sh"
+  # Can't run docker on crouton :(
+  FAKE_DOCKER_PATH="/usr/bin/docker"
+  if [ ! -x "$FAKE_DOCKER_PATH" ]; then
+    echo "$ARROW Creating fake docker executable (requires sudo)"
+    sudo tee "$FAKE_DOCKER_PATH" > /dev/null <<FAKE_DOCKER
+#!/bin/bash
+>&2 echo 'Docker does not run on crouton'
+exit 1
+FAKE_DOCKER
+    sudo chmod +x "$FAKE_DOCKER_PATH"
+  fi
+  echo "$CMARK Fake docker bin installed for crouton"
 fi
 
 PACKAGES=$(xargs < "$HOME/dotfiles/scripts/apt-packages-headless")
