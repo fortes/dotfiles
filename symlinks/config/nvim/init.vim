@@ -152,6 +152,10 @@ Plug 'othree/yajs.vim', {
 Plug 'gavocanov/vim-js-indent', {
 \   'for': ['javascript']
 \ }
+" Format code
+Plug 'millermedeiros/vim-esformatter', {
+\   'for': ['javascript']
+\ }
 " JS syntax for common libraries
 Plug 'othree/javascript-libraries-syntax.vim', {
 \   'for': ['javascript']
