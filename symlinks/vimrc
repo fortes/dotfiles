@@ -394,17 +394,17 @@ augroup END
 " Use ag instead of grep, if available
 if executable('ag')
   " Use smart case, match whole words, and output in vim-friendly format
-  set grepprg=ag\ -S\ -Q\ --nogroup\ --nocolor\ --column\ $*
-  set grepformat=%f:%l:%c:%m
+  set grepprg=ag\ -S\ -Q\ --nogroup\ --nocolor\ --vimgrep
+  set grepformat^=%f:%l:%c:%m
 else
   " Mimic ag settings (literal, recursive, ignore common directories)
   set grepprg=grep\ -FIinrw\ --exclude-dir=.git\ --exclude-dir=node_modules
 
   " Unlike ag, grep needs to have a file path after the search command. Add that
   " in for the K bindings (default to current directory)
-  nnoremap K :lgrep! "<C-R><C-W>" .<cr>
-  vnoremap K :<C-u>norm! gv"sy<cr>:lgrep! "<C-R>s" .<cr>
-  nnoremap Q :lgrep!<SPACE><SPACE>.<LEFT><LEFT>
+  nnoremap K :GitRootCD<cr>:lgrep! "<C-R><C-W>" .<cr>
+  vnoremap K :<C-u>norm! gv"sy<cr>:GitRootCD<cr>:lgrep! "<C-R>s" .<cr>
+  nnoremap Q :GitRootCD<cr>:lgrep!<SPACE><SPACE>.<LEFT><LEFT>
 endif
 " }}}
 
