@@ -18,6 +18,11 @@ Plug 'w0ng/vim-hybrid'
 Plug 'nathanaelkane/vim-indent-guides'
 " }}}
 
+" System {{{
+" Clipboard provider that uses tmux
+Plug 'cazador481/fakeclip.neovim'
+" }}}
+
 " Editing {{{
 " Accent autocompletion via <C-X><C-U> or gx in normal mode
 Plug 'airblade/vim-accent'
