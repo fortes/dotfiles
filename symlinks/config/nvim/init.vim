@@ -28,6 +28,8 @@ Plug 'cazador481/fakeclip.neovim'
 Plug 'airblade/vim-accent'
 " Auto-close parens / quotes, requires no config
 Plug 'cohama/lexima.vim'
+" Personal snippets
+Plug 'fortes/vim-personal-snippets'
 " Make it easier to find the cursor after searching
 Plug 'inside/vim-search-pulse'
 " Motion via two-character combinations
@@ -96,9 +98,6 @@ Plug 'junegunn/vim-peekaboo'
 " }}}
 
 " General coding {{{
-Plug 'fortes/vim-personal-snippets'
-" Temporary while editing
-"Plug '~/x/vim-personal-snippets/'
 " async :make via NeoVim job control, replaces syntastic for showing errors
 " Provides :Neomake and :Neomake!
 " Only load on first use of :Neomake command
@@ -150,32 +149,22 @@ Plug 'groenewege/vim-less', {
 " }}}
 
 " Javascript {{{
-" JSX support
-Plug 'othree/yajs.vim', {
-\   'for': ['javascript']
-\ }
-Plug 'gavocanov/vim-js-indent', {
+" JS highlighting and indent support. Sometimes buggy, but has support for
+" jsdocs and flow
+Plug 'pangloss/vim-javascript', {
 \   'for': ['javascript']
 \ }
 " Format code
 Plug 'millermedeiros/vim-esformatter', {
 \   'for': ['javascript']
 \ }
-" JS syntax for common libraries
-Plug 'othree/javascript-libraries-syntax.vim', {
-\   'for': ['javascript']
-\ }
 " Tern auto-completion engine for JS (requires node/npm)
 if executable('node')
   Plug 'marijnh/tern_for_vim', {
-\     'do': 'npm install',
-\     'for': ['javascript', 'coffee']
+\     'do': 'yarn install',
+\     'for': ['javascript']
 \   }
 endif
-" Makes gf work on node require statements
-Plug 'moll/vim-node', {
-\   'for': ['javascript']
-\ }
 " }}}
 
 call plug#end()
@@ -344,6 +333,14 @@ let g:UltiSnipsExpandTrigger="<tab>"
 inoremap <C-k> <C-o>:Snippets<cr>
 let g:UltiSnipsJumpForwardTrigger="<tab>"
 let g:UltiSnipsJumpBackwardTrigger="<S-tab>"
+" }}}
+
+" vim-javascript {{{
+" jsdoc syntax
+let g:javascript_plugin_jsdoc = 1
+
+" flow syntax
+let g:javascript_plugin_flow = 1
 " }}}
 
 " Tern {{{

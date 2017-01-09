@@ -578,7 +578,7 @@ augroup filetype_tweaks
   autocmd FileType javascript setlocal fdm=marker fmr={,}
 
   " Find .js files when using `gf` (useful with require)
-  autocmd FileType javascript setlocal suffixesadd=.js
+  autocmd FileType javascript setlocal suffixesadd=.js,.json,index.js
 
   " Alphabetic sort for import in JS (use on paragraph via leader si)
   autocmd FileType javascript command!
@@ -596,6 +596,9 @@ augroup filetype_tweaks
 
   " Fold via indent in CoffeeScript and Python
   autocmd FileType coffee,python setlocal foldmethod=indent
+
+  " Fold via syntax for JS
+  autocmd FileType javascript setlocal foldmethod=syntax
 
   " Python uses 4 spaces
   autocmd FileType python setlocal shiftwidth=4
