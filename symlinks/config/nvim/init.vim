@@ -10,7 +10,8 @@ endif
 call plug#begin()
 
 " Colors {{{
-Plug 'w0ng/vim-hybrid'
+" A bunch of Base16 colorschemes
+Plug 'chriskempson/base16-vim'
 " Temporary while developing colorscheme
 " Plug 'fortes/vim-escuro'
 " Plug '~/x/vim-escuro'
@@ -210,8 +211,8 @@ augroup END
 
 if &t_Co >= 256
   " Upgrade colors if we have more colors, stays with default if not available
-  " silent! colorscheme escuro
-  silent! colorscheme hybrid
+  let base16colorspace=256
+  silent! colorscheme base16-railscasts
 endif
 
 " TODO: Move into .vimrc

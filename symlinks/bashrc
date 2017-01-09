@@ -18,9 +18,6 @@ source $HOME/.profile
 # Clear C-w binding in order to re-bind in .inputrc
 stty werase undef
 
-# For platform-specific conditions
-OS=`uname`
-
 # Remember a lot of stuff
 HISTFILE=$HOME/.bash_history
 HISTFILESIZE=5000
@@ -43,10 +40,6 @@ if ! infocmp $TERM > /dev/null 2>&1; then
     export TERM="xterm-256color"
   fi
 fi
-
-# Nicer colors
-export LS_COLORS='di=36;40:ln=35;40:so=31;40:pi=31;40:ex=1;32;40:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=36;01:ow=36;01:'
-unset OS
 
 # Bash Options {{{
 # cd without typing cd

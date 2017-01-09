@@ -322,8 +322,7 @@ set showbreak=«
 
 " Colors & Syntax Highlighting {{{
 " Base install has some lame themes, this one is OK, I guess
-set background=dark
-silent! colorscheme industry
+silent! colorscheme delek
 
 " Enable syntax highlighting by default
 syntax enable
