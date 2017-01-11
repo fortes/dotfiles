@@ -1,13 +1,3 @@
-esformatter
-esformatter-add-trailing-commas
-esformatter-flow
-esformatter-jsx
-esformatter-literal-notation
-esformatter-parseint
-esformatter-quotes
-esformatter-semicolons
-esformatter-spaced-lined-comment
-esformatter-use-strict
 eslint
 eslint-plugin-mocha
 eslint-plugin-react
@@ -16,3 +6,4 @@ git-recent
 js-beautify
 node-inspector
 nodemon
+prettier
