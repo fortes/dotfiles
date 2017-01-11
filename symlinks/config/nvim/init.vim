@@ -165,8 +165,13 @@ Plug 'pangloss/vim-javascript', {
 Plug 'millermedeiros/vim-esformatter', {
 \   'for': ['javascript']
 \ }
+if executable('flow')
+  Plug 'flowtype/vim-flow', {
+\     'for': ['javascript']
+\   }
+endif
 " Tern auto-completion engine for JS (requires node/npm)
-if executable('node')
+if executable('yarn')
   Plug 'marijnh/tern_for_vim', {
 \     'do': 'yarn install',
 \     'for': ['javascript']
@@ -298,7 +303,12 @@ let g:neoformat_javascript_prettier = {
 " NeoMake {{{
 if executable('eslint') || executable('eslint_d')
   " Use eslint/eslint_d if it's available
-  let g:neomake_javascript_enabled_makers = ['makeprg']
+  if executable('flow')
+    " And flow
+    let g:neomake_javascript_enabled_makers = ['makeprg', 'flow']
+  else
+    let g:neomake_javascript_enabled_makers = ['makeprg']
+  endif
 endif
 
 if executable('lessc')
@@ -371,9 +381,25 @@ let g:javascript_plugin_jsdoc = 1
 let g:javascript_plugin_flow = 1
 " }}}
 
+" Flow {{{
+" Don't typecheck automatically (Neomake does this)
+let g:flow#enable = 0
+
+augroup flow_shortcuts
+  autocmd!
+
+  " Switch omnifunc to flow
+  autocmd FileType javascript nnoremap <buffer> <leader>fc :setlocal omnifunc=flowcomplete#Complete<cr>
+augroup END
+" }}}
+
 " Tern {{{
-let g:tern_show_signature_in_pum=1
-let g:tern_show_argument_hints=1
+let g:tern_show_signature_in_pum = 1
+let g:tern_show_argument_hints = 1
+" Don't automatically set omnifunc (use flow)
+let g:tern_set_omni_funciton = 0
+" Don't automatically map keys
+let g:tern_map_keys = 0
 
 augroup tern_shortcuts
   autocmd!
@@ -382,6 +408,8 @@ augroup tern_shortcuts
   autocmd FileType javascript nnoremap <buffer> <leader>tr :TernRename<cr>
   " <leader>td to go to definition
   autocmd FileType javascript nnoremap <buffer> <leader>td :TernDef<cr>
+  " <leader>tc to swtich omnifunc to tern
+  autocmd FileType javascript nnoremap <buffer> <leader>tc :setlocal omnifunc=tern#Complete<cr>
 augroup END
 " }}}
 
