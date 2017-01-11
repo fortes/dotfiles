@@ -229,12 +229,20 @@ augroup END
 
 " Called after plugins have loaded {{{
 function! g:OnVimEnter()
-  augroup neomake_configuration
+  augroup neoformat_autosave
+    autocmd!
+    if exists(':Neoformat')
+      " Run automatically before saving for supported filetypes
+      echom 'Setting up neoformat'
+      autocmd BufWritePre *.js Neoformat
+    endif
+  augroup END
+
+  augroup neomake_automake
     autocmd!
     if exists(':Neomake')
       " Check for lint errors on open & write for supported filetypes
-      autocmd BufRead,BufWritePost *.js,*.es6,*.less,*.sh silent! Neomake
-      autocmd User NeomakeFinished checktime
+      autocmd BufRead,BufWritePost *.js,*.less,*.sh silent! Neomake
     endif
   augroup END
 endfunction
@@ -275,13 +283,16 @@ augroup END
 " }}}
 
 " Neoformat {{{
+" Prefer prettier when available
 if executable('prettier')
-  " Configure prettier
-  let g:neoformat_javascript_prettier = {
-\   'exe': 'prettier',
-\   'args': ['--flow-parser', '--single-quote', '--trailing-comma', '--bracket-spacing false'],
-\   }
+  let g:neoformat_enabled_javascript = ['prettier']
 endif
+
+" Preferred flags for prettier
+let g:neoformat_javascript_prettier = {
+\   'exe': 'prettier',
+\   'args': ['--flow-parser', '--single-quote', '--bracket-spacing false', '--print-width 120'],
+\   }
 " }}}
 
 " NeoMake {{{
