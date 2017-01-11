@@ -296,7 +296,8 @@ endif
 " Preferred flags for prettier
 let g:neoformat_javascript_prettier = {
 \   'exe': 'prettier',
-\   'args': ['--flow-parser', '--single-quote', '--bracket-spacing false', '--print-width 120'],
+\   'args': ['--stdin', '--flow-parser', '--single-quote', '--bracket-spacing false', '--print-width 120'],
+\   'stdin': 1,
 \   }
 " }}}
 
