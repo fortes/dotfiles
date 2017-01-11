@@ -1,5 +1,6 @@
 #!/bin/bash
 set -euf
+# shellcheck source=helpers.sh
 source "$HOME/dotfiles/scripts/helpers.sh"
 
 # Ubuntu cmus is ancient

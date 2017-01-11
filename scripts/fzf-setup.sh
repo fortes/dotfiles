@@ -1,5 +1,6 @@
 #!/bin/bash
 set -euf -o pipefail
+# shellcheck source=helpers.sh
 source "$HOME/dotfiles/scripts/helpers.sh"
 
 FZF_SOURCE_DIR=$HOME/.local/source/fzf

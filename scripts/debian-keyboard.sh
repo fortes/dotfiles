@@ -1,7 +1,6 @@
 #!/bin/bash
 set -ef -o pipefail
-# shellcheck source=/home/fortes/dotfiles/scripts/helpers.sh
-# shellcheck disable=SC1091
+# shellcheck source=helpers.sh
 source "$HOME/dotfiles/scripts/helpers.sh"
 
 if [ ! -f /etc/default/keyboard ]; then

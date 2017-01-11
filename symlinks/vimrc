@@ -565,7 +565,7 @@ augroup filetype_tweaks
 
   " Linting for shell scripts
   if executable('shellcheck')
-    autocmd FileType sh setlocal makeprg=shellcheck\ -f\ gcc\ %
+    autocmd FileType sh setlocal makeprg=shellcheck\ -x\ -f\ gcc\ %
   endif
 
   " Use prettier to autoformat (gq in Visual mode)

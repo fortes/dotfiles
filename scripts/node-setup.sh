@@ -1,5 +1,6 @@
 #!/bin/bash
 set -ef -o pipefail
+# shellcheck source=helpers.sh
 source "$HOME/dotfiles/scripts/helpers.sh"
 
 NODE_SOURCES_FILE=/etc/apt/sources.list.d/node.list

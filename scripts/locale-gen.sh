@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck source=helpers.sh
 source "$HOME/dotfiles/scripts/helpers.sh"
 
 installAptPackagesIfMissing locales

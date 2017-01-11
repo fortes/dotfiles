@@ -1,5 +1,6 @@
 #!/bin/bash
 set -euf -o pipefail
+# shellcheck source=helpers.sh
 source "$HOME/dotfiles/scripts/helpers.sh"
 
 if ! command -v nvim > /dev/null; then
