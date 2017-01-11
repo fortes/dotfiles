@@ -99,6 +99,12 @@ Plug 'junegunn/vim-peekaboo'
 " }}}
 
 " General coding {{{
+" async code formatting
+" :Neoformat <opt_formatter> for entire file
+" :Neoformat! <filetype> for visual selection
+Plug 'sbdchd/neoformat', {
+\   'on': ['Neoformat']
+\ }
 " async :make via NeoVim job control, replaces syntastic for showing errors
 " Provides :Neomake and :Neomake!
 " Only load on first use of :Neomake command
@@ -266,6 +272,16 @@ augroup test_shortcuts
   autocmd FileType javascript nnoremap <buffer> <silent> <leader>tf :TestFile<cr>
   autocmd FileType javascript nnoremap <buffer> <silent> <leader>twf :TestFile -w<cr><c-\><c-n><c-w><c-k>
 augroup END
+" }}}
+
+" Neoformat {{{
+if executable('prettier')
+  " Configure prettier
+  let g:neoformat_javascript_prettier = {
+\   'exe': 'prettier',
+\   'args': ['--flow-parser', '--single-quote', '--trailing-comma', '--bracket-spacing false'],
+\   }
+endif
 " }}}
 
 " NeoMake {{{
