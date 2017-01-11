@@ -540,9 +540,9 @@ augroup filetype_tweaks
   if executable('eslint_d') || executable('eslint')
     " Use faster eslint_d if possible
     if executable('eslint_d')
-      autocmd FileType javascript setlocal makeprg=eslint_d\ --fix\ -f\ compact\ %
+      autocmd FileType javascript setlocal makeprg=eslint_d\ -f\ compact\ %
     else
-      autocmd FileType javascript setlocal makeprg=eslint\ --fix\ -f\ compact\ %
+      autocmd FileType javascript setlocal makeprg=eslint\ -f\ compact\ %
     endif
 
     " Parse eslint errors correctly
