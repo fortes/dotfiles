@@ -38,15 +38,25 @@ if command -v fzf-tmux > /dev/null; then
     # Fuzzy find to show/edit lastpass entry
     alias lshow="lpass show \$(lpass ls | fzf-tmux | awk '{print \$(NF)}' | sed 's/\]//g')"
     alias ledit="lpass edit \$(lpass ls | fzf-tmux | awk '{print \$(NF)}' | sed 's/\]//g')"
-    # Backup LastPass database, sadly there is no import in command line tool
-    alias lbackup="lpass export | gpg --symmetric > lpass-backup.gpg"
-
-    # Use lpass to fill in password for encfs
-    alias encfs-lpass="lshow --password | encfs -S"
   fi
 
   # Fuzzy find for killing processes
   alias fkill="kill \$(ps afx | fzf-tmux | cut -f1 -d' ')"
+fi
+
+if command -v lpass > /dev/null; then
+  function lpass_export() {
+    TEMPFILE=$(mktemp)
+    shred "$TEMPFILE"
+    OUTPUT_NAME="$(date +%Y%m%d)-lpass-export.gz.scrypt"
+    lpass export | gzip > "$TEMPFILE"
+    echo "Encrypting export"
+    scrypt enc "$TEMPFILE" > "$OUTPUT_NAME"
+    rm "$TEMPFILE"
+    unset TEMPFILE
+    echo "Backup saved to $OUTPUT_NAME"
+  }
+  alias lexport=lpass_export
 fi
 
 # Add current project NPM to path
