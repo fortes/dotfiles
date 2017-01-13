@@ -288,17 +288,8 @@ augroup END
 " }}}
 
 " Neoformat {{{
-" Prefer prettier when available
-if executable('prettier')
-  let g:neoformat_enabled_javascript = ['prettier']
-endif
-
-" Preferred flags for prettier
-let g:neoformat_javascript_prettier = {
-\   'exe': 'prettier',
-\   'args': ['--stdin', '--flow-parser', '--single-quote', '--bracket-spacing false', '--print-width 120'],
-\   'stdin': 1,
-\   }
+" Use formatprg when available
+let g:neoformat_try_formatprg = 1
 " }}}
 
 " NeoMake {{{
