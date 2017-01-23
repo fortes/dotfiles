@@ -161,10 +161,6 @@ Plug 'groenewege/vim-less', {
 Plug 'pangloss/vim-javascript', {
 \   'for': ['javascript']
 \ }
-" Format code
-Plug 'millermedeiros/vim-esformatter', {
-\   'for': ['javascript']
-\ }
 if executable('flow')
   Plug 'flowtype/vim-flow', {
 \     'for': ['javascript']
