@@ -15,9 +15,9 @@ if [ -z "$BATTERY" ]; then
 fi
 
 BATTERY_INFO=$(upower -i "$BATTERY")
-BATTERY_ICON="⚡ "
+BATTERY_ICON="☀"
 if echo "$BATTERY_INFO" | grep -i state | grep -qi discharging; then
   BATTERY_ICON=""
 fi
 BATTERY_PERCENTAGE=$(echo "$BATTERY_INFO" | grep -i percentage | awk '{print $2}')
-echo "[$BATTERY_ICON$BATTERY_PERCENTAGE]"
+echo "$BATTERY_ICON$BATTERY_PERCENTAGE"
