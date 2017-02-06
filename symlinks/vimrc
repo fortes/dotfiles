@@ -621,8 +621,8 @@ augroup END
 " Disable annoying banner
 let g:netrw_banner=0
 
-" Open in prior window
-let g:netrw_browse_split=4
+" Open in same window
+let g:netrw_browse_split=0
 
 " Open splits to the right
 let g:netrw_altv=1
