@@ -73,6 +73,10 @@ Plug 'tpope/vim-surround'
 " - >p paste and indent
 " - <p paste and deindent
 Plug 'tpope/vim-unimpaired'
+" Replace object with register contents
+" gr{motion} Replace w/ unnamed register
+" "xgr{motion} Replace w/ register x
+Plug 'vim-scripts/ReplaceWithRegister'
 " Complete words from tmux with <C-x><C-u>
 Plug 'wellle/tmux-complete.vim'
 " }}}
