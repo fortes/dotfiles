@@ -100,7 +100,7 @@ fi
 BASE_PROMPT="$BASE_PROMPT$CYAN\h:$YELLOW\w$RESET"
 JOB_COUNT="$BOLD$BLUE[\j]$RESET "
 # Add job count if non-zero
-export PROMPT_COMMAND='HAS_JOBS=$(jobs -p) '
+export PROMPT_COMMAND="HAS_JOBS=\`jobs -p\` "
 PS1="$BASE_PROMPT ""\${HAS_JOBS:+$JOB_COUNT}"
 
 if [ -r /etc/bash_completion.d/git-prompt ]; then
@@ -113,7 +113,7 @@ if [ -r /etc/bash_completion.d/git-prompt ]; then
   # Note untracked files
   export GIT_PS1_SHOWUNTRACKEDFILES=1
   source /etc/bash_completion.d/git-prompt
-  export PROMPT_COMMAND="HAS_JOBS=\`jobs -p\`; __git_ps1 \"$BASE_PROMPT\" \" \${HAS_JOBS:+$JOB_COUNT }\" \" %s$RESET\""
+  export PROMPT_COMMAND="$PROMPT_COMMAND; __git_ps1 \"$BASE_PROMPT\" \" \${HAS_JOBS:+$JOB_COUNT }\" \" %s$RESET\""
 fi
 
 # FZF keybindings
