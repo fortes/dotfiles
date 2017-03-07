@@ -368,18 +368,22 @@ let g:flow#enable = 0
 augroup flow_shortcuts
   autocmd!
 
-  " Switch omnifunc to flow
+  " Switch omnifunc to flow via <leader>fc
   autocmd FileType javascript nnoremap <buffer> <leader>fc :setlocal omnifunc=flowcomplete#Complete<cr>
 augroup END
 " }}}
 
 " Tern {{{
-let g:tern_show_signature_in_pum = 1
-let g:tern_show_argument_hints = 1
-" Don't automatically set omnifunc (use flow)
-let g:tern_set_omni_funciton = 0
+" Hide argument hints
+let g:tern_show_argument_hints = 0
+" Automatically set omnifunc (switch to flow via <leader>fc)
+let g:tern_set_omni_function = 1
 " Don't automatically map keys
 let g:tern_map_keys = 0
+" Don't auto-shutdown after 5 minutes
+let g:tern#arguments = ['--persistent']
+" Suppress location list after variable rename
+let g:tern_show_loc_after_rename = 0
 
 augroup tern_shortcuts
   autocmd!
