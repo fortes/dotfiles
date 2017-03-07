@@ -108,21 +108,15 @@ Plug 'junegunn/vim-peekaboo'
 " async code formatting
 " :Neoformat <opt_formatter> for entire file
 " :Neoformat! <filetype> for visual selection
-Plug 'sbdchd/neoformat', {
-\   'on': ['Neoformat']
-\ }
+Plug 'sbdchd/neoformat', { 'on': ['Neoformat'] }
 " async :make via NeoVim job control, replaces syntastic for showing errors
 " Provides :Neomake and :Neomake!
 " Only load on first use of :Neomake command
-Plug 'benekastah/neomake', {
-\   'on': ['Neomake']
-\ }
+Plug 'benekastah/neomake', { 'on': ['Neomake'] }
 " Use SignColumn to mark lines in Quickfix/Location list
 Plug 'dhruvasagar/vim-markify'
 " Test.vim: Run tests based on cursor position / file
-Plug 'janko-m/vim-test', {
-\   'for': ['javascript']
-\ }
+Plug 'janko-m/vim-test', { 'for': ['javascript'] }
 " }}}
 
 " Git {{{
@@ -152,32 +146,21 @@ Plug 'airblade/vim-gitgutter'
 
 " CSS/LESS {{{
 " Better CSS syntax
-Plug 'JulesWang/css.vim', {
-\   'for': ['css', 'less']
-\ }
+Plug 'JulesWang/css.vim', { 'for': ['css', 'less'] }
 " LESS Support
-Plug 'groenewege/vim-less', {
-\ 'for': ['less']
-\ }
+Plug 'groenewege/vim-less', { 'for': ['less'] }
 " }}}
 
 " Javascript {{{
 " JS highlighting and indent support. Sometimes buggy, but has support for
 " jsdocs and flow
-Plug 'pangloss/vim-javascript', {
-\   'for': ['javascript']
-\ }
+Plug 'pangloss/vim-javascript', { 'for': ['javascript']}
 if executable('flow')
-  Plug 'flowtype/vim-flow', {
-\     'for': ['javascript']
-\   }
+  Plug 'flowtype/vim-flow', { 'for': ['javascript'] }
 endif
 " Tern auto-completion engine for JS (requires node/npm)
 if executable('yarn')
-  Plug 'marijnh/tern_for_vim', {
-\     'do': 'yarn install',
-\     'for': ['javascript']
-\   }
+  Plug 'marijnh/tern_for_vim', { 'do': 'yarn install', 'for': ['javascript'] }
 endif
 " }}}
 
