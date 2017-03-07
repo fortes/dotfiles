@@ -27,6 +27,8 @@ Plug 'cazador481/fakeclip.neovim'
 " Editing {{{
 " Accent autocompletion via <C-X><C-U> or gx in normal mode
 Plug 'airblade/vim-accent'
+" <leader>nr open visual selection in sep window
+Plug 'chrisbra/NrrwRgn'
 " Auto-close parens / quotes, requires no config
 Plug 'cohama/lexima.vim'
 " Personal snippets
@@ -198,6 +200,9 @@ endfor
 " Useful reference for Neovim-only features (:help vim-differences)
 
 " Terminal {{{
+" Lots of scrollback in terminal
+let g:terminal_scrollback_buffer_size = 50000
+
 " Quickly open a shell below current window
 nnoremap <leader>sh :below 10sp term://$SHELL<cr>
 
