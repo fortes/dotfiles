@@ -99,8 +99,8 @@ fi
 # [user@]host:pwd $
 BASE_PROMPT="$BASE_PROMPT$CYAN\h:$YELLOW\w$RESET"
 JOB_COUNT="$BOLD$BLUE[\j]$RESET "
-# Add job count if non-zero
-export PROMPT_COMMAND="HAS_JOBS=\`jobs -p\` "
+# Write out history after every command. Add job count if non-zero
+export PROMPT_COMMAND="history -a; HAS_JOBS=\`jobs -p\` "
 PS1="$BASE_PROMPT ""\${HAS_JOBS:+$JOB_COUNT}"
 
 if [ -r /etc/bash_completion.d/git-prompt ]; then
