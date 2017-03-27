@@ -18,6 +18,7 @@
   addmp = "!git add -p `git ls-files -m --other --exclude-standard | fzf-tmux -m`"
   bclean = "!git branch --merged | grep -v '*' | xargs -n 1 git branch -d"
   grephistory = "!f(){ git log -S "${1}" --oneline | cut -d' ' -f1 | xargs git grep "$1"; };f"
+  squash=!f(){ git reset --soft HEAD~${1} && git commit --edit -m"$(git log --format=%B --reverse HEAD..HEAD@{1})"; };f
 [apply]
   whitespace = fix
 [branch]
