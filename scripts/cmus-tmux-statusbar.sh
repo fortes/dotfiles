@@ -2,7 +2,7 @@
 if [[ $1 =~ ^[[:digit:]]+$ ]]; then
   MAX_TITLE_WIDTH=$1
 else
-  MAX_TITLE_WIDTH=$(($(tmux display -p '#{window_width}') - 80))
+  MAX_TITLE_WIDTH=$(($(tmux display -p '#{window_width}' 2> /dev/null || echo 120) - 80))
 fi
 
 if cmus-remote -Q > /dev/null 2> /dev/null; then
