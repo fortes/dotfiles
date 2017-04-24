@@ -15,10 +15,10 @@ if [ ! -f $YARN_SOURCES_FILE ]; then
 fi
 echo "$CMARK Yarn in sources.list"
 
-echo "$ARROW Installing node, npm, and yarn (requires sudo)"
-installAptPackagesIfMissing nodejs npm yarn
+echo "$ARROW Installing node and yarn (requires sudo)"
+installAptPackagesIfMissing nodejs yarn
 
-if ! update-alternatives --get-selections | grep -v -q "^node"; then
+if ! update-alternatives --get-selections | grep -q "^node"; then
   echo "$ARROW Updating alternatives to set symlinks for nodejs to node"
   sudo update-alternatives --install \
     /usr/bin/node node "$(command -v nodejs)" 10
@@ -28,20 +28,28 @@ echo "$CMARK Node system alternatives set"
 # Create directories for packages
 NPM_PREFIX=$HOME/.local
 NPM_CACHE_DIR=$HOME/.cache/npm
-npm config set prefix "$NPM_PREFIX"
-npm config set cache "$NPM_CACHE_DIR"
 mkdir -p "$NPM_PREFIX/bin"
 mkdir -p "$NPM_CACHE_DIR"
 
-# Yarn is fast enough that we just install everything at once
-echo "  $ARROW Installing global node packages"
-yarn global add $(xargs < "$HOME/dotfiles/scripts/node-packages")
-
-# Use latest node via n instead of relying on old packages, this also provides
-# npm
-if which node | grep -iq /usr/bin; then
-  echo "  $ARROW Using n to get latest lts"
-  n lts
+# npm isn't available from the debian repository in stretch (wtf?), so we use
+# yarn to temporarily install n, which we then use to install node lts, which
+# comes with npm (and can officially run yarn). Note that this may break someday
+# in the future, since yarn requires node v6+
+if ! command -v npm > /dev/null; then
+  pushd /tmp > /dev/null
+  echo "$ARROW installing local node lts and npm"
+  yarn add n
+  N_PREFIX=$NPM_PREFIX /tmp/node_modules/.bin/n lts
+  rm -rf /tmp/node_modules /tmp/package.json
+  popd > /dev/null
 fi
+
+# Make sure we have latest path for node / npm before running yarn, which needs
+# node v6+
+export PATH="$NPM_PREFIX/bin:$PATH"
+
+# Yarn is fast enough that we just install everything at once
+echo "$ARROW Installing global node packages"
+yarn global add $(xargs < "$HOME/dotfiles/scripts/node-packages")
 
 echo "$CMARK All node packages installed"
