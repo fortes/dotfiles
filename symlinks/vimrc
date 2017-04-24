@@ -470,6 +470,10 @@ nnoremap <S-Tab> <C-W>W
 nnoremap <expr><silent> <Bar> v:count == 0 ? "<C-W>v<C-W><Right>" : ":<C-U>normal! 0".v:count."<Bar><CR>"
 nnoremap <expr><silent> _     v:count == 0 ? "<C-W>s<C-W><Down>"  : ":<C-U>normal! ".v:count."_<CR>"
 
+" Delete buffer via <C-W>d since I don't use tags
+nnoremap <C-w>d :bd<cr>
+nnoremap <C-w><C-d> :bd<cr>
+
 " Unimpaired-style toggling of paste mode (and print result)
 nnoremap cop :set invpaste<cr>:set paste?<cr>
 
