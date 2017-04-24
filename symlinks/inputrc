@@ -17,7 +17,9 @@ Control-p: history-search-backward
 Control-w: unix-filename-rubout
 "\C-x\C-e": edit-and-execute-command
 # Auto expand history
+$if Bash
 Space: magic-space
+$endif
 Control-j: menu-complete
 Control-k: menu-complete-backward
 
