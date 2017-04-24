@@ -73,9 +73,9 @@ fi
 alias autossh-forward="autossh -M 0 -f -T -N"
 
 # Map ls to be colorful and reasonable defaults
-alias ls='ls --color=auto -pLFhv'
-alias la='ls --color=auto -ApLFhv'
-alias ll='ls --color=auto -AlpLFhv'
+alias ls='ls --color=auto -pFhv --quoting-style=shell-escape'
+alias la='ls --color=auto -ApFhv'
+alias ll='ls --color=auto -AlpFhv'
 
 # Shortcuts for copying from tmux clipboard to system clipboard
 if command -v xclip > /dev/null; then
