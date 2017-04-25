@@ -1,0 +1,5 @@
+#!/bin/sh
+#
+# SSH-only env makes `xclip` choke, and the `yank` script needs to ignore normal
+# `xclip` arguments (e.g. `-i selection``)
+yank
