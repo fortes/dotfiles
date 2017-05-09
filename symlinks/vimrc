@@ -201,23 +201,22 @@ set wildignorecase
 " Status line {{{
 if version >= 704
   " Show git repo information (if available)
-  let g:activeStatusLine=" %{StatuslineTag()} » "
+  let g:activeStatusLine="%{StatuslineTag()}»"
 else
-  let g:activeStatusLine=" "
+  let g:activeStatusLine=""
 endif
 " Relative path to file in current buffer
 let g:activeStatusLine.="%<%f "
 " Exclamation mark if not modifiable, + if modified
 let g:activeStatusLine.="%{&readonly ? \"! \" : &modified ? '+ ' : ''}"
 " Start left align, show filetype
-let g:activeStatusLine.="%= %{&filetype == '' ? 'unknown' : &filetype} "
+let g:activeStatusLine.="%= %{&filetype == '' ? 'none' : &filetype} "
 " Line/col/percent
 let g:activeStatusLine.="%l:%2c "
 function! StatuslineTag()
   if exists('b:git_dir')
-    let dir = fnamemodify(b:git_dir[:-6], ':t')
     " Shitty unicode character w/o patched fonts
-    return dir." ‡ ".fugitive#head(7)
+    return "‡".fugitive#head(7)
   else
     return fnamemodify(getwinvar(0, 'getcwd', getcwd()), ':t')
   endif
