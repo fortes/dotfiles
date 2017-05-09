@@ -463,6 +463,11 @@ nnoremap ZZ <nop>
 nnoremap <Tab> <C-W>w
 nnoremap <S-Tab> <C-W>W
 
+" Run `.` or macro over selected lines, taken from:
+" https://reddit.com/r/vim/comments/3y2mgt
+vnoremap . :normal .<CR>
+vnoremap @ :normal @
+
 " Use | and _ to split windows (while preserving original behaviour of
 " [count]bar and [count]_).
 " Stolen from http://howivim.com/2016/andy-stewart/
