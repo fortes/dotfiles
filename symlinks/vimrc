@@ -138,8 +138,8 @@ set sidescrolloff=5
 set sidescroll=1
 
 " Hide the intro screen, use [+] instead of [Modified], use [RO] instead
-" of [readyonly]
-set shortmess+=Imr
+" of [readyonly], and don't give completion match messages
+set shortmess+=Imrc
 
 " Display incomplete commands
 set showcmd
@@ -154,7 +154,7 @@ set wildmode=full
 " Resize splits when the window is resized
 augroup on_vim_resized
   autocmd!
-  autocmd VimResized * exe "normal! \<c-w>="
+  autocmd VimResized * wincmd =
 augroup END
 " }}}
 
@@ -278,6 +278,10 @@ set completeopt=menuone,longest
 if filereadable('/usr/share/dict/words')
   set dictionary+=/usr/share/dict/words
 endif
+
+" Enable tab/enter if completion menu is open
+inoremap <expr> <Tab> (pumvisible() ? "\<C-n>" : "\<Tab>")
+inoremap <expr> <S-Tab> (pumvisible() ? "\<C-p>" : "\<S-Tab>")
 " }}}
 
 " Default formatoptions (as of neovim): tcqj
@@ -325,6 +329,9 @@ silent! colorscheme delek
 
 " Enable syntax highlighting by default
 syntax enable
+
+" Only highlight first 200 chars for better performance
+set synmaxcol=200
 " }}}
 
 " Searching {{{
@@ -560,7 +567,7 @@ augroup filetype_tweaks
 
     " Parse eslint errors correctly
     autocmd FileType javascript setlocal
-          \ errorformat=%E%f:\ line\ %l\\,\ col\ %c\\,\ Error\ -\ %m
+          \ errorformat+=%E%f:\ line\ %l\\,\ col\ %c\\,\ Error\ -\ %m
     autocmd FileType javascript setlocal
           \ errorformat+=%W%f:\ line\ %l\\,\ col\ %c\\,\ Warning\ -\ %m
     " Ignore lines that don't match the above
@@ -584,6 +591,8 @@ augroup filetype_tweaks
   " Use prettier to autoformat (gq in Visual mode)
   if executable('prettier')
     autocmd FileType javascript setlocal formatprg=prettier\ --stdin\ --parser\ flow\ --single-quote\ --bracket-spacing\ false\ --trailing-comma\ es5
+    autocmd FileType css setlocal formatprg=prettier\ --parser\ postcss
+    autocmd FileType less setlocal formatprg=prettier\ --parser\ postcss
   endif
 
   " Simple folding for JS

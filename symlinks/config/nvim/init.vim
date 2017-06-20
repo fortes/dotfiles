@@ -164,6 +164,10 @@ if executable('yarn')
 endif
 " }}}
 
+" More coding {{{
+" Pug template support
+Plug 'digitaltoad/vim-pug'
+" }}}
 call plug#end()
 " }}}
 
@@ -226,7 +230,6 @@ function! g:OnVimEnter()
     autocmd!
     if exists(':Neoformat')
       " Run automatically before saving for supported filetypes
-      echom 'Setting up neoformat'
       autocmd BufWritePre *.js Neoformat
     endif
   augroup END
