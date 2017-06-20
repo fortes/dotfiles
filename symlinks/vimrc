@@ -538,6 +538,8 @@ vnoremap <leader>y :<C-u>norm! gvy<cr>:Osc52CopyYank<cr>
 " Filetype configuration {{{
 augroup filetype_tweaks
   autocmd!
+  " Recognize typescript
+  autocmd BufNewFile,BufReadPost *.ts set filetype=typescript
 
   " .md is markdown, not modula
   autocmd BufNewFile,BufReadPost *.md set filetype=markdown
@@ -574,6 +576,23 @@ augroup filetype_tweaks
     autocmd FileType javascript setlocal errorformat+=%-G%.%#
   endif
 
+  " TypeScript linting and type checking
+  if executable('tsc') && executable('tslint')
+    " Type check and lint at the same time, can be slow at times
+    autocmd FileType typescript setlocal makeprg=(tsc\ --strict\ %\;tslint\ -c\ ~/.tslint.json\ --format\ msbuild\ %)
+
+    " Use the `msbuild` error format for `tslint`, which luckily matches what
+    " `tsc` outputs.
+    autocmd FileType typescript setlocal errorformat+=%E%f(%l\\,%c):\ error\ %m
+    autocmd FileType typescript setlocal errorformat+=%W%f(%l\\,%c):\ warning\ %m
+
+    " Ignore TS usage warnings when type checking disabled
+    autocmd FileType typescript setlocal errorformat+=%-GWarning:\ %m,
+
+    " Ignore remaining non-matching lines
+    autocmd FileType typescript setlocal errorformat+=%-G%.%#,
+  endif
+
   " Linting for LESS
   if executable('lessc')
     autocmd FileType less setlocal makeprg=lessc\ --lint\ --no-color\ %
@@ -591,6 +610,8 @@ augroup filetype_tweaks
   " Use prettier to autoformat (gq in Visual mode)
   if executable('prettier')
     autocmd FileType javascript setlocal formatprg=prettier\ --stdin\ --parser\ flow\ --single-quote\ --bracket-spacing\ false\ --trailing-comma\ es5
+    autocmd FileType typescript setlocal formatprg=prettier\ --stdin\ --parser\ typescript\ --single-quote\ --bracket-spacing\ false\ --trailing-comma\ all
+
     autocmd FileType css setlocal formatprg=prettier\ --parser\ postcss
     autocmd FileType less setlocal formatprg=prettier\ --parser\ postcss
   endif

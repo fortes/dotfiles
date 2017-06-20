@@ -6,3 +6,5 @@ flow-bin
 git-recent
 n
 prettier
+tslint
+typescript
