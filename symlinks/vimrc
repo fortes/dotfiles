@@ -67,6 +67,9 @@ if !exists('g:loaded_matchit') && findfile('plugin/matchit.vim', &rtp) ==# ''
 endif
 
 " Core Behavior {{{
+" Read .vimrc from current dir, if present
+set exrc
+
 " Enable loading plugin / indent settings based on filetype
 filetype plugin indent on
 
@@ -559,17 +562,12 @@ augroup filetype_tweaks
   autocmd BufRead,BufNewFile *.es6 set filetype=javascript
 
   " Set up linting for JS
-  if executable('eslint_d') || executable('eslint')
-    " Use faster eslint_d if possible
-    if executable('eslint_d')
-      autocmd FileType javascript setlocal makeprg=eslint_d\ -f\ compact\ %
-    else
-      autocmd FileType javascript setlocal makeprg=eslint\ -f\ compact\ %
-    endif
+  if executable('eslint')
+    autocmd FileType javascript setlocal makeprg=eslint\ -f\ compact\ %
 
     " Parse eslint errors correctly
     autocmd FileType javascript setlocal
-          \ errorformat+=%E%f:\ line\ %l\\,\ col\ %c\\,\ Error\ -\ %m
+          \ errorformat=%E%f:\ line\ %l\\,\ col\ %c\\,\ Error\ -\ %m
     autocmd FileType javascript setlocal
           \ errorformat+=%W%f:\ line\ %l\\,\ col\ %c\\,\ Warning\ -\ %m
     " Ignore lines that don't match the above
@@ -579,11 +577,16 @@ augroup filetype_tweaks
   " TypeScript linting and type checking
   if executable('tsc') && executable('tslint')
     " Type check and lint at the same time, can be slow at times
-    autocmd FileType typescript setlocal makeprg=(tsc\ --strict\ %\;tslint\ -c\ ~/.tslint.json\ --format\ msbuild\ %)
+    if filereadable('./tslint.json')
+      " Use local tslint.json if available
+      autocmd FileType typescript setlocal makeprg=(tsc\ --strict\ %\;tslint\ -c\ ./tslint.json\ --format\ msbuild\ %)
+    else
+      autocmd FileType typescript setlocal makeprg=(tsc\ --strict\ %\;tslint\ -c\ ~/.tslint.json\ --format\ msbuild\ %)
+    endif
 
     " Use the `msbuild` error format for `tslint`, which luckily matches what
     " `tsc` outputs.
-    autocmd FileType typescript setlocal errorformat+=%E%f(%l\\,%c):\ error\ %m
+    autocmd FileType typescript setlocal errorformat=%E%f(%l\\,%c):\ error\ %m
     autocmd FileType typescript setlocal errorformat+=%W%f(%l\\,%c):\ warning\ %m
 
     " Ignore TS usage warnings when type checking disabled
