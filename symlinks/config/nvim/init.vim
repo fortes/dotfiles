@@ -164,6 +164,12 @@ if executable('yarn')
 endif
 " }}}
 
+" Typescript {{{
+" Highlighting and indent support
+Plug 'leafgarland/typescript-vim', { 'for': ['typescript']}
+" TODO: Get omnicompletion working well without a mess of plugins
+" }}}
+
 " More coding {{{
 " Pug template support
 Plug 'digitaltoad/vim-pug'
@@ -302,6 +308,10 @@ if executable('shellcheck')
   let g:neomake_sh_enabled_makers = ['makeprg']
 endif
 
+if executable('tsc')
+  let g:neomake_typescript_enabled_makers = ['makeprg']
+endif
+
 " Open list automatically when there are errors
 let g:neomake_open_list = 2
 " }}}
@@ -398,6 +408,11 @@ augroup tern_shortcuts
   " <leader>tc to swtich omnifunc to tern
   autocmd FileType javascript nnoremap <buffer> <leader>tc :setlocal omnifunc=tern#Complete<cr>
 augroup END
+" }}}
+
+" vim-typescript {{{
+" Have prettier to autoformat, so don't bother with indent rules.
+let g:typescript_indent_disable = 1
 " }}}
 
 " GitGutter {{{
