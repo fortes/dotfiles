@@ -1,20 +1,25 @@
 " vim:fdm=marker et fdl=2 ft=vim sts=2 sw=2 ts=2
 
-" Plugins {{{
-if !filereadable(expand('~/.config/nvim/autoload/plug.vim'))
-  echo 'Must install vim-plug, run ~/dotfiles/scripts/nvim-setup.sh'
-  echo 'Run nvim -u NONE to open without ' . expand("<sfile>")
-  exit
+" Automatically download vim-plug, if not present
+if !filereadable(expand($XDG_CONFIG_HOME.'/nvim/autoload/plug.vim'))
+  echo 'vim-plug not installed, downloading'
+  !curl -fLo "$XDG_CONFIG_HOME/nvim/autoload/plug.vim" --create-dirs
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  echo 'vim-plug downloaded, will install plugins once vim loads'
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
+" Read ~/.vimrc as well
+if filereadable(expand($HOME.'/.vimrc'))
+  source $HOME/.vimrc
+endif
+
+" Plugins {{{
 call plug#begin()
 
 " Colors {{{
 " A bunch of Base16 colorschemes
 Plug 'chriskempson/base16-vim'
-" Temporary while developing colorscheme
-" Plug 'fortes/vim-escuro'
-" Plug '~/x/vim-escuro'
 " Shades indent levels
 Plug 'nathanaelkane/vim-indent-guides'
 " }}}
@@ -25,7 +30,7 @@ Plug 'cazador481/fakeclip.neovim'
 " }}}
 
 " Editing {{{
-" Accent autocompletion via <C-X><C-U> or gx in normal mode
+" Accent autocompletion via gx in normal mode
 Plug 'airblade/vim-accent'
 " <leader>nr open visual selection in sep window
 Plug 'chrisbra/NrrwRgn'
@@ -89,6 +94,9 @@ if executable('fzf')
   Plug 'junegunn/fzf'
   Plug 'junegunn/fzf.vim'
 end
+" Show register contents when using " or @ in normal mode
+" Also shows when hitting <c-r> in insert mode
+Plug 'junegunn/vim-peekaboo'
 " Adds helpers for UNIX shell commands
 " :Remove Delete buffer and file at same time
 " :Unlink Delete file, keep buffer
@@ -99,16 +107,12 @@ Plug 'tpope/vim-eunuch'
 " - cg/cl to cd into the 
 " - ! to use the file in a command
 Plug 'tpope/vim-vinegar'
-" Show register contents when using " or @ in normal mode
-" Also shows when hitting <c-r> in insert mode
-Plug 'junegunn/vim-peekaboo'
 " }}}
 
 " General coding {{{
-" async code formatting
-" :Neoformat <opt_formatter> for entire file
-" :Neoformat! <filetype> for visual selection
-Plug 'sbdchd/neoformat', { 'on': ['Neoformat'] }
+" async LanguageServerClient, lots of commands (rename, definitions, etc)
+" No default bindings, see config below
+Plug 'autozimu/LanguageClient-neovim', { 'do': ':UpdateRemotePlugins' }
 " async :make via NeoVim job control, replaces syntastic for showing errors
 " Provides :Neomake and :Neomake!
 " Only load on first use of :Neomake command
@@ -117,6 +121,12 @@ Plug 'benekastah/neomake', { 'on': ['Neomake'] }
 Plug 'dhruvasagar/vim-markify'
 " Test.vim: Run tests based on cursor position / file
 Plug 'janko-m/vim-test', { 'for': ['javascript'] }
+" Async completion
+Plug 'roxma/nvim-completion-manager'
+" async code formatting
+" :Neoformat <opt_formatter> for entire file
+" :Neoformat! <filetype> for visual selection
+Plug 'sbdchd/neoformat', { 'on': ['Neoformat'] }
 " }}}
 
 " Git {{{
@@ -152,16 +162,15 @@ Plug 'groenewege/vim-less', { 'for': ['less'] }
 " }}}
 
 " Javascript {{{
+if executable('flow')
+  Plug 'flowtype/vim-flow', { 'for': ['javascript'] }
+  Plug 'roxma/ncm-flow',  {'for': ['javascript']}
+endif
 " JS highlighting and indent support. Sometimes buggy, but has support for
 " jsdocs and flow
 Plug 'pangloss/vim-javascript', { 'for': ['javascript']}
-if executable('flow')
-  Plug 'flowtype/vim-flow', { 'for': ['javascript'] }
-endif
-" Tern auto-completion engine for JS (requires node/npm)
-if executable('yarn')
-  Plug 'marijnh/tern_for_vim', { 'do': 'yarn install', 'for': ['javascript'] }
-endif
+" JS Completion clients for nvim-completion
+Plug 'roxma/nvim-cm-tern',  {'do': 'yarn install', 'for': ['javascript']}
 " }}}
 
 " Typescript {{{
@@ -170,7 +179,7 @@ Plug 'leafgarland/typescript-vim', { 'for': ['typescript']}
 " TODO: Get omnicompletion working well without a mess of plugins
 " }}}
 
-" More coding {{{
+" Misc coding {{{
 " Pug template support
 Plug 'digitaltoad/vim-pug'
 " }}}
@@ -251,6 +260,48 @@ endfunction
 " }}}
 
 " Plugin Configuration {{{
+
+" LanguageClient-neovim {{{
+" Automatically start language servers.
+let g:LanguageClient_autoStart = 1
+
+augroup LanguageClientConfig
+  autocmd!
+
+  " <leader>ld to go to definition
+  autocmd FileType javascript nnoremap <buffer> <leader>ld :call LanguageClient_textDocument_definition()<cr>
+  " <leader>lf to fuzzy find the symbols in the current document
+  autocmd FileType javascript nnoremap <buffer> <leader>lf :call LanguageClient_textDocument_documentSymbol()<cr>
+  " <leader>lh for type info under cursor
+  autocmd FileType javascript nnoremap <buffer> <leader>lh :call LanguageClient_textDocument_hover()<cr>
+  " <leader>lr to rename variable under cursor
+  autocmd FileType javascript nnoremap <buffer> <leader>lr :call LanguageClient_textDocument_rename()<cr>
+  " <leader>lc to swtich omnifunc to LanguageClient
+  autocmd FileType javascript nnoremap <buffer> <leader>lc :setlocal omnifunc=LanguageClient#complete<cr>
+
+  " Use as omnifunc by default
+  autocmd FileType javascript setlocal omnifunc=LanguageClient#complete
+  autocmd FileType typescript setlocal omnifunc=LanguageClient#complete
+  autocmd FileType python setlocal omnifunc=LanguageClient#complete
+augroup END
+
+let g:LanguageClient_serverCommands = {}
+
+if executable('pyls')
+  let g:LanguageClient_serverCommands.python = ['pyls']
+endif
+
+if executable('javascript-typescript-stdio')
+  let g:LanguageClient_serverCommands.javascript = ['javascript-typescript-stdio']
+  let g:LanguageClient_serverCommands.typescript = ['javascript-typescript-stdio']
+endif
+" }}}
+
+" nvim-completion-manager {{{
+" Use fuzzy matching
+let g:cm_matcher = {'case': 'smartcase', 'module': 'cm_matchers.fuzzy_matcher'}
+" }}}
+
 " Markify {{{
 " Use nicer symbols
 let g:markify_error_text = '✗'
@@ -375,38 +426,17 @@ let g:javascript_plugin_flow = 1
 " }}}
 
 " Flow {{{
-" Don't typecheck automatically (Neomake does this)
+" Don't typecheck automatically (Async checkers do this already)
 let g:flow#enable = 0
 
-augroup flow_shortcuts
+" Don't automatically set omnifunc (use LanguageClient)
+let g:flow#omnifunc = 0
+
+augroup flow_omni
   autocmd!
 
   " Switch omnifunc to flow via <leader>fc
   autocmd FileType javascript nnoremap <buffer> <leader>fc :setlocal omnifunc=flowcomplete#Complete<cr>
-augroup END
-" }}}
-
-" Tern {{{
-" Hide argument hints
-let g:tern_show_argument_hints = 0
-" Automatically set omnifunc (switch to flow via <leader>fc)
-let g:tern_set_omni_function = 1
-" Don't automatically map keys
-let g:tern_map_keys = 0
-" Don't auto-shutdown after 5 minutes
-let g:tern#arguments = ['--persistent']
-" Suppress location list after variable rename
-let g:tern_show_loc_after_rename = 0
-
-augroup tern_shortcuts
-  autocmd!
-
-  " <leader>tr to rename variable under cursor via Tern
-  autocmd FileType javascript nnoremap <buffer> <leader>tr :TernRename<cr>
-  " <leader>td to go to definition
-  autocmd FileType javascript nnoremap <buffer> <leader>td :TernDef<cr>
-  " <leader>tc to swtich omnifunc to tern
-  autocmd FileType javascript nnoremap <buffer> <leader>tc :setlocal omnifunc=tern#Complete<cr>
 augroup END
 " }}}
 

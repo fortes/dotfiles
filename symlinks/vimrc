@@ -434,8 +434,9 @@ vnoremap <cr> :
 nnoremap <M-cr> <cr>
 vnoremap <M-cr> <cr>
 
-" Hide annoying quit message
-nnoremap <C-c> <C-c>:echo<cr>
+" Kick the habit of using <C-c> instead of <C-[>, since <C-c> breaks
+" nvim-completion-manager
+inoremap <C-c> <C-[>:echom "Use C-[ instead!"<cr>
 
 " Close quickfix & help with q, Escape, or Control-C
 " Also, keep default <cr> binding

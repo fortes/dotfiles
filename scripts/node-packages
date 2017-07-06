@@ -4,6 +4,7 @@ eslint-plugin-react
 eslint_d
 flow-bin
 git-recent
+javascript-typescript-langserver
 n
 prettier
 tslint
