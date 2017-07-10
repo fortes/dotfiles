@@ -372,8 +372,8 @@ if executable('fzf')
   " <C-p> or <C-t> to search files
   " Open in split via control-x / control-v
   " Select/Deselect all via alt-a / alt-d
-  nnoremap <silent> <C-t> :FZF -m<cr>
-  nnoremap <silent> <C-p> :FZF -m<cr>
+  onoremap <silent> <C-t> :call fzf#vim#files('', fzf#vim#with_preview())<cr>
+  nnoremap <silent> <C-p> :call fzf#vim#files('', fzf#vim#with_preview())<cr>
 
   " <M-p> for open buffers
   nnoremap <silent> <M-p> :Buffers<cr>
@@ -381,8 +381,8 @@ if executable('fzf')
   " <M-S-p> for MRU & v:oldfiles
   nnoremap <silent> <M-S-p> :History<cr>
 
-  " Fuzzy line completion via <c-x><c-m> instead of <c-x><c-l>
-  imap <c-x><c-m> <plug>(fzf-complete-line)
+  " Fuzzy insert mode completion for lines
+  imap <c-x><c-l> <plug>(fzf-complete-line)
 
   " Use fuzzy completion relative filepaths across directory with <c-x><c-j>
   imap <expr> <c-x><c-j> fzf#vim#complete#path('git ls-files $(git rev-parse --show-toplevel)')
@@ -397,13 +397,18 @@ if executable('fzf')
   nnoremap <leader>? :Helptags<CR>
 
   " Search from git root via :Rag (Root Ag)
-  autocmd VimEnter * command! -nargs=* Rag
-    \ call fzf#vim#ag(<q-args>, extend(FindGitRootCD(), g:fzf#vim#default_layout))
+  " :Rag  - hidden preview enabled with "?" key
+  " :Rag! - fullscreen and preview window above
+  command! -bang -nargs=* Rag
+    \ call GitRootCD() | call fzf#vim#ag(<q-args>,
+    \                 <bang>0 ? fzf#vim#with_preview('up:60%', '?')
+    \                         : fzf#vim#with_preview('right:50%:hidden', '?'),
+    \                 <bang>0)
 
   " Use fuzzy searching for K & Q, select items to go into quickfix
-  nnoremap K :Rag <C-R><C-W><cr>
-  vnoremap K :<C-u>norm! gv"sy<cr>:silent! Rag <C-R>s<cr>
-  nnoremap Q :Rag<SPACE>
+  nnoremap K :Rag! <C-R><C-W><cr>
+  vnoremap K :<C-u>norm! gv"sy<cr>:silent! Rag! <C-R>s<cr>
+  nnoremap Q :Rag!<SPACE>
 end
 " }}}
 
