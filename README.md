@@ -46,6 +46,18 @@ ssh-import-id gh:fortes
     email = xyz@abc.com
   ```
 
+## Ignoring changes to a file
+
+```
+git update-index --skip-worktree ./symlinks/npmrc
+```
+
+To make changes in the future:
+
+```
+git update-index --no-skip-worktree ./symlinks/npmrc
+```
+
 ## Additional Settings
 
 TODO: Automate these steps.
