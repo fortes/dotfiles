@@ -589,9 +589,9 @@ augroup filetype_tweaks
     " Type check and lint at the same time, can be slow at times
     if filereadable('./tslint.json')
       " Use local tslint.json if available
-      autocmd FileType typescript setlocal makeprg=(tsc\ --strict\ %\;tslint\ -c\ ./tslint.json\ --format\ msbuild\ %)
+      autocmd FileType typescript setlocal makeprg=(tsc\ --noEmit\ --strict\ %\;tslint\ -c\ ./tslint.json\ --format\ msbuild\ %)
     else
-      autocmd FileType typescript setlocal makeprg=(tsc\ --strict\ %\;tslint\ -c\ ~/.tslint.json\ --format\ msbuild\ %)
+      autocmd FileType typescript setlocal makeprg=(tsc\ --noEmit\ --strict\ %\;tslint\ -c\ ~/.tslint.json\ --format\ msbuild\ %)
     endif
 
     " Use the `msbuild` error format for `tslint`, which luckily matches what
