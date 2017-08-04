@@ -70,6 +70,9 @@ endif
 " Read .vimrc from current dir, if present
 set exrc
 
+" Don't allow shell and write commands in exrc
+set secure
+
 " Enable loading plugin / indent settings based on filetype
 filetype plugin indent on
 
