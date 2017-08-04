@@ -114,6 +114,10 @@ Plug 'tpope/vim-vinegar'
 " No default bindings, see config below
 Plug 'autozimu/LanguageClient-neovim', { 'do': ':UpdateRemotePlugins' }
 " async :make via NeoVim job control, replaces syntastic for showing errors
+" TODO: Use w0rp/ale instead of Neomake and adjust all settings for this
+" https://github.com/w0rp/ale
+" LanguageServer may remove the need for all of this in places, need to figure
+" out what is really needed here.
 " Use SignColumn to mark lines in Quickfix/Location list
 Plug 'dhruvasagar/vim-markify'
 " Test.vim: Run tests based on cursor position / file
@@ -242,7 +246,7 @@ function! g:OnVimEnter()
     autocmd!
     if exists(':Neoformat')
       " Run automatically before saving for supported filetypes
-      autocmd BufWritePre *.js Neoformat
+      autocmd BufWritePre *.css,*.less,*.js,*.ts Neoformat
     endif
   augroup END
 endfunction
@@ -258,20 +262,18 @@ augroup LanguageClientConfig
   autocmd!
 
   " <leader>ld to go to definition
-  autocmd FileType javascript nnoremap <buffer> <leader>ld :call LanguageClient_textDocument_definition()<cr>
+  autocmd FileType javascript,python,typescript nnoremap <buffer> <leader>ld :call LanguageClient_textDocument_definition()<cr>
   " <leader>lf to fuzzy find the symbols in the current document
-  autocmd FileType javascript nnoremap <buffer> <leader>lf :call LanguageClient_textDocument_documentSymbol()<cr>
+  autocmd FileType javascript,python,typescript nnoremap <buffer> <leader>lf :call LanguageClient_textDocument_documentSymbol()<cr>
   " <leader>lh for type info under cursor
-  autocmd FileType javascript nnoremap <buffer> <leader>lh :call LanguageClient_textDocument_hover()<cr>
+  autocmd FileType javascript,python,typescript nnoremap <buffer> <leader>lh :call LanguageClient_textDocument_hover()<cr>
   " <leader>lr to rename variable under cursor
-  autocmd FileType javascript nnoremap <buffer> <leader>lr :call LanguageClient_textDocument_rename()<cr>
+  autocmd FileType javascript,python,typescript nnoremap <buffer> <leader>lr :call LanguageClient_textDocument_rename()<cr>
   " <leader>lc to swtich omnifunc to LanguageClient
-  autocmd FileType javascript nnoremap <buffer> <leader>lc :setlocal omnifunc=LanguageClient#complete<cr>
+  autocmd FileType javascript,python,typescript nnoremap <buffer> <leader>lc :setlocal omnifunc=LanguageClient#complete<cr>
 
   " Use as omnifunc by default
-  autocmd FileType javascript setlocal omnifunc=LanguageClient#complete
-  autocmd FileType typescript setlocal omnifunc=LanguageClient#complete
-  autocmd FileType python setlocal omnifunc=LanguageClient#complete
+  autocmd FileType javascript,python,typescript setlocal omnifunc=LanguageClient#complete
 augroup END
 
 let g:LanguageClient_serverCommands = {}
