@@ -114,9 +114,6 @@ Plug 'tpope/vim-vinegar'
 " No default bindings, see config below
 Plug 'autozimu/LanguageClient-neovim', { 'do': ':UpdateRemotePlugins' }
 " async :make via NeoVim job control, replaces syntastic for showing errors
-" Provides :Neomake and :Neomake!
-" Only load on first use of :Neomake command
-Plug 'benekastah/neomake', { 'on': ['Neomake'] }
 " Use SignColumn to mark lines in Quickfix/Location list
 Plug 'dhruvasagar/vim-markify'
 " Test.vim: Run tests based on cursor position / file
@@ -248,14 +245,6 @@ function! g:OnVimEnter()
       autocmd BufWritePre *.js Neoformat
     endif
   augroup END
-
-  augroup neomake_automake
-    autocmd!
-    if exists(':Neomake')
-      " Check for lint errors on open & write for supported filetypes
-      autocmd BufRead,BufWritePost *.js,*.less,*.sh silent! Neomake
-    endif
-  augroup END
 endfunction
 " }}}
 
@@ -338,33 +327,6 @@ augroup END
 " Neoformat {{{
 " Use formatprg when available
 let g:neoformat_try_formatprg = 1
-" }}}
-
-" NeoMake {{{
-if executable('eslint') || executable('eslint_d')
-  " Use eslint/eslint_d if it's available
-  if executable('flow')
-    " And flow
-    let g:neomake_javascript_enabled_makers = ['makeprg', 'flow']
-  else
-    let g:neomake_javascript_enabled_makers = ['makeprg']
-  endif
-endif
-
-if executable('lessc')
-  let g:neomake_less_enabled_makers = ['makeprg']
-endif
-
-if executable('shellcheck')
-  let g:neomake_sh_enabled_makers = ['makeprg']
-endif
-
-if executable('tsc')
-  let g:neomake_typescript_enabled_makers = ['makeprg']
-endif
-
-" Open list automatically when there are errors
-let g:neomake_open_list = 2
 " }}}
 
 " Fuzzy Finding (FZF) {{{
