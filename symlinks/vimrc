@@ -562,8 +562,12 @@ augroup filetype_tweaks
   " ES6 is JS
   autocmd BufRead,BufNewFile *.es6 set filetype=javascript
 
+  let s:automake_filetypes = []
+
   " Set up linting for JS
   if executable('eslint')
+    let s:automake_filetypes += ['*.js']
+
     autocmd FileType javascript setlocal makeprg=eslint\ -f\ compact\ %
 
     " Parse eslint errors correctly
@@ -577,6 +581,8 @@ augroup filetype_tweaks
 
   " TypeScript linting and type checking
   if executable('tsc') && executable('tslint')
+    let s:automake_filetypes += ['*.ts']
+
     " Type check and lint at the same time, can be slow at times
     if filereadable('./tslint.json')
       " Use local tslint.json if available
@@ -599,6 +605,8 @@ augroup filetype_tweaks
 
   " Linting for LESS
   if executable('lessc')
+    let s:automake_filetypes += ['*.less']
+
     autocmd FileType less setlocal makeprg=lessc\ --lint\ --no-color\ %
     autocmd FileType less setlocal
           \ errorformat=%E%.%#Error:\ %m\ in\ %f\ on\ line\ %l\\,\ column\ %c:
@@ -608,8 +616,16 @@ augroup filetype_tweaks
 
   " Linting for shell scripts
   if executable('shellcheck')
+    let s:automake_filetypes += ['*.sh']
+
     autocmd FileType sh setlocal makeprg=shellcheck\ -x\ -f\ gcc\ %
   endif
+
+  " Auto-make for supported filetypes
+  augroup automake
+    autocmd!
+    execute 'autocmd BufWritePost ' . join(s:automake_filetypes, ',') . ' make!'
+  augroup END
 
   " Use prettier to autoformat (gq in Visual mode)
   if executable('prettier')
