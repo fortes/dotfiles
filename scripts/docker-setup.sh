@@ -1,6 +1,6 @@
 #!/bin/bash
 set -ef -o pipefail
-# shellcheck source=helpers.sh
+# shellcheck source=./helpers.sh
 source "$HOME/dotfiles/scripts/helpers.sh"
 
 if [[ "$IS_CROUTON" == 1 ]]; then
@@ -8,20 +8,19 @@ if [[ "$IS_CROUTON" == 1 ]]; then
   exit 1
 fi
 
-DOCKER_SOURCES_FILE=/etc/apt/sources.list.d/docker.list
-if [ ! -f $DOCKER_SOURCES_FILE ]; then
+if [ ! grep -q docker.com /etc/apt/sources.list ]; then
   echo "$XMARK Docker not in sources.list"
   echo "  $ARROW Adding docker to in sources.list (requires sudo)"
-  sudo apt-key adv --keyserver hkp://pgp.mit.edu:80 \
-    --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
-  echo "deb https://apt.dockerproject.org/repo ${DISTRO,,}-${VERSION} main" | \
-    sudo tee "$DOCKER_SOURCES_FILE"
-  sudo apt-get update -qq
+  curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
+  sudo add-apt-repository -u \
+   "deb [arch=amd64] https://download.docker.com/linux/debian \
+   $(lsb_release -cs) stable"
 fi
 echo "$CMARK Docker in sources.list"
 
-echo "$ARROW Installing Docker (requires sudo)"
-installAptPackagesIfMissing docker-engine
+echo "$ARROW Installing Docker and dependencies (requires sudo)"
+installAptPackagesIfMissing apt-transport-https ca-certificates curl gnupg2 \
+  software-properties-common docker-ce
 
 if [ ! -f "/etc/sudoers.d/$USER-docker" ]; then
   echo "$ARROW Allowing $USER to run docker without sudo prompt (requires sudo)"
