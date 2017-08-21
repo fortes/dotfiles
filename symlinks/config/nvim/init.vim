@@ -122,6 +122,9 @@ Plug 'autozimu/LanguageClient-neovim', { 'do': ':UpdateRemotePlugins' }
 Plug 'dhruvasagar/vim-markify'
 " Test.vim: Run tests based on cursor position / file
 Plug 'janko-m/vim-test', { 'for': ['javascript'] }
+" Interactive repl for supported languages
+" :Codi!! Toggle for current buffer
+Plug 'metakirby5/codi.vim'
 " Async completion
 Plug 'roxma/nvim-completion-manager'
 " async code formatting
@@ -328,6 +331,11 @@ augroup test_shortcuts
   autocmd FileType javascript nnoremap <buffer> <silent> <leader>tf :TestFile<cr>
   autocmd FileType javascript nnoremap <buffer> <silent> <leader>twf :TestFile -w<cr><c-\><c-n><c-w><c-k>
 augroup END
+" }}}
+
+" Codi {{{
+" Toggle repl via <leader>cc
+nnoremap <leader>cc :Codi!!<cr>
 " }}}
 
 " Neoformat {{{
