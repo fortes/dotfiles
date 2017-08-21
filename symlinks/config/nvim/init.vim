@@ -262,18 +262,18 @@ augroup LanguageClientConfig
   autocmd!
 
   " <leader>ld to go to definition
-  autocmd FileType javascript,python,typescript nnoremap <buffer> <leader>ld :call LanguageClient_textDocument_definition()<cr>
+  autocmd FileType javascript,python,typescript,json,css,less,html nnoremap <buffer> <leader>ld :call LanguageClient_textDocument_definition()<cr>
   " <leader>lf to fuzzy find the symbols in the current document
-  autocmd FileType javascript,python,typescript nnoremap <buffer> <leader>lf :call LanguageClient_textDocument_documentSymbol()<cr>
+  autocmd FileType javascript,python,typescript,json,css,less,html nnoremap <buffer> <leader>lf :call LanguageClient_textDocument_documentSymbol()<cr>
   " <leader>lh for type info under cursor
-  autocmd FileType javascript,python,typescript nnoremap <buffer> <leader>lh :call LanguageClient_textDocument_hover()<cr>
+  autocmd FileType javascript,python,typescript,json,css,less,html nnoremap <buffer> <leader>lh :call LanguageClient_textDocument_hover()<cr>
   " <leader>lr to rename variable under cursor
-  autocmd FileType javascript,python,typescript nnoremap <buffer> <leader>lr :call LanguageClient_textDocument_rename()<cr>
+  autocmd FileType javascript,python,typescript,json,css,less,html nnoremap <buffer> <leader>lr :call LanguageClient_textDocument_rename()<cr>
   " <leader>lc to swtich omnifunc to LanguageClient
-  autocmd FileType javascript,python,typescript nnoremap <buffer> <leader>lc :setlocal omnifunc=LanguageClient#complete<cr>
+  autocmd FileType javascript,python,typescript,json,css,less,html nnoremap <buffer> <leader>lc :setlocal omnifunc=LanguageClient#complete<cr>
 
   " Use as omnifunc by default
-  autocmd FileType javascript,python,typescript setlocal omnifunc=LanguageClient#complete
+  autocmd FileType javascript,python,typescript,json,css,less,html setlocal omnifunc=LanguageClient#complete
 augroup END
 
 let g:LanguageClient_serverCommands = {}
@@ -285,6 +285,10 @@ endif
 if executable('javascript-typescript-stdio')
   let g:LanguageClient_serverCommands.javascript = ['javascript-typescript-stdio']
   let g:LanguageClient_serverCommands.typescript = ['javascript-typescript-stdio']
+  let g:LanguageClient_serverCommands.html = ['html-languageserver', '--stdio']
+  let g:LanguageClient_serverCommands.css = ['css-languageserver', '--stdio']
+  let g:LanguageClient_serverCommands.less = ['css-languageserver', '--stdio']
+  let g:LanguageClient_serverCommands.json = ['json-languageserver', '--stdio']
 endif
 " }}}
 
