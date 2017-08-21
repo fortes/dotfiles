@@ -29,4 +29,6 @@ Icon
 .Trashes
 
 .tern-port
-.vimrc.local
+
+# Directory-local overrides
+.nvimrc
