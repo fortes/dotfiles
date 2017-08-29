@@ -8,7 +8,7 @@ if [[ "$IS_CROUTON" == 1 ]]; then
   exit 1
 fi
 
-if [ ! grep -q docker.com /etc/apt/sources.list ]; then
+if ! grep -q docker.com /etc/apt/sources.list; then
   echo "$XMARK Docker not in sources.list"
   echo "  $ARROW Adding docker to in sources.list (requires sudo)"
   curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
