@@ -3,15 +3,16 @@ chromium
 cmake
 cmus
 dbus-x11
+dconf-cli
 exfat-fuse
 exfat-utils
 fonts-dejavu
 fonts-inconsolata
 fonts-noto
+gnome-terminal
 i3
 mpv
 pulseaudio
-qterminal
 scrot
 wicd-curses
 xinit
