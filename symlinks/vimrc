@@ -634,6 +634,7 @@ augroup filetype_tweaks
   if executable('prettier')
     autocmd FileType javascript setlocal formatprg=prettier\ --stdin\ --parser\ flow
     autocmd FileType typescript setlocal formatprg=prettier\ --stdin\ --parser\ typescript
+    autocmd FileType json setlocal formatprg=prettier\ --stdin\ --parser\ json
 
     autocmd FileType css,less setlocal formatprg=prettier\ --parser\ postcss
   endif

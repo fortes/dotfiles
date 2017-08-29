@@ -1,5 +1,13 @@
 {
-  "single-quote": true,
-  "bracket-spacing": false,
-  "trailing-comma": "all"
+  "singleQuote": true,
+  "bracketSpacing": false,
+  "trailingComma": "all",
+  "overrides": [
+    {
+      "files": "*.js",
+      "options": {
+        "trailingComma": "es5"
+      }
+    }
+  ]
 }
