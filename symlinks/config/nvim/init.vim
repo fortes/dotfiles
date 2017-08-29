@@ -320,16 +320,22 @@ let test#javascript#mocha#options = {
   \ 'suite': '--reporter dot',
   \ }
 
+let test#typescript#mocha#options = {
+  \ 'nearest': '--reporter list',
+  \ 'file': '--reporter list',
+  \ 'suite': '--reporter dot',
+  \ }
+
 " Only works in JS for now
 augroup test_shortcuts
   autocmd!
 
   " <leader>tt to test based on cursor, <leader>twt to watch
-  autocmd FileType javascript nnoremap <buffer> <silent> <leader>tt :TestNearest<cr>
-  autocmd FileType javascript nnoremap <buffer> <silent> <leader>twt :TestNearest -w<cr><c-\><c-n><c-w><c-k>
+  autocmd FileType javascript,typescript nnoremap <buffer> <silent> <leader>tt :TestNearest<cr>
+  autocmd FileType javascript,typescript nnoremap <buffer> <silent> <leader>twt :TestNearest -w<cr><c-\><c-n><c-w><c-k>
   " <leader>tf to test current file, <leader> twf to watch
-  autocmd FileType javascript nnoremap <buffer> <silent> <leader>tf :TestFile<cr>
-  autocmd FileType javascript nnoremap <buffer> <silent> <leader>twf :TestFile -w<cr><c-\><c-n><c-w><c-k>
+  autocmd FileType javascript,typescript nnoremap <buffer> <silent> <leader>tf :TestFile<cr>
+  autocmd FileType javascript,typescript nnoremap <buffer> <silent> <leader>twf :TestFile -w<cr><c-\><c-n><c-w><c-k>
 augroup END
 " }}}
 
