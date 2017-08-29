@@ -632,11 +632,10 @@ augroup filetype_tweaks
 
   " Use prettier to autoformat (gq in Visual mode)
   if executable('prettier')
-    autocmd FileType javascript setlocal formatprg=prettier\ --stdin\ --parser\ flow\ --single-quote\ --bracket-spacing\ false\ --trailing-comma\ es5
-    autocmd FileType typescript setlocal formatprg=prettier\ --stdin\ --parser\ typescript\ --single-quote\ --bracket-spacing\ false\ --trailing-comma\ all
+    autocmd FileType javascript setlocal formatprg=prettier\ --stdin\ --parser\ flow
+    autocmd FileType typescript setlocal formatprg=prettier\ --stdin\ --parser\ typescript
 
-    autocmd FileType css setlocal formatprg=prettier\ --parser\ postcss
-    autocmd FileType less setlocal formatprg=prettier\ --parser\ postcss
+    autocmd FileType css,less setlocal formatprg=prettier\ --parser\ postcss
   endif
 
   " Simple folding for JS
