@@ -261,6 +261,9 @@ endfunction
 " Automatically start language servers.
 let g:LanguageClient_autoStart = 1
 
+" Use location list instead of quickfix
+let g:LanguageClient_diagnosticsList = 'location'
+
 augroup LanguageClientConfig
   autocmd!
 
