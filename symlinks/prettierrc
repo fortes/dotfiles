@@ -6,6 +6,8 @@
     {
       "files": "*.js",
       "options": {
+        "singleQuote": true,
+        "bracketSpacing": false,
         "trailingComma": "es5"
       }
     }
