@@ -260,6 +260,13 @@ endfunction
 " Plugin Configuration {{{
 
 " LanguageClient-neovim {{{
+" Don't need to automake in supported languages
+augroup automake
+  autocmd!
+  " JavaScript and Typescript lint via language servers
+  autocmd BufWritePost *.sh,*.less,*.css make!'
+augroup END
+
 " Automatically start language servers.
 let g:LanguageClient_autoStart = 1
 
