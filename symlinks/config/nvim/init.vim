@@ -36,6 +36,8 @@ Plug 'airblade/vim-accent'
 Plug 'chrisbra/NrrwRgn'
 " Auto-close parens / quotes, requires no config
 Plug 'cohama/lexima.vim'
+" Shared project settings
+Plug 'editorconfig/editorconfig-vim'
 " Personal snippets
 Plug 'fortes/vim-personal-snippets'
 " Make it easier to find the cursor after searching
