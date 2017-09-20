@@ -10,6 +10,7 @@ dbus
 dnsutils
 elinks
 encfs
+exiftool
 fuse
 git
 git-extras

@@ -1,7 +1,9 @@
 acdcli
 neovim
+proselint
 pygments
 python-language-server
 requests
 ssh-import-id
+vim-vint
 youtube-dl

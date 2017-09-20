@@ -373,6 +373,7 @@ function! FindGitRootCD()
     return ''
   else
     return {'dir': root}
+  endif
 endfunction
 
 function! GitRootCD()
@@ -622,6 +623,20 @@ augroup filetype_tweaks
     let s:automake_filetypes += ['*.sh']
 
     autocmd FileType sh setlocal makeprg=shellcheck\ -x\ -f\ gcc\ %
+  endif
+
+  " Linting for prose
+  if executable('proselint')
+    let s:automake_filetypes += ['*.md', '*.txt']
+
+    autocmd FileType markdown,text setlocal makeprg=proselint\ %
+  endif
+
+  " Linting for vimscript
+  if executable('vint')
+    let s:automake_filetypes += ['*.vim', '*.vimrc']
+
+    autocmd FileType vim setlocal makeprg=vint\ --enable-neovim\ \-s\ %
   endif
 
   " Auto-make for supported filetypes
