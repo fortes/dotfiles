@@ -264,7 +264,7 @@ endfunction
 augroup automake
   autocmd!
   " JavaScript and Typescript lint via language servers
-  autocmd BufWritePost *.sh,*.less,*.css make!'
+  autocmd BufWritePost *.sh,*.less,*.css make!
 augroup END
 
 " Automatically start language servers.

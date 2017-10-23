@@ -168,10 +168,11 @@ augroup END
 " Automatically write files on :next, :make, etc
 set autowriteall
 
+" Save automatically all the time
 augroup auto_save
   autocmd!
   " Frequently save automatically
-  autocmd BufLeave,FocusLost,InsertLeave,TextChanged * silent! write
+  autocmd BufLeave,FocusLost,InsertLeave,TextChanged * silent! wall
   " Check for file changes
   autocmd BufEnter,BufWinEnter,CursorHold,FocusGained * silent! checktime
 augroup END
@@ -421,12 +422,6 @@ endif
 " }}}
 
 " Efficiency Shortcuts {{{
-" Save automatically all the time
-augroup autosave
-  autocmd!
-  autocmd FocusLost,InsertLeave <buffer> silent! :update
-augroup END
-
 " Use space as leader
 let mapleader=" "
 let maplocalleader=" "
@@ -553,7 +548,7 @@ augroup filetype_tweaks
   autocmd BufNewFile,BufReadPost *.md set filetype=markdown
 
   " Not all files should wrap automatically
-  autocmd BufNewFile,BufReadPost *.txt,*.md,*.markdown,*.json,*.conf,*.ini
+  autocmd BufNewFile,BufReadPost *.txt,*.md,*.markdown,*.json,*.conf,*.ini,*.pug
     \ setlocal textwidth=0
 
   " Enable spell checking & linebreaking at words in some filetypes
@@ -651,7 +646,7 @@ augroup filetype_tweaks
     autocmd FileType typescript setlocal formatprg=prettier\ --stdin\ --parser\ typescript
     autocmd FileType json setlocal formatprg=prettier\ --stdin\ --parser\ json
 
-    autocmd FileType css,less setlocal formatprg=prettier\ --parser\ postcss
+    autocmd FileType css,less setlocal formatprg=prettier\ --parser\ css
   endif
 
   " Simple folding for JS
