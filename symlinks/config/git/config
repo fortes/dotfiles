@@ -5,6 +5,7 @@
   lall = log --graph --pretty=oneline --abbrev-commit --decorate --all
   ls = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cgreen\\ [%cn]" --decorate
   ll = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cgreen\\ [%cn]" --decorate --numstat
+  noedit = "commit -a --amend --no-edit"
   # Fetch and rebase
   frb = !git fetch --prune && git rebase origin/master
   # Edit all modified & new files
