@@ -14,6 +14,7 @@
   # Checkout/delete fuzzy-find branch
   cb = "!git checkout $(git branch -vv | fzf-tmux | sed 's/*//' | awk '{print $1}')"
   db = "!git branch -d $(git branch -vv | fzf-tmux -m | sed 's/*//' | awk '{print $1}')"
+  Db = "!git branch -D $(git branch -vv | fzf-tmux -m | sed 's/*//' | awk '{print $1}')"
   # Use fzf to select some modified files to add
   addm = "!git add `git ls-files -m --other --exclude-standard | fzf-tmux -m`"
   addmp = "!git add -p `git ls-files -m --other --exclude-standard | fzf-tmux -m`"
