@@ -25,9 +25,6 @@ Plug 'nathanaelkane/vim-indent-guides'
 " }}}
 
 " System {{{
-" Clipboard provider that uses tmux
-Plug 'cazador481/fakeclip.neovim'
-" }}}
 
 " Editing {{{
 " Accent autocompletion via gx in normal mode
@@ -51,6 +48,8 @@ Plug 'inside/vim-search-pulse'
 " For text objects, use z (s taken by surround.vim)
 " {action}z{char}{char}
 Plug 'justinmk/vim-sneak'
+" Share clipboard with tmux
+Plug 'cazador481/fakeclip.neovim'
 " Snippet support, see configuration below
 Plug 'SirVer/ultisnips'
 " Comment / uncomment things quickly
@@ -106,7 +105,7 @@ Plug 'junegunn/vim-peekaboo'
 Plug 'tpope/vim-eunuch'
 " Make netrw better
 " - '-' in any buffer to go up to directory listing
-" - cg/cl to cd into the 
+" - cg/cl to cd into the
 " - ! to use the file in a command
 Plug 'tpope/vim-vinegar'
 " }}}
@@ -120,8 +119,6 @@ Plug 'autozimu/LanguageClient-neovim', { 'do': ':UpdateRemotePlugins' }
 " https://github.com/w0rp/ale
 " LanguageServer may remove the need for all of this in places, need to figure
 " out what is really needed here.
-" Use SignColumn to mark lines in Quickfix/Location list
-Plug 'dhruvasagar/vim-markify'
 " Test.vim: Run tests based on cursor position / file
 Plug 'janko-m/vim-test', { 'for': ['javascript'] }
 " Interactive repl for supported languages
@@ -259,12 +256,15 @@ endfunction
 
 " Plugin Configuration {{{
 
+" Enable tmux to be mapped to '+' register
+let g:vim_fakeclip_tmux_plus=1
+
 " LanguageClient-neovim {{{
 " Don't need to automake in supported languages
 augroup automake
   autocmd!
   " JavaScript and Typescript lint via language servers
-  autocmd BufWritePost *.sh,*.less,*.css make!
+  autocmd BufWritePost *.sh,*.less,*.css,*.vim,*.vimrc,*.txt,*.md make!'
 augroup END
 
 " Automatically start language servers.
@@ -278,14 +278,16 @@ augroup LanguageClientConfig
 
   " <leader>ld to go to definition
   autocmd FileType javascript,python,typescript,json,css,less,html nnoremap <buffer> <leader>ld :call LanguageClient_textDocument_definition()<cr>
-  " <leader>lf to fuzzy find the symbols in the current document
-  autocmd FileType javascript,python,typescript,json,css,less,html nnoremap <buffer> <leader>lf :call LanguageClient_textDocument_documentSymbol()<cr>
+  " <leader>lf to autoformat document
+  autocmd FileType javascript,python,typescript,json,css,less,html nnoremap <buffer> <leader>lf :call LanguageClient_textDocument_formatting()<cr>
   " <leader>lh for type info under cursor
   autocmd FileType javascript,python,typescript,json,css,less,html nnoremap <buffer> <leader>lh :call LanguageClient_textDocument_hover()<cr>
   " <leader>lr to rename variable under cursor
   autocmd FileType javascript,python,typescript,json,css,less,html nnoremap <buffer> <leader>lr :call LanguageClient_textDocument_rename()<cr>
-  " <leader>lc to swtich omnifunc to LanguageClient
+  " <leader>lc to switch omnifunc to LanguageClient
   autocmd FileType javascript,python,typescript,json,css,less,html nnoremap <buffer> <leader>lc :setlocal omnifunc=LanguageClient#complete<cr>
+  " <leader>ls to fuzzy find the symbols in the current document
+  autocmd FileType javascript,python,typescript,json,css,less,html nnoremap <buffer> <leader>ls :call LanguageClient_textDocument_documentSymbol()<cr>
 
   " Use as omnifunc by default
   autocmd FileType javascript,python,typescript,json,css,less,html setlocal omnifunc=LanguageClient#complete
@@ -312,27 +314,11 @@ endif
 let g:cm_matcher = {'case': 'smartcase', 'module': 'cm_matchers.fuzzy_matcher'}
 " }}}
 
-" Markify {{{
-" Use nicer symbols
-let g:markify_error_text = '✗'
-let g:markify_warning_text = '⚠'
-let g:markify_info_text = '↳'
-
-" Clear out markify symbols with <c-l>
-nnoremap <silent> <C-L> :MarkifyClear<cr>:nohlsearch<cr><C-L>
-" }}}
-
 " Test.vim {{{
 " Run test commands in NeoVim terminal
 let test#strategy = 'neovim'
 
 let test#javascript#mocha#options = {
-  \ 'nearest': '--reporter list',
-  \ 'file': '--reporter list',
-  \ 'suite': '--reporter dot',
-  \ }
-
-let test#typescript#mocha#options = {
   \ 'nearest': '--reporter list',
   \ 'file': '--reporter list',
   \ 'suite': '--reporter dot',
@@ -346,8 +332,8 @@ augroup test_shortcuts
   autocmd FileType javascript,typescript nnoremap <buffer> <silent> <leader>tt :TestNearest<cr>
   autocmd FileType javascript,typescript nnoremap <buffer> <silent> <leader>twt :TestNearest -w<cr><c-\><c-n><c-w><c-k>
   " <leader>tf to test current file, <leader> twf to watch
-  autocmd FileType javascript,typescript nnoremap <buffer> <silent> <leader>tf :TestFile<cr>
-  autocmd FileType javascript,typescript nnoremap <buffer> <silent> <leader>twf :TestFile -w<cr><c-\><c-n><c-w><c-k>
+  autocmd FileType javascript nnoremap <buffer> <silent> <leader>tf :TestFile<cr>
+  autocmd FileType javascript nnoremap <buffer> <silent> <leader>twf :TestFile -w<cr><c-\><c-n><c-w><c-k>
 augroup END
 " }}}
 

@@ -11,6 +11,7 @@ fonts-inconsolata
 fonts-noto
 gnome-terminal
 i3
+libnotify-bin
 mpv
 pulseaudio
 scrot

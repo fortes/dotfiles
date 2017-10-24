@@ -1,0 +1,6 @@
+#!/bin/bash
+if which xhost 2> /dev/null > /dev/null && xhost 2> /dev/null > /dev/null; then
+  notify-send "$@"
+else
+  hterm-notify.sh $@
+fi

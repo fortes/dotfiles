@@ -337,7 +337,7 @@ silent! colorscheme delek
 " Enable syntax highlighting by default
 syntax enable
 
-" Only highlight first 200 chars for better performance
+" Only highlight first 500 chars for better performance
 set synmaxcol=500
 " }}}
 
