@@ -48,14 +48,13 @@ main() {
     len=${#output}
     if [ "${len}" -lt "${OSC_52_MAX_SEQUENCE}" ]; then
       printf $output
-      # printf "%b" "\033Ptmux;\033\033]52;c;$(base64 | tr -d '\n')\a\033\\"
     else
       echo "ERROR: selection too long to send to terminal: ${len}" >&2
       exit 1
     fi
   fi
 
-  #Copy to local tmux
+  # Add to tmux clipboard as well
   if isWithinTmux; then
     tmux set-buffer "$buf"
     tmux display-message 'Copied!'
