@@ -264,7 +264,7 @@ let g:vim_fakeclip_tmux_plus=1
 augroup automake
   autocmd!
   " JavaScript and Typescript lint via language servers
-  autocmd BufWritePost *.sh,*.less,*.css,*.vim,*.vimrc,*.txt,*.md make!'
+  autocmd BufWritePost *.sh,*.less,*.css,*.vim,*.vimrc,*.txt,*.md make!
 augroup END
 
 " Automatically start language servers.
