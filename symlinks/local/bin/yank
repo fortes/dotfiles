@@ -1,41 +1,65 @@
-#!/bin/sh
-#
-# Usage: yank [FILE...]
-#
-# Copies the contents of the given files (or stdin if no files are given) to
-# the terminal that runs this program.  If this program is run inside tmux(1),
-# then it also copies the given contents into tmux's current clipboard buffer.
-# If this program is run inside X11, then it also copies to the X11 clipboard.
-#
-# This is achieved by writing an OSC 52 escape sequence to the said terminal.
-# The maximum length of an OSC 52 escape sequence is 100_000 bytes, of which
-# 7 bytes are occupied by a "\033]52;c;" header, 1 byte by a "\a" footer, and
-# 99_992 bytes by the base64-encoded result of 74_994 bytes of copyable text.
-#
-# In other words, this program can only copy up to 74_994 bytes of its input.
-# However, in such cases, this program tries to bypass the input length limit
-# by copying directly to the X11 clipboard if a $DISPLAY server is available;
-# otherwise, it emits a warning (on stderr) about the number of bytes dropped.
-#
-# See http://en.wikipedia.org/wiki/Base64 for the 4*ceil(n/3) length formula.
-# See http://sourceforge.net/p/tmux/mailman/message/32221257 for copy limits.
-# See http://sourceforge.net/p/tmux/tmux-code/ci/a0295b4c2f6 for DCS in tmux.
-#
-# Written in 2014 by Suraj N. Kurapati and documented at http://goo.gl/NwYqfW
+#!/bin/bash
 
-buf=$( cat "$@" )
+# Copies to clipboard, using one or more of the following:
+# - tmux
+# - xsel
+# - Osc52 over SSH
 
-# copy to tmux if possible
-test -n "$TMUX" && tmux set-buffer "$buf" && tmux display-message 'Copied!'
+isWithinTmux() {
+  if [ -n "$TMUX" ]; then
+    return 0
+  else
+    return 1
+  fi
+}
 
-# copy to X11 if possible...
-test -n "$DISPLAY" && printf %s "$buf" | { xsel -ib || xclip -sel c ;} && exit
+inX() {
+  if command -v xhost > /dev/null && xhost 2> /dev/null > /dev/null; then
+    return 0
+  else
+    return 1
+  fi
+}
 
-# ...otherwise copy to terminal
-len=$( printf %s "$buf" | wc -c ) max=74994
-test $len -gt $max && echo "$0: input is $(( len - max )) bytes too long" >&2
+# OSC52 Adapted from:
+# https://chromium.googlesource.com/apps/libapps/+/master/hterm/etc/osc52.sh
+OSC_52_MAX_SEQUENCE="100000"
 
-esc="\033]52;c;$( printf %s "$buf" | head -c $max | base64 | tr -d '\r\n' )\a"
-test -n "$TMUX" && esc="\033Ptmux;\033$esc\033\\"
+# base64 source as a single blob and wrap in a single OSC 52 sequence, for use
+# on raw terminal that supports OSC52.
+get_osc52() {
+  printf "%b" "\033]52;c;$(echo "$@" | base64 | tr -d '\n')\a\n"
+}
 
-printf "$esc"
+main() {
+  buf=$(cat "$@")
+
+  if inX; then
+    echo "$buf" | xsel -ib
+    notify-send -u low -t 1000 'Copied!'
+  else
+    # Use OSC52 to copy over SSH
+    output=$(get_osc52 "$buf")
+    if isWithinTmux; then
+      # Escape to bypass tmux
+      output="\033Ptmux;\033$output\033\\"
+    fi
+
+    len=${#output}
+    if [ "${len}" -lt "${OSC_52_MAX_SEQUENCE}" ]; then
+      printf $output
+      # printf "%b" "\033Ptmux;\033\033]52;c;$(base64 | tr -d '\n')\a\033\\"
+    else
+      echo "ERROR: selection too long to send to terminal: ${len}" >&2
+      exit 1
+    fi
+  fi
+
+  #Copy to local tmux
+  if isWithinTmux; then
+    tmux set-buffer "$buf"
+    tmux display-message 'Copied!'
+  fi
+}
+
+main "$@"
