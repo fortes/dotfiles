@@ -1,0 +1,3 @@
+{
+  "extends": "/home/fortes/.config/yarn/global/node_modules/stylelint-config-standard"
+}

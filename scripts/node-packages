@@ -6,6 +6,8 @@ javascript-typescript-langserver
 less
 n
 prettier
+stylelint
+stylelint-config-standard
 tslint
 typescript
 vscode-css-languageserver-bin
