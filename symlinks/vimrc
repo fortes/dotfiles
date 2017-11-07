@@ -548,7 +548,7 @@ augroup filetype_tweaks
   autocmd BufNewFile,BufReadPost *.md set filetype=markdown
 
   " Not all files should wrap automatically
-  autocmd BufNewFile,BufReadPost *.txt,*.md,*.markdown,*.json,*.conf,*.ini,*.pug
+  autocmd BufNewFile,BufReadPost *.txt,*.md,*.json,*.conf,*.ini,*.pug
     \ setlocal textwidth=0
 
   " Enable spell checking & linebreaking at words in some filetypes
@@ -660,6 +660,12 @@ augroup filetype_tweaks
     autocmd FileType json setlocal formatprg=prettier\ --stdin\ --parser\ json
 
     autocmd FileType css,less setlocal formatprg=prettier\ --parser\ css
+
+    autocmd FileType markdown setlocal formatprg=prettier\ --parser\ markdown
+  endif
+
+  if executable('refmt')
+    autocmd FileType reason setlocal formatprg=refmt
   endif
 
   " Find .js files when using `gf` (useful with require)
