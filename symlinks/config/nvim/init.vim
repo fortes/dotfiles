@@ -124,6 +124,8 @@ Plug 'janko-m/vim-test', { 'for': ['javascript'] }
 " Interactive repl for supported languages
 " :Codi!! Toggle for current buffer
 Plug 'metakirby5/codi.vim'
+" Syntax highlighting and language server
+Plug 'reasonml-editor/vim-reason-plus'
 " Async completion
 Plug 'roxma/nvim-completion-manager'
 " async code formatting
@@ -277,20 +279,20 @@ augroup LanguageClientConfig
   autocmd!
 
   " <leader>ld to go to definition
-  autocmd FileType javascript,python,typescript,json,css,less,html nnoremap <buffer> <leader>ld :call LanguageClient_textDocument_definition()<cr>
+  autocmd FileType javascript,python,typescript,json,css,less,html,reason nnoremap <buffer> <leader>ld :call LanguageClient_textDocument_definition()<cr>
   " <leader>lf to autoformat document
-  autocmd FileType javascript,python,typescript,json,css,less,html nnoremap <buffer> <leader>lf :call LanguageClient_textDocument_formatting()<cr>
+  autocmd FileType javascript,python,typescript,json,css,less,html,reason nnoremap <buffer> <leader>lf :call LanguageClient_textDocument_formatting()<cr>
   " <leader>lh for type info under cursor
-  autocmd FileType javascript,python,typescript,json,css,less,html nnoremap <buffer> <leader>lh :call LanguageClient_textDocument_hover()<cr>
+  autocmd FileType javascript,python,typescript,json,css,less,html,reason nnoremap <buffer> <leader>lh :call LanguageClient_textDocument_hover()<cr>
   " <leader>lr to rename variable under cursor
-  autocmd FileType javascript,python,typescript,json,css,less,html nnoremap <buffer> <leader>lr :call LanguageClient_textDocument_rename()<cr>
+  autocmd FileType javascript,python,typescript,json,css,less,html,reason nnoremap <buffer> <leader>lr :call LanguageClient_textDocument_rename()<cr>
   " <leader>lc to switch omnifunc to LanguageClient
-  autocmd FileType javascript,python,typescript,json,css,less,html nnoremap <buffer> <leader>lc :setlocal omnifunc=LanguageClient#complete<cr>
+  autocmd FileType javascript,python,typescript,json,css,less,html,reason nnoremap <buffer> <leader>lc :setlocal omnifunc=LanguageClient#complete<cr>
   " <leader>ls to fuzzy find the symbols in the current document
-  autocmd FileType javascript,python,typescript,json,css,less,html nnoremap <buffer> <leader>ls :call LanguageClient_textDocument_documentSymbol()<cr>
+  autocmd FileType javascript,python,typescript,json,css,less,html,reason nnoremap <buffer> <leader>ls :call LanguageClient_textDocument_documentSymbol()<cr>
 
   " Use as omnifunc by default
-  autocmd FileType javascript,python,typescript,json,css,less,html setlocal omnifunc=LanguageClient#complete
+  autocmd FileType javascript,python,typescript,json,css,less,html,reason setlocal omnifunc=LanguageClient#complete
 augroup END
 
 let g:LanguageClient_serverCommands = {}
@@ -306,6 +308,11 @@ if executable('javascript-typescript-stdio')
   let g:LanguageClient_serverCommands.css = ['css-languageserver', '--stdio']
   let g:LanguageClient_serverCommands.less = ['css-languageserver', '--stdio']
   let g:LanguageClient_serverCommands.json = ['json-languageserver', '--stdio']
+endif
+
+if executable('ocaml-language-server')
+  let g:LanguageClient_serverCommands.reason = ['ocaml-language-server', '--stdio']
+  let g:LanguageClient_serverCommands.ocaml = ['ocaml-language-server', '--stdio']
 endif
 " }}}
 
