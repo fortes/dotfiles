@@ -15,6 +15,7 @@ fuse
 git
 git-extras
 htop
+imagemagick
 keychain
 libssl-dev
 lsb-release
