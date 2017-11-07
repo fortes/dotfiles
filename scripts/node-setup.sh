@@ -30,6 +30,8 @@ NPM_PREFIX=$HOME/.local
 NPM_CACHE_DIR=$HOME/.cache/npm
 mkdir -p "$NPM_PREFIX/bin"
 mkdir -p "$NPM_CACHE_DIR"
+yarn config set prefix "$NPM_PREFIX"
+yarn config set global-folder "$NPM_PREFIX/lib"
 
 # npm isn't available from the debian repository in stretch (wtf?), so we use
 # yarn to temporarily install n, which we then use to install node lts, which
@@ -50,6 +52,7 @@ export PATH="$NPM_PREFIX/bin:$PATH"
 
 # Yarn is fast enough that we just install everything at once
 echo "$ARROW Installing global node packages"
-yarn global add $(xargs < "$HOME/dotfiles/scripts/node-packages")
+yarn global add $(xargs < "$HOME/dotfiles/scripts/node-packages") \
+  --global-folder "$NPM_PREFIX/lib"
 
 echo "$CMARK All node packages installed"
