@@ -5,6 +5,7 @@ git-recent
 javascript-typescript-langserver
 less
 n
+ocaml-language-server
 prettier
 stylelint
 stylelint-config-standard
