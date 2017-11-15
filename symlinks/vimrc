@@ -664,6 +664,10 @@ augroup filetype_tweaks
     autocmd FileType markdown setlocal formatprg=prettier\ --parser\ markdown
   endif
 
+  if executable('yapf')
+    autocmd FileType python setlocal formatprg=yapf
+  endif
+
   if executable('refmt')
     autocmd FileType reason setlocal formatprg=refmt
   endif
