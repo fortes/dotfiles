@@ -6,7 +6,15 @@ if !filereadable(expand($XDG_CONFIG_HOME.'/nvim/autoload/plug.vim'))
   !curl -fLo "$XDG_CONFIG_HOME/nvim/autoload/plug.vim" --create-dirs
     \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
   echo 'vim-plug downloaded, will install plugins once vim loads'
-  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+  augroup VimPlugInstall
+    autocmd!
+    autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+  augroup END
+else
+  " Clear out install on enter
+  augroup VimPlugInstall
+    autocmd!
+  augroup END
 endif
 
 " Read ~/.vimrc as well
@@ -201,7 +209,7 @@ call plug#end()
 " }}}
 
 " Load Vanilla (no-plugin) config
-if filereadable(expand("~/.vimrc"))
+if filereadable(expand('~/.vimrc'))
   source ~/.vimrc
 endif
 
@@ -410,12 +418,12 @@ end
 
 " UltiSnips {{{
 " Use tab to expand snippet and move to next target. Shift tab goes back.
-let g:UltiSnipsExpandTrigger="<tab>"
+let g:UltiSnipsExpandTrigger='<tab>'
 " <C-k> fuzzy-finds available snippets for the file with FZF
 " let g:UltiSnipsListSnippets="<C-k>"
 inoremap <C-k> <C-o>:Snippets<cr>
-let g:UltiSnipsJumpForwardTrigger="<tab>"
-let g:UltiSnipsJumpBackwardTrigger="<S-tab>"
+let g:UltiSnipsJumpForwardTrigger='<tab>'
+let g:UltiSnipsJumpBackwardTrigger='<S-tab>'
 " }}}
 
 " vim-javascript {{{
@@ -499,7 +507,7 @@ let g:jsx_ext_required=0
 " }}}
 
 " Local Settings {{{
-if filereadable(expand("~/.nvimrc.local"))
+if filereadable(expand('~/.nvimrc.local'))
   source ~/.nvimrc.local
 endif
 " }}}
