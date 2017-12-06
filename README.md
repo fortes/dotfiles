@@ -80,4 +80,5 @@ TODO: Automate these steps.
 
 #### TODO
 
-* Better colorschemes
+- [ ] Better colorschemes
+- [ ] Setup [textlint](https://github.com/textlint/textlint)
