@@ -166,6 +166,15 @@ Plug 'JulesWang/css.vim', { 'for': ['css', 'less'] }
 Plug 'groenewege/vim-less', { 'for': ['less'] }
 " }}}
 
+" Markdown {{{
+" Nice set of markdown tools
+" <leader>= /  <leader>- toggle checkboxes
+" <leader>[ /  <leader>] change heading level
+" <leader>' to make blockquote out of selection
+" <leader>i to insert / update table of contents
+Plug 'SidOfc/mkdx', { 'for': ['markdown'] }
+" }}}
+
 " Javascript {{{
 if executable('flow')
   Plug 'flowtype/vim-flow', { 'for': ['javascript'] }
