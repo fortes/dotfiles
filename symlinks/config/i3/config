@@ -162,6 +162,7 @@ for_window [window_role="browser"] border none
 # Hide title bar for terminals, which seem to have no unifying class / role :(
 for_window [class="(?i)(lily|x)?term"] border pixel 1
 for_window [class="X-terminal-emulator"] border pixel 1
+for_window [class="(?i)(alacr|k)itty"] border pixel 1
 
 # Dialogs should open floating by default
 for_window [window_role="pop-up"] floating enable
@@ -170,3 +171,9 @@ for_window [title="(?i)authy"] floating enable
 
 # Chrome task manager should float
 for_window [title="Task Manager - Chromium"] floating enable
+
+# Record my desktop needs to float
+for_window [class="(?i)gtk-recordmydeskto*"] floating enable
+
+# Float a few Zoom windows
+for_window [class="(?i)zoom"] floating enable
