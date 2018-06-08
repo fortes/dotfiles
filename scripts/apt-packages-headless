@@ -1,7 +1,8 @@
 apt-transport-https
 autossh
 avahi-daemon
-avahi-discover
+avahi-dnsconfd
+avahi-utils
 bash-completion
 build-essential
 curl
