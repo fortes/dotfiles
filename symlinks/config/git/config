@@ -7,7 +7,7 @@
   ll = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cgreen\\ [%cn]" --decorate --numstat
   noedit = "commit -a --amend --no-edit"
   # Fetch and rebase
-  frb = !git fetch --prune && git rebase origin/master
+  frb = !git fetch --prune && git rebase --autostash origin/master
   # Edit all modified & new files
   edit = "!$EDITOR `git ls-files -m --other --exclude-standard`"
   editm = "!$EDITOR `git ls-files -m --other --exclude-standard | fzf-tmux -m`"
