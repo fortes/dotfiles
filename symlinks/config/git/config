@@ -31,6 +31,9 @@
   interactive = auto
   status = auto
   ui = auto
+[commit]
+  # Show diff when committing
+  verbose = true
 [core]
   excludesfile = ~/.gitignore
   autocrlf = input
