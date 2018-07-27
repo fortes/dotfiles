@@ -267,7 +267,7 @@ function! g:OnVimEnter()
     autocmd!
     if exists(':Neoformat')
       " Run automatically before saving for supported filetypes
-      autocmd BufWritePre *.css,*.less,*.js,*.ts Neoformat
+      autocmd BufWritePre *.css,*.less,*.js,*.re,*.ts Neoformat
     endif
   augroup END
 endfunction
