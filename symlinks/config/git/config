@@ -52,6 +52,8 @@
   default = current
 [rebase]
   autosquash = true
+[stash]
+  showPatch = true
 # Local modifications / auth
 [include]
   path=~/.gitconfig.local
