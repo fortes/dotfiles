@@ -1,6 +1,7 @@
 acdcli
 asciinema
 neovim
+pip
 proselint
 pygments
 python-language-server

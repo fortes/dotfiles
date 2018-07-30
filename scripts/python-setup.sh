@@ -33,10 +33,7 @@ if [ ! -d $PYENV_VIRTUALENV_DIR ]; then
 fi
 
 # Install python packages
-for package in $(cat $HOME/dotfiles/scripts/python-packages); do
-  if [[ -z "$(pip3 show "$package")" ]]; then
-    echo "  $ARROW installing package $package"
-    pip3 install -q -U --user "$package"
-  fi
-done
+echo "$ARROW Installing/upgrading pip packages"
+pip3 install -q -U --user $(xargs < $HOME/dotfiles/scripts/python-packages)
+
 echo "$CMARK All python packages installed"
