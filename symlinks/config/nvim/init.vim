@@ -184,15 +184,9 @@ Plug 'SidOfc/mkdx', { 'for': ['markdown'] }
 " }}}
 
 " Javascript {{{
-if executable('flow')
-  Plug 'flowtype/vim-flow', { 'for': ['javascript'] }
-  Plug 'roxma/ncm-flow',  {'for': ['javascript']}
-endif
 " JS highlighting and indent support. Sometimes buggy, but has support for
 " jsdocs and flow
 Plug 'pangloss/vim-javascript', { 'for': ['javascript']}
-" JS Completion clients for nvim-completion
-Plug 'roxma/nvim-cm-tern',  {'do': 'yarn install', 'for': ['javascript']}
 " }}}
 
 " Typescript {{{
@@ -432,21 +426,6 @@ let g:javascript_plugin_jsdoc = 1
 
 " flow syntax
 let g:javascript_plugin_flow = 1
-" }}}
-
-" Flow {{{
-" Don't typecheck automatically (Async checkers do this already)
-let g:flow#enable = 0
-
-" Don't automatically set omnifunc (use LanguageClient)
-let g:flow#omnifunc = 0
-
-augroup flow_omni
-  autocmd!
-
-  " Switch omnifunc to flow via <leader>fc
-  autocmd FileType javascript nnoremap <buffer> <leader>fc :setlocal omnifunc=flowcomplete#Complete<cr>
-augroup END
 " }}}
 
 " vim-typescript {{{
