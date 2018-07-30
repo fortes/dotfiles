@@ -3,17 +3,20 @@ set -euf -o pipefail
 # shellcheck source=helpers.sh
 source "$HOME/dotfiles/scripts/helpers.sh"
 
-if update-alternatives --get-selections | grep "^editor" | grep -v -q nvim; then
-  echo "$ARROW Updating system editor alternatives to set symlinks"
-  NVIM_PATH=$(which nvim)
-  sudo update-alternatives --install /usr/bin/vi vi "$NVIM_PATH" 60
-  sudo update-alternatives --install /usr/bin/vim vim "$NVIM_PATH" 60
-  sudo update-alternatives --install /usr/bin/editor editor "$NVIM_PATH" 60
-  echo "$CMARK System editor alternatives updated"
+# Debian version currently super old, use this one instead
+NVIM_APPIMAGE_PATH="$HOME/.local/bin/nvim"
+if [ ! -f "$NVIM_APPIMAGE_PATH" ]; then
+  echo "$XMARK nvim not installed"
+  echo "$ARROW Downloading nvim appimage"
+  wget -nv -O "$NVIM_APPIMAGE_PATH" \
+    "https://github.com/neovim/neovim/releases/download/v0.3.1/nvim.appimage"
+  chmod u+x "$NVIM_APPIMAGE_PATH"
+  sudo update-alternatives \
+    --install /usr/bin/editor editor $NVIM_APPIMAGE_PATH 60
 fi
+echo "$CMARK nvim installed"
 
-echo "$CMARK Neovim set as default editor"
-NVIM_CONFIG_DIR=$HOME/.config/nvim
+NVIM_CONFIG_DIR="$HOME/.config/nvim"
 
 if [ ! -f "$NVIM_CONFIG_DIR/autoload/plug.vim" ]; then
   echo "$XMARK vim-plug not installed"
