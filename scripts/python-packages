@@ -6,6 +6,7 @@ proselint
 pygments
 python-language-server
 requests
+setuptools
 ssh-import-id
 vim-vint
 youtube-dl
