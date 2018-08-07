@@ -2,8 +2,10 @@
 set -ef -o pipefail
 # shellcheck source=helpers.sh
 source "$HOME/dotfiles/scripts/helpers.sh"
-# Pick up $PYENV_ROOT
-source "$HOME/dotfiles/symlinks/bashrc"
+# Set $PYENV_ROOT if we haven't run in normal shell yet
+if [ -z "$PYENV_ROOT" ]; then 
+  PYENV_ROOT="$HOME/.local/pyenv"
+fi
 
 # Install pyenv and pyenv-virtualenv
 if ! command -v pyenv > /dev/null; then
