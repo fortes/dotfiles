@@ -14,10 +14,10 @@ if ! command -v pyenv > /dev/null; then
     git clone https://github.com/pyenv/pyenv.git "$PYENV_ROOT"
   else
     echo "$XMARK pyenv not installed but installation directory already present"
-    # exit 1
+    exit 1
   fi
 
-  echo "$ARROW Installing build dependencies (requires sudo)"
+  echo "$ARROW Installing pyenv build dependencies (requires sudo)"
   sudo apt-get -qqfuy install make build-essential libssl-dev zlib1g-dev \
     libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev \
     xz-utils tk-dev libxml2-dev libxmlsec1-dev
@@ -28,6 +28,9 @@ if [ -d "$PYENV_ROOT" ]; then
   pushd "$PYENV_ROOT" > /dev/null
   git pull > /dev/null
   popd > /dev/null
+else
+  echo "$XMARK pyenv directory does not exist"
+  exit 1
 fi
 
 PYENV_VIRTUALENV_DIR="$PYENV_ROOT/plugins/pyenv-virtualenv"
@@ -36,8 +39,10 @@ if [ ! -d $PYENV_VIRTUALENV_DIR ]; then
   git clone https://github.com/pyenv/pyenv-virtualenv.git "$PYENV_VIRTUALENV_DIR"
 fi
 
-# Install python packages
+# Install python packages, but make sure pip and setuptools are latest first
 echo "$ARROW Installing/upgrading pip packages"
-pip3 install -q -U --user $(xargs < $HOME/dotfiles/scripts/python-packages)
+pip install -q --upgrade --user setuptools pip
+pip install -q --upgrade --user \
+  $(xargs < $HOME/dotfiles/scripts/python-packages)
 
 echo "$CMARK All python packages installed"
