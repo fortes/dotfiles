@@ -26,7 +26,9 @@ if [ ! -f "$NVIM_CONFIG_DIR/autoload/plug.vim" ]; then
     2> /dev/null
   echo "$CMARK vim-plug installed"
   echo "$ARROW Installing plugins..."
-  nvim +PlugInstall +qall
+  # Make sure fzf in path
+  sourceIfExists "$HOME/.fzf.bash"
+  nvim +PlugInstall +UpdateRemotePlugins +qall
 fi
 
 echo "$CMARK NeoVim setup complete"

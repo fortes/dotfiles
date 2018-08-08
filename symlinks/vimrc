@@ -278,8 +278,9 @@ set shiftround
 " Keyword completion brings in the dictionary if spell check is enabled
 set complete+=kspell
 
-" Only insert longest common text of matches & show menu when only one match
-set completeopt=menuone,longest
+" Show menu when only one match, don't insert until match selected,
+" and don't autoselect a match
+set completeopt=menuone,noinsert,noselect
 
 " Make sure there's a default dictionary for completion
 if filereadable('/usr/share/dict/words')

@@ -1,4 +1,4 @@
-" vim:fdm=marker et fdl=2 ft=vim sts=2 sw=2 ts=2
+" vim:fdm=marker et ft=vim sts=2 sw=2 ts=2
 
 " Automatically download vim-plug, if not present
 if !filereadable(expand($XDG_CONFIG_HOME.'/nvim/autoload/plug.vim'))
@@ -94,7 +94,7 @@ Plug 'tpope/vim-unimpaired'
 " "xgr{motion} Replace w/ register x
 Plug 'vim-scripts/ReplaceWithRegister'
 " Complete words from tmux with <C-x><C-u>
-Plug 'wellle/tmux-complete.vim'
+" Plug 'wellle/tmux-complete.vim'
 " }}}
 
 " File/Buffer Handling {{{
@@ -121,7 +121,10 @@ Plug 'tpope/vim-vinegar'
 " General coding {{{
 " async LanguageServerClient, lots of commands (rename, definitions, etc)
 " No default bindings, see config below
-Plug 'autozimu/LanguageClient-neovim', { 'do': ':UpdateRemotePlugins' }
+Plug 'autozimu/LanguageClient-neovim', {
+      \ 'branch': 'next',
+      \ 'do': 'bash install.sh'
+      \ }
 " async :make via NeoVim job control, replaces syntastic for showing errors
 " TODO: Use w0rp/ale instead of Neomake and adjust all settings for this
 " https://github.com/w0rp/ale
@@ -132,7 +135,14 @@ Plug 'janko-m/vim-test', { 'for': ['javascript'] }
 " Syntax highlighting and language server
 Plug 'reasonml-editor/vim-reason-plus'
 " Async completion
-Plug 'roxma/nvim-completion-manager'
+Plug 'ncm2/ncm2'
+" Required by ncm2
+Plug 'roxma/nvim-yarp'
+" Completion sources
+Plug 'ncm2/ncm2-bufword'
+Plug 'ncm2/ncm2-tmux'
+Plug 'ncm2/ncm2-path'
+Plug 'ncm2/ncm2-ultisnips'
 " async code formatting
 " :Neoformat <opt_formatter> for entire file
 " :Neoformat! <filetype> for visual selection
@@ -277,9 +287,6 @@ augroup automake
   autocmd BufWritePost *.sh,*.less,*.css,*.vim,*.vimrc,*.txt,*.md make!
 augroup END
 
-" Automatically start language servers.
-let g:LanguageClient_autoStart = 1
-
 " Use location list instead of quickfix
 let g:LanguageClient_diagnosticsList = 'location'
 
@@ -324,9 +331,9 @@ if executable('ocaml-language-server')
 endif
 " }}}
 
-" nvim-completion-manager {{{
-" Use fuzzy matching
-let g:cm_matcher = {'case': 'smartcase', 'module': 'cm_matchers.fuzzy_matcher'}
+" ncm2 {{{
+" Enable in all buffers
+autocmd BufEnter * call ncm2#enable_for_buffer()
 " }}}
 
 " Test.vim {{{
