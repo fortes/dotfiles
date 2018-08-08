@@ -39,10 +39,16 @@ if [ ! -d $PYENV_VIRTUALENV_DIR ]; then
   git clone https://github.com/pyenv/pyenv-virtualenv.git "$PYENV_VIRTUALENV_DIR"
 fi
 
+# Make sure to pick up pyenv in $PATH before install fully complete
+source "$HOME/dotfiles/symlinks/bashrc"
+
+echo "$ARROW Setting python version via pyenv"
+pyenv install "$PYENV_VERSION"
+pyenv global "$PYENV_VERSION"
+
 # Install python packages, but make sure pip and setuptools are latest first
 echo "$ARROW Installing/upgrading pip packages"
-pip install -q --upgrade --user setuptools pip
-pip install -q --upgrade --user \
-  $(xargs < $HOME/dotfiles/scripts/python-packages)
+pip install -q --upgrade pip setuptools
+pip install -q --upgrade $(xargs < $HOME/dotfiles/scripts/python-packages)
 
 echo "$CMARK All python packages installed"
