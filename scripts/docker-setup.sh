@@ -8,13 +8,14 @@ if [[ "$IS_CROUTON" == 1 ]]; then
   exit 1
 fi
 
-if ! grep -q docker.com /etc/apt/sources.list; then
+DOCKER_SOURCES_FILE=/etc/apt/sources.list.d/docker.list
+if [ ! -f "$DOCKER_SOURCES_FILE" ]; then
   echo "$XMARK Docker not in sources.list"
   echo "  $ARROW Adding docker to in sources.list (requires sudo)"
   curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
-  sudo add-apt-repository -u \
-   "deb [arch=amd64] https://download.docker.com/linux/debian \
-   $(lsb_release -cs) stable"
+  echo "deb [arch=amd64] https://download.docker.com/linux/debian \
+   $(lsb_release -cs) stable" | sudo tee "$DOCKER_SOURCES_FILE"
+  sudo apt-get update -qq
 fi
 echo "$CMARK Docker in sources.list"
 
