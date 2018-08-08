@@ -9,7 +9,7 @@ esac
 # Glorious editor
 set -o vi
 
-# Make sure we have always loaded ~/.profile, which can get lost due to
+# Make sure we have always loaded ~/.profile, which can get lost
 source $HOME/.profile
 
 # make less more friendly for non-text input files, see lesspipe(1)
@@ -25,11 +25,6 @@ HISTSIZE=2000
 SAVEHIST=$HISTSIZE
 # Don't put duplicate lines into history, ignore commands w/ initial space
 HISTCONTROL=ignoreboth:erasedups
-
-# Locally-installed packages belong in path
-if echo ":$PATH:" | grep -vq ":$HOME/.local/bin:"; then
-  export PATH="$HOME/.local/bin:$PATH"
-fi
 
 # Make sure the terminal type we're using is supported (tmux-256color doesn't
 # work everywhere yet)
@@ -124,19 +119,6 @@ sourceIfExists /usr/share/bash-completion/bash_completion
 # Load local bash completion
 sourceIfExists "$HOME/.local/completions.d/*"
 sourceIfExists "$HOME/.local/etc/bash_completion.d/*"
-
-# pyenv setup
-export PYENV_VERSION="3.6.3"
-export PYENV_ROOT="$HOME/.local/pyenv"
-if echo ":$PATH:" | grep -vq "$PYENV_ROOT/bin:"; then
-  export PATH="$PYENV_ROOT/bin:$PATH"
-fi
-
-if command -v pyenv > /dev/null; then
-  eval "$(pyenv init -)"
-  # Enable auto-activation for virtualenv
-  eval "$(pyenv virtualenv-init -)"
-fi
 
 # Load aliases
 sourceIfExists "$HOME/.aliases"

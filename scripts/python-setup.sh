@@ -2,10 +2,8 @@
 set -ef -o pipefail
 # shellcheck source=helpers.sh
 source "$HOME/dotfiles/scripts/helpers.sh"
-# Set $PYENV_ROOT if we haven't run in normal shell yet
-if [ -z "$PYENV_ROOT" ]; then 
-  PYENV_ROOT="$HOME/.local/pyenv"
-fi
+# Make sure to pick up pyenv settings before install fully complete
+source "$HOME/dotfiles/symlinks/profile"
 
 # Install pyenv and pyenv-virtualenv
 if ! command -v pyenv > /dev/null; then
@@ -39,8 +37,8 @@ if [ ! -d $PYENV_VIRTUALENV_DIR ]; then
   git clone https://github.com/pyenv/pyenv-virtualenv.git "$PYENV_VIRTUALENV_DIR"
 fi
 
-# Make sure to pick up pyenv in $PATH before install fully complete
-source "$HOME/dotfiles/symlinks/bashrc"
+# May need to update now that pyenv, etc are in path and latest
+source "$HOME/dotfiles/symlinks/profile"
 
 echo "$ARROW Setting python version via pyenv"
 pyenv install "$PYENV_VERSION"
@@ -52,3 +50,4 @@ pip install -q --upgrade pip setuptools
 pip install -q --upgrade $(xargs < $HOME/dotfiles/scripts/python-packages)
 
 echo "$CMARK All python packages installed"
+echo "$CMARK Python setup complete"
