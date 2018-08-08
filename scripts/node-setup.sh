@@ -30,6 +30,8 @@ NPM_PREFIX=$HOME/.local
 NPM_CACHE_DIR=$HOME/.cache/npm
 mkdir -p "$NPM_PREFIX/bin"
 mkdir -p "$NPM_CACHE_DIR"
+# Note: In the past, there have been bugs with yarn actually respecting these
+# settings, might have to switch back to npm at some point.
 yarn config set prefix "$NPM_PREFIX"
 yarn config set global-folder "$NPM_PREFIX/lib"
 
@@ -48,11 +50,10 @@ fi
 
 # Make sure we have latest path for node / npm before running yarn, which needs
 # node v6+
-export PATH="$NPM_PREFIX/bin:$PATH"
+source "$HOME/dotfiles/symlinks/profile"
 
 # Yarn is fast enough that we just install everything at once
 echo "$ARROW Installing global node packages"
-yarn global add $(xargs < "$HOME/dotfiles/scripts/node-packages") \
-  --global-folder "$NPM_PREFIX/lib"
+yarn global add $(xargs < "$HOME/dotfiles/scripts/node-packages")
 
 echo "$CMARK All node packages installed"
