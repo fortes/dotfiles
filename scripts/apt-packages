@@ -14,10 +14,12 @@ gnome-terminal
 i3
 keepass2
 libnotify-bin
+maim
 mpv
 pulseaudio
-scrot
+simplescreenrecorder
 wicd-curses
+xdotool
 xinit
 xsel
 xserver-xorg

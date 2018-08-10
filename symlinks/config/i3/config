@@ -172,8 +172,8 @@ for_window [title="(?i)authy"] floating enable
 # Chrome task manager should float
 for_window [title="Task Manager - Chromium"] floating enable
 
-# Record my desktop needs to float
-for_window [class="(?i)gtk-recordmydeskto*"] floating enable
+# Float while screen recording
+for_window [class="(?i)simplescreenrecorder"] floating enable
 
 # Float a few Zoom windows
 for_window [class="(?i)zoom"] floating enable
