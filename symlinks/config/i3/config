@@ -1,9 +1,6 @@
 # vim: ft=conf
 # http://i3wm.org/docs/userguide.html for reference
 
-# Plain background
-exec --no-startup-id xsetroot -solid "#666666"
-
 set $mod Mod1
 
 # Use Inconsolata instead of the nasty default
@@ -177,3 +174,10 @@ for_window [class="(?i)simplescreenrecorder"] floating enable
 
 # Float a few Zoom windows
 for_window [class="(?i)zoom"] floating enable
+
+# Plain background
+exec --no-startup-id xsetroot -solid "#666666"
+# Needed for inactive window transparency
+exec --no-startup-id compton -b
+# Save my eyes
+exec --no-startup-id redshift || redshift -l 28.6:-81.6

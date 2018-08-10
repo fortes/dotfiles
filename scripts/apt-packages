@@ -2,10 +2,12 @@ alsa-utils
 chromium
 cmake
 cmus
+compton
 dbus-x11
 dconf-cli
 exfat-fuse
 exfat-utils
+feh
 fonts-dejavu
 fonts-inconsolata
 fonts-noto
