@@ -36,7 +36,7 @@ main() {
 
   if inX; then
     echo "$buf" | xsel -ib
-    notify-send -u low -t 1000 'Copied!'
+    notify-send --hint=int:transient:1 -u low -t 1000 'Copied!'
   else
     # Use OSC52 to copy over SSH
     output=$(get_osc52 "$buf")
