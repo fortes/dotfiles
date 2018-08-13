@@ -149,7 +149,7 @@ bar {
   mode hide
   modifier $mod
   position bottom
-  status_command i3status
+  status_command i3blocks
   tray_output primary
 }
 
