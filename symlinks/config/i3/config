@@ -142,6 +142,9 @@ mode "resize" {
 
 bindsym $mod+r mode "resize"
 
+# Use hardware key to start/stop music
+bindsym XF86AudioPlay exec --no-startup-id cmus-remote --pause
+
 # Bar shows workspaces and status, but only displayed when hitting Mod key
 bar {
   font pango:Inconsolata 14
