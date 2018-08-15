@@ -9,8 +9,8 @@
   # Fetch and rebase
   frb = !git fetch --prune && git rebase --autostash origin/master
   # Edit all modified & new files
-  edit = "!$EDITOR `git ls-files -m --other --exclude-standard`"
-  editm = "!$EDITOR `git ls-files -m --other --exclude-standard | fzf-tmux -m`"
+  edit = "!$EDITOR `git ls-files -m --other --exclude-standard | sort -u`"
+  editm = "!$EDITOR `git ls-files -m --other --exclude-standard | sort -u | fzf-tmux -m`"
   # Checkout/delete fuzzy-find branch
   cb = "!git checkout $(git branch -vv | fzf-tmux | sed 's/*//' | awk '{print $1}')"
   db = "!git branch -d $(git branch -vv | fzf-tmux -m | sed 's/*//' | awk '{print $1}')"
