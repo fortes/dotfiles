@@ -9,7 +9,7 @@ n
 npm
 ocaml-language-server
 prettier
-reason-cli@3.1.0-linux
+reason-cli@latest-linux
 stylelint
 stylelint-config-standard
 tslint
