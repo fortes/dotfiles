@@ -41,7 +41,9 @@ fi
 source "$HOME/dotfiles/symlinks/profile"
 
 echo "$ARROW Setting python version via pyenv"
-pyenv install "$PYENV_VERSION"
+if pyenv versions | grep -q "$PYENV_VERSION"; then
+  pyenv install "$PYENV_VERSION"
+fi
 pyenv global "$PYENV_VERSION"
 
 # Install python packages, but make sure pip and setuptools are latest first
