@@ -294,27 +294,27 @@ augroup LanguageClientConfig
   autocmd!
 
   " <leader>ld to go to definition
-  autocmd FileType javascript,python,typescript,json,css,less,html,reason,sh nnoremap <buffer> <leader>ld :call LanguageClient_textDocument_definition()<cr>
+  autocmd FileType javascript,python,typescript,json,css,less,html,reason,sh,dockerfile nnoremap <buffer> <leader>ld :call LanguageClient_textDocument_definition()<cr>
   " <leader>li to go to implementation
-  autocmd FileType javascript,python,typescript,json,css,less,html,reason,sh nnoremap <buffer> <leader>li :call LanguageClient_textDocument_implementation()<cr>
+  autocmd FileType javascript,python,typescript,json,css,less,html,reason,sh,dockerfile nnoremap <buffer> <leader>li :call LanguageClient_textDocument_implementation()<cr>
   " <leader>lt to go to type definition
-  autocmd FileType javascript,python,typescript,json,css,less,html,reason,sh nnoremap <buffer> <leader>lt :call LanguageClient_textDocument_typeDefinition()<cr>
+  autocmd FileType javascript,python,typescript,json,css,less,html,reason,sh,dockerfile nnoremap <buffer> <leader>lt :call LanguageClient_textDocument_typeDefinition()<cr>
   " <leader>lf to autoformat document / selection
-  autocmd FileType javascript,python,typescript,json,css,less,html,reason,sh nnoremap <buffer> <leader>lf :call LanguageClient_textDocument_formatting()<cr>
-  autocmd FileType javascript,python,typescript,json,css,less,html,reason,sh vnoremap <buffer> <leader>lf :call LanguageClient_textDocument_rangeFomatting()<cr>
+  autocmd FileType javascript,python,typescript,json,css,less,html,reason,sh,dockerfile nnoremap <buffer> <leader>lf :call LanguageClient_textDocument_formatting()<cr>
+  autocmd FileType javascript,python,typescript,json,css,less,html,reason,sh,dockerfile vnoremap <buffer> <leader>lf :call LanguageClient_textDocument_rangeFomatting()<cr>
   " <leader>lh for type info under cursor
-  autocmd FileType javascript,python,typescript,json,css,less,html,reason,sh nnoremap <buffer> <leader>lh :call LanguageClient_textDocument_hover()<cr>
+  autocmd FileType javascript,python,typescript,json,css,less,html,reason,sh,dockerfile nnoremap <buffer> <leader>lh :call LanguageClient_textDocument_hover()<cr>
   " <leader>lr to rename variable under cursor
-  autocmd FileType javascript,python,typescript,json,css,less,html,reason,sh nnoremap <buffer> <leader>lr :call LanguageClient_textDocument_rename()<cr>
+  autocmd FileType javascript,python,typescript,json,css,less,html,reason,sh,dockerfile nnoremap <buffer> <leader>lr :call LanguageClient_textDocument_rename()<cr>
   " <leader>lc to find references
-  autocmd FileType javascript,python,typescript,json,css,less,html,reason,sh nnoremap <buffer> <leader>lc :call LanguageClient_textDocument_references()<cr>
+  autocmd FileType javascript,python,typescript,json,css,less,html,reason,sh,dockerfile nnoremap <buffer> <leader>lc :call LanguageClient_textDocument_references()<cr>
   " <leader>ls to fuzzy find the symbols in the current document
-  autocmd FileType javascript,python,typescript,json,css,less,html,reason,sh nnoremap <buffer> <leader>ls :call LanguageClient_textDocument_documentSymbol()<cr>
+  autocmd FileType javascript,python,typescript,json,css,less,html,reason,sh,dockerfile nnoremap <buffer> <leader>ls :call LanguageClient_textDocument_documentSymbol()<cr>
   " <leader>lw to fuzzy find the symbols in entire workspace
-  autocmd FileType javascript,python,typescript,json,css,less,html,reason,sh nnoremap <buffer> <leader>lw :call LanguageClient_textDocument_workspace_symbol()<cr>
+  autocmd FileType javascript,python,typescript,json,css,less,html,reason,sh,dockerfile nnoremap <buffer> <leader>lw :call LanguageClient_textDocument_workspace_symbol()<cr>
 
   " Use as omnifunc by default
-  autocmd FileType javascript,python,typescript,json,css,less,html,reason,sh setlocal omnifunc=LanguageClient#complete
+  autocmd FileType javascript,python,typescript,json,css,less,html,reason,sh,dockerfile setlocal omnifunc=LanguageClient#complete
 augroup END
 
 let g:LanguageClient_serverCommands = {}
@@ -339,6 +339,10 @@ endif
 
 if executable('bash-language-server')
   let g:LanguageClient_serverCommands.sh = ['bash-language-server', 'start']
+endif
+
+if executable('docker-langserver')
+  let g:LanguageClient_serverCommands.dockerfile = ['docker-langserver', '--stdio']
 endif
 " }}}
 

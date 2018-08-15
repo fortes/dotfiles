@@ -1,5 +1,6 @@
 bash-language-server
 bs-platform
+dockerfile-language-server-nodejs
 eslint
 eslint-plugin-react
 flow-bin
