@@ -4,7 +4,7 @@
 set $mod Mod1
 
 # Use Inconsolata instead of the nasty default
-font pango:Inconsolata 10 
+font pango:Inconsolata 10
 
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
@@ -144,6 +144,11 @@ bindsym $mod+r mode "resize"
 
 # Use hardware key to start/stop music
 bindsym XF86AudioPlay exec --no-startup-id cmus-remote --pause
+
+# Capture entire screen with mod-F12
+bindsym $mod+F12 exec "maim ~/screenshot-$(date +%F-%T).png"
+# Capture portion of screen with mod-Shift-F12
+bindsym $mod+Shift+F12 exec "maim -s --highlight --nokeyboard --color=0.25,0.5,1,0.25 ~/screenshot-$(date +%F-%T).png"
 
 # Bar shows workspaces and status, but only displayed when hitting Mod key
 bar {
