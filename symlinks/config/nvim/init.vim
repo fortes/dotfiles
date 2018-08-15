@@ -311,7 +311,7 @@ augroup LanguageClientConfig
   " <leader>ls to fuzzy find the symbols in the current document
   autocmd FileType javascript,python,typescript,json,css,less,html,reason nnoremap <buffer> <leader>ls :call LanguageClient_textDocument_documentSymbol()<cr>
   " <leader>lw to fuzzy find the symbols in entire workspace
-  autocmd FileType javascript,python,typescript,json,css,less,html,reason nnoremap <buffer> <leader>ls :call LanguageClient_textDocument_workspace_symbol()<cr>
+  autocmd FileType javascript,python,typescript,json,css,less,html,reason nnoremap <buffer> <leader>lw :call LanguageClient_textDocument_workspace_symbol()<cr>
 
   " Use as omnifunc by default
   autocmd FileType javascript,python,typescript,json,css,less,html,reason setlocal omnifunc=LanguageClient#complete
