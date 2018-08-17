@@ -157,8 +157,9 @@ bar {
   mode hide
   modifier $mod
   position bottom
-  status_command i3blocks
+  # If not working, do something like `xrandr --output HDMI-1 --primary`
   tray_output primary
+  status_command i3blocks
 }
 
 # No title bar or borders for browsers (works for Chrome & Firefox)
