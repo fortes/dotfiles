@@ -21,6 +21,7 @@ imagemagick
 keychain
 libssl-dev
 lsb-release
+lsof
 mergerfs
 mosh
 ncdu

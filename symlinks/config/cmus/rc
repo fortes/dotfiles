@@ -2,7 +2,7 @@
 set softvol=true
 
 # Defaults a tad ugly
-set colorscheme=gruvbox
+colorscheme gruvbox
 
 # Enable mouse
 set mouse=true
