@@ -1,6 +1,9 @@
 # Soft volume control
 set softvol=true
 
+# Defaults a tad ugly
+set colorscheme=gruvbox
+
 # Enable mouse
 set mouse=true
 
@@ -10,8 +13,8 @@ set status_display_program=~/dotfiles/scripts/cmus-status.sh
 # Sort order
 set lib_sort=albumartist date album discnumber tracknumber title
 
-# Play current album by default
-set aaa_mode=album
+# Play all albums by current artist default
+set aaa_mode=artist
 # Buffer a bunch, which is useful when playing over sshfs
 set buffer_seconds=90
 # Enable replaygain
@@ -29,16 +32,3 @@ set format_trackwin_va=   %03n %t (%a)%= %g %d
 # Include year in tree view
 set format_treewin=  %l [%y]
 set format_treewin_artist=%a
-
-# Filters
-fset instrumental=~g instrumental
-fset grime=~g grime
-fset 2015=date=2015
-fset 2014=date=2014
-fset 2013=date=2013
-fset 2012=date=2012
-fset 2011=date=2011
-fset 2010=date=2010
-fset 2000s=date>=2000&date<2010
-fset 1990s=date>=1990&date<2000
-fset 1980s=date>=1980&date<1990
