@@ -5,6 +5,7 @@ OS=`uname`
 alias lisbon='TZ="Europe/Lisbon" date'
 alias nyc='TZ="America/New_York" date'
 alias seattle='TZ="America/Los_Angeles" date'
+alias sf='TZ="America/Los_Angeles" date'
 alias rio='TZ="America/Sao_Paulo" date'
 alias utc='TZ="UTC" date'
 
@@ -50,6 +51,8 @@ fi
 
 # Autossh as a way to keep ports open
 alias autossh-forward="autossh -M 0 -f -T -N"
+# Use autossh for sshfs reconnecting
+alias autossh-sshfs="sshfs -o reconnect,compression=yes,transform_symlinks,ServerAliveInterval=30,ServerAliveCountMax=3,ssh_command='autossh -M 0'"
 
 # Map ls to be colorful and reasonable defaults
 alias ls='ls --color=auto -pFhv --quoting-style=shell-escape'
