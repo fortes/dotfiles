@@ -4,6 +4,7 @@
 !.gitignore
 !beets
 !cmus
+!redshift.conf
 !git
 !i3
 !i3status
