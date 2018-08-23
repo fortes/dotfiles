@@ -663,6 +663,7 @@ augroup filetype_tweaks
     autocmd FileType css,less setlocal formatprg=prettier\ --parser\ css
 
     autocmd FileType markdown setlocal formatprg=prettier\ --parser\ markdown
+    autocmd FileType yaml setlocal formatprg=prettier\ --parser\ yaml
   endif
 
   if executable('yapf')
