@@ -11,6 +11,10 @@ floating_modifier $mod
 
 # start a terminal with mod-enter
 bindsym $mod+Return exec i3-sensible-terminal
+# floating terminal with mod-`
+bindsym $mod+grave exec gnome-terminal --role='console'
+# floating terminal with mod-`
+bindsym $mod+Shift+grave exec chromium --temp-profile --incognito --class='console'
 
 # start a browser with mod-shift-enter
 bindsym $mod+Shift+Return exec sensible-browser
@@ -142,9 +146,9 @@ bindsym $mod+r mode "resize"
 bindsym XF86AudioPlay exec --no-startup-id cmus-remote --pause
 
 # Capture entire screen with mod-F12
-bindsym $mod+F12 exec "maim ~/screenshot-$(date +%F-%T).png"
+bindsym $mod+F12 exec "maim ~/Downloads/screenshot-$(date +%F-%T).png"
 # Capture portion of screen with mod-Shift-F12
-bindsym $mod+Shift+F12 exec "maim -s --highlight --nokeyboard --color=0.25,0.5,1,0.25 ~/screenshot-$(date +%F-%T).png"
+bindsym $mod+Shift+F12 exec "maim -s --highlight --nokeyboard --color=0.25,0.5,1,0.25 ~/Downloads/screenshot-$(date +%F-%T).png"
 
 # Bar shows workspaces and status, but only displayed when hitting Mod key
 bar {
@@ -166,6 +170,10 @@ hide_edge_borders smart
 
 # No title bar or borders for browsers (works for Chrome & Firefox)
 for_window [window_role="browser"] border none
+
+# Float terminals launched floating
+for_window [window_role="console"] floating enable
+for_window [class="console"] floating enable
 
 # Hide title bar for terminals, which seem to have no unifying class / role :(
 for_window [class="(?i)(lily|x)?term"] border pixel 1
