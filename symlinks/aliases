@@ -59,6 +59,9 @@ alias ls='ls --color=auto -pFhv --quoting-style=shell-escape'
 alias la='ls --color=auto -ApFhv'
 alias ll='ls --color=auto -AlpFhv'
 
+# Make feh nicer in i3
+alias feh='feh --scale-down'
+
 # Shortcuts for copying from tmux clipboard to system clipboard
 if command -v xclip > /dev/null; then
   alias tcopy='tmux save-buffer - | xclip -i -sel clipboard'

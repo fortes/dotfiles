@@ -158,6 +158,12 @@ bar {
   status_command i3blocks
 }
 
+# Focus only via keyboard / clicks
+focus_follows_mouse no
+
+# Hide borders adjacent to screen edges
+hide_edge_borders smart
+
 # No title bar or borders for browsers (works for Chrome & Firefox)
 for_window [window_role="browser"] border none
 
