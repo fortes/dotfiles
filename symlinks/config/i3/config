@@ -16,13 +16,13 @@ bindsym $mod+Return exec i3-sensible-terminal
 bindsym $mod+Shift+Return exec sensible-browser
 
 # lock screen with mod-shift-z
-bindsym $mod+Shift+z exec --no-startup-id /usr/bin/i3lock -d -c 333333 -e
+bindsym $mod+Shift+z exec --no-startup-id ~/.local/bin/i3blurlock
 
 # kill focused window
 bindsym $mod+Shift+q kill
 
 # launch program launcher
-bindsym $mod+d exec --no-startup-id j4-dmenu-desktop --no-generic -i
+bindsym $mod+d exec --no-startup-id j4-dmenu-desktop --no-generic --dmenu="dmenu -i"
 
 # Use vim-like bindings for movement of focus
 bindsym $mod+h focus left
@@ -186,4 +186,4 @@ exec --no-startup-id xsetroot -solid "#666666"
 # Needed for inactive window transparency
 exec --no-startup-id compton -b
 # Save my eyes
-exec --no-startup-id redshift || redshift -l 28.6:-81.6
+exec --no-startup-id redshift-gtk || redshift -l 28.6:-81.6

@@ -1,7 +1,8 @@
 *
 !.gitignore
-!yank
-!xclip
-!notify
+!i3blurlock
 !hterm-notify.sh
+!notify
 !show-image.sh
+!xclip
+!yank
