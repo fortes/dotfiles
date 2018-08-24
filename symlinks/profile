@@ -64,9 +64,6 @@ function sourceIfExists() {
 
 export -f sourceIfExists
 
-# Use yank command for clipboard access via SSH or system clipboard
-export LPASS_CLIPBOARD_COMMAND=yank
-
 if command -v keychain &>/dev/null; then
   # Don't prompt for password to load id_rsa if not already loaded
   eval "$(keychain --eval --noask --agents ssh --quiet)"

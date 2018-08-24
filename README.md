@@ -66,6 +66,7 @@ TODO: Automate these steps.
 
 * Depending on the machine, you may need `pavucontrol` in order to unmute your audio output via GUI.
 ** Alternatively, find the name of the desired output via `pacmd list-sinks` then run `pacmd set-default-sink $SINK_NAME`
+* Get decent (not great) emoji support by installing Noto font packages manually from unstable
 
 ### EC2
 
@@ -73,10 +74,18 @@ TODO: Automate these steps.
 
 ### Chromebook
 
-* Map Caps Lock to Control: Should come through with user account though.
-* Set root password via `crosh`
-* Copy chroots from backup files
-* Create chroots
+* ~Map Caps Lock to Control~ Synced via user account
+* Setup Smart Lock & PIN unlock
+* Enable the following flags:
+  * `#enable-wifi-credential-sync`
+  * `#ash-enable-night-light`
+* Extensions
+  * Should sync and install
+  * Enable cloud storage for uBlock
+* Crouton
+  * Set root password via `crosh`
+  * Copy chroots from backup files
+  * Create chroots
 
 #### TODO
 

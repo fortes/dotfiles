@@ -18,7 +18,7 @@ if [ "$OS" = "Linux" ]; then
   # Distinguish betweent Debian & Ubuntu
   if command -v apt-get > /dev/null; then
     # Must have lsb_release installed for Debian/Ubuntu beforehand. Seems
-    # to come on EC2 images, but not in chromebook chroots.
+    # to come on EC2 images
     if ! command -v lsb_release > /dev/null; then
       echo "Installing lsb-release (requires sudo)"
       sudo apt-get -qqfuy install lsb-release
@@ -31,9 +31,6 @@ if [ "$OS" = "Linux" ]; then
       DISTRO="Debian"
     fi
     VERSION=$(lsb_release -s -c)
-  elif [ "$(whoami)" = "chronos" ]; then
-    DISTRO="Chromebook"
-    VERSION="Unknown"
   else
     # Haven't bothered using other distros yet
     DISTRO="Unknown"
@@ -148,62 +145,18 @@ if [ "$OS" = "Linux" ] && command -v apt-get > /dev/null; then
     sudo apt-get -qqfuy install git
   fi
   echo "$CMARK Git installed"
-elif [ "$DISTRO" = "Chromebook" ]; then
-  # Chromebook is pretty restricted, so let's do the bare minimum here and rely
-  # on crouton for the rest
-  DOTFILES_TARBALL="https://github.com/fortes/dotfiles/archive/master.tar.gz"
-  if [ -d "$DOTFILES" ]; then
-    rm -rf "$HOME/dotfiles"
-  fi
-
-  wget "$DOTFILES_TARBALL" -O "$HOME/dotfiles.tar.gz"
-  mkdir -p "$DOTFILES"
-  echo "$ARROW Downloading latest dotfiles to $DOTFILES"
-  tar zxf "$HOME/dotfiles.tar.gz" -C "$DOTFILES" --strip-components=1
-  rm "$HOME/dotfiles.tar.gz"
-  echo "$CMARK dotfiles updated"
-
-  echo "$ARROW Downloading crouton script to ~/Downloads/"
-  wget "https://goo.gl/fd3zc" -O "$HOME/Downloads/crouton" -q
-  echo "$ARROW Installing crouton bin tools (requires sudo)"
-  sudo sh "$HOME/Downloads/crouton" -b
-
-  echo "$ARROW Linking dotfiles"
-  (bash "$HOME/dotfiles/scripts/link-dotfiles.sh" -f)
-
-  echo "$CMARK Limited crosh setup complete"
-  exit
 else
   echo "$XMARK Sorry, but your system ($OS) is not supported"
   exit 1
 fi
 
-if [ $DISTRO = "Chromebook" ]; then
-  # Chromebook is pretty restricted, so let's do the bare minimum here and rely
-  # on crouton for the rest
-  DOTFILES_TARBALL="https://github.com/fortes/dotfiles/archive/master.tar.gz"
-  if [ -d "$DOTFILES" ]; then
-    rm -rf "$HOME/dotfiles.old"
-    echo "Moving previous ~/dotfiles to ~/dotfiles.old"
-    mv "$DOTFILES" "$DOTFILES".old
-  fi
-
-  if [ ! -d "$DOTFILES" ]; then
-    wget "$DOTFILES_TARBALL" -O "$HOME/dotfiles.tar.gz"
-    mkdir -p "$DOTFILES"
-    echo "Downloading latest dotfiles to $DOTFILES"
-    tar zxf "$HOME/dotfiles.tar.gz" -C "$DOTFILES" --strip-components=1
-    rm "$HOME/dotfiles.tar.gz"
-  fi
+# Pull down the full repo
+if [ ! -d "$DOTFILES" ]; then
+  echo "Cloning dotfiles repo to $DOTFILES"
+  git clone http://github.com/fortes/dotfiles "$DOTFILES" > /dev/null
 else
-  # Pull down the full repo
-  if [ ! -d "$DOTFILES" ]; then
-    echo "Cloning dotfiles repo to $DOTFILES"
-    git clone http://github.com/fortes/dotfiles "$DOTFILES" > /dev/null
-  else
-    echo "Pulling latest dotfiles..."
-    (cd "$DOTFILES"; git pull 2> /dev/null || true)
-  fi
+  echo "Pulling latest dotfiles..."
+  (cd "$DOTFILES"; git pull 2> /dev/null || true)
 fi
 echo "$CMARK ~/dotfiles present"
 
