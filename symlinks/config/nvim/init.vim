@@ -1,4 +1,5 @@
 " vim:fdm=marker et ft=vim sts=2 sw=2 ts=2
+scriptencoding utf-8
 
 " Automatically download vim-plug, if not present
 if !filereadable(expand($XDG_CONFIG_HOME.'/nvim/autoload/plug.vim'))
@@ -268,7 +269,7 @@ function! g:OnVimEnter()
     autocmd!
     if exists(':Neoformat')
       " Run automatically before saving for supported filetypes
-      autocmd BufWritePre *.css,*.less,*.js,*.md,*.re,*.ts,*.yaml Neoformat
+      autocmd BufWritePre *.css,*.less,*.js,*.md,*.py,*.re,*.ts,*.yaml Neoformat
     endif
   augroup END
 endfunction
@@ -348,7 +349,10 @@ endif
 
 " ncm2 {{{
 " Enable in all buffers
-autocmd BufEnter * call ncm2#enable_for_buffer()
+augroup ncm2
+  autocmd!
+  autocmd BufEnter * call ncm2#enable_for_buffer()
+augroup END
 " }}}
 
 " Test.vim {{{

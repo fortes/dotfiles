@@ -1,4 +1,7 @@
 " vim:fdm=marker et fdl=2 ft=vim sts=2 sw=2 ts=2
+" Use modern encoding
+set encoding=utf-8
+scriptencoding utf-8
 
 " Configuration for vanilla (neo)vim, with no plugins
 
@@ -17,8 +20,6 @@ if !has('nvim')
   set complete-=i
   " Display as much as possible as last line, instead of just showing @
   set display=lastline
-  " Use modern encoding
-  set encoding=utf-8
   " Default formatoptions in neovim: tcqj
   " t Wrap text using textwidth
   " c Wrap comments using textwidth, inserting comment leader automatically.
@@ -62,7 +63,7 @@ endif
 " Base Configuration {{{
 
 " Load matchit.vim, but only if the user hasn't installed a newer version.
-if !exists('g:loaded_matchit') && findfile('plugin/matchit.vim', &rtp) ==# ''
+if !exists('g:loaded_matchit') && findfile('plugin/matchit.vim', &runtimepath) ==# ''
   runtime! macros/matchit.vim
 endif
 
@@ -206,20 +207,20 @@ set wildignorecase
 " }}}
 
 " Status line {{{
-if version >= 704
+if v:version >= 704
   " Show git repo information (if available)
-  let g:activeStatusLine="%{StatuslineTag()}»"
+  let g:activeStatusLine='%{StatuslineTag()}»'
 else
-  let g:activeStatusLine=""
+  let g:activeStatusLine=''
 endif
 " Relative path to file in current buffer
-let g:activeStatusLine.="%<%f "
+let g:activeStatusLine.='%<%f '
 " Exclamation mark if not modifiable, + if modified
 let g:activeStatusLine.="%{&readonly ? \"! \" : &modified ? '+ ' : ''}"
 " Start left align, show filetype
 let g:activeStatusLine.="%= %{&filetype == '' ? 'none' : &filetype} "
 " Line/col/percent
-let g:activeStatusLine.="%l:%2c "
+let g:activeStatusLine.='%l:%2c '
 function! StatuslineTag()
   if exists('b:git_dir')
     " Shitty unicode character w/o patched fonts
@@ -528,7 +529,7 @@ function! Osc52Yank()
 
   " Must output to /dev/tty, otherwise the escape codes don't make it out to the
   " terminal
-  silent exe "!echo -ne ".shellescape(buffer)." > /dev/tty"
+  silent exe '!echo -ne '.shellescape(buffer).' > /dev/tty'
 endfunction
 
 command! Osc52CopyYank call Osc52Yank()
@@ -732,7 +733,7 @@ let g:netrw_list_hide.=',\(^\|\s\s\)\zs\.\S\+'
 " }}}
 
 " Local Settings {{{
-if filereadable(expand("~/.vimrc.local"))
+if filereadable(expand('~/.vimrc.local'))
   source ~/.vimrc.local
 endif
 " }}}
