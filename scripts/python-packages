@@ -4,5 +4,6 @@ neovim
 proselint
 pygments
 python-language-server
+tldr
 vim-vint
 youtube-dl
