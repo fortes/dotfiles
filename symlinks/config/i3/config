@@ -190,6 +190,9 @@ for_window [title="Task Manager - Chromium"] floating enable
 # Float while screen recording
 for_window [class="(?i)simplescreenrecorder"] floating enable
 
+# Screen maginifier needs to float in order to not mess up layout
+for_window [title="^xzoom"] floating enable
+
 # Always float a few specific Zoom windows
 for_window [class=zoom title="ount$"] floating enable
 for_window [class=zoom title="(?i)participants"] floating enable
