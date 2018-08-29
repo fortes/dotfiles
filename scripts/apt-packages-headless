@@ -17,6 +17,7 @@ fuse
 git
 git-extras
 htop
+iftop
 imagemagick
 keychain
 libssl-dev
@@ -25,6 +26,7 @@ lsof
 mergerfs
 mosh
 ncdu
+nethogs
 neovim
 oathtool
 python3-dev
