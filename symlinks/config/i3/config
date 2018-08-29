@@ -146,9 +146,11 @@ bindsym $mod+r mode "resize"
 bindsym XF86AudioPlay exec --no-startup-id cmus-remote --pause
 
 # Capture entire screen with mod-F12
-bindsym $mod+F12 exec "maim ~/Downloads/screenshot-$(date +%F-%T).png"
+bindsym --release $mod+F12 exec "maim ~/Downloads/screenshot-$(date +%F-%T).png"
 # Capture portion of screen with mod-Shift-F12
-bindsym $mod+Shift+F12 exec "maim -s --highlight --nokeyboard --color=0.25,0.5,1,0.25 ~/Downloads/screenshot-$(date +%F-%T).png"
+bindsym --release $mod+Shift+F12 exec "maim -s --highlight --nokeyboard --color=0.25,0.5,1,0.25 ~/Downloads/screenshot-$(date +%F-%T).png"
+# Toggle full screen recording with mod-F11
+bindsym --release $mod+Shift+F11 exec "record_screen.sh"
 
 # Bar shows workspaces and status, but only displayed when hitting Mod key
 bar {

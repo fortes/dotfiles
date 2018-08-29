@@ -3,6 +3,7 @@
 !i3blurlock
 !hterm-notify.sh
 !notify
+!record_screen.sh
 !show-image.sh
 !xclip
 !yank
