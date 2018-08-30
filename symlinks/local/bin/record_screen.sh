@@ -17,7 +17,7 @@ if [ -f "$SCREEN_CAP_INPUT_FILE" ]; then
 fi
 
 SCREEN_DIMENSIONS=$(xdotool getdisplaygeometry | tr ' ' x)
-FILENAME="$HOME/Downloads/screencast-$(date +%F-%T).mkv"
+FILENAME="$HOME/Downloads/screencast-$(date +%F-%T).mp4"
 
 touch "$SCREEN_CAP_INPUT_FILE"
 < "$SCREEN_CAP_INPUT_FILE" ffmpeg -framerate 25 \
@@ -26,3 +26,7 @@ touch "$SCREEN_CAP_INPUT_FILE"
   -i ":0.0" \
   "$FILENAME" \
   > /dev/null 2> /tmp/i3-screencap.log
+
+if command -v video_to_gif.sh > /dev/null; then
+  video_to_gif.sh "$FILENAME"
+fi
