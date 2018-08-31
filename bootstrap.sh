@@ -78,7 +78,7 @@ else
 fi
 
 # Slightly hacky way to see if we are within a Docker container
-if [ -f /.dockerinit ]; then
+if [ -f /.dockerenv ]; then
   IS_DOCKER=1
 else
   IS_DOCKER=0
