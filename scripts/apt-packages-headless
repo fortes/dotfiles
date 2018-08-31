@@ -11,7 +11,7 @@ dbus
 dnsutils
 elinks
 encfs
-exiftool
+exiv2
 ffmpeg
 fuse
 git
@@ -20,6 +20,7 @@ htop
 iftop
 imagemagick
 keychain
+libimage-exiftool-perl
 libssl-dev
 lsb-release
 lsof
