@@ -12,9 +12,9 @@ if [ ! -f "$NVIM_APPIMAGE_PATH" ]; then
     "https://github.com/neovim/neovim/releases/download/v0.3.1/nvim.appimage"
   chmod u+x "$NVIM_APPIMAGE_PATH"
 
-  # AppImage requires fuse, which is unsupported on WSL
+  # AppImage requires fuse, which is unsupported on Docker & WSL
   sourceIfExists "$HOME/.profile.local"
-  if [ "$IS_WSL" == 1 ]; then
+  if [ "$IS_DOCKER" == 1 ] || [ "$IS_WSL" == 1 ]; then
     echo "$ARROW Extracting nvim AppImage"
     NVIM_EXTRACT_DIR="$HOME/.local/nvim-squashfs-root"
     pushd "$HOME/.local" > /dev/null
