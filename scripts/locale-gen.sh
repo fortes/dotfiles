@@ -5,11 +5,6 @@ source "$HOME/dotfiles/scripts/helpers.sh"
 installAptPackagesIfMissing locales
 if ! locale -a | grep -iq "en_us.utf8"; then
   echo "$ARROW Generating locale"
-  sudo locale-gen en_US.UTF-8
-
-  # Only run in interactive shell
-  if [[ $- == *i* ]]; then
-    sudo dpkg-reconfigure locales
-  fi
+  sudo localedef -i en_US -c -f UTF-8 en_US.UTF-8
 fi
-echo "$CMARK Locale setup"
+echo "$CMARK Locale setup complete"
