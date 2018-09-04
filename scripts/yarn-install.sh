@@ -10,7 +10,7 @@ if [ ! -f $YARN_SOURCES_FILE ]; then
   curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
   echo "deb https://dl.yarnpkg.com/debian/ stable main" | \
     sudo tee "$YARN_SOURCES_FILE"
-  sudo apt-get update -qq
+  sudo DEBIAN_FRONTEND=noninteractive apt-get update -qq
 fi
 echo "$CMARK Yarn in sources.list"
 

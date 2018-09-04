@@ -16,9 +16,10 @@ if ! command -v pyenv > /dev/null; then
   fi
 
   echo "$ARROW Installing pyenv build dependencies (requires sudo)"
-  sudo apt-get -qqfuy install make build-essential libssl-dev zlib1g-dev \
-    libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev \
-    xz-utils tk-dev libxml2-dev libxmlsec1-dev
+  sudo DEBIAN_FRONTEND=noninteractive apt-get -qqfuy install make \
+    build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev \
+    libsqlite3-dev wget curl llvm libncurses5-dev xz-utils tk-dev \
+    libxml2-dev libxmlsec1-dev
 fi
 
 if [ -d "$PYENV_ROOT" ]; then

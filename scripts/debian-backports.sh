@@ -11,7 +11,7 @@ if [ ! -f $BACKPORTS_FILE ]; then
   echo "deb http://ftp.debian.org/debian jessie-backports main" | \
     sudo tee $BACKPORTS_FILE
   echo "$CMARK Backports in sources.list, updating sources"
-  sudo apt-get update -qq
+  sudo DEBIAN_FRONTEND=noninteractive apt-get update -qq
 fi
 
 echo "$CMARK Backports setup. Use 'apt-get -t $VERSION-backports install'"

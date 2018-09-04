@@ -57,7 +57,7 @@ installAptPackagesIfMissing() {
 
   if [  "$PACKAGES" != "" ]; then
     echo "  $ARROW Installing $PACKAGES (requires sudo)"
-    sudo -E apt-get -qqfuy install $PACKAGES > /dev/null
+    sudo -E DEBIAN_FRONTEND=noninteractive apt-get -qqfuy install $PACKAGES > /dev/null
     echo "$CMARK $PACKAGES installed"
   fi
 }

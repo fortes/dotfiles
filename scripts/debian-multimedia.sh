@@ -11,9 +11,9 @@ if [ ! -f $MULTIMEDIA_FILE ]; then
   echo "deb http://www.deb-multimedia.org stretch main non-free" | \
     sudo tee $MULTIMEDIA_FILE
   echo "$CMARK Multimedia in sources.list, updating sources"
-  sudo apt-get update -oAcquire::AllowInsecureRepositories=true -qq
+  sudo DEBIAN_FRONTEND=noninteractive apt-get update -oAcquire::AllowInsecureRepositories=true -qq
   echo "$ARROW Getting keyring for Multimedia"
-  sudo apt-get install deb-multimedia-keyring -oAcquire::AllowInsecureRepositories=true
+  sudo DEBIAN_FRONTEND=noninteractive apt-get install deb-multimedia-keyring -oAcquire::AllowInsecureRepositories=true
 fi
 
 echo "$CMARK Multimedia repository setup"
