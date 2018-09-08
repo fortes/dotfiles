@@ -91,8 +91,17 @@ if [ `whoami` != 'fortes' ]; then
 else
   BASE_PROMPT=""
 fi
+# Different host colors for different environments
+if [ "$IS_CROUTON" == "1" ]; then
+  HOST_COLOR="$MAGENTA"
+elif [ "$IS_DOCKER" == "1" ]; then
+  HOST_COLOR="$GREEN"
+else
+  HOST_COLOR="$CYAN"
+fi
+
 # [user@]host:pwd $
-BASE_PROMPT="$BASE_PROMPT$CYAN\h:$YELLOW\w$RESET"
+BASE_PROMPT="$BASE_PROMPT$HOST_COLOR\h:$YELLOW\w$RESET"
 JOB_COUNT="$BOLD$BLUE[\j]$RESET "
 # Write out history after every command. Add job count if non-zero
 export PROMPT_COMMAND="history -a; HAS_JOBS=\`jobs -p\` "
