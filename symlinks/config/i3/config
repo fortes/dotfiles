@@ -207,4 +207,4 @@ exec --no-startup-id xsetroot -solid "#666666"
 # Needed for inactive window transparency
 exec --no-startup-id compton -b
 # Save my eyes
-exec --no-startup-id redshift-gtk || redshift -l 28.6:-81.6
+exec --no-startup-id redshift-gtk || redshift -l 27.3:-82.5
