@@ -294,28 +294,34 @@ let g:LanguageClient_diagnosticsList = 'location'
 augroup LanguageClientConfig
   autocmd!
 
-  " <leader>ld to go to definition
-  autocmd FileType javascript,python,typescript,json,css,less,html,reason,sh,dockerfile nnoremap <buffer> <leader>ld :call LanguageClient_textDocument_definition()<cr>
-  " <leader>li to go to implementation
-  autocmd FileType javascript,python,typescript,json,css,less,html,reason,sh,dockerfile nnoremap <buffer> <leader>li :call LanguageClient_textDocument_implementation()<cr>
-  " <leader>lt to go to type definition
-  autocmd FileType javascript,python,typescript,json,css,less,html,reason,sh,dockerfile nnoremap <buffer> <leader>lt :call LanguageClient_textDocument_typeDefinition()<cr>
-  " <leader>lf to autoformat document / selection
-  autocmd FileType javascript,python,typescript,json,css,less,html,reason,sh,dockerfile nnoremap <buffer> <leader>lf :call LanguageClient_textDocument_formatting()<cr>
-  autocmd FileType javascript,python,typescript,json,css,less,html,reason,sh,dockerfile vnoremap <buffer> <leader>lf :call LanguageClient_textDocument_rangeFomatting()<cr>
-  " <leader>lh for type info under cursor
-  autocmd FileType javascript,python,typescript,json,css,less,html,reason,sh,dockerfile nnoremap <buffer> <leader>lh :call LanguageClient_textDocument_hover()<cr>
-  " <leader>lr to rename variable under cursor
-  autocmd FileType javascript,python,typescript,json,css,less,html,reason,sh,dockerfile nnoremap <buffer> <leader>lr :call LanguageClient_textDocument_rename()<cr>
-  " <leader>lc to find references
-  autocmd FileType javascript,python,typescript,json,css,less,html,reason,sh,dockerfile nnoremap <buffer> <leader>lc :call LanguageClient_textDocument_references()<cr>
-  " <leader>ls to fuzzy find the symbols in the current document
-  autocmd FileType javascript,python,typescript,json,css,less,html,reason,sh,dockerfile nnoremap <buffer> <leader>ls :call LanguageClient_textDocument_documentSymbol()<cr>
-  " <leader>lw to fuzzy find the symbols in entire workspace
-  autocmd FileType javascript,python,typescript,json,css,less,html,reason,sh,dockerfile nnoremap <buffer> <leader>lw :call LanguageClient_textDocument_workspace_symbol()<cr>
+  function! LC_maps()
+    if has_key(g:LanguageClient_serverCommands, &filetype)
+      " <leader>ld to go to definition
+      nnoremap <buffer> <leader>ld :call LanguageClient_textDocument_definition()<cr>
+      " <leader>li to go to implementation
+      nnoremap <buffer> <leader>li :call LanguageClient_textDocument_implementation()<cr>
+      " <leader>lt to go to type definition
+      nnoremap <buffer> <leader>lt :call LanguageClient_textDocument_typeDefinition()<cr>
+      " <leader>lf to autoformat document / selection
+      nnoremap <buffer> <leader>lf :call LanguageClient_textDocument_formatting()<cr>
+      vnoremap <buffer> <leader>lf :call LanguageClient_textDocument_rangeFomatting()<cr>
+      " <leader>lh for type info under cursor
+      nnoremap <buffer> <leader>lh :call LanguageClient_textDocument_hover()<cr>
+      " <leader>lr to rename variable under cursor
+      nnoremap <buffer> <leader>lr :call LanguageClient_textDocument_rename()<cr>
+      " <leader>lc to find references
+      nnoremap <buffer> <leader>lc :call LanguageClient_textDocument_references()<cr>
+      " <leader>ls to fuzzy find the symbols in the current document
+      nnoremap <buffer> <leader>ls :call LanguageClient_textDocument_documentSymbol()<cr>
+      " <leader>lw to fuzzy find the symbols in entire workspace
+      nnoremap <buffer> <leader>lw :call LanguageClient_textDocument_workspace_symbol()<cr>
 
-  " Use as omnifunc by default
-  autocmd FileType javascript,python,typescript,json,css,less,html,reason,sh,dockerfile setlocal omnifunc=LanguageClient#complete
+      " Use as omnifunc by default
+      setlocal omnifunc=LanguageClient#complete
+    endif
+  endfunction
+
+  autocmd FileType * call LC_maps()
 augroup END
 
 let g:LanguageClient_serverCommands = {}
