@@ -21,6 +21,8 @@ libnotify-bin
 maim
 mpv
 pulseaudio
+redshift
+redshift-gtk
 simplescreenrecorder
 wicd-curses
 xdotool
