@@ -26,7 +26,8 @@ bindsym $mod+Shift+z exec --no-startup-id ~/.local/bin/i3blurlock
 bindsym $mod+Shift+q kill
 
 # launch program launcher
-bindsym $mod+d exec --no-startup-id j4-dmenu-desktop --no-generic --dmenu="dmenu -i"
+bindsym $mod+d exec --no-startup-id "i3-dmenu-desktop --dmenu='rofi -dmenu -i'"
+bindsym $mod+Shift+d exec --no-startup-id "rofi -show window"
 
 # Use vim-like bindings for movement of focus
 bindsym $mod+h focus left

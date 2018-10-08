@@ -1,0 +1,5 @@
+#include "/usr/share/rofi/themes/Monokai.theme"
+rofi.case-sensitive:  false
+rofi.font:            Inconsolata 14
+rofi.matching:        glob
+rofi.theme:           Monokai
