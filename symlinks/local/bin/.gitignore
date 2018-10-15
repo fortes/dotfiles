@@ -4,6 +4,7 @@
 !hterm-notify.sh
 !notify
 !record_screen.sh
+!record_window.sh
 !show-image.sh
 !xclip
 !video_to_gif.sh
