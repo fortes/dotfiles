@@ -26,8 +26,8 @@ touch "$SCREEN_CAP_INPUT_FILE"
   -f x11grab \
   -s "$W"x"$H" \
   -i :0.0+"$X","$Y" \
-  "$FILENAME" #\
-  # > /dev/null 2> /tmp/i3-screencap.log
+  "$FILENAME" \
+  > /dev/null 2> /tmp/i3-screencap.log
 
 if command -v video_to_gif.sh > /dev/null; then
   video_to_gif.sh "$FILENAME"
