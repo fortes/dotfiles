@@ -3,7 +3,7 @@ title=$1
 rest=${@:2}
 
 if which xhost 2> /dev/null > /dev/null && xhost 2> /dev/null > /dev/null; then
-  notify-send "$1" "$rest"
+  notify-send --hint int:transient:1 "$1" $rest
 else
   hterm-notify.sh "$1" "$rest"
 fi
