@@ -12,7 +12,7 @@ if [ -f "$SCREEN_CAP_INPUT_FILE" ]; then
   # Quit if already running
   echo 'q' > "$SCREEN_CAP_INPUT_FILE"
   rm "$SCREEN_CAP_INPUT_FILE"
-  notify 'Screen recording saved!'
+  notify-send 'Screen recording saved' -t 2 -u low
   exit
 fi
 
