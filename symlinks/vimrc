@@ -662,6 +662,7 @@ augroup filetype_tweaks
     autocmd FileType json setlocal formatprg=prettier\ --stdin\ --parser\ json
 
     autocmd FileType css,less setlocal formatprg=prettier\ --parser\ css
+    autocmd FileType html setlocal formatprg=prettier\ --parser\ html
 
     autocmd FileType markdown setlocal formatprg=prettier\ --parser\ markdown
     autocmd FileType yaml setlocal formatprg=prettier\ --parser\ yaml
