@@ -96,6 +96,8 @@ if [ "$IS_CROUTON" == "1" ]; then
   HOST_COLOR="$MAGENTA"
 elif [ "$IS_DOCKER" == "1" ]; then
   HOST_COLOR="$GREEN"
+elif [ ! -z "$SSH_TTY" ]; then
+  HOST_COLOR="$RED"
 else
   HOST_COLOR="$CYAN"
 fi
