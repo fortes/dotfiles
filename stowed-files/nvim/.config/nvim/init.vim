@@ -61,6 +61,9 @@ Plug 'justinmk/vim-sneak'
 Plug 'cazador481/fakeclip.neovim'
 " Snippet support, see configuration below
 Plug 'SirVer/ultisnips'
+" Set `path` for various file types
+" TODO: Learn more about this config
+Plug 'tpope/apathy'
 " Comment / uncomment things quickly
 " {Visual}gc comment / uncomment selection
 " - gc{motion} comment / uncomment lines for motion
@@ -69,9 +72,6 @@ Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-repeat'
 " Readline-style keybindings everywhere (e.g. <C-a> for beginning of line)
 Plug 'tpope/vim-rsi'
-" Needed for orgmode
-" Makes <C-a> and <C-x> able to increment/decrement dates
-Plug 'tpope/vim-speeddating'
 " Edit surrounding quotes / parents / etc
 " - {Visual}S<arg> surrounds selection
 " - cs/ds<arg1><arg2> change / delete
