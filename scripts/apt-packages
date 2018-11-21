@@ -15,7 +15,6 @@ fonts-symbola
 gnome-terminal
 i3
 i3blocks
-keepass2
 libnotify-bin
 maim
 mpv
@@ -23,7 +22,6 @@ pulseaudio
 redshift
 redshift-gtk
 rofi
-simplescreenrecorder
 slop
 wicd-curses
 xdotool

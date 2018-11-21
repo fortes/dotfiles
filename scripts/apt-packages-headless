@@ -40,6 +40,7 @@ software-properties-common
 ssh
 ssh-import-id
 sshfs
+stow
 sudo
 tmux
 tree

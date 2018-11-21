@@ -63,8 +63,20 @@ if [ "$IS_HEADLESS" != 1 ]; then
   sudo update-alternatives --set x-www-browser "$(which chromium)"
 fi
 
-# Link missing dotfiles
-("$HOME/dotfiles/scripts/link-dotfiles.sh" -f)
+# Link dotfiles
+echo "$ARROW Linking dotfiles"
+pushd "$HOME/dotfiles/stowed-files"
+# Remove default .bashrc and .profile on first run
+if [[ ! -L "$HOME/.bashrc" ]]; then
+  echo "$ARROW Removing default .bashrc"
+  mv "$HOME/.bashrc" "$HOME/bashrc.original"
+fi
+if [[ ! -L "$HOME/.profile" ]]; then
+  echo "$ARROW Removing default .profile"
+  mv "$HOME/.profile" "$HOME/profile.original"
+fi
+stow --target="$HOME" *
+popd > /dev/null
 
 # Update source paths, etc
 source ~/.profile
