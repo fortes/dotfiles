@@ -63,7 +63,7 @@ Plug 'cazador481/fakeclip.neovim'
 Plug 'SirVer/ultisnips'
 " Set `path` for various file types
 " TODO: Learn more about this config
-Plug 'tpope/apathy'
+Plug 'tpope/vim-apathy'
 " Comment / uncomment things quickly
 " {Visual}gc comment / uncomment selection
 " - gc{motion} comment / uncomment lines for motion
