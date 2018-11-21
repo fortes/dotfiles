@@ -1,5 +1,0 @@
-# This directory gets noisy, so must opt-in
-*
-
-!.gitignore
-!bin/yank

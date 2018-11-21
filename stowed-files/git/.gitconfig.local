@@ -1,0 +1,4 @@
+# vim: ft=gitconfig
+[user]
+  name = Filipe Fortes
+  email = accounts@fortes.com

@@ -50,7 +50,7 @@ fi
 
 # Make sure we have latest path for node / npm before running yarn, which needs
 # node v6+
-source "$HOME/dotfiles/symlinks/profile"
+source "/home/fortes/dotfiles/stowed-files/bash/.profile"
 
 # Yarn is fast enough that we just install everything at once
 echo "$ARROW Installing global node packages"

@@ -3,7 +3,7 @@ set -ef -o pipefail
 # shellcheck source=helpers.sh
 source "$HOME/dotfiles/scripts/helpers.sh"
 # Make sure to pick up pyenv settings before install fully complete
-source "$HOME/dotfiles/symlinks/profile"
+source "$HOME/dotfiles/stowed-files/bash/.profile"
 
 # Install pyenv and pyenv-virtualenv
 if ! command -v pyenv > /dev/null; then
@@ -39,7 +39,7 @@ if [ ! -d $PYENV_VIRTUALENV_DIR ]; then
 fi
 
 # May need to update now that pyenv, etc are in path and latest
-source "$HOME/dotfiles/symlinks/profile"
+source "$HOME/dotfiles/stowed-files/bash/.profile"
 
 echo "$ARROW Setting python version via pyenv"
 pyenv install -s "$PYENV_VERSION"

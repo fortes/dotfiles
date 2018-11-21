@@ -1,9 +1,0 @@
-# vim set ft=ini
-interval=15
-signal=10
-
-[cmus]
-command=$HOME/dotfiles/scripts/cmus-tmux-statusbar.sh
-
-[time]
-command=date +'%m-%d %H:%M'
