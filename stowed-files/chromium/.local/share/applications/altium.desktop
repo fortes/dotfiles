@@ -1,0 +1,8 @@
+[Desktop Entry]
+
+Type=Application
+Version=1.0
+Name=Altium
+Comment=Second profile for Chromium
+Terminal=false
+Exec=/usr/bin/chromium --user-data-dir="$XDG_CONFIG_HOME/chromium_alt_profile"
