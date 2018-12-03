@@ -34,7 +34,7 @@
   # Show diff when committing
   verbose = true
 [core]
-  excludesfile = ~/.gitignore
+  excludesfile = ~/.config/git/gitignore.global
   autocrlf = input
   editor = $EDITOR
   whitespace = fix,space-before-tab,tab-in-indent,trailing-space
