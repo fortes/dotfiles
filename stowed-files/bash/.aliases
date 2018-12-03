@@ -28,8 +28,8 @@ fi
 # Confirm file overwrite
 alias mv='mv -i'
 
-# CD into root of git project
-alias pcd="cd \$(git rev-parse --show-toplevel 2>/dev/null || echo '.')"
+# CD into root of git project via `...`
+alias ...="cd \$(git rev-parse --show-toplevel 2>/dev/null || echo '.')"
 
 if command -v fzf-tmux > /dev/null; then
   # CD into a directory within the project, selecting via fzf
