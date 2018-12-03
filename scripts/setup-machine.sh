@@ -65,7 +65,6 @@ fi
 
 # Link dotfiles
 echo "$ARROW Linking dotfiles"
-pushd "$HOME/dotfiles/stowed-files"
 # Remove default .bashrc and .profile on first run
 if [[ -f "$HOME/.bashrc" && ! -L "$HOME/.bashrc" ]]; then
   echo "$ARROW Removing default .bashrc"
@@ -75,8 +74,7 @@ if [[ -f "$HOME/.profile" && ! -L "$HOME/.profile" ]]; then
   echo "$ARROW Removing default .profile"
   mv "$HOME/.profile" "$HOME/profile.original"
 fi
-stow --target="$HOME" *
-popd > /dev/null
+stow --dir="$HOME/dotfiles/stowed-files/" --target="$HOME" *
 
 # Update source paths, etc
 source ~/.profile
