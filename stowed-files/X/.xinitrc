@@ -1,3 +1,5 @@
+#!/bin/bash
+
 IS_CROUTON=0
 IS_HIDPI=0
 if command -v croutonversion > /dev/null; then
