@@ -74,7 +74,8 @@ if [[ -f "$HOME/.profile" && ! -L "$HOME/.profile" ]]; then
   echo "$ARROW Removing default .profile"
   mv "$HOME/.profile" "$HOME/profile.original"
 fi
-stow --dir="$HOME/dotfiles/stowed-files/" --target="$HOME" *
+stow --dir="$HOME/dotfiles/stowed-files/" --target="$HOME" \
+  $(ls "$HOME"/dotfiles/stowed-files)
 
 # Update source paths, etc
 source ~/.profile
