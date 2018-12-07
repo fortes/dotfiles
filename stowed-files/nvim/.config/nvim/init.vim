@@ -38,6 +38,14 @@ Plug 'nathanaelkane/vim-indent-guides'
 " Editing {{{
 " Accent autocompletion via gx in normal mode
 Plug 'airblade/vim-accent'
+" Smarter matchit, extends `%`
+" % / g% forward/backwards to next matching open/close word
+" [% / ]% go to prev/next surrounding word
+" z% go into nearest inner contained block
+" a% & i% text objects
+" ds% / cs% to delete/change surrounding
+" Can also do parallel editing of matches on tags
+Plug 'andymass/vim-matchup'
 " <leader>nr open visual selection in sep window
 Plug 'chrisbra/NrrwRgn'
 " Auto-close parens / quotes, requires no config
@@ -277,6 +285,12 @@ endfunction
 " }}}
 
 " Plugin Configuration {{{
+
+" Enable transmutation of open / close blocks
+let g:matchup_transmute_enabled = 1
+
+" Enable deelete/change surrounding
+let g:matchup_surround_enabled = 1
 
 " Enable tmux to be mapped to '+' register
 let g:vim_fakeclip_tmux_plus=1
