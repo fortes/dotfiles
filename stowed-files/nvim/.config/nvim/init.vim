@@ -116,6 +116,10 @@ end
 " Show register contents when using " or @ in normal mode
 " Also shows when hitting <c-r> in insert mode
 Plug 'junegunn/vim-peekaboo'
+" Unobtrusive scratch window
+" gs to open scratch window (works w/ selection)
+" :Scratch opens blank scratch window
+Plug 'mtth/scratch.vim'
 " Adds helpers for UNIX shell commands
 " :Remove Delete buffer and file at same time
 " :Unlink Delete file, keep buffer
