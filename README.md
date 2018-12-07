@@ -4,13 +4,13 @@ This is only public so I can easily share it across machines. There is probably 
 
 ## Letting me own your machine
 
-```
+```sh
 bash <(curl -fsSL https://raw.github.com/fortes/dotfiles/master/bootstrap.sh)
 ```
 
 If for some reason, you don't have `curl` installed (why?):
 
-```
+```sh
 bash <(wget -qO- https://raw.github.com/fortes/dotfiles/master/bootstrap.sh)
 ```
 
@@ -22,7 +22,7 @@ Once you've run setup, you'll still have to do the following manual steps:
 
 1. Generate this machine's SSH keys:
 
-```
+```sh
 ssh-keygen -t rsa -b 4096 -C "$(hostname)"
 ```
 
@@ -32,7 +32,7 @@ Then add the key into GitHub and wherever else
 
 3. Authorize your public keys on the new machine:
 
-```
+```sh
 ssh-import-id gh:fortes
 ```
 
@@ -48,13 +48,13 @@ ssh-import-id gh:fortes
 
 ## Ignoring changes to a file
 
-```
+```sh
 git update-index --skip-worktree ./symlinks/npmrc
 ```
 
 To make changes in the future:
 
-```
+```sh
 git update-index --no-skip-worktree ./symlinks/npmrc
 ```
 

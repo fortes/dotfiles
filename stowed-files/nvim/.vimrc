@@ -718,7 +718,7 @@ augroup END
 " Markdown config {{{
 " Syntax highlight within fenced code blocks
 let g:markdown_fenced_languages = ['bash=sh', 'css', 'html', 'js=javascript',
-      \ 'typescript=javascript', 'python']
+      \ 'less', 'typescript=javascript', 'python', 'sh']
 " }}}
 
 " Netrw config {{{
