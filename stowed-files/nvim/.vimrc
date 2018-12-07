@@ -16,16 +16,18 @@ if !has('nvim')
   set autoread
   " Remove silly restrictions from backspace
   set backspace=indent,eol,start
+  " Shhhh
+  set belloff=all
   " Don't scan included files for keyword completion (too slow)
   set complete-=i
   " Display as much as possible as last line, instead of just showing @
-  set display=lastline
+  set display=lastline,msgsep
   " Default formatoptions in neovim: tcqj
   " t Wrap text using textwidth
   " c Wrap comments using textwidth, inserting comment leader automatically.
   " q Allow formatting of comments with "gq"
   set formatoptions=tcq
-  if version >= 704
+  if v:version >= 704
     " j Remove comment leader when joining lines (added in Vim 7.4)
     set formatoptions+=j
   endif
@@ -43,6 +45,8 @@ if !has('nvim')
   set mouse=a
   " The future is now!
   set nocompatible
+  " Show cursor position in bottom right
+  set ruler
   " Neovim default
   set sessionoptions-=options
   " Backspace should delete tabwidth of characters
@@ -136,9 +140,6 @@ set numberwidth=5
 set noerrorbells
 set visualbell t_vb=
 
-" Show cursor position in bottom right
-set ruler
-
 " Keep lines in view at edges of screen
 set scrolloff=5
 set sidescrolloff=5
@@ -150,6 +151,9 @@ set shortmess+=Imrc
 
 " Display incomplete commands
 set showcmd
+
+" Always show the signcolumn to avoid jitter
+set signcolumn=yes
 
 " Open new split panes to right and bottom, which feels more natural
 set splitbelow
@@ -281,16 +285,25 @@ set complete+=kspell
 
 " Show menu when only one match, don't insert until match selected,
 " and don't autoselect a match
-set completeopt=menuone,noinsert,noselect
+set completeopt=longest,menuone,noinsert,noselect
 
 " Make sure there's a default dictionary for completion
 if filereadable('/usr/share/dict/words')
   set dictionary+=/usr/share/dict/words
 endif
 
-" Enable tab/enter if completion menu is open
-inoremap <expr> <Tab> (pumvisible() ? "\<C-n>" : "\<Tab>")
-inoremap <expr> <S-Tab> (pumvisible() ? "\<C-p>" : "\<S-Tab>")
+" Make completion work a bit more like traditional IDEs w/o losing useful keys
+
+" Enable tab navigation between completion items
+inoremap <silent><expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <silent><expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+
+" Enter to confirm completion item
+inoremap <silent><expr> <CR> pumvisible() ? "\<C-y>" : "\<CR>"
+
+" PageUp/PageDown doesn't select item by default
+inoremap <silent><expr> <PageDown> pumvisible() ? "\<PageDown>\<C-p>\<C-n>" : "\<PageDown>"
+inoremap <silent><expr> <PageUp> pumvisible() ? "\<PageUp>\<C-p>\<C-n>" : "\<PageUp>"
 " }}}
 
 " Default formatoptions (as of neovim): tcqj

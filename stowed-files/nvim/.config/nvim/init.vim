@@ -106,7 +106,7 @@ Plug 'vim-scripts/ReplaceWithRegister'
 " Plug 'wellle/tmux-complete.vim'
 " }}}
 
-" File/Buffer Handling {{{
+" File/Buffer Hbndling {{{
 " Use FZF for fuzzy finding if available (see config below)
 if isdirectory(expand('$HOME/.local/source/fzf'))
   " Use locally-installed FZF (will change to system once buster hits)
@@ -133,34 +133,19 @@ Plug 'tpope/vim-vinegar'
 " }}}
 
 " General coding {{{
-" async LanguageServerClient, lots of commands (rename, definitions, etc)
-" No default bindings, see config below
-Plug 'autozimu/LanguageClient-neovim', {
-      \ 'branch': 'next',
-      \ 'do': 'bash install.sh'
-      \ }
-" async :make via NeoVim job control, replaces syntastic for showing errors
-" TODO: Use w0rp/ale instead of Neomake and adjust all settings for this
-" https://github.com/w0rp/ale
-" LanguageServer may remove the need for all of this in places, need to figure
-" out what is really needed here.
+function! CocSetup(info)
+  " Initial setup
+  call coc#util#install()
+  " Update/install extensions
+  :CocInstall coc-css coc-emoji coc-highlight coc-html coc-json coc-prettier
+        \ coc-pyls coc-stylelint coc-tslint coc-ultisnips coc-yaml
+endfunction
+
+Plug 'neoclide/coc.nvim', {'tag': '*', 'do': function('CocSetup')}
 " Test.vim: Run tests based on cursor position / file
 Plug 'janko-m/vim-test', { 'for': ['javascript'] }
 " Syntax highlighting and language server
 Plug 'reasonml-editor/vim-reason-plus'
-" Async completion
-Plug 'ncm2/ncm2'
-" Required by ncm2
-Plug 'roxma/nvim-yarp'
-" Completion sources
-Plug 'ncm2/ncm2-bufword'
-Plug 'ncm2/ncm2-tmux'
-Plug 'ncm2/ncm2-path'
-Plug 'ncm2/ncm2-ultisnips'
-" async code formatting
-" :Neoformat <opt_formatter> for entire file
-" :Neoformat! <filetype> for visual selection
-Plug 'sbdchd/neoformat', { 'on': ['Neoformat'] }
 " }}}
 
 " Git {{{
@@ -207,12 +192,12 @@ Plug 'SidOfc/mkdx', { 'for': ['markdown'] }
 " Javascript {{{
 " JS highlighting and indent support. Sometimes buggy, but has support for
 " jsdocs and flow
-Plug 'pangloss/vim-javascript', { 'for': ['javascript']}
+Plug 'pangloss/vim-javascript', { 'for': ['javascript'] }
 " }}}
 
 " Typescript {{{
 " Highlighting and indent support
-Plug 'leafgarland/typescript-vim', { 'for': ['typescript']}
+Plug 'leafgarland/typescript-vim', { 'for': ['typescript'] }
 " TODO: Get omnicompletion working well without a mess of plugins
 " }}}
 
@@ -278,13 +263,7 @@ augroup END
 
 " Called after plugins have loaded {{{
 function! g:OnVimEnter()
-  augroup neoformat_autosave
-    autocmd!
-    if exists(':Neoformat')
-      " Run automatically before saving for supported filetypes
-      autocmd BufWritePre *.css,*.less,*.js,*.md,*.py,*.re,*.ts,*.yaml Neoformat
-    endif
-  augroup END
+  " TODO
 endfunction
 " }}}
 
@@ -299,85 +278,36 @@ let g:matchup_surround_enabled = 1
 " Enable tmux to be mapped to '+' register
 let g:vim_fakeclip_tmux_plus=1
 
-" LanguageClient-neovim {{{
-" Don't need to automake in supported languages
-augroup automake
-  autocmd!
-  " JavaScript and Typescript lint via language servers
-  autocmd BufWritePost *.sh,*.less,*.css,*.vim,*.vimrc,*.txt,*.md make!
-augroup END
-
-" Use location list instead of quickfix
-let g:LanguageClient_diagnosticsList = 'location'
-
-augroup LanguageClientConfig
+" COC language server {{{
+augroup coc_setup
   autocmd!
 
-  function! LC_maps()
-    if has_key(g:LanguageClient_serverCommands, &filetype)
-      " <leader>ld to go to definition
-      nnoremap <buffer> <leader>ld :call LanguageClient_textDocument_definition()<cr>
-      " <leader>li to go to implementation
-      nnoremap <buffer> <leader>li :call LanguageClient_textDocument_implementation()<cr>
-      " <leader>lt to go to type definition
-      nnoremap <buffer> <leader>lt :call LanguageClient_textDocument_typeDefinition()<cr>
-      " <leader>lf to autoformat document / selection
-      nnoremap <buffer> <leader>lf :call LanguageClient_textDocument_formatting()<cr>
-      vnoremap <buffer> <leader>lf :call LanguageClient_textDocument_rangeFomatting()<cr>
-      " <leader>lh for type info under cursor
-      nnoremap <buffer> <leader>lh :call LanguageClient_textDocument_hover()<cr>
-      " <leader>lr to rename variable under cursor
-      nnoremap <buffer> <leader>lr :call LanguageClient_textDocument_rename()<cr>
-      " <leader>lc to find references
-      nnoremap <buffer> <leader>lc :call LanguageClient_textDocument_references()<cr>
-      " <leader>ls to fuzzy find the symbols in the current document
-      nnoremap <buffer> <leader>ls :call LanguageClient_textDocument_documentSymbol()<cr>
-      " <leader>lw to fuzzy find the symbols in entire workspace
-      nnoremap <buffer> <leader>lw :call LanguageClient_textDocument_workspace_symbol()<cr>
-
-      " Use as omnifunc by default
-      setlocal omnifunc=LanguageClient#complete
-    endif
-  endfunction
-
-  autocmd FileType * call LC_maps()
+  " Close preview window when completion is done
+  autocmd InsertLeave,CompleteDone * if pumvisible() == 0 | pclose | endif
 augroup END
 
-let g:LanguageClient_serverCommands = {}
+" Trigger completion via same as omni-completion
+inoremap <silent><expr> <C-x><C-o> coc#refresh()
 
-if executable('pyls')
-  let g:LanguageClient_serverCommands.python = ['pyls']
-endif
+nnoremap <silent> <leader>lk <Plug>(coc-action-doHover)
 
-if executable('javascript-typescript-stdio')
-  let g:LanguageClient_serverCommands.javascript = ['javascript-typescript-stdio']
-  let g:LanguageClient_serverCommands.typescript = ['javascript-typescript-stdio']
-  let g:LanguageClient_serverCommands.html = ['html-languageserver', '--stdio']
-  let g:LanguageClient_serverCommands.css = ['css-languageserver', '--stdio']
-  let g:LanguageClient_serverCommands.less = ['css-languageserver', '--stdio']
-  let g:LanguageClient_serverCommands.json = ['json-languageserver', '--stdio']
-endif
+" Note: These do not work with `noremap`
+nmap <buffer> <leader>lc <Plug>(coc-references)
+nmap <buffer> <leader>ld <Plug>(coc-definition)
+nmap <buffer> <leader>li <Plug>(coc-implementation)
+nmap <buffer> <leader>lr <Plug>(coc-rename)
+nmap <buffer> <leader>ls <Plug>(coc-documentSymbols)
+nmap <buffer> <leader>lt <Plug>(coc-type-definition)
 
-if executable('ocaml-language-server')
-  let g:LanguageClient_serverCommands.reason = ['ocaml-language-server', '--stdio']
-  let g:LanguageClient_serverCommands.ocaml = ['ocaml-language-server', '--stdio']
-endif
+vmap <buffer> <leader>lf <Plug>(coc-format-selected)
+nmap <buffer> <leader>lf <Plug>(coc-format-selected)
 
-if executable('bash-language-server')
-  let g:LanguageClient_serverCommands.sh = ['bash-language-server', 'start']
-endif
+nmap <silent> [c <Plug>(coc-diagnostic-prev)
+nmap <silent> ]c <Plug>(coc-diagnostic-next)
 
-if executable('docker-langserver')
-  let g:LanguageClient_serverCommands.dockerfile = ['docker-langserver', '--stdio']
-endif
-" }}}
-
-" ncm2 {{{
-" Enable in all buffers
-augroup ncm2
-  autocmd!
-  autocmd BufEnter * call ncm2#enable_for_buffer()
-augroup END
+" Navigation snippet sections with C-j/k
+let g:coc_snippet_next = '<C-j>'
+let g:coc_snippet_prev = '<C-k>'
 " }}}
 
 " Test.vim {{{
@@ -401,11 +331,6 @@ augroup test_shortcuts
   autocmd FileType javascript nnoremap <buffer> <silent> <leader>tf :TestFile<cr>
   autocmd FileType javascript nnoremap <buffer> <silent> <leader>twf :TestFile -w<cr><c-\><c-n><c-w><c-k>
 augroup END
-" }}}
-
-" Neoformat {{{
-" Use formatprg when available
-let g:neoformat_try_formatprg = 1
 " }}}
 
 " Fuzzy Finding (FZF) {{{
@@ -454,13 +379,13 @@ end
 " }}}
 
 " UltiSnips {{{
-" Use tab to expand snippet and move to next target. Shift tab goes back.
-let g:UltiSnipsExpandTrigger='<tab>'
+" Don't let UltiSnips try to do any mappings, messes with our completion keys
+let g:UltiSnipsExpandTrigger='<nop>'
 " <C-k> fuzzy-finds available snippets for the file with FZF
 " let g:UltiSnipsListSnippets="<C-k>"
 inoremap <C-k> <C-o>:Snippets<cr>
-let g:UltiSnipsJumpForwardTrigger='<tab>'
-let g:UltiSnipsJumpBackwardTrigger='<S-tab>'
+" let g:UltiSnipsJumpForwardTrigger='<tab>'
+" let g:UltiSnipsJumpBackwardTrigger='<S-tab>'
 " }}}
 
 " vim-javascript {{{
