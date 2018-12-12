@@ -138,7 +138,7 @@ function! CocSetup(info)
   call coc#util#install()
   " Update/install extensions
   :CocInstall coc-css coc-emoji coc-highlight coc-html coc-json coc-prettier
-        \ coc-pyls coc-stylelint coc-tslint coc-ultisnips coc-yaml
+        \ coc-pyls coc-stylelint coc-tslint coc-tsserver coc-ultisnips coc-yaml
 endfunction
 
 Plug 'neoclide/coc.nvim', {'tag': '*', 'do': function('CocSetup')}
@@ -284,6 +284,12 @@ augroup coc_setup
 
   " Close preview window when completion is done
   autocmd InsertLeave,CompleteDone * if pumvisible() == 0 | pclose | endif
+augroup END
+
+augroup automake
+  autocmd!
+
+  " COC handles auto-linting / formatting
 augroup END
 
 " Trigger completion via same as omni-completion
