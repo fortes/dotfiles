@@ -15,19 +15,19 @@
 
   "coc.preferences.snippetIndicator": " ★",
 
-  "coc.preferences.formatOnType": true,
+  "coc.preferences.formatOnType": false,
   "coc.preferences.formatOnSaveFiletypes": [
     "css",
     "html",
-    "javascript",
     "json",
     "less",
     "markdown",
     "python",
     "reason",
-    "typescript",
     "yaml"
   ],
+
+  "tslint.enable": true,
 
   "languageserver": {
     "bash": {

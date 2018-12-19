@@ -279,6 +279,11 @@ let g:matchup_surround_enabled = 1
 let g:vim_fakeclip_tmux_plus=1
 
 " COC language server {{{
+
+" :Prettier/:PrettierAsync for formatting
+command! -nargs=0 Prettier :call CocAction('runCommand', 'prettier.formatFile')
+command! -nargs=0 PrettierAsync :call CocAction('runCommand', 'prettier.formatFile')
+
 augroup coc_setup
   autocmd!
 
@@ -289,7 +294,8 @@ augroup END
 augroup automake
   autocmd!
 
-  " COC handles auto-linting / formatting
+  " COC handles auto-linting . Setup formatting via prettier
+  autocmd BufWritePre *.js,*.json,*.ts Prettier
 augroup END
 
 " Trigger completion via same as omni-completion
@@ -298,15 +304,15 @@ inoremap <silent><expr> <C-x><C-o> coc#refresh()
 nnoremap <silent> <leader>lk <Plug>(coc-action-doHover)
 
 " Note: These do not work with `noremap`
-nmap <buffer> <leader>lc <Plug>(coc-references)
-nmap <buffer> <leader>ld <Plug>(coc-definition)
-nmap <buffer> <leader>li <Plug>(coc-implementation)
-nmap <buffer> <leader>lr <Plug>(coc-rename)
-nmap <buffer> <leader>ls <Plug>(coc-documentSymbols)
-nmap <buffer> <leader>lt <Plug>(coc-type-definition)
+nmap <leader>lc <Plug>(coc-references)
+nmap <leader>ld <Plug>(coc-definition)
+nmap <leader>li <Plug>(coc-implementation)
+nmap <leader>lr <Plug>(coc-rename)
+nmap <leader>ls <Plug>(coc-documentSymbols)
+nmap <leader>lt <Plug>(coc-type-definition)
 
-vmap <buffer> <leader>lf <Plug>(coc-format-selected)
-nmap <buffer> <leader>lf <Plug>(coc-format-selected)
+vmap <leader>lf <Plug>(coc-format-selected)
+nmap <leader>lf <Plug>(coc-format-selected)
 
 nmap <silent> [c <Plug>(coc-diagnostic-prev)
 nmap <silent> ]c <Plug>(coc-diagnostic-next)
