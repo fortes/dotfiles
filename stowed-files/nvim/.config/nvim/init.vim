@@ -69,6 +69,8 @@ Plug 'justinmk/vim-sneak'
 Plug 'cazador481/fakeclip.neovim'
 " Snippet support, see configuration below
 Plug 'SirVer/ultisnips'
+" Fade inactive buffers
+Plug 'TaDaa/vimade'
 " Set `path` for various file types
 " TODO: Learn more about this config
 Plug 'tpope/vim-apathy'
