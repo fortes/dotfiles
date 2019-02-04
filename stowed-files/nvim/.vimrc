@@ -668,6 +668,10 @@ augroup filetype_tweaks
     execute 'autocmd BufWritePost ' . join(s:automake_filetypes, ',') . ' make!'
   augroup END
 
+  if executable('beautysh')
+    autocmd FileType sh setlocal formatprg=beautysh\ -f\ -
+  endif
+
   " Use prettier to autoformat (gq in Visual mode)
   if executable('prettier')
     autocmd FileType javascript setlocal formatprg=prettier\ --stdin\ --parser\ flow
