@@ -11,7 +11,9 @@ feh
 fonts-dejavu
 fonts-inconsolata
 fonts-noto
-fonts-symbola
+fonts-noto-color-emoji
+fonts-noto-mono
+fonts-noto-ui-core
 gnome-terminal
 i3
 i3blocks

@@ -12,8 +12,10 @@ dnsutils
 elinks
 encfs
 exiv2
+fd-find
 ffmpeg
 fuse
+fzf
 git
 git-extras
 htop
@@ -24,15 +26,18 @@ libimage-exiftool-perl
 libssl-dev
 lsb-release
 lsof
+man-db
 mergerfs
 mosh
 ncdu
 nethogs
 neovim
+nnn
 oathtool
 python3-dev
 python3-pip
 rclone
+ripgrep
 scrypt
 shellcheck
 silversearcher-ag
@@ -49,3 +54,4 @@ vifm
 virtualenv
 wamerican
 wget
+yank

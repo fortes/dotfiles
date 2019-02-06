@@ -123,10 +123,10 @@ if [ -r /etc/bash_completion.d/git-prompt ]; then
 fi
 
 # FZF keybindings
-sourceIfExists "$HOME/.fzf.bash"
+sourceIfExists "/usr/share/doc/fzf/examples/key-bindings.bash"
 
 # Load system bash completion
-sourceIfExists /usr/share/bash-completion/bash_completion
+sourceIfExists "/usr/share/bash-completion/bash_completion"
 # Load local bash completion
 sourceIfExists "$HOME/.local/completions.d/*"
 sourceIfExists "$HOME/.local/etc/bash_completion.d/*"

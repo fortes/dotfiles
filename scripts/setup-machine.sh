@@ -36,6 +36,8 @@ FAKE_DOCKER
     sudo chmod +x "$FAKE_DOCKER_PATH"
   fi
   echo "$CMARK Fake docker bin installed for crouton"
+
+  installAptPackagesIfMissing upower
 fi
 
 PACKAGES=$(xargs < "$HOME/dotfiles/scripts/apt-packages-headless")
@@ -83,5 +85,4 @@ source ~/.bashrc
 
 ("$HOME/dotfiles/scripts/python-setup.sh")
 ("$HOME/dotfiles/scripts/node-setup.sh")
-("$HOME/dotfiles/scripts/fzf-setup.sh")
 ("$HOME/dotfiles/scripts/nvim-setup.sh")

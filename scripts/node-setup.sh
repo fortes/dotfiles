@@ -30,30 +30,14 @@ NPM_PREFIX=$HOME/.local
 NPM_CACHE_DIR=$HOME/.cache/npm
 mkdir -p "$NPM_PREFIX/bin"
 mkdir -p "$NPM_CACHE_DIR"
-# Note: In the past, there have been bugs with yarn actually respecting these
-# settings, might have to switch back to npm at some point.
-yarn config set prefix "$NPM_PREFIX"
-yarn config set global-folder "$NPM_PREFIX/lib"
-
-# npm isn't available from the debian repository in stretch (wtf?), so we use
-# yarn to temporarily install n, which we then use to install node lts, which
-# comes with npm (and can officially run yarn). Note that this may break someday
-# in the future, since yarn requires node v6+
-if ! command -v npm > /dev/null; then
-  pushd /tmp > /dev/null
-  echo "$ARROW installing local node lts and npm"
-  yarn add n
-  N_PREFIX=$NPM_PREFIX /tmp/node_modules/.bin/n lts
-  rm -rf /tmp/node_modules /tmp/package.json
-  popd > /dev/null
-fi
-
-# Make sure we have latest path for node / npm before running yarn, which needs
-# node v6+
-source "/home/fortes/dotfiles/stowed-files/bash/.profile"
 
 # Yarn is fast enough that we just install everything at once
 echo "$ARROW Installing global node packages"
-yarn global add $(xargs < "$HOME/dotfiles/scripts/node-packages")
+< "$HOME/dotfiles/scripts/node-packages" xargs yarn global add
+
+# Make sure $PATH is up to date
+source "$HOME/.profile"
+# Setup latest node/npm locally
+n stable
 
 echo "$CMARK All node packages installed"

@@ -3,29 +3,9 @@ set -euf -o pipefail
 # shellcheck source=helpers.sh
 source "$HOME/dotfiles/scripts/helpers.sh"
 
-# Debian version currently super old, use this one instead
-NVIM_APPIMAGE_PATH="$HOME/.local/bin/nvim"
-if [ ! -f "$NVIM_APPIMAGE_PATH" ]; then
-  echo "$XMARK nvim not installed"
-  echo "$ARROW Downloading nvim appimage"
-  wget -nv -O "$NVIM_APPIMAGE_PATH" \
-    "https://github.com/neovim/neovim/releases/download/v0.3.1/nvim.appimage"
-  chmod u+x "$NVIM_APPIMAGE_PATH"
-
-  # AppImage requires fuse, which is unsupported on Docker & WSL
-  sourceIfExists "$HOME/.profile.local"
-  if [ "$IS_DOCKER" == 1 ] || [ "$IS_WSL" == 1 ]; then
-    echo "$ARROW Extracting nvim AppImage"
-    NVIM_EXTRACT_DIR="$HOME/.local/nvim-squashfs-root"
-    pushd "$HOME/.local" > /dev/null
-    "$NVIM_APPIMAGE_PATH" --appimage-extract > /dev/null
-    mv squashfs-root "$NVIM_EXTRACT_DIR"
-    rm "$NVIM_APPIMAGE_PATH"
-    ln -s "$NVIM_EXTRACT_DIR/usr/bin/nvim" "$NVIM_APPIMAGE_PATH"
-    echo "$CMARK nvim AppImage extracted"
-  fi
+if ! update-alternatives --get-selections | grep editor | grep -q nvim; then
   sudo update-alternatives \
-    --install /usr/bin/editor editor "$NVIM_APPIMAGE_PATH" 60
+    --install /usr/bin/editor editor "$(command -v nvim)" 60
 fi
 echo "$CMARK nvim installed"
 

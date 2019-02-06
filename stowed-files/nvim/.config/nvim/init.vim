@@ -109,10 +109,10 @@ Plug 'vim-scripts/ReplaceWithRegister'
 " }}}
 
 " File/Buffer Hbndling {{{
-" Use FZF for fuzzy finding if available (see config below)
-if isdirectory(expand('$HOME/.local/source/fzf'))
-  " Use locally-installed FZF (will change to system once buster hits)
-  Plug expand('$HOME/.local/source/fzf')
+" Use FZF for fuzzy finding
+if filereadable('/usr/share/doc/fzf/examples/fzf.vim')
+  " Use locally-installed FZF plugin
+  Plug '/usr/share/doc/fzf/examples'
   Plug 'junegunn/fzf.vim'
 end
 " Show register contents when using " or @ in normal mode
