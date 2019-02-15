@@ -56,3 +56,5 @@
 # Local modifications / auth
 [include]
   path=~/.gitconfig.local
+[fetch]
+  prune = true
