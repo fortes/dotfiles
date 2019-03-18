@@ -170,6 +170,9 @@ augroup END
 " }}}
 
 " File Handling {{{
+" Automatically switch directory to current file
+set autochdir
+
 " Automatically write files on :next, :make, etc
 set autowriteall
 
