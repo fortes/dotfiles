@@ -4,10 +4,10 @@ cmake
 cmus
 compton
 dbus-x11
-dconf-cli
 exfat-fuse
 exfat-utils
 feh
+firefox-esr
 fonts-dejavu
 fonts-inconsolata
 fonts-noto
@@ -17,6 +17,7 @@ fonts-noto-ui-core
 gnome-terminal
 i3
 i3blocks
+kitty
 libnotify-bin
 maim
 mpv

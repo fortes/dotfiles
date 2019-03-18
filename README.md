@@ -65,8 +65,7 @@ TODO: Automate these steps.
 ### Debian / Ubuntu
 
 * Depending on the machine, you may need `pavucontrol` in order to unmute your audio output via GUI.
-** Alternatively, find the name of the desired output via `pacmd list-sinks` then run `pacmd set-default-sink $SINK_NAME`
-* Get decent (not great) emoji support by installing `fonts-noto-color-emoji`, `fonts-noto-mono`, and `fonts-noto-hinted` manually from `sid`
+** Alternatively, find the name of the desired output via `pacmd list-sinks` then run `pacmd set-default-sink $SINK_NAME` and make sure to unmute via `pacmd set-sink-mute [name] 0`
 
 ### EC2
 

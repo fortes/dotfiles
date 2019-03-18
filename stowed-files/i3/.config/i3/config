@@ -10,9 +10,9 @@ font pango:Inconsolata 10
 floating_modifier $mod
 
 # start a terminal with mod-enter
-bindsym $mod+Return exec i3-sensible-terminal
+bindsym $mod+Return exec kitty
 # floating terminal with mod-`
-bindsym $mod+grave exec gnome-terminal --role='console'
+bindsym $mod+grave exec kitty --class='console'
 # floating terminal with mod-`
 bindsym $mod+Shift+grave exec chromium --temp-profile --incognito --class='console'
 
