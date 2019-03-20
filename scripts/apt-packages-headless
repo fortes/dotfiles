@@ -5,8 +5,8 @@ avahi-dnsconfd
 avahi-utils
 bash-completion
 build-essential
-curl
 cryfs
+curl
 dbus
 dnsutils
 elinks
@@ -21,6 +21,8 @@ git-extras
 htop
 iftop
 imagemagick
+jid
+jq
 keychain
 libimage-exiftool-perl
 libssl-dev
@@ -30,8 +32,8 @@ man-db
 mergerfs
 mosh
 ncdu
-nethogs
 neovim
+nethogs
 nnn
 oathtool
 python3-dev
