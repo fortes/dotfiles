@@ -8,7 +8,7 @@ if [ ! -f $MULTIMEDIA_FILE ]; then
   echo "$XMARK Debian Multimedia not in sources.list"
   echo "  $ARROW Adding backports to in sources.list (requires sudo)"
   # TODO: Use `apt-key add`?
-  echo "deb http://www.deb-multimedia.org stretch main non-free" | \
+  echo "deb http://www.deb-multimedia.org buster main non-free" | \
     sudo tee $MULTIMEDIA_FILE
   echo "$CMARK Multimedia in sources.list, updating sources"
   sudo DEBIAN_FRONTEND=noninteractive apt-get update -oAcquire::AllowInsecureRepositories=true -qq
