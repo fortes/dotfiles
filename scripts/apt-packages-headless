@@ -15,7 +15,9 @@ exiv2
 ffmpeg
 fuse
 git
+git-crypt
 git-extras
+html-xml-utils
 htop
 iftop
 imagemagick
