@@ -1,6 +1,7 @@
 acdcli
 asciinema
 beautysh
+extruct
 neovim
 mps-youtube
 proselint
@@ -9,4 +10,5 @@ python-language-server
 slugify
 tldr
 vim-vint
+xq
 youtube-dl

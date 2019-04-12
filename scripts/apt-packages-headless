@@ -11,13 +11,16 @@ dbus
 dnsutils
 elinks
 encfs
+entr
 exiv2
 fd-find
 ffmpeg
 fuse
 fzf
 git
+git-crypt
 git-extras
+html-xml-utils
 htop
 iftop
 imagemagick
@@ -44,6 +47,7 @@ rsync
 scrypt
 shellcheck
 silversearcher-ag
+slugify
 software-properties-common
 ssh
 ssh-import-id

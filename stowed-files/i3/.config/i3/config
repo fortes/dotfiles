@@ -3,8 +3,8 @@
 
 set $mod Mod1
 
-# Use Inconsolata instead of the nasty default
-font pango:Inconsolata 10
+# Change nasty default font
+font pango:Noto Sans Mono 10
 
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
@@ -26,8 +26,8 @@ bindsym $mod+Shift+z exec --no-startup-id ~/.local/bin/i3blurlock
 bindsym $mod+Shift+q kill
 
 # launch program launcher
-bindsym $mod+d exec --no-startup-id "i3-dmenu-desktop --dmenu='rofi -dmenu -i'"
-bindsym $mod+Shift+d exec --no-startup-id "rofi -show window"
+bindsym $mod+d exec --no-startup-id "i3-dmenu-desktop --dmenu='rofi -dmenu -i -show-icons'"
+bindsym $mod+Shift+d exec --no-startup-id "rofi -show window -show-icons"
 
 # Use vim-like bindings for movement of focus
 bindsym $mod+h focus left
@@ -64,6 +64,12 @@ bindsym $mod+Shift+space floating toggle
 
 # change focus between tiling / floating windows
 bindsym $mod+space focus mode_toggle
+
+# toggle scratchpad
+bindsym $mod+x scratchpad show
+
+# Move window to scratchpad
+bindsym $mod+Shift+x move scratchpad
 
 # focus the parent container
 bindsym $mod+a focus parent
@@ -157,7 +163,7 @@ bindsym --release $mod+Shift+F11 exec "record_window.sh"
 
 # Bar shows workspaces and status, but only displayed when hitting Mod key
 bar {
-  font pango:Inconsolata 14
+  font pango:Noto Sans Mono 12
   hidden_state hide
   mode hide
   modifier $mod
@@ -199,9 +205,13 @@ for_window [class="(?i)simplescreenrecorder"] floating enable
 for_window [title="^xzoom"] floating enable
 
 # Always float a few specific Zoom windows
-for_window [class=zoom title="ount$"] floating enable
 for_window [class=zoom title="(?i)participants"] floating enable
 for_window [class=zoom title="(?i)settings"] floating enable
+
+# Games are a problem sometimes
+for_window [class="(?i)steam" title="(?i)steam - news"] floating enable
+for_window [class="(?i)wine"] border pixel 0
+for_window [class="(?i)wine"] floating enable
 
 # Plain background
 exec --no-startup-id xsetroot -solid "#666666"

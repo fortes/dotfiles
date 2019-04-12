@@ -67,8 +67,12 @@ if command -v croutonversion > /dev/null; then
   if croutonversion | grep -q xorg; then
     IS_HEADLESS=0
   fi
+  if croutonversion | grep -q samus; then
+    IS_HIDPI=1
+  fi
 else
   IS_CROUTON=0
+  IS_HIDPI=0
 fi
 
 if grep -q Microsoft /proc/version; then
@@ -97,6 +101,7 @@ if [ ! -f "$LOCAL_PROFILE" ]; then
     echo "export IS_DOCKER=$IS_DOCKER"
     echo "export IS_EC2=$IS_EC2"
     echo "export IS_HEADLESS=$IS_HEADLESS"
+    echo "export IS_HIDPI=$IS_HIDPI"
     echo "export IS_WSL=$IS_WSL"
     echo ""
     echo "# Add machine-specific items below"
