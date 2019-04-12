@@ -23,8 +23,8 @@ set replaygain_limit=true
 set replaygain_preamp=6
 
 set format_current= %a - %l [%y] - %03n - %t%= %g
-set format_playlist= %-20%A %-20%l %t %= %g %y
-set format_playlist_va= %-20%A %-20%l %t (%a) %= %g %y
+set format_playlist= %-20%A %-20%l %03n %t %= %g %y
+set format_playlist_va= %-20%A %-20%l %03n %t (%a) %= %g %y
 set format_title=%a - %l - %t
 set format_trackwin_album= %l [%y]
 set format_trackwin=   %03n %t%= %g %d
