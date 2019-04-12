@@ -63,7 +63,7 @@ if [ "$IS_HEADLESS" != 1 ]; then
   echo "$ARROW Setting default browser to chromium"
   sudo update-alternatives --set x-www-browser "$(which chromium)"
   echo "$ARROW Setting default terminal to kitty"
-  sudo update-alternatives --set x-terminal-emulator"$(which kitty)"
+  sudo update-alternatives --set x-terminal-emulator "$(which kitty)"
 fi
 
 # Link dotfiles
@@ -84,6 +84,7 @@ stow --dir="$HOME/dotfiles/stowed-files/" --target="$HOME" \
 source ~/.profile
 source ~/.bashrc
 
+("$HOME/dotfiles/scripts/cargo-setup.sh")
 ("$HOME/dotfiles/scripts/python-setup.sh")
 ("$HOME/dotfiles/scripts/node-setup.sh")
 ("$HOME/dotfiles/scripts/nvim-setup.sh")

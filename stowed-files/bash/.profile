@@ -33,6 +33,12 @@ fi
 # Use local directory for n
 export N_PREFIX="$HOME/.local"
 
+# cargo
+export CARGO_HOME="$HOME/.local/cargo"
+if echo ":$PATH:" | grep -vq ":$HOME/.local/cargo/bin:"; then
+  export PATH="$HOME/.local/cargo/bin:$PATH"
+fi
+
 # pyenv setup
 export PYENV_VERSION="3.7.3"
 export PYENV_ROOT="$HOME/.local/pyenv"
