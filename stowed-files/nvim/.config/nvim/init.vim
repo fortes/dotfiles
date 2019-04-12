@@ -254,7 +254,12 @@ augroup END
 if &t_Co >= 256
   " Upgrade colors if we have more colors, stays with default if not available
   let base16colorspace=256
-  silent! colorscheme base16-railscasts
+  if $COLOR_THEME == "light"
+
+    silent! colorscheme base16-classic-light
+  else
+    silent! colorscheme base16-railscasts
+  endif
 endif
 
 " TODO: Move into .vimrc

@@ -164,9 +164,40 @@ bindsym --release $mod+F11 exec "record_screen.sh"
 # Current window with mod-Shift-F11
 bindsym --release $mod+Shift+F11 exec "record_window.sh"
 
+## Base16 Default Dark
+# Author: Chris Kempson (http://chriskempson.com)
+#
+# You can use these variables anywhere in the i3 configuration file.
+
+set $base00 #181818
+set $base01 #282828
+set $base02 #383838
+set $base03 #585858
+set $base04 #b8b8b8
+set $base05 #d8d8d8
+set $base06 #e8e8e8
+set $base07 #f8f8f8
+set $base08 #ab4642
+set $base09 #dc9656
+set $base0A #f7ca88
+set $base0B #a1b56c
+set $base0C #86c1b9
+set $base0D #7cafc2
+set $base0E #ba8baf
+set $base0F #a16946
+
+# Basic color configuration using the Base16 variables for windows and borders.
+# Property Name         Border  BG      Text    Indicator Child Border
+client.focused          $base05 $base0D $base02 $base0D $base04
+client.focused_inactive $base01 $base01 $base05 $base03 $base04
+client.unfocused        $base01 $base00 $base05 $base01 $base04
+client.urgent           $base08 $base08 $base00 $base08 $base08
+client.placeholder      $base00 $base00 $base05 $base00 $base00
+client.background       $base07
+
 # Bar shows workspaces and status, but only displayed when hitting Mod key
 bar {
-  font pango:Noto Sans Mono Medium 11
+  font pango:Noto Sans Mono Medium 14
   hidden_state hide
   mode hide
   modifier $mod
@@ -174,6 +205,20 @@ bar {
   # May need `xrandr --output [NAME] --primary` in `~/.xinitrc.local`
   tray_output primary
   status_command i3blocks
+
+  # Bar configuration using the Base16 variables.
+  colors {
+      background $base00
+      separator  $base01
+      statusline $base04
+
+      # State             Border  BG      Text
+      focused_workspace   $base05 $base0D $base00
+      active_workspace    $base05 $base03 $base00
+      inactive_workspace  $base03 $base01 $base05
+      urgent_workspace    $base08 $base08 $base00
+      binding_mode        $base00 $base0A $base00
+  }
 }
 
 # Focus only via keyboard / clicks
