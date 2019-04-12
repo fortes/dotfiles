@@ -10,9 +10,9 @@ font pango:Noto Sans Mono 10
 floating_modifier $mod
 
 # start a terminal with mod-enter
-bindsym $mod+Return exec kitty
+bindsym $mod+Return exec i3-sensible-terminal
 # floating terminal with mod-`
-bindsym $mod+grave exec kitty --class='console'
+bindsym $mod+grave exec i3-sensible-terminal --class='console'
 # floating terminal with mod-`
 bindsym $mod+Shift+grave exec chromium --temp-profile --incognito --class='console'
 

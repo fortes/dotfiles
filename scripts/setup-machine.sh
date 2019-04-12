@@ -60,9 +60,10 @@ installAptPackagesIfMissing "$PACKAGES"
 echo "$CMARK apt packages installed"
 
 if [ "$IS_HEADLESS" != 1 ]; then
-  # Set default browser
   echo "$ARROW Setting default browser to chromium"
   sudo update-alternatives --set x-www-browser "$(which chromium)"
+  echo "$ARROW Setting default terminal to kitty"
+  sudo update-alternatives --set x-terminal-emulator"$(which kitty)"
 fi
 
 # Link dotfiles

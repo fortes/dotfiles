@@ -10,8 +10,8 @@ curl
 dbus
 dnsutils
 elinks
-encfs
 entr
+exa
 exiv2
 fd-find
 ffmpeg
@@ -28,6 +28,7 @@ jid
 jq
 keychain
 libimage-exiftool-perl
+libncurses5
 libssl-dev
 lsb-release
 lsof

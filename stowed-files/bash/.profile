@@ -34,7 +34,7 @@ fi
 export N_PREFIX="$HOME/.local"
 
 # pyenv setup
-export PYENV_VERSION="3.6.3"
+export PYENV_VERSION="3.7.3"
 export PYENV_ROOT="$HOME/.local/pyenv"
 if echo ":$PATH:" | grep -vq "$PYENV_ROOT/bin:"; then
   export PATH="$PYENV_ROOT/bin:$PATH"
