@@ -1,0 +1,35 @@
+#!/bin/bash
+set -euo pipefail
+
+OPTIONS=$(cat <<-END
+🚫 Cancel
+🔐 Lock
+⏯️ Pause
+⏭️ Next
+🔃 Reload
+🚪 Exit
+END
+)
+
+SELECTION=$(echo "$OPTIONS" | rofi -dmenu -i -p Action -lines 6 -width 400 | awk '{print $2}')
+echo "$SELECTION"
+case "$SELECTION" in
+  "[Cancel]")
+    # noop
+    ;;
+  "Lock")
+    i3blurlock
+    ;;
+  "Pause")
+    cmus-remote -u
+    ;;
+  "Next")
+    cmus-remote -n
+    ;;
+  "Reload")
+    i3-msg restart
+    ;;
+  "Exit")
+    i3-msg exit
+    ;;
+esac

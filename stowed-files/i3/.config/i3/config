@@ -4,7 +4,7 @@
 set $mod Mod1
 
 # Change nasty default font
-font pango:Noto Sans Mono 10
+font pango:Noto Sans Mono Medium 11
 
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
@@ -26,8 +26,8 @@ bindsym $mod+Shift+z exec --no-startup-id ~/.local/bin/i3blurlock
 bindsym $mod+Shift+q kill
 
 # launch program launcher
-bindsym $mod+d exec --no-startup-id "i3-dmenu-desktop --dmenu='rofi -dmenu -i -show-icons'"
-bindsym $mod+Shift+d exec --no-startup-id "rofi -show window -show-icons"
+bindsym $mod+d exec --no-startup-id "rofi -modi drun -show drun -i -show-icons -width 400"
+bindsym $mod+Shift+d exec --no-startup-id "rofi -show window -show-icons -width 400"
 
 # Use vim-like bindings for movement of focus
 bindsym $mod+h focus left
@@ -113,7 +113,7 @@ bindsym $mod+Shift+c reload
 # restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
 bindsym $mod+Shift+r restart
 # exit i3 (logs you out of your X session)
-bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'Exit i3?.' -b 'Yes' 'i3-msg exit'"
+bindsym $mod+Shift+e exec --no-startup-id i3_wm_menu
 
 # Use multimedia/Fx keys for sound
 bindsym XF86AudioMute exec --no-startup-id amixer set Master toggle
@@ -163,12 +163,12 @@ bindsym --release $mod+Shift+F11 exec "record_window.sh"
 
 # Bar shows workspaces and status, but only displayed when hitting Mod key
 bar {
-  font pango:Noto Sans Mono 12
+  font pango:Noto Sans Mono Medium 11
   hidden_state hide
   mode hide
   modifier $mod
   position bottom
-  # If not working, do something like `xrandr --output HDMI-1 --primary`
+  # May need `xrandr --output [NAME] --primary` in `~/.xinitrc.local`
   tray_output primary
   status_command i3blocks
 }
@@ -214,8 +214,12 @@ for_window [class="(?i)wine"] border pixel 0
 for_window [class="(?i)wine"] floating enable
 
 # Plain background
-exec --no-startup-id xsetroot -solid "#666666"
+exec --no-startup-id hsetroot -solid "#222222"
 # Needed for inactive window transparency
 exec --no-startup-id compton -b
 # Save my eyes
 exec --no-startup-id redshift-gtk || redshift -l 27.3:-82.5
+# Notifications
+exec --no-startup-id dunst
+# Try to get right primary monitor
+exec --no-startup-id guess_primary_monitor

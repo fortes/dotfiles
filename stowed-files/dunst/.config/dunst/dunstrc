@@ -1,9 +1,10 @@
 [global]
-  allow_markup = yes
   corner_radius = 4
   follow = mouse
-  font = "Noto Sans Mono 10"
+  font = "Noto Sans Mono Medium 11"
   format = "<b>%s</b>\n%b"
+  frame_color = "#cccccc"
+  frame_width = 2
   geometry = "300x5-6-30"
   history_length = 10
   horizontal_padding = 8
@@ -11,6 +12,7 @@
   ignore_newline = no
   indicate_hidden = yes
   line_height = 0
+  markup = yes
   padding = 8
   separator_color = "#585858"
   separator_height = 2
@@ -19,10 +21,6 @@
   stack_duplicates = true
   transparency = 20
   word_wrap = yes
-
-[frame]
-  width = 2
-  color = "#cccccc"
 
 [urgency_low]
   background = "#181818"

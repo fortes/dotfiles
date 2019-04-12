@@ -1,0 +1,10 @@
+#!/bin/bash
+set -euo pipefail
+
+if xrandr | grep -i primary | grep -qi disconnected; then
+  # Grab first connected display
+  CONNECTED=$(xrandr | grep -i " connected " | awk '{print $1}' | head -n 1)
+  xrandr --output "$CONNECTED" --primary
+  i3-msg restart
+  echo "Set $CONNECTED to primary"
+fi
