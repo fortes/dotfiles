@@ -208,6 +208,11 @@ for_window [title="^xzoom"] floating enable
 for_window [class=zoom title="(?i)participants"] floating enable
 for_window [class=zoom title="(?i)settings"] floating enable
 
+# Games are a problem sometimes
+for_window [class="(?i)steam" title="(?i)steam - news"] floating enable
+for_window [class="(?i)wine"] border pixel 0
+for_window [class="(?i)wine"] floating enable
+
 # Plain background
 exec --no-startup-id xsetroot -solid "#666666"
 # Needed for inactive window transparency
