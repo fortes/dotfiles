@@ -8,7 +8,9 @@ proselint
 pygments
 python-language-server
 slugify
+spotipy
 tldr
 vim-vint
 xq
 youtube-dl
+yq
