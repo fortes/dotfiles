@@ -10,10 +10,10 @@ EDITOR=$VISUAL
 export EDITOR VISUAL
 
 # If available, we use git to list files from the root directory (not from the
-# current directory as in other fzf cases). Otherwise, fallback to ag
+# current directory as in other fzf cases). Otherwise, fallback to fd
 # shellcheck disable=SC2016
-export FZF_DEFAULT_COMMAND='(git ls-files -co --exclude-standard $(git rev-parse --show-toplevel) || ag -l -g "") 2> /dev/null'
-export FZF_DEFAULT_OPTS="--extended --bind alt-a:select-all,alt-d:deselect-all"
+export FZF_DEFAULT_COMMAND='(git ls-files -co --exclude-standard $(git rev-parse --show-toplevel) || fdfind --type file --color always) 2> /dev/null'
+export FZF_DEFAULT_OPTS="--extended --bind alt-a:select-all,alt-d:deselect-all --ansi --preview-window 'right:60%' --preview 'bat --color always --style='grid,changes' --line-range :300 {}'"
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
 # Case insensitive by default
