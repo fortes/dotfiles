@@ -58,7 +58,6 @@ sshfs
 stow
 sudo
 tmux
-tree
 unzip
 vifm
 virtualenv
