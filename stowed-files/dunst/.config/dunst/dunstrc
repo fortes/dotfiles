@@ -1,7 +1,7 @@
 [global]
   corner_radius = 4
   follow = mouse
-  font = "Noto Sans Mono Medium 11"
+  font = "Noto Sans Mono Medium 18"
   format = "<b>%s</b>\n%b"
   frame_color = "#cccccc"
   frame_width = 2
