@@ -9,7 +9,6 @@ mps-youtube
 proselint
 pygments
 python-language-server
-slugify
 spotipy
 tldr
 vim-vint
