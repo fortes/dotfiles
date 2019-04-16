@@ -10,9 +10,9 @@ EDITOR=$VISUAL
 export EDITOR VISUAL
 
 # shellcheck disable=SC2016
-export FZF_DEFAULT_COMMAND='fdfind --type file --color always --follow --hidden'
+export FZF_DEFAULT_COMMAND='fdfind --type file --follow --hidden'
 export FZF_DEFAULT_OPTS="--extended --bind alt-a:select-all,alt-d:deselect-all"
-export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND --color always"
 export FZF_CTRL_T_OPTS="--ansi --preview-window 'right:50%' --preview 'bat --color always --style='grid,changes' --line-range :300 {}'"
 
 # Case insensitive by default
