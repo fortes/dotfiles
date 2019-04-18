@@ -1,10 +1,17 @@
 #!/bin/bash
 
-# Blurry screen effect when locked, taken from:
-# https://faq.i3wm.org/question/83/how-to-run-i3lock-after-computer-inactivity.1.html
 
-maim /tmp/lock-screen.png && \
-  convert /tmp/lock-screen.png -scale 10% -scale 1000% \
-  /tmp/lock-screen-blurred.png && \
-  rm /tmp/lock-screen.png && \
-  i3lock -i /tmp/lock-screen-blurred.png -e -f
+# Use currently playing album, if available
+BG_FILEPATH="/tmp/album-bg-blurred.png"
+
+if [ ! -f "$BG_FILEPATH" ]; then
+  # Blurry screen effect when locked, taken from:
+  # https://faq.i3wm.org/question/83/how-to-run-i3lock-after-computer-inactivity
+  BG_FILEPATH="/tmp/lock-screen-blurred.png"
+  TMP_SCREENSHOT="/tmp/lock-screen.png"
+  maim "$TMP_SCREENSHOT" && \
+    convert /tmp/lock-screen.png -scale 10% -scale 1000% "$BG_FILEPATH" && \
+    rm "$TMP_SCREENSHOT"
+fi
+
+i3lock -i "$BG_FILEPATH" -e -f

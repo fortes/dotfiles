@@ -26,7 +26,10 @@ if [[ $? != 0 ]] || [[ -z "$ART_PATH" ]]; then
   exit 1
 fi
 
-convert "$ART_PATH" -scale 20% -scale 500% -modulate 100,20,100 -fill black -colorize 20% "$TMP_ART_PATH"
+RESOLUTION=$(xrandr | grep \* | awk '{print $1}')
+convert "$ART_PATH" -scale 20% -scale "$RESOLUTION"\! \
+  -modulate 100,20,100 -fill black -colorize 20% \
+  "$TMP_ART_PATH"
 
 echo "setting background to $TMP_ART_PATH"
 feh --bg-fill "$TMP_ART_PATH"
