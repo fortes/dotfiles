@@ -138,9 +138,13 @@ Plug 'tpope/vim-vinegar'
 function! CocSetup(info)
   " Initial setup
   call coc#util#install()
-  " Update/install extensions
-  :CocInstall coc-css coc-emoji coc-highlight coc-html coc-json coc-prettier
-        \ coc-pyls coc-stylelint coc-tslint coc-tsserver coc-ultisnips coc-yaml
+
+  " Install extensions on installation, update otherwise
+  if a:info.status == 'installed' || a:info.force
+    call coc#add_extension('coc-css', 'coc-emoji', 'coc-highlight', 'coc-html', 'coc-json', 'coc-prettier', 'coc-pyls', 'coc-stylelint', 'coc-tslint', 'coc-tsserver', 'coc-ultisnips', 'coc-yaml')
+  else
+    execute 'CocUpdateSync'
+  endif
 endfunction
 
 Plug 'neoclide/coc.nvim', {'tag': '*', 'do': function('CocSetup')}
