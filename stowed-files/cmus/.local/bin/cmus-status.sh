@@ -10,3 +10,7 @@ fi
 if [[ -n $TMUX ]]; then
   tmux refresh-client -S
 fi
+
+if [[ -n $DISPLAY ]]; then
+  cmus-album-background.sh >> /tmp/cmus-status.txt 2>&1 &
+fi
