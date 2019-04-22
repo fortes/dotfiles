@@ -39,6 +39,7 @@ mosh
 ncdu
 neovim
 nethogs
+nodejs
 oathtool
 pydf
 python3-dev
@@ -64,3 +65,4 @@ virtualenv
 wamerican
 wget
 yank
+yarnpkg
