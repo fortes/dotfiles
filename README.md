@@ -22,9 +22,9 @@ Once you've run setup, you'll still have to do the following manual steps:
 
 1. Generate this machine's SSH keys:
 
-```sh
-ssh-keygen -t rsa -b 4096 -C "$(hostname)"
-```
+   ```sh
+   ssh-keygen -t rsa -b 4096 -C "$(hostname)"
+   ```
 
 Then add the key into GitHub and wherever else
 
@@ -32,19 +32,19 @@ Then add the key into GitHub and wherever else
 
 3. Authorize your public keys on the new machine:
 
-```sh
-ssh-import-id gh:fortes
-```
+   ```sh
+   ssh-import-id gh:fortes
+   ```
 
-4. Add your favorite servers into `.ssh/config`
+4. Add your favorite servers into `.ssh/config.local`
 
 5. Setup `.gitconfig.local`:
 
-  ````
-  [user]
-    name = Your Name
-    email = xyz@abc.com
-  ```
+   ```
+   [user]
+     name = Your Name
+     email = xyz@abc.com
+   ```
 
 ## Ignoring changes to a file
 
@@ -62,30 +62,32 @@ git update-index --no-skip-worktree ./symlinks/npmrc
 
 TODO: Automate these steps.
 
+- Install `kindlegen` [from Amazon](https://www.amazon.com/gp/feature.html?ie=UTF8&docId=1000765211)
+
 ### Debian / Ubuntu
 
-* Depending on the machine, you may need `pavucontrol` in order to unmute your audio output via GUI.
-** Alternatively, find the name of the desired output via `pacmd list-sinks` then run `pacmd set-default-sink $SINK_NAME` and make sure to unmute via `pacmd set-sink-mute [name] 0`
+- Depending on the machine, you may need `pavucontrol` in order to unmute your audio output via GUI.
+  \*\* Alternatively, find the name of the desired output via `pacmd list-sinks` then run `pacmd set-default-sink $SINK_NAME` and make sure to unmute via `pacmd set-sink-mute [name] 0`
 
 ### EC2
 
-* None?
+- None?
 
 ### Chromebook
 
-* ~Map Caps Lock to Control~ Synced via user account
-* Setup Smart Lock & PIN unlock
-* Enable the following flags:
-  * `#enable-wifi-credential-sync`
-  * `#ash-enable-night-light`
-  * `#enable-devtools-experiments`
-* Extensions
-  * Should sync and install
-  * Enable cloud storage for uBlock
-* Crouton
-  * Set root password via `crosh`
-  * Copy chroots from backup files
-  * Create chroots
+- ~Map Caps Lock to Control~ Synced via user account
+- Setup Smart Lock & PIN unlock
+- Enable the following flags:
+  - `#enable-wifi-credential-sync`
+  - `#ash-enable-night-light`
+  - `#enable-devtools-experiments`
+- Extensions
+- Should sync and install
+- Enable cloud storage for uBlock
+- Crouton
+- Set root password via `crosh`
+- Copy chroots from backup files
+- Create chroots
 
 #### TODO
 
