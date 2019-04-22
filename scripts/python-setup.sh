@@ -48,7 +48,7 @@ pyenv global "$PYENV_VERSION"
 # Install python packages, but make sure pip and setuptools are latest first
 echo "$ARROW Installing/upgrading pip packages"
 pip install -q --upgrade pip setuptools
-pip install -q --upgrade $(xargs < $HOME/dotfiles/scripts/python-packages)
+< "$HOME/dotfiles/scripts/python-packages" xargs pip install -q --upgrade
 
 echo "$CMARK All python packages installed"
 echo "$CMARK Python setup complete"
