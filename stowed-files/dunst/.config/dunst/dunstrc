@@ -1,18 +1,22 @@
 [global]
   corner_radius = 4
   follow = mouse
-  font = "Noto Sans Mono Medium 18"
-  format = "<b>%s</b>\n%b"
+  font = "Noto Sans 16"
+  format = "<b>%s</b>\n<span font='12'>%b</span>"
   frame_color = "#cccccc"
   frame_width = 2
-  geometry = "300x5-6-30"
+  geometry = "400x5-6-30"
+  history = ctrl+grave
   history_length = 10
   horizontal_padding = 8
+  icon_position = left
+  max_icon_size = 48
+  icon_path = /usr/share/icons/gnome/48x48/status/:/usr/share/icons/gnome/48x48/devices/
   idle_threshold = 120
   ignore_newline = no
   indicate_hidden = yes
   line_height = 0
-  markup = yes
+  markup = full
   padding = 8
   separator_color = "#585858"
   separator_height = 2
@@ -33,6 +37,7 @@
   timeout = 20
 
 [urgency_critical]
-  background = "#9b3632"
+  background = "#9b3648"
   foreground = "#e8e8e8"
+  icon = /usr/share/icons/gnome/48x48/status/stock_dialog-warning.png
   timeout = 0
