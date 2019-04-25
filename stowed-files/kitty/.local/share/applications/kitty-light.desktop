@@ -1,0 +1,9 @@
+[Desktop Entry]
+
+Type=Application
+Version=1.0
+Name=Kitty Light
+Comment=Light mode for Kitty
+Terminal=false
+Exec=sh -c "/usr/bin/kitty --config \$XDG_CONFIG_HOME/kitty/kitty-light.conf"
+Icon=/usr/share/icons/hicolor/256x256/apps/kitty.png
