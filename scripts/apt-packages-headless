@@ -33,6 +33,7 @@ libncurses5
 libssl-dev
 lsb-release
 lsof
+m4
 man-db
 mergerfs
 mosh
