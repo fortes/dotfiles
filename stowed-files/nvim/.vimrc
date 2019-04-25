@@ -754,6 +754,9 @@ let g:netrw_altv=1
 " Tree view
 let g:netrw_liststyle=3
 
+" Sensible limit to the width of the file explorer
+let g:netrw_winsize = 25
+
 " Hide files in .gitignore
 let g:netrw_list_hide=netrw_gitignore#Hide()
 let g:netrw_list_hide.=',\(^\|\s\s\)\zs\.\S\+'
