@@ -563,7 +563,7 @@ augroup filetype_tweaks
   autocmd BufNewFile,BufReadPost *.ts set filetype=typescript
 
   " .md is markdown, not modula
-  autocmd BufNewFile,BufReadPost *.md set filetype=markdown
+  autocmd BufNewFile,BufReadPost *.md,TODO set filetype=markdown
 
   " Not all files should wrap automatically
   autocmd BufNewFile,BufReadPost *.txt,*.md,*.json,*.conf,*.ini,*.pug
@@ -672,7 +672,7 @@ augroup filetype_tweaks
   augroup END
 
   if executable('beautysh')
-    autocmd FileType sh setlocal formatprg=beautysh\ -f\ -
+    autocmd FileType sh setlocal formatprg=beautysh\ -i\ 2\ -f\ -
   endif
 
   " Use prettier to autoformat (gq in Visual mode)
