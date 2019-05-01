@@ -7,14 +7,14 @@ CMUS_STATUS=$(cmus-remote -Q 2>/dev/null)
 if [[ $? != 0 ]]; then
   echo 'cmus not running, exiting'
   hsetroot -solid "$DEFAULT_BG"
-  rm "$TMP_ART_PATH" "$PREVIOUS_FOLDER_PATH"
+  rm -rf "$TMP_ART_PATH" "$PREVIOUS_FOLDER_PATH"
   exit 1
 fi
 
 if grep -iq "^status stopped" <<< "$CMUS_STATUS"; then
   echo 'cmus stopped, exiting'
   hsetroot -solid "$DEFAULT_BG"
-  rm "$TMP_ART_PATH" "$PREVIOUS_FOLDER_PATH"
+  rm -rf "$TMP_ART_PATH" "$PREVIOUS_FOLDER_PATH"
   exit 1
 fi
 
@@ -27,7 +27,7 @@ if [[ "$ALBUM_DIRPATH" != "$PREVIOUS_DIRPATH" ]]; then
   if [[ $? != 0 ]] || [[ -z "$ART_PATH" ]]; then
     echo 'album art file not found, exiting'
     hsetroot -solid "$DEFAULT_BG"
-    rm "$TMP_ART_PATH"
+    rm -rf "$TMP_ART_PATH"
     exit 1
   fi
 

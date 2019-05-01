@@ -12,6 +12,7 @@ set status_display_program=~/dotfiles/stowed-files/cmus/.local/bin/cmus-status.s
 
 # Sort order
 set lib_sort=albumartist date album discnumber tracknumber title
+set pl_sort=date albumartist album discnumber tracknumber title
 
 # Play all albums by current artist default
 set aaa_mode=artist
