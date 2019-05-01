@@ -102,8 +102,12 @@ else
   HOST_COLOR="$CYAN"
 fi
 
-# [user@]host:pwd $
-BASE_PROMPT="$BASE_PROMPT$HOST_COLOR\h:$YELLOW\w$RESET"
+# [[user@]host]:pwd $
+if [ -z "$SSH_TTY" ]; then
+  BASE_PROMPT="$BASE_PROMPT$YELLOW\w$RESET"
+else
+  BASE_PROMPT="$BASE_PROMPT$HOST_COLOR\h:$YELLOW\w$RESET"
+fi
 JOB_COUNT="$BOLD$BLUE[\j]$RESET "
 # Write out history after every command. Add job count if non-zero
 export PROMPT_COMMAND="history -a; HAS_JOBS=\`jobs -p\` "
