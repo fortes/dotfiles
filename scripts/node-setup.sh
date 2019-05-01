@@ -38,6 +38,12 @@ mkdir -p "$NPM_CACHE_DIR"
 echo "$ARROW Installing global node packages"
 < "$HOME/dotfiles/scripts/node-packages" xargs yarn global add
 
+NPM_BASH_COMPLETION_PATH="$HOME/.local/completions.d/npm"
+if [ ! -f "$NPM_BASH_COMPLETION_PATH" ]; then
+  mkdir -p "$(dirname "$NPM_BASH_COMPLETION_PATH")"
+  npm completion > "$NPM_BASH_COMPLETION_PATH"
+fi
+
 # Make sure $PATH is up to date
 source "$HOME/.profile"
 # Setup latest node/npm locally
