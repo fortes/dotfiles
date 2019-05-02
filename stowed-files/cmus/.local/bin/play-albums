@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+[[ "$TRACE" ]] && set -xtrace
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+main() {
+  declare -r cmus_stats=$(cmus-remote -Q)
+  declare -r album_ids=$(beet ls -f'$mb_albumid' -a "$@")
+
+  if [ -z "$album_ids" ]; then
+    echo "No albums found"
+    return 1
+  fi
+
+  declare query=""
+  for album_id in $album_ids; do
+    query="$query, mb_albumid:${album_id}"
+  done
+
+  # Remove initial ','
+  echo "Playing $(wc -l <<< "$album_ids") albums"
+  beet play -y $(cut -c2- <<< "$query") year- album- track+
+}
+
+if cmus-remote -Q > /dev/null 2>&1; then
+  if [[ -z "$@" ]]; then
+    echo "You probably want an argument here"
+    exit 1
+  fi
+
+  main "$@"
+else
+  echo "cmus not running"
+  exit 1
+fi
+
