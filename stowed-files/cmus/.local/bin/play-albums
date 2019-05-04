@@ -5,9 +5,12 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
+BEET_FORMAT_STRING='$mb_albumid $albumartist - [$original_year] $album'
+
 main() {
   declare -r cmus_stats=$(cmus-remote -Q)
-  declare -r album_ids=$(beet ls -f'$mb_albumid' -a "$@")
+  declare -r album_ids=$(beet ls -f"$BEET_FORMAT_STRING" -a "$@" albumartist+ original_year+ | \
+    fzf --multi -1 -0 --with-nth 2.. -n2.. | awk '{print $1}')
 
   if [ -z "$album_ids" ]; then
     echo "No albums found"
@@ -22,6 +25,12 @@ main() {
   # Remove initial ','
   echo "Playing $(wc -l <<< "$album_ids") albums"
   beet play -y $(cut -c2- <<< "$query") year- album- track+
+
+  if cmus-remote -Q | head -n 1 | grep -vq stopped; then
+    cmus-remote -p
+  else
+    cmus-remote -n
+  fi
 }
 
 if cmus-remote -Q > /dev/null 2>&1; then
@@ -35,4 +44,3 @@ else
   echo "cmus not running"
   exit 1
 fi
-
