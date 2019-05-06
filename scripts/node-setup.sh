@@ -36,7 +36,7 @@ mkdir -p "$NPM_CACHE_DIR"
 
 # Yarn is fast enough that we just install everything at once
 echo "$ARROW Installing global node packages"
-< "$HOME/dotfiles/scripts/node-packages" xargs yarn global add
+< "$HOME/dotfiles/scripts/node-packages" xargs yarn global add --ignore-engines
 
 NPM_BASH_COMPLETION_PATH="$HOME/.local/completions.d/npm"
 if [ ! -f "$NPM_BASH_COMPLETION_PATH" ]; then
