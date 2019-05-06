@@ -23,14 +23,15 @@ main() {
   done
 
   # Remove initial ','
-  echo "Playing $(wc -l <<< "$album_ids") albums"
-  beet play -y $(cut -c2- <<< "$query") year- album- track+
+  query=$(echo "$query" | cut -c2-)
 
-  if cmus-remote -Q | head -n 1 | grep -vq stopped; then
-    cmus-remote -p
-  else
-    cmus-remote -n
-  fi
+  echo "Playing $(wc -l <<< "$album_ids") albums"
+
+  # Stop music first, then queue tracks, wait a beat to give to cmus before
+  # unpausing to play
+  cmus-remote -s && \
+  beet play -y "$query" year- album- track+ && \
+    sleep 1 && cmus-remote -n && cmus-remote -p
 }
 
 if cmus-remote -Q > /dev/null 2>&1; then
