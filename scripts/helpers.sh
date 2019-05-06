@@ -36,7 +36,7 @@ fi
 
 # Helper functions {{{
 isAptPackageInstalled() {
-  if dpkg -s "$1" > /dev/null 2> /dev/null; then
+  if dpkg-query -l "$1" | grep -q "^ii"; then
     return 0
   else
     return 1
