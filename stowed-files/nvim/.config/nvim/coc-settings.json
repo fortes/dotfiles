@@ -19,15 +19,21 @@
   "coc.preferences.formatOnSaveFiletypes": [
     "css",
     "html",
+    "javascript",
     "json",
     "less",
     "markdown",
     "python",
     "reason",
+    "typescript",
     "yaml"
   ],
 
   "tslint.enable": true,
+
+  "tsserver.typingsCacheLocation": "~/.cache/tsserver",
+  "tsserver.log": "normal",
+  "tsserver.orgnizeImportOnSave": true,
 
   "languageserver": {
     "bash": {
