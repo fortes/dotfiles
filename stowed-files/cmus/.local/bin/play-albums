@@ -10,7 +10,7 @@ BEET_FORMAT_STRING='$mb_albumid $albumartist - [$original_year] $album'
 main() {
   declare -r cmus_stats=$(cmus-remote -Q)
   declare -r album_ids=$(beet ls -f"$BEET_FORMAT_STRING" -a "$@" albumartist+ original_year+ | \
-    fzf --multi -1 -0 --with-nth 2.. -n2.. | awk '{print $1}')
+    fzf --multi -1 -0 --with-nth 2.. | awk '{print $1}')
 
   if [ -z "$album_ids" ]; then
     echo "No albums found"
