@@ -10,7 +10,7 @@
   "coc.preferences.triggerAfterInsertEnter": true,
   "coc.preferences.hyphenAsKeyword": true,
 
-  "coc.preferences.timeout": 500,
+  "coc.preferences.timeout": 2000,
   "coc.preferences.acceptSuggestionOnCommitCharacter": true,
 
   "coc.preferences.snippetIndicator": " ★",
