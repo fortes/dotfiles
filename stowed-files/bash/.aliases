@@ -20,11 +20,6 @@ alias dnsflush="dscacheutil -flushcache"
 # JSON Viewing view python
 alias json='python -mjson.tool'
 
-# Colorized cat (nyan)
-if command -v pygmentize > /dev/null; then
-  alias nyan='pygmentize -O style=emacs -f console256 -g'
-fi
-
 # Confirm file overwrite
 alias mv='mv -i'
 
