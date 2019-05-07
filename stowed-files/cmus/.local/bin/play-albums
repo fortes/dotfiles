@@ -27,20 +27,19 @@ main() {
 
   echo "Playing $(wc -l <<< "$album_ids") albums"
 
-  # Stop music first, then queue tracks, wait a beat to give to cmus before
-  # unpausing to play
-  cmus-remote -s && \
+  # Pause
+  cmus-remote -C 'view queue'
+  cmus-remote -C 'clear'
   beet play -y "$query" year- album- track+ && \
-    sleep 1 && cmus-remote -n && cmus-remote -p
+    cmus-remote -p && cmus-remote -n
 }
 
 if cmus-remote -Q > /dev/null 2>&1; then
   if [[ -z "$@" ]]; then
-    echo "You probably want an argument here"
-    exit 1
+    main "added:-1w.."
+  else
+    main "$@"
   fi
-
-  main "$@"
 else
   echo "cmus not running"
   exit 1
