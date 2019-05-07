@@ -1,5 +1,4 @@
 # vim: ft=sh
-OS=`uname`
 
 # Easy timezones for places I care about
 alias lisbon='TZ="Europe/Lisbon" date'
