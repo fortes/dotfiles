@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-[[ "$TRACE" ]] && set -xtrace
+[[ "$TRACE" ]] && set -o xtrace
 
 set -o errexit
 set -o nounset
