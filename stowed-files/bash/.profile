@@ -62,7 +62,7 @@ export CARGO_HOME="$HOME/.local/cargo"
 addToPath "$HOME/.local/cargo/bin"
 
 # pyenv setup
-export PYENV_VERSION="3.7.3"
+export PYENV_VIRTUALENV_DISABLE_PROMPT=1
 export PYENV_ROOT="$HOME/.local/pyenv"
 addToPath "$PYENV_ROOT/bin"
 
