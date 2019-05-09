@@ -204,7 +204,7 @@ bar {
   hidden_state hide
   mode hide
   modifier $mod
-  position bottom
+  position top
   # May need `xrandr --output [NAME] --primary` in `~/.xinitrc.local`
   tray_output primary
   status_command i3blocks
