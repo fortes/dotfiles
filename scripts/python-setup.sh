@@ -6,7 +6,7 @@ source "$HOME/dotfiles/scripts/helpers.sh"
 source "$HOME/dotfiles/stowed-files/bash/.profile"
 
 # Install pyenv and pyenv-virtualenv
-if ! command -v pyenv > /dev/null; then
+if ! commandExists pyenv; then
   if [ ! -d "$PYENV_ROOT" ]; then
     echo "  $ARROW Cloning pyenv repository"
     git clone https://github.com/pyenv/pyenv.git "$PYENV_ROOT"

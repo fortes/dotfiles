@@ -3,7 +3,7 @@ set -ef -o pipefail
 # shellcheck source=helpers.sh
 source "$HOME/dotfiles/scripts/helpers.sh"
 
-if ! command -v keybase > /dev/null; then
+if ! commandExists keybase; then
   echo "$XMARK Keybase not installed"
   installAptPackagesIfMissing libappindicator1
   pushd /tmp > /dev/null

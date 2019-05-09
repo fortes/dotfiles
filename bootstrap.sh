@@ -14,12 +14,16 @@ fi
 ARCH=$(uname -m)
 OS=$(uname)
 
+commandExists() {
+  command -v "$1" &> /dev/null
+}
+
 if [ "$OS" = "Linux" ]; then
   # Distinguish betweent Debian & Ubuntu
-  if command -v apt-get > /dev/null; then
+  if commandExists apt-get; then
     # Must have lsb_release installed for Debian/Ubuntu beforehand. Seems
     # to come on EC2 images
-    if ! command -v lsb_release > /dev/null; then
+    if ! commandExists lsb_release; then
       echo "Installing lsb-release (requires sudo)"
       sudo DEBIAN_FRONTEND=noninteractive apt-get -qqfuy install lsb-release
     fi
@@ -62,7 +66,7 @@ else
   IS_EC2=0
 fi
 
-if command -v croutonversion > /dev/null; then
+if commandExists croutonversion; then
   IS_CROUTON=1
   if croutonversion | grep -q xorg; then
     IS_HEADLESS=0
@@ -121,11 +125,11 @@ DOTFILES="$HOME/dotfiles"
 
 # First, we need to make sure we have the bare minimums to install things on
 # this system
-if [ "$OS" = "Linux" ] && command -v apt-get > /dev/null; then
+if [ "$OS" = "Linux" ] && commandExists apt-get; then
   # Don't want installs to wait on user interaction
   export DEBIAN_FRONTEND=noninteractive
 
-  if ! command -v add-apt-repository > /dev/null; then
+  if ! commandExists add-apt-repository; then
     echo "Installing software-properties-common (requires sudo)"
     sudo DEBIAN_FRONTEND=noninteractive apt-get -qqfuy install software-properties-common
   fi
@@ -142,7 +146,7 @@ if [ "$OS" = "Linux" ] && command -v apt-get > /dev/null; then
   fi
 
   # Make sure git is in there
-  if ! command -v git > /dev/null; then
+  if ! commandExists git; then
     echo "Installing git (requires sudo)..."
     # If git isn't here, then this is the first time running, likely need to
     # update all sources

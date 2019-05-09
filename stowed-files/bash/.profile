@@ -18,7 +18,7 @@ export FZF_DEFAULT_COMMAND='(
   git ls-files -co --exclude-standard || "$fd_command"
 ) 2> /dev/null'
 export FZF_DEFAULT_OPTS="--extended --bind ctrl-alt-a:select-all,ctrl-alt-d:deselect-all"
-export fzf_CTRL_T_COMMAND="$fd_command --color always"
+export FZF_CTRL_T_COMMAND="$fd_command --color always"
 export FZF_CTRL_T_OPTS="--ansi --preview-window 'right:50%' --preview '$bat_preview_command'"
 
 # Case insensitive by default
@@ -46,6 +46,11 @@ sourceIfExists() {
 }
 export -f sourceIfExists
 
+commandExists() {
+  command -v "$1" &> /dev/null
+}
+export -f commandExists
+
 # Locally-installed packages belong in path
 addToPath "$HOME/.local/bin"
 
@@ -61,17 +66,15 @@ export PYENV_VERSION="3.7.3"
 export PYENV_ROOT="$HOME/.local/pyenv"
 addToPath "$PYENV_ROOT/bin"
 
-if command -v pyenv > /dev/null; then
+if commandExists pyenv; then
   eval "$(pyenv init -)"
   # Enable auto-activation for virtualenv
   eval "$(pyenv virtualenv-init -)"
 fi
 
-if command -v keychain &>/dev/null; then
+if commandExists keychain; then
   # Don't prompt for password to load id_rsa if not already loaded
-  eval "$(keychain --eval --noask --agents ssh --quiet)"
-else
-  sourceIfExists "$HOME/.ssh/start_agent.sh"
+  eval "$(keychain --eval --noask --agents ssh --quiet --inherit any)"
 fi
 
 # Local overrides

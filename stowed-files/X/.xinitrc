@@ -1,8 +1,6 @@
 #!/bin/bash
 
-if [ -f /etc/X11/xinit/xinitrc ]; then
-  . /etc/X11/xinit/xinitrc
-fi
+sourceIfExists /etc/X11/xinit/xinitrc
 
 # Caps lock sucks
 setxkbmap -layout us -option "ctrl:nocaps,altwin:left_meta_win" && \

@@ -9,7 +9,7 @@ if [ "$DISTRO" = "Chromebook" ]; then
   echo "$XMARK Chromebook setup not complete yet"
   return 1
 elif [ "$OS" == "Linux" ]; then
-  if ! command -v apt-get > /dev/null; then
+  if ! commandExists apt-get; then
     echo "$XMARK Non-apt setup not supported"
     return 1
   fi

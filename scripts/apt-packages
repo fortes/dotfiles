@@ -3,7 +3,6 @@ chromium
 cmake
 cmus
 compton
-dbus-x11
 exfat-fuse
 exfat-utils
 feh

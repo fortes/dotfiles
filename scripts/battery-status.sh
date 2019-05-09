@@ -1,8 +1,8 @@
 #!/bin/bash
 #
-# Ghetto display of battery status for use in tmux 
+# Ghetto display of battery status for use in tmux
 
-if ! command -v upower > /dev/null; then
+if ! commandExists upower; then
   >&2 echo "Must install upower"
   exit 1
 fi

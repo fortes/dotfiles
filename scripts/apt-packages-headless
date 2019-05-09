@@ -8,7 +8,6 @@ build-essential
 cargo
 cryfs
 curl
-dbus
 dnsutils
 elinks
 entr
