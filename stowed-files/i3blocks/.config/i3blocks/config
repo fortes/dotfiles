@@ -4,6 +4,7 @@ signal=10
 
 [cmus]
 command=$HOME/dotfiles/stowed-files/cmus/.local/bin/cmus-tmux-statusbar.sh
+color=#666666
 
 [time]
 command=date +'%m-%d %H:%M'

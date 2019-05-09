@@ -4,7 +4,7 @@
 set $mod Mod1
 
 # Change nasty default font
-font pango:Noto Sans Mono Medium 11
+font pango:Noto Sans Medium 11
 
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
@@ -200,7 +200,7 @@ client.background       $base07
 
 # Bar shows workspaces and status, but only displayed when hitting Mod key
 bar {
-  font pango:Noto Sans Mono Medium 14
+  font pango:Noto Sans Medium 16
   hidden_state hide
   mode hide
   modifier $mod
