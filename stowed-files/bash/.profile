@@ -74,7 +74,7 @@ fi
 
 if commandExists keychain; then
   # Don't prompt for password to load id_rsa if not already loaded
-  eval "$(keychain --eval --noask --agents ssh --quiet --inherit any)"
+  eval "$(keychain --eval --noask --agents ssh --quiet)"
 fi
 
 # Local overrides
