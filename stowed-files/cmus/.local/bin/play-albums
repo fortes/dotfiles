@@ -9,7 +9,7 @@ BEET_FORMAT_STRING='$mb_albumid $albumartist - [$original_year] $album'
 
 main() {
   declare -r cmus_status=$(cmus-remote -Q)
-  declare -r album_ids=$(beet ls -f"$BEET_FORMAT_STRING" -a "$@" albumartist+ original_year+ | \
+  declare -r album_ids=$(beet ls -f"$BEET_FORMAT_STRING" -a "$@" added- albumartist+ | \
     fzf --multi -1 -0 --with-nth 2.. | awk '{print $1}')
 
   if [ -z "$album_ids" ]; then
@@ -22,14 +22,15 @@ main() {
     query="$query, mb_albumid:${album_id}"
   done
 
-  # Remove initial ','
-  query=$(echo "$query" | cut -c2-)
+  # Remove initial ', '
+  query=$(echo "$query" | cut -c3-)
 
-  echo "Playing $(wc -l <<< "$album_ids") albums"
+  declare -r num_albums=$(wc -l <<< "$album_ids")
+  echo "Playing $num_albums albums"
 
   # Pause
   cmus-remote -C 'view queue'
-  beet play -y "$query" year- album- track+
+  beet play -y $query year- album- track+
 
   # Wait a beat in order to make sure cmus has queued the album
   sleep 2
