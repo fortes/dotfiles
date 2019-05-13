@@ -150,8 +150,8 @@ endfunction
 Plug 'neoclide/coc.nvim', {'tag': '*', 'do': function('CocSetup')}
 " Test.vim: Run tests based on cursor position / file
 Plug 'janko-m/vim-test', { 'for': ['javascript'] }
-" Syntax highlighting and language server
-Plug 'reasonml-editor/vim-reason-plus'
+" Syntax highlighting for a ton of languages
+Plug 'sheerun/vim-polyglot'
 " }}}
 
 " Git {{{
@@ -179,13 +179,6 @@ Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
 " }}}
 
-" CSS/LESS {{{
-" Better CSS syntax
-Plug 'JulesWang/css.vim', { 'for': ['css', 'less'] }
-" LESS Support
-Plug 'groenewege/vim-less', { 'for': ['less'] }
-" }}}
-
 " Markdown {{{
 " Nice set of markdown tools
 " <leader>= /  <leader>- toggle checkboxes
@@ -195,22 +188,6 @@ Plug 'groenewege/vim-less', { 'for': ['less'] }
 Plug 'SidOfc/mkdx', { 'for': ['markdown'] }
 " }}}
 
-" Javascript {{{
-" JS highlighting and indent support. Sometimes buggy, but has support for
-" jsdocs and flow
-Plug 'pangloss/vim-javascript', { 'for': ['javascript'] }
-" }}}
-
-" Typescript {{{
-" Highlighting and indent support
-Plug 'leafgarland/typescript-vim', { 'for': ['typescript'] }
-" TODO: Get omnicompletion working well without a mess of plugins
-" }}}
-
-" Misc coding {{{
-" Pug template support
-Plug 'digitaltoad/vim-pug'
-" }}}
 call plug#end()
 " }}}
 
@@ -414,9 +391,6 @@ inoremap <C-k> <C-o>:Snippets<cr>
 " vim-javascript {{{
 " jsdoc syntax
 let g:javascript_plugin_jsdoc = 1
-
-" flow syntax
-let g:javascript_plugin_flow = 1
 " }}}
 
 " vim-typescript {{{
