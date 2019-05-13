@@ -92,9 +92,7 @@ else
   BASE_PROMPT=""
 fi
 # Different host colors for different environments
-if [ "$IS_CROUTON" == "1" ]; then
-  HOST_COLOR="$MAGENTA"
-elif [ "$IS_DOCKER" == "1" ]; then
+if [ "$IS_DOCKER" == "1" ]; then
   HOST_COLOR="$GREEN"
 elif [ ! -z "$SSH_TTY" ]; then
   HOST_COLOR="$RED"
@@ -103,7 +101,7 @@ else
 fi
 
 # [[user@]host]:pwd $
-if [ -z "$SSH_TTY" ]; then
+if [ -z "$SSH_TTY" ] || [ "$IS_CROUTON" == "1" ]; then
   BASE_PROMPT="$BASE_PROMPT$YELLOW\w$RESET"
 else
   BASE_PROMPT="$BASE_PROMPT$HOST_COLOR\h:$YELLOW\w$RESET"
