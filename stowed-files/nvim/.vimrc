@@ -722,6 +722,9 @@ augroup filetype_tweaks
   " Fold via syntax for JS/TypeScript
   autocmd FileType javascript,typescript setlocal foldmethod=syntax
 
+  " Makefiles use tabs
+  autocmd FileType make setlocal noexpandtab shiftwidth=4
+
   " Python uses 4 spaces
   autocmd FileType python setlocal shiftwidth=4
 
