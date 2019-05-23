@@ -275,3 +275,5 @@ exec --no-startup-id redshift-gtk || redshift -l 27.3:-82.5
 exec --no-startup-id dunst
 # Try to get right primary monitor
 exec --no-startup-id guess_primary_monitor
+# Tray applets
+exec --no-startup-id pasystray
