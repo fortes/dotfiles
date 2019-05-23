@@ -21,9 +21,6 @@ if [ ! -f $ZEROTIER_SOURCES_LIST ]; then
 
   echo "$CMARK Zerotier in sources.list, updating sources"
   sudo DEBIAN_FRONTEND=noninteractive apt-get update -qq
-
-  echo "$ARROW Getting keyring for Multimedia"
-  sudo DEBIAN_FRONTEND=noninteractive apt-get install deb-multimedia-keyring -oAcquire::AllowInsecureRepositories=true
 fi
 echo "$CMARK Zerotier in sources.list"
 
