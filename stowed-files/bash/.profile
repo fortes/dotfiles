@@ -9,6 +9,27 @@ fi
 EDITOR=$VISUAL
 export EDITOR VISUAL
 
+# Add path if not present
+addToPath() {
+  if echo ":$PATH:" | grep -vq ":$@:"; then
+    export PATH="$@:$PATH"
+  fi
+}
+export -f addToPath
+
+# Helper function for sourcing a file only if it exists
+sourceIfExists() {
+  for file in $@; do
+    [ -f "$file" ] && . "$file"
+  done
+}
+export -f sourceIfExists
+
+commandExists() {
+  command -v "$1" &> /dev/null
+}
+export -f commandExists
+
 # Locally-installed packages belong in path
 addToPath "$HOME/.local/bin"
 
@@ -47,27 +68,6 @@ if [ -z "$XDG_CONFIG_HOME" ]; then
   export XDG_CONFIG_HOME="$HOME/.config"
   export XDG_DATA_HOME="$HOME/.local/share"
 fi
-
-# Add path if not present
-addToPath() {
-  if echo ":$PATH:" | grep -vq ":$@:"; then
-    export PATH="$@:$PATH"
-  fi
-}
-export -f addToPath
-
-# Helper function for sourcing a file only if it exists
-sourceIfExists() {
-  for file in $@; do
-    [ -f "$file" ] && . "$file"
-  done
-}
-export -f sourceIfExists
-
-commandExists() {
-  command -v "$1" &> /dev/null
-}
-export -f commandExists
 
 if commandExists pyenv; then
   eval "$(pyenv init -)"
