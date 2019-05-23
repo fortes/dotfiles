@@ -5,18 +5,18 @@ set -eo pipefail
 source "$HOME/.profile.local"
 source "$HOME/dotfiles/scripts/helpers.sh"
 
-if [ "$DISTRO" = "Chromebook" ]; then
-  echo "$XMARK Chromebook setup not complete yet"
+if [ "$OS" != "Linux" ]; then
+  echo "$XMARK Non-Linux setup not supported"
   return 1
-elif [ "$OS" == "Linux" ]; then
-  if ! commandExists apt-get; then
-    echo "$XMARK Non-apt setup not supported"
-    return 1
-  fi
-
-  # Make sure not to get stuck on any prompts
-  export DEBIAN_FRONTEND=noninteractive
 fi
+
+if ! commandExists apt-get; then
+  echo "$XMARK Non-apt setup not supported"
+  return 1
+fi
+
+# Make sure not to get stuck on any prompts
+export DEBIAN_FRONTEND=noninteractive
 
 if [ "$IS_EC2" != 1 ] && [ "$IS_DOCKER" != 1 ]; then
   ("$HOME/dotfiles/scripts/debian-keyboard.sh" || true)
