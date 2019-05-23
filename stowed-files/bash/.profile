@@ -9,9 +9,27 @@ fi
 EDITOR=$VISUAL
 export EDITOR VISUAL
 
+# Locally-installed packages belong in path
+addToPath "$HOME/.local/bin"
+
+# Use local directory for n
+export N_PREFIX="$HOME/.local"
+
+# cargo
+export CARGO_HOME="$HOME/.local/cargo"
+addToPath "$HOME/.local/cargo/bin"
+
+# pyenv setup
+export PYENV_VIRTUALENV_DISABLE_PROMPT=1
+export PYENV_ROOT="$HOME/.local/pyenv"
+addToPath "$PYENV_ROOT/bin"
+
 # shellcheck disable=SC2016
 fd_command='fdfind --type file --follow --hidden'
-bat_preview_command="bat --color always --style=grid,changes --line-range :300 {}"
+bat_preview_command=""
+if commandExists bat; then
+  bat_preview_command="--preview 'bat --color always --style=grid,changes --line-range :300 {}'"
+fi
 
 # Use git if available
 export FZF_DEFAULT_COMMAND='(
@@ -19,7 +37,7 @@ export FZF_DEFAULT_COMMAND='(
 ) 2> /dev/null'
 export FZF_DEFAULT_OPTS="--extended --bind ctrl-alt-a:select-all,ctrl-alt-d:deselect-all"
 export FZF_CTRL_T_COMMAND="$fd_command --color always"
-export FZF_CTRL_T_OPTS="--ansi --preview-window 'right:50%' --preview '$bat_preview_command'"
+export FZF_CTRL_T_OPTS="--ansi --preview-window 'right:50%' $bat_preview_command"
 
 # Case insensitive by default
 export FZF_COMPLETION_OPTS='-i'
@@ -50,21 +68,6 @@ commandExists() {
   command -v "$1" &> /dev/null
 }
 export -f commandExists
-
-# Locally-installed packages belong in path
-addToPath "$HOME/.local/bin"
-
-# Use local directory for n
-export N_PREFIX="$HOME/.local"
-
-# cargo
-export CARGO_HOME="$HOME/.local/cargo"
-addToPath "$HOME/.local/cargo/bin"
-
-# pyenv setup
-export PYENV_VIRTUALENV_DISABLE_PROMPT=1
-export PYENV_ROOT="$HOME/.local/pyenv"
-addToPath "$PYENV_ROOT/bin"
 
 if commandExists pyenv; then
   eval "$(pyenv init -)"
