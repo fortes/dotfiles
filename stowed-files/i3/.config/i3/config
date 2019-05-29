@@ -240,7 +240,7 @@ for_window [class="console"] floating enable, border none
 for_window [instance="terminal" class="console"] resize set 100ppt 20ppt, move position 0 px 0 px, move scratchpad, scratchpad show
 
 # Hide title bar for terminals, which seem to have no unifying class / role :(
-for_window [class="(?i)(lily|x)?term"] border none
+for_window [class="(?i)x?term"] border none
 for_window [class="(?i)x-terminal-emulator"] border none
 for_window [class="(?i)(alacr|k)itty"] border none
 
@@ -250,9 +250,6 @@ for_window [window_role="task_dialog"] floating enable
 
 # Chrome task manager should float
 for_window [title="Task Manager - Chromium"] floating enable
-
-# Float while screen recording
-for_window [class="(?i)simplescreenrecorder"] floating enable
 
 # Screen maginifier needs to float in order to not mess up layout
 for_window [title="^xzoom"] floating enable
