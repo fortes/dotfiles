@@ -1,14 +1,5 @@
 # vim:ft=sh
 
-# Use NeoVim if we have it
-if command -v nvim > /dev/null; then
-  VISUAL=nvim
-else
-  VISUAL=vim
-fi
-EDITOR=$VISUAL
-export EDITOR VISUAL
-
 # Add path if not present
 addToPath() {
   if echo ":$PATH:" | grep -vq ":$@:"; then
@@ -17,7 +8,7 @@ addToPath() {
 }
 export -f addToPath
 
-# Helper function for sourcing a file only if it exists
+# Source file only if it exists
 sourceIfExists() {
   for file in $@; do
     [ -f "$file" ] && . "$file"
@@ -25,10 +16,20 @@ sourceIfExists() {
 }
 export -f sourceIfExists
 
+# Check for command in path
 commandExists() {
   command -v "$1" &> /dev/null
 }
 export -f commandExists
+
+# Use NeoVim if we have it
+if commandExists nvim; then
+  VISUAL=nvim
+else
+  VISUAL=vim
+fi
+EDITOR="$VISUAL"
+export EDITOR VISUAL
 
 # Locally-installed packages belong in path
 addToPath "$HOME/.local/bin"
