@@ -46,21 +46,29 @@ export PYENV_VIRTUALENV_DISABLE_PROMPT=1
 export PYENV_ROOT="$HOME/.local/pyenv"
 addToPath "$PYENV_ROOT/bin"
 
-# shellcheck disable=SC2016
-fd_command='fdfind --type file --follow --hidden'
+isInsideGitRepo() {
+  git rev-parse --is-inside-work-tree &> /dev/null
+}
+export -f isInsideGitRepo
+
+gitAwareFd() {
+  # Show hidden files only when in a git repository
+  fdfind --type file --follow \
+    $(isInsideGitRepo && echo . "$(git rev-parse --show-cdup)" --hidden) $@
+}
+export -f gitAwareFd
+
 bat_preview_command=""
 if commandExists bat; then
   bat_preview_command="--preview 'bat --color always --style=grid,changes --line-range :300 {}'"
 fi
 
-# Use git if available
-export FZF_DEFAULT_COMMAND='(
-  git ls-files -co --exclude-standard || $fd_command
-) 2> /dev/null'
-export FZF_DEFAULT_OPTS="--extended --bind ctrl-alt-a:select-all,ctrl-alt-d:deselect-all"
-export FZF_CTRL_T_COMMAND="$fd_command --color always"
+# $FZF_DEFAULT_COMMAND is executed with `sh -c`, so need to be careful with
+# POSIX compliance
+export FZF_DEFAULT_COMMAND='bash -c "fdfind --type file --follow . \$(git rev-parse --show-cdup 2>/dev/null && echo --hidden)"'
+export FZF_DEFAULT_OPTS="--height 40% --extended --bind ctrl-alt-a:select-all,ctrl-alt-d:deselect-all"
+export FZF_CTRL_T_COMMAND='gitAwareFd --color always'
 export FZF_CTRL_T_OPTS="--ansi --preview-window 'right:50%' $bat_preview_command"
-
 # Case insensitive by default
 export FZF_COMPLETION_OPTS='-i'
 
