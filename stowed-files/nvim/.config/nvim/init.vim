@@ -338,7 +338,7 @@ if executable('fzf')
   " <C-p> or <C-t> to search files
   " Open in split via control-x / control-v
   " Select/Deselect all via alt-a / alt-d
-  onoremap <silent> <C-t> :call fzf#vim#files('', fzf#vim#with_preview())<cr>
+  nnoremap <silent> <C-t> :call fzf#vim#files('', fzf#vim#with_preview())<cr>
   nnoremap <silent> <C-p> :call fzf#vim#files('', fzf#vim#with_preview())<cr>
 
   " <M-p> for open buffers
