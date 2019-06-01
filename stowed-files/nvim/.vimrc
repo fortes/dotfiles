@@ -385,6 +385,15 @@ vnoremap # :<C-u>call <SID>VisualSetSearch('#')<cr>/<C-R>=@/<cr><cr>
 " <leader>s starts a find a replace for word under cursor
 nnoremap <leader>s :%s/\<<C-R><C-W>\>/<C-R><C-W>/g<Left><Left>
 
+function! IsInsideGitRepo()
+  let result=systemlist('git rev-parse --is-inside-work-tree')
+  if v:shell_error
+    return 0
+  else
+    return 1
+  fi
+endfunction
+
 " Change to git root of current file (if in a repo)
 function! FindGitRootCD()
   let root = systemlist('git -C ' . expand('%:p:h') . ' rev-parse --show-toplevel')[0]
