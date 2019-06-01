@@ -335,11 +335,26 @@ augroup END
 
 " Fuzzy Finding (FZF) {{{
 if executable('fzf')
+  " Enable preview for :Files and :GFiles
+  command! -bang -nargs=? -complete=dir Files
+  \ call fzf#vim#files(<q-args>, fzf#vim#with_preview(), <bang>0)
+  command! -bang -nargs=? -complete=dir GFiles
+  \ call fzf#vim#gitfiles(<q-args>, fzf#vim#with_preview(), <bang>0)
+
+  " Fallback to :Files when not in git repo
+  function! GFilesOrFiles()
+    if IsInsideGitRepo()
+      execute 'GFiles'
+    else
+      execute 'Files'
+    endif
+  endfunction
+
   " <C-p> or <C-t> to search files
   " Open in split via control-x / control-v
   " Select/Deselect all via alt-a / alt-d
-  nnoremap <silent> <C-t> :call fzf#vim#files('', fzf#vim#with_preview())<cr>
-  nnoremap <silent> <C-p> :call fzf#vim#files('', fzf#vim#with_preview())<cr>
+  nnoremap <silent> <C-t> :call GFilesOrFiles()<cr>
+  nnoremap <silent> <C-p> :call GFilesOrFiles()<cr>
 
   " <M-p> for open buffers
   nnoremap <silent> <M-p> :Buffers<cr>
