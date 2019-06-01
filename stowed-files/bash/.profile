@@ -54,7 +54,7 @@ fi
 
 # Use git if available
 export FZF_DEFAULT_COMMAND='(
-  git ls-files -co --exclude-standard || "$fd_command"
+  git ls-files -co --exclude-standard || $fd_command
 ) 2> /dev/null'
 export FZF_DEFAULT_OPTS="--extended --bind ctrl-alt-a:select-all,ctrl-alt-d:deselect-all"
 export FZF_CTRL_T_COMMAND="$fd_command --color always"
