@@ -66,7 +66,7 @@ fi
 # $FZF_DEFAULT_COMMAND is executed with `sh -c`, so need to be careful with
 # POSIX compliance
 export FZF_DEFAULT_COMMAND='bash -c "fdfind --type file --follow . \$(git rev-parse --show-cdup 2>/dev/null && echo --hidden)"'
-export FZF_DEFAULT_OPTS="--height 40% --extended --bind ctrl-alt-a:select-all,ctrl-alt-d:deselect-all"
+export FZF_DEFAULT_OPTS="--height 40% --extended --bind ctrl-alt-a:select-all,ctrl-alt-d:deselect-all,F1:toggle-preview"
 export FZF_CTRL_T_COMMAND='gitAwareFd --color always'
 export FZF_CTRL_T_OPTS="--ansi --preview-window 'right:50%' $bat_preview_command"
 # Case insensitive by default
