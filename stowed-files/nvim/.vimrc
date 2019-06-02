@@ -711,6 +711,9 @@ augroup filetype_tweaks
   " Find .ts & .js files when using `gf` (useful with require)
   autocmd FileType typescript setlocal suffixesadd=.ts,.js,.json,index.js
 
+  " Find .ts & .js files when using `gf` (useful with require)
+  autocmd FileType markdown setlocal suffixesadd=.md
+
   " Alphabetic sort for import in JS (use on paragraph via leader si)
   autocmd FileType javascript command!
     \  -range=% Isort :<line1>,<line2>sort/^const {\=/

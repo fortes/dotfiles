@@ -403,6 +403,12 @@ inoremap <C-k> <C-o>:Snippets<cr>
 " let g:UltiSnipsJumpBackwardTrigger='<S-tab>'
 " }}}
 
+" vim-markdown {{{
+let g:vim_markdown_fenced_languages = ['javascript', 'json', 'ts=typescript', 'typescript']
+let g:vim_markdown_frontmatter = 1
+let g:vim_markdown_strikethrough = 1
+" }}}
+
 " vim-javascript {{{
 " jsdoc syntax
 let g:javascript_plugin_jsdoc = 1
