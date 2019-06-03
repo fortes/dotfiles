@@ -41,6 +41,7 @@ ncdu
 neovim
 nethogs
 nodejs
+npm
 oathtool
 pydf
 python3-dev
@@ -66,3 +67,4 @@ virtualenv
 wamerican
 wget
 yank
+yarnpkg
