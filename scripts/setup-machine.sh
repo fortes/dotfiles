@@ -84,6 +84,7 @@ fi
 source ~/.profile
 source ~/.bashrc
 
+("$HOME/dotfiles/scripts/increase-max-watchers.sh")
 ("$HOME/dotfiles/scripts/cargo-setup.sh")
 ("$HOME/dotfiles/scripts/python-setup.sh")
 ("$HOME/dotfiles/scripts/node-setup.sh")
