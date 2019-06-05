@@ -72,6 +72,9 @@ if !exists('g:loaded_matchit') && findfile('plugin/matchit.vim', &runtimepath) =
 endif
 
 " Core Behavior {{{
+" Disable for security reasons. `securemodelines` plugin helps here
+set nomodeline
+
 " Read .vimrc from current dir, if present
 set exrc
 

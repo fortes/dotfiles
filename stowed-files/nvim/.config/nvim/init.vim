@@ -34,6 +34,8 @@ Plug 'nathanaelkane/vim-indent-guides'
 " }}}
 
 " System {{{
+" `modeline` without the security concerns
+Plug 'ciaranm/securemodelines'
 
 " Editing {{{
 " Accent autocompletion via gx in normal mode
