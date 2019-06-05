@@ -1,6 +1,9 @@
 # Soft volume control
 set softvol=true
 
+# Doesn't work in crouton and I don't use it anyway
+set mpris=false
+
 # Defaults a tad ugly
 colorscheme gruvbox
 
