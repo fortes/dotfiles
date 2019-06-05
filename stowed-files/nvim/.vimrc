@@ -575,7 +575,7 @@ augroup filetype_tweaks
   autocmd BufNewFile,BufReadPost *.ts set filetype=typescript
 
   " .md is markdown, not modula
-  autocmd BufNewFile,BufReadPost *.md,TODO set filetype=markdown
+  autocmd BufNewFile,BufReadPost *.md,README,TODO set filetype=markdown
 
   " Not all files should wrap automatically
   autocmd BufNewFile,BufReadPost *.txt,*.md,*.json,*.conf,*.ini,*.pug
