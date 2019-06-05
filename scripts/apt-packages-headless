@@ -1,4 +1,5 @@
 apt-transport-https
+apt-utils
 autossh
 avahi-daemon
 avahi-dnsconfd
