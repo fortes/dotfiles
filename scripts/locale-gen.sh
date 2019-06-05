@@ -10,7 +10,7 @@ if ! locale -a | grep -iq "en_us.utf8"; then
 fi
 
 if locale | grep LANGUAGE | grep -iq "en_us.utf8"; then
-  dpkg-reconfigure locales
+  sudo dpkg-reconfigure locales
 fi
 
 echo "$CMARK Locale setup complete"
