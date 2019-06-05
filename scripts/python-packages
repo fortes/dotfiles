@@ -6,6 +6,7 @@ neovim
 mps-youtube
 proselint
 pygments
+pylint
 python-language-server
 tldr
 vim-vint
