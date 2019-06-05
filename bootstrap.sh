@@ -88,6 +88,10 @@ fi
 # Slightly hacky way to see if we are within a Docker container
 if [ -f /.dockerenv ]; then
   IS_DOCKER=1
+
+  # `resolvconf` leads to all sorts of failures inside of Docker, so just punt
+  echo "resolvconf resolvconf/linkify-resolvconf boolean false" | \
+    sudo debconf-set-selections
 else
   IS_DOCKER=0
 fi
