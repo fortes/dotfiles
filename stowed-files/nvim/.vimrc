@@ -573,6 +573,7 @@ augroup filetype_tweaks
   autocmd!
   " Recognize typescript
   autocmd BufNewFile,BufReadPost *.ts set filetype=typescript
+  autocmd BufNewFile,BufReadPost *.tsx set filetype=typescript.tsx
 
   " .md is markdown, not modula
   autocmd BufNewFile,BufReadPost *.md,README,TODO set filetype=markdown
@@ -690,7 +691,7 @@ augroup filetype_tweaks
   " Use prettier to autoformat (gq in Visual mode)
   if executable('prettier')
     autocmd FileType javascript setlocal formatprg=prettier\ --stdin\ --parser\ flow
-    autocmd FileType typescript setlocal formatprg=prettier\ --stdin\ --parser\ typescript
+    autocmd FileType typescript,typescript.tsx setlocal formatprg=prettier\ --stdin\ --parser\ typescript
     autocmd FileType json setlocal formatprg=prettier\ --stdin\ --parser\ json
 
     autocmd FileType css,less setlocal formatprg=prettier\ --parser\ css
@@ -712,7 +713,7 @@ augroup filetype_tweaks
   autocmd FileType javascript setlocal suffixesadd=.js,.json,index.js
 
   " Find .ts & .js files when using `gf` (useful with require)
-  autocmd FileType typescript setlocal suffixesadd=.ts,.js,.json,index.js
+  autocmd FileType typescript setlocal suffixesadd=.ts,.tsx,.js,.jsx,.json,index.js
 
   " Find .ts & .js files when using `gf` (useful with require)
   autocmd FileType markdown setlocal suffixesadd=.md

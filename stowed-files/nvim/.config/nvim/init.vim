@@ -416,11 +416,6 @@ let g:vim_markdown_strikethrough = 1
 let g:javascript_plugin_jsdoc = 1
 " }}}
 
-" vim-typescript {{{
-" Have prettier to autoformat, so don't bother with indent rules.
-let g:typescript_indent_disable = 1
-" }}}
-
 " GitGutter {{{
 " Unimpaired-style toggling for the line highlights
 " cogg Gutter / cogl line highlight
