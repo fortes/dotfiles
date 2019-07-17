@@ -4,11 +4,11 @@ set -ef -o pipefail
 source "$HOME/dotfiles/scripts/helpers.sh"
 
 # Instructions from https://backports.debian.org/Instructions/
-BACKPORTS_FILE=/etc/apt/sources.list.d/jessie-backports.list
+BACKPORTS_FILE=/etc/apt/sources.list.d/buster-backports.list
 if [ ! -f $BACKPORTS_FILE ]; then
   echo "$XMARK Backports not in sources.list"
   echo "  $ARROW Adding backports to in sources.list (requires sudo)"
-  echo "deb http://ftp.debian.org/debian jessie-backports main" | \
+  echo "deb http://ftp.debian.org/debian buster-backports main" | \
     sudo tee $BACKPORTS_FILE
   echo "$CMARK Backports in sources.list, updating sources"
   sudo DEBIAN_FRONTEND=noninteractive apt-get update -qq
