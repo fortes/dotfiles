@@ -9,7 +9,7 @@ source "$HOME/dotfiles/scripts/helpers.sh"
 
 ZEROTIER_SOURCES_LIST=/etc/apt/sources.list.d/zerotier.list
 if [ ! -f $ZEROTIER_SOURCES_LIST ]; then
-  ZEROTIER_KEY_URL='https://raw.githubusercontent.com/zerotier/download.zerotier.com/master/htdocs/contact%40zerotier.com.gpg'
+  ZEROTIER_KEY_URL='https://raw.githubusercontent.com/zerotier/ZeroTierOne/master/doc/contact%40zerotier.com.gpg'
   echo "$XMARK Zerotier not in sources.list"
 
   echo "  $ARROW Adding zerotier gpg key"
