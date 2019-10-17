@@ -143,7 +143,7 @@ function! CocSetup(info)
 
   " Install extensions on installation, update otherwise
   if a:info.status == 'installed' || a:info.force
-    call coc#add_extension('coc-css', 'coc-emoji', 'coc-highlight', 'coc-html', 'coc-json', 'coc-prettier', 'coc-python', 'coc-stylelint', 'coc-tslint', 'coc-tsserver', 'coc-ultisnips', 'coc-yaml')
+    call coc#add_extension('coc-css', 'coc-emoji', 'coc-highlight', 'coc-html', 'coc-json', 'coc-prettier', 'coc-python', 'coc-stylelint', 'coc-tsserver', 'coc-ultisnips', 'coc-yaml')
   else
     execute 'CocUpdateSync'
   endif

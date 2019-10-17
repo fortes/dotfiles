@@ -609,20 +609,12 @@ augroup filetype_tweaks
     autocmd FileType javascript setlocal errorformat+=%-G%.%#
   endif
 
-  " TypeScript linting and type checking
-  if executable('tsc') && executable('tslint')
+  " TypeScript type checking
+  if executable('tsc')
     let s:automake_filetypes += ['*.ts']
 
-    " Type check and lint at the same time, can be slow at times
-    if filereadable('./tslint.json')
-      " Use local tslint.json if available
-      autocmd FileType typescript setlocal makeprg=tsc\ --allowJs\ --noEmit\ --strict\ %\;tslint\ -c\ ./tslint.json\ --format\ msbuild\ %
-    else
-      autocmd FileType typescript setlocal makeprg=tsc\ --allowJs\ --noEmit\ --strict\ %\;tslint\ -c\ ~/.tslint.json\ --format\ msbuild\ %
-    endif
+    autocmd FileType typescript setlocal makeprg=tsc\ --allowJs\ --noEmit\ --strict\ %\
 
-    " Use the `msbuild` error format for `tslint`, which luckily matches what
-    " `tsc` outputs.
     autocmd FileType typescript setlocal errorformat=%E%f(%l\\,%c):\ error\ %m
     autocmd FileType typescript setlocal errorformat+=%W%f(%l\\,%c):\ warning\ %m
 

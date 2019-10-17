@@ -14,7 +14,6 @@ prettier
 reason-cli@latest-linux
 stylelint
 stylelint-config-standard
-tslint
 typescript
 vscode-css-languageserver-bin
 vscode-html-languageserver-bin

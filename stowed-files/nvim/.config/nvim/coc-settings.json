@@ -33,8 +33,6 @@
   "python.jediEnabled": false,
   "python.formatting.provider": "yapf",
 
-  "tslint.enable": true,
-
   "tsserver.typingsCacheLocation": "~/.cache/tsserver",
   "tsserver.log": "normal",
   "tsserver.orgnizeImportOnSave": true,
