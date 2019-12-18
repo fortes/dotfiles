@@ -6,7 +6,6 @@ avahi-dnsconfd
 avahi-utils
 bash-completion
 build-essential
-cargo
 cryfs
 curl
 dnsutils
