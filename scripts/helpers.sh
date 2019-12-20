@@ -44,22 +44,9 @@ isAptPackageInstalled() {
 }
 
 installAptPackagesIfMissing() {
-  PACKAGES=''
-
-  for package in $@; do
-    if ! isAptPackageInstalled "$package"; then
-      echo "$XMARK Apt package $package not installed"
-      PACKAGES="$PACKAGES $package"
-    else
-      echo "$CMARK Apt package $package installed"
-    fi
-  done
-
-  if [  "$PACKAGES" != "" ]; then
-    echo "  $ARROW Installing $PACKAGES (requires sudo)"
-    sudo -E DEBIAN_FRONTEND=noninteractive apt-get -qqfuy install $PACKAGES > /dev/null
-    echo "$CMARK $PACKAGES installed"
-  fi
+  echo "  $ARROW Installing $@ (requires sudo)"
+  sudo -E DEBIAN_FRONTEND=noninteractive apt-get -qqfuy install $@ > /dev/null
+  echo "$CMARK $@ installed"
 }
 
 export -f installAptPackagesIfMissing
