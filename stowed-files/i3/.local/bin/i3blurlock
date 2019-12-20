@@ -14,4 +14,4 @@ if [ ! -f "$BG_FILEPATH" ]; then
     rm "$TMP_SCREENSHOT"
 fi
 
-i3lock -i "$BG_FILEPATH" -e -f
+i3lock -i "$BG_FILEPATH" -e -f -t

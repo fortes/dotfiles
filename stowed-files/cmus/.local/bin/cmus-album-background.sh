@@ -31,7 +31,7 @@ if [[ "$ALBUM_DIRPATH" != "$PREVIOUS_DIRPATH" ]]; then
     exit 1
   fi
 
-  RESOLUTION=$(xrandr | grep \* | awk '{print $1}')
+  RESOLUTION=$(xrandr | grep \* | awk '{print $1}' | head -n 1)
   convert "$ART_PATH" -background "$DEFAULT_BG" \
     -scale "$RESOLUTION"\^ -paint 6 \
     -modulate 100,20,100 -fill "$DEFAULT_BG" -colorize 20% \
