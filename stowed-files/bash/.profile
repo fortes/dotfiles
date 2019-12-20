@@ -84,7 +84,7 @@ if commandExists pyenv; then
   eval "$(pyenv virtualenv-init -)"
 fi
 
-if commandExists keychain; then
+if [ -z "$SSH_AUTH_SOCK" ] && commandExists keychain; then
   # Don't prompt for password to load id_rsa if not already loaded
   eval "$(keychain --eval --noask --agents ssh --quiet)"
 fi
