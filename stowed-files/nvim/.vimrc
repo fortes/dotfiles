@@ -673,6 +673,7 @@ augroup filetype_tweaks
   " Auto-make for supported filetypes
   augroup automake
     autocmd!
+    " TODO: This may be breaking disabling automake because of this eval
     execute 'autocmd BufWritePost ' . join(s:automake_filetypes, ',') . ' make!'
   augroup END
 
