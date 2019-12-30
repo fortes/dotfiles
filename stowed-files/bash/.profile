@@ -46,6 +46,9 @@ export PYENV_VIRTUALENV_DISABLE_PROMPT=1
 export PYENV_ROOT="$HOME/.local/pyenv"
 addToPath "$PYENV_ROOT/bin"
 
+# Make sure to use system for virsh by default
+export LIBVIRT_DEFAULT_URI="qemu:///system"
+
 isInsideGitRepo() {
   git rev-parse --is-inside-work-tree &> /dev/null
 }
