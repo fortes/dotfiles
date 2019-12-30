@@ -6,12 +6,14 @@ OPTIONS=$(cat <<-END
 🔐 Lock
 ⏯️ Pause
 ⏭️ Next
-🔃 Reload
-🚪 Exit
+🔃 Restart
+📴 Shutdown
+🌀 Reload i3
+📤 Exit i3
 END
 )
 
-SELECTION=$(echo "$OPTIONS" | rofi -dmenu -i -p Action -lines 6 -width 400 | awk '{print $2}')
+SELECTION=$(echo "$OPTIONS" | rofi -dmenu -i -p Action -lines 8 -width 400 | awk '{print $2}')
 echo "$SELECTION"
 case "$SELECTION" in
   "[Cancel]")
@@ -31,5 +33,11 @@ case "$SELECTION" in
     ;;
   "Exit")
     i3-msg exit
+    ;;
+  "Restart")
+    systemctl reboot
+    ;;
+  "Exit")
+    systemctl poweroff
     ;;
 esac

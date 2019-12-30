@@ -60,7 +60,7 @@ bindsym $mod+w layout tabbed
 bindsym $mod+e layout toggle split
 
 # toggle sticky (stays across workspaces)
-bindsym $mod+Shift+s floating toggle, sticky toggle
+bindsym $mod+Shift+s floating toggle, sticky toggle, resize set 400px 280px
 
 # toggle tiling / floating
 bindsym $mod+Shift+space floating toggle

@@ -3,3 +3,5 @@ rofi.case-sensitive:  false
 rofi.font:            Noto Sans Medium 18
 rofi.matching:        glob
 rofi.theme:           Monokai
+rofi.display-drun:    👉
+rofi.display-window:  📋
