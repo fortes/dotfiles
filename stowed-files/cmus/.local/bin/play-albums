@@ -5,7 +5,7 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-BEET_FORMAT_STRING='$mb_albumid $albumartist - [$original_year] $album'
+BEET_FORMAT_STRING='$mb_albumid $albumartist - [$original_year] $album%aunique{albumartist album original_year, albumtype albumdisambig label year catalognum}'
 
 main() {
   declare -r cmus_status=$(cmus-remote -Q)
