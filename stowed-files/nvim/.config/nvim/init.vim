@@ -137,19 +137,7 @@ Plug 'tpope/vim-vinegar'
 " }}}
 
 " General coding {{{
-function! CocSetup(info)
-  " Initial setup
-  call coc#util#install()
-
-  " Install extensions on installation, update otherwise
-  if a:info.status == 'installed' || a:info.force
-    call coc#add_extension('coc-css', 'coc-emoji', 'coc-highlight', 'coc-html', 'coc-json', 'coc-prettier', 'coc-python', 'coc-stylelint', 'coc-tsserver', 'coc-ultisnips', 'coc-yaml')
-  else
-    execute 'CocUpdateSync'
-  endif
-endfunction
-
-Plug 'neoclide/coc.nvim', {'tag': '*', 'do': function('CocSetup')}
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
 " Test.vim: Run tests based on cursor position / file
 Plug 'janko-m/vim-test', { 'for': ['javascript'] }
 " Syntax highlighting for a ton of languages
@@ -269,6 +257,20 @@ let g:matchup_surround_enabled = 1
 let g:vim_fakeclip_tmux_plus=1
 
 " COC language server {{{
+
+let g:coc_global_extensions = [
+      \ 'coc-css',
+      \ 'coc-emoji',
+      \ 'coc-highlight',
+      \ 'coc-html',
+      \ 'coc-json',
+      \ 'coc-prettier',
+      \ 'coc-python',
+      \ 'coc-stylelint',
+      \ 'coc-tsserver',
+      \ 'coc-ultisnips',
+      \ 'coc-yaml'
+      \]
 
 " :Prettier/:PrettierAsync for formatting
 command! -nargs=0 Prettier :call CocAction('runCommand', 'prettier.formatFile')
