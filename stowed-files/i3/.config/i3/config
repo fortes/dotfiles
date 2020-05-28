@@ -261,6 +261,8 @@ for_window [class=zoom title="(?i)(participants|settings)"] floating enable
 # Games are a problem sometimes
 for_window [class="(?i)steam" title="(?i)steam - news"] floating enable
 for_window [class="(?i)wine"] floating enable, border none, move position center
+# Wine programs end in '.exe' a bunch
+for_window [class="(?i)\.exe"] floating enable, border none, move position center
 
 # Plain background
 exec --no-startup-id hsetroot -solid "#222222"
