@@ -101,7 +101,7 @@ else
 fi
 
 # [[user@]host]:pwd $
-if [ -z "$SSH_TTY" ] || [ "$IS_CROUTON" == "1" ]; then
+if [ -z "$SSH_TTY" ]; then
   BASE_PROMPT="$BASE_PROMPT$YELLOW\w$RESET"
 else
   BASE_PROMPT="$BASE_PROMPT$HOST_COLOR\h:$YELLOW\w$RESET"

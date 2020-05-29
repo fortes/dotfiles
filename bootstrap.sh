@@ -66,15 +66,6 @@ else
   IS_EC2=0
 fi
 
-if commandExists croutonversion; then
-  IS_CROUTON=1
-  if croutonversion | grep -q xorg; then
-    IS_HEADLESS=0
-  fi
-else
-  IS_CROUTON=0
-fi
-
 if grep -q Microsoft /proc/version; then
   IS_WSL=1
 else
@@ -101,7 +92,6 @@ if [ ! -f "$LOCAL_PROFILE" ]; then
     echo "export OS=$OS"
     echo "export DISTRO=$DISTRO"
     echo "export VERSION=$VERSION"
-    echo "export IS_CROUTON=$IS_CROUTON"
     echo "export IS_DOCKER=$IS_DOCKER"
     echo "export IS_EC2=$IS_EC2"
     echo "export IS_HEADLESS=$IS_HEADLESS"

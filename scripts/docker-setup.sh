@@ -3,11 +3,6 @@ set -ef -o pipefail
 # shellcheck source=./helpers.sh
 source "$HOME/dotfiles/scripts/helpers.sh"
 
-if [[ "$IS_CROUTON" == 1 ]]; then
-  echo "$XMARK Crouton does not support Docker"
-  exit 1
-fi
-
 echo "$ARROW Installing Docker and dependencies (requires sudo)"
 installAptPackagesIfMissing docker.io
 

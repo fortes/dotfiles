@@ -75,19 +75,10 @@ TODO: Automate these steps.
 
 ### Chromebook
 
-- ~Map Caps Lock to Control~ Synced via user account
+- Extensions should automatically sync and install
 - Setup Smart Lock & PIN unlock
-- Enable the following flags:
-  - `#enable-wifi-credential-sync`
-  - `#ash-enable-night-light`
-  - `#enable-devtools-experiments`
-- Extensions
-- Should sync and install
+- Enable Linux
 - Enable cloud storage for uBlock
-- Crouton
-- Set root password via `crosh`
-- Copy chroots from backup files
-- Create chroots
 
 #### TODO
 
