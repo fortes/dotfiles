@@ -266,7 +266,6 @@ let g:coc_global_extensions = [
       \ 'coc-json',
       \ 'coc-prettier',
       \ 'coc-python',
-      \ 'coc-stylelint',
       \ 'coc-tsserver',
       \ 'coc-ultisnips',
       \ 'coc-yaml'

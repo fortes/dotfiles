@@ -18,7 +18,7 @@
   "coc.preferences.formatOnType": false,
   "coc.preferences.formatOnSaveFiletypes": [
     "css",
-    "_html",
+    "html",
     "javascript",
     "json",
     "less",
@@ -47,13 +47,6 @@
       "command": "docker-langserver",
       "filetypes": ["dockerfile"],
       "args": ["--stdio"],
-      "initializationOptions": {},
-      "settings": {}
-    },
-    "reason": {
-      "command": "ocaml-language-server",
-      "args": ["--stdio"],
-      "filetypes": ["reason"],
       "initializationOptions": {},
       "settings": {}
     }
