@@ -1,0 +1,17 @@
+# Global .gitignore
+.gitconfig.local
+
+# Directory-local overrides
+.nvimrc
+
+# Editor temp/swap files
+*.swp
+*.tmp
+*~
+
+# Python
+*.pyc
+
+# Node.js
+npm-debug.log
+node_modules

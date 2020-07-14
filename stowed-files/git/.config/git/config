@@ -1,60 +1,37 @@
 # vim: ft=gitconfig
 
 [alias]
-  lg = log --graph --pretty=oneline --abbrev-commit --decorate
-  lall = log --graph --pretty=oneline --abbrev-commit --decorate --all
-  ls = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cgreen\\ [%cn]" --decorate
-  ll = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cgreen\\ [%cn]" --decorate --numstat
-  noedit = "commit -a --amend --no-edit"
+  # Fuzzy add modified files, optionally via patch
+  addm = "!git ls-files --deleted --modified --other --exclude-standard | fzf-tmux -m --preview 'git diff --color=always {-1}' | xargs --no-run-if-empty git add"
+  addmp = "!git ls-files --deleted --modified --exclude-standard | fzf-tmux -m --preview 'git diff --color=always {-1}' | xargs --open-tty --no-run-if-empty git add -p"
+  # Add all changes to last commit
+  append = "commit --all --amend --no-edit"
+  # Fuzzy checkout a branch, showing most recent commit
+  cb = "!git branch --all | grep -v '* ' | awk '{print $1}' | fzf-tmux -0 --preview 'git show --color=always {-1}' | xargs --no-run-if-empty 'git checkout'"
+  # Fuzzy (force) delete a branch, showing most recent commit
+  db = "!git branch | grep -v '* ' | awk '{print $1}' | fzf-tmux --preview 'git show --color=always {-1}' | xargs --no-run-if-empty git branch --delete"
+  Db = "!git branch | grep -v '* ' | awk '{print $1}' | fzf-tmux --preview 'git show --color=always {-1}' | xargs --no-run-if-empty git branch --delete --force"
+  # Delete merged branches
+  dm = "!git fetch && git branch --merged | grep -v '* ' | xargs --no-run-if-empty git branch --delete --force"
+  # Create a fixup commit to the selected commit
+  fixup = "!git log --oneline --no-decorate --no-merges | fzf-tmux --preview 'git show --color=always --format=oneline {1}' | xargs --no-run-if-empty git commit --fixup"
   # Fetch and rebase
-  frb = !git fetch --prune && git rebase --autostash origin/master
-  # Edit all modified & new files
-  edit = "!$EDITOR `git ls-files -m --other --exclude-standard | sort -u`"
-  editm = "!$EDITOR `git ls-files -m --other --exclude-standard | sort -u | fzf-tmux -m`"
-  # Checkout/delete fuzzy-find branch
-  cb = "!git checkout $(git branch -vv | fzf-tmux | sed 's/*//' | awk '{print $1}')"
-  db = "!git branch -d $(git branch -vv | fzf-tmux -m | sed 's/*//' | awk '{print $1}')"
-  Db = "!git branch -D $(git branch -vv | fzf-tmux -m | sed 's/*//' | awk '{print $1}')"
-  # Use fzf to select some modified files to add
-  addm = "!git add `git ls-files -m --other --exclude-standard | fzf-tmux -m`"
-  addmp = "!git add -p `git ls-files -m --other --exclude-standard | fzf-tmux -m`"
-  grephistory = "!f(){ git log -S "${1}" --oneline | cut -d' ' -f1 | xargs git grep "$1"; };f"
-  squash=!f(){ git reset --soft HEAD~${1} && git commit --edit -m"$(git log --format=%B --reverse HEAD..HEAD@{1})"; };f
-[apply]
-  whitespace = fix
-[branch]
-  autosetupmerge = true
-[color]
-  branch = auto
-  diff = auto
-  interactive = auto
-  status = auto
-  ui = auto
-[commit]
-  # Show diff when committing
-  verbose = true
+  frb = "!git fetch --prune && git rebase --autostash origin/master"
+  # Undo last commit, but keeping changes
+  undo = "reset --soft HEAD^"
 [core]
-  excludesfile = ~/.config/git/gitignore.global
-  autocrlf = input
-  editor = $EDITOR
-  whitespace = fix,space-before-tab,tab-in-indent,trailing-space
-  pager = less -r
+  excludesfile = ~/.config/git/ignore.global
 [diff]
-  algorithm = patience
-[help]
-  autocorrect = 1
-[merge]
-  defaultToUpstream = true
-[pull]
-  rebase = true
-[push]
-  default = current
-[rebase]
-  autosquash = true
-[stash]
-  showPatch = true
-# Local modifications / auth
-[include]
-  path=~/.gitconfig.local
+  algorithm = minimal
 [fetch]
   prune = true
+[help]
+  autocorrect = 1
+[rebase]
+  autosquash = 1
+[status]
+  # Show files within an untracked directory
+  showUntrackedFiles = all
+[include]
+  # Local modifications / auth
+  path=~/.gitconfig.local
