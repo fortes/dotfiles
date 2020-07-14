@@ -1,11 +1,9 @@
 bash-language-server
 dockerfile-language-server-nodejs
-git-recent
-javascript-typescript-langserver
-less
+typescript-language-server
 n
-npm
 prettier
+ts-node
 typescript
 vscode-css-languageserver-bin
 vscode-html-languageserver-bin

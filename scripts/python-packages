@@ -10,6 +10,7 @@ pylint
 python-language-server
 tldr
 vim-vint
+virtualenv
 yapf
 youtube-dl
 yq
