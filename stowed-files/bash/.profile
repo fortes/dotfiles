@@ -34,17 +34,14 @@ export EDITOR VISUAL
 # Locally-installed packages belong in path
 addToPath "$HOME/.local/bin"
 
-# Use local directory for n
-export N_PREFIX="$HOME/.local"
+if commandExists yarnpkg; then
+  # Add global packages to path (TODO: This might be too slow, may need to cache)
+  addToPath "$(yarnpkg global bin)"
+fi
 
 # cargo
 export CARGO_HOME="$HOME/.local/cargo"
 addToPath "$HOME/.local/cargo/bin"
-
-# pyenv setup
-export PYENV_VIRTUALENV_DISABLE_PROMPT=1
-export PYENV_ROOT="$HOME/.local/pyenv"
-addToPath "$PYENV_ROOT/bin"
 
 # Make sure to use system for virsh by default
 export LIBVIRT_DEFAULT_URI="qemu:///system"
@@ -79,12 +76,6 @@ if [ -z "$XDG_CONFIG_HOME" ]; then
   export XDG_CACHE_HOME="$HOME/.cache"
   export XDG_CONFIG_HOME="$HOME/.config"
   export XDG_DATA_HOME="$HOME/.local/share"
-fi
-
-if commandExists pyenv; then
-  eval "$(pyenv init -)"
-  # Enable auto-activation for virtualenv
-  eval "$(pyenv virtualenv-init -)"
 fi
 
 if [ -z "$SSH_AUTH_SOCK" ] && commandExists keychain; then
