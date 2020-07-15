@@ -9,8 +9,8 @@
   # Fuzzy checkout a branch, showing most recent commit
   cb = "!git branch --all | grep -v '* ' | awk '{print $1}' | fzf-tmux -0 --preview 'git show --color=always {-1}' | xargs --no-run-if-empty 'git checkout'"
   # Fuzzy (force) delete a branch, showing most recent commit
-  db = "!git branch | grep -v '* ' | awk '{print $1}' | fzf-tmux --preview 'git show --color=always {-1}' | xargs --no-run-if-empty git branch --delete"
-  Db = "!git branch | grep -v '* ' | awk '{print $1}' | fzf-tmux --preview 'git show --color=always {-1}' | xargs --no-run-if-empty git branch --delete --force"
+  db = "!git branch | grep -v '* ' | awk '{print $1}' | fzf-tmux --multi --preview 'git show --color=always {-1}' | xargs --no-run-if-empty git branch --delete"
+  Db = "!git branch | grep -v '* ' | awk '{print $1}' | fzf-tmux --multi --preview 'git show --color=always {-1}' | xargs --no-run-if-empty git branch --delete --force"
   # Delete merged branches
   dm = "!git fetch && git branch --merged | grep -v '* ' | xargs --no-run-if-empty git branch --delete --force"
   # Create a fixup commit to the selected commit
