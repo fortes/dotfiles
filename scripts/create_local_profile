@@ -8,17 +8,20 @@ set -euo pipefail
 IFS=$'\n\t'
 
 main() {
-  local is_crostini="$(test -f /etc/apt/sources.list.d/cros.list && printf 1)"
-  local is_docker="$(test -f /.dockerenv && printf 1)"
-  local is_headless="$(test -z "${DISPLAY:-}" && printf 1)"
-  local is_wsl="$(test -d /run/WSL && printf 1)"
+  local is_crostini=$([[ -f /etc/apt/sources.list.d/cros.list ]] && printf 1)
+  local is_docker=$([[ -f /.dockerenv ]] && printf 1)
+  local is_wsl=$([[ -d /run/WSL ]] && printf 1)
+  # Default to headless in Crostini / Docker / WSL, even though GUI might be
+  # possible, can always be overridden
+  local is_headless=$([[ -n "${is_crostini}${is_docker}${is_wsl}" || \
+    -z "${DISPLAY:-}" ]] && printf 1)
 
   cat <<PROFILE_TEMPLATE
 # Generated $(date +%F)
-export IS_CROSTINI="$is_crostini"
-export IS_DOCKER="$is_docker"
-export IS_HEADLESS="$is_headless"
-export IS_WSL="$is_wsl"
+export IS_CROSTINI="${is_crostini:-}"
+export IS_DOCKER="${is_docker:-}"
+export IS_WSL="${is_wsl:-}"
+export IS_HEADLESS="${is_headless:-}"
 
 # Add machine-specific items below
 # echo export LAST_FM_USERNAME="fortes"

@@ -10,18 +10,18 @@ IFS=$'\n\t'
 # Make sure not to get stuck on any prompts
 export DEBIAN_FRONTEND=noninteractive
 
+check_prerequisites() {
+  if ! command_exists apt-get; then
+    echo_stderr "Only works on Debian-like systems"
+  fi
+}
+
 command_exists() {
   command -v "$1" &> /dev/null
 }
 
 echo_stderr() {
   >&2 echo "${@}"
-}
-
-check_prerequisites() {
-  if ! command_exists apt-get; then
-    echo_stderr "Only works on Debian-like systems"
-  fi
 }
 
 increase_max_watchers() {
@@ -38,7 +38,7 @@ increase_max_watchers() {
 
 install_apt_packages() {
   local apt_packages=$(cat "$dotfiles_path/scripts/apt-packages-headless")
-  if [[ -z "$IS_HEADLESS" ]]; then
+  if [[ -z "${IS_HEADLESS:-}" ]]; then
     apt_packages=$(cat "$dotfiles_path/scripts/apt-packages"*)
   fi
 
@@ -73,6 +73,14 @@ install_python_packages() {
   pip install --user --quiet --upgrade pip setuptools
   < "$HOME/dotfiles/scripts/python-packages" xargs pip install --user --quiet --upgrade
   echo "Python packages installed"
+}
+
+is_package_installed() {
+  if dpkg-query -l "$1" | grep -q "^ii"; then
+    return 0
+  else
+    return 1
+  fi
 }
 
 lock_local_files() {
@@ -133,6 +141,22 @@ setup_docker_sudo() {
   fi
 }
 
+setup_keyboard() {
+  if [[ ! -f /etc/default/keyboard ]]; then
+    # Crostini / WSL don't have this
+    return 0
+  fi
+
+  if ! grep -q "ctrl:nocaps" /etc/default/keyboard; then
+    echo "Mapping Caps Lock to Control (requires sudo)"
+    sudo sed -i.bak 's/^XKBOPTIONS=""/XKBOPTIONS="altwin:left_meta_win,ctrl:nocaps"/' /etc/default/keyboard
+
+    if is_package_installed console-setup; then
+      sudo dpkg-reconfigure -phigh console-setup
+    fi
+  fi
+}
+
 main() {
   check_prerequisites
 
@@ -161,10 +185,21 @@ main() {
   lock_local_files
   set_default_applications
   setup_docker_sudo
+  setup_keyboard
 
+  # Non-apt package managers
   install_node_packages
   install_python_packages
   install_neovim_plugins
+
+  # TODO:
+  # - backports
+  # - unstable
+  # - multimedia
+  # - tailscale / wireguard / zerotier
+  # - locale
+  # - chrome / kvm / steam / wine / others that require custom stuff
+  # - bat / others from unstable / nightlies
 }
 
 main "${@}"
