@@ -1,0 +1,36 @@
+# !/usr/bin/env bash
+#
+# Make your machine usable
+#
+# Usage: setup_machine
+
+set -euo pipefail
+IFS=$'\n\t'
+
+command_exists() {
+  command -v "$1" &> /dev/null
+}
+
+echo_stderr() {
+  >&2 echo "${@}"
+}
+
+check_prerequisites() {
+  if ! command_exists apt-get; then
+    echo_stderr "Only works on Debian-like systems"
+  fi
+}
+
+main() {
+  check_prerequisites
+
+  local local_profile_path="$HOME/.profile.local"
+  if [[ ! -f "$local_profile_path" ]]; then
+    echo "Generating $local_profile_path"
+    create_local_profile > "$local_profile_path"
+  fi
+
+  . "$local_profile_path"
+}
+
+main "${@}"

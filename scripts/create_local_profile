@@ -1,0 +1,29 @@
+# !/usr/bin/env bash
+#
+# Generate variable declarations based on machine attributes / settings
+#
+# Usage: create_local_profile > ~/.profile.local
+
+set -euo pipefail
+IFS=$'\n\t'
+
+main() {
+  local is_crostini="$(test -f /etc/apt/sources.list.d/cros.list && printf 1)"
+  local is_docker="$(test -f /.dockerenv && printf 1)"
+  local is_headless="$(test -z "${DISPLAY:-}" && printf 1)"
+  local is_wsl="$(test -d /run/WSL && printf 1)"
+
+  cat <<PROFILE_TEMPLATE
+# Generated $(date +%F)
+export IS_CROSTINI="$is_crostini"
+export IS_DOCKER="$is_docker"
+export IS_HEADLESS="$is_headless"
+export IS_WSL="$is_wsl"
+
+# Add machine-specific items below
+# echo export LAST_FM_USERNAME="fortes"
+# echo export LAST_FM_PASSWORD="xxxxxx"
+PROFILE_TEMPLATE
+}
+
+main "${@}"
