@@ -1,4 +1,4 @@
-# !/usr/bin/env bash
+#!/usr/bin/env bash
 #
 # Make your machine usable
 #
@@ -6,6 +6,9 @@
 
 set -euo pipefail
 IFS=$'\n\t'
+
+# Make sure not to get stuck on any prompts
+export DEBIAN_FRONTEND=noninteractive
 
 command_exists() {
   command -v "$1" &> /dev/null
@@ -21,16 +24,147 @@ check_prerequisites() {
   fi
 }
 
+increase_max_watchers() {
+  declare -r conf_file_path="/etc/sysctl.d/20-increase-max-watchers.conf"
+  declare -r max_watches="524288"
+
+  if [ ! -f  "$conf_file_path" ]; then
+    echo "Increasing max watchers (requires sudo)"
+    echo "fs.inotify.max_user_watches=$max_watches" | \
+      sudo tee -a "$conf_file_path" && sudo sysctl -p
+    echo "Max watchers set to $max_watches"
+  fi
+}
+
+install_apt_packages() {
+  local apt_packages=$(cat "$dotfiles_path/scripts/apt-packages-headless")
+  if [[ -z "$IS_HEADLESS" ]]; then
+    apt_packages=$(cat "$dotfiles_path/scripts/apt-packages"*)
+  fi
+
+  echo "Ensuring apt packages installed (requires sudo)"
+  #sudo apt-get --quiet --quiet update
+  echo $apt_packages | xargs sudo -E apt-get install --quiet --assume-yes --fix-broken --no-install-recommends
+  echo "Apt packages installed"
+}
+
+install_node_packages() {
+  echo "Installing global node packages"
+  < "$HOME/dotfiles/scripts/node-packages" xargs yarnpkg global add --ignore-engines --non-interactive --silent
+  echo "Node packages installed"
+}
+
+install_neovim_plugins() {
+  local nvim_config_dir="$XDG_CONFIG_HOME/nvim"
+
+  if [ ! -f "$nvim_config_dir/autoload/plug.vim" ]; then
+    echo "Installing vim-plug"
+    curl -fLo "$nvim_config_dir/autoload/plug.vim" --create-dirs \
+      https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim \
+      2> /dev/null
+    echo "vim-plug installed, installing Neovim plugins"
+    nvim +PlugInstall +UpdateRemotePlugins +qall
+  fi
+}
+
+install_python_packages() {
+  echo "Installing global python packages"
+  # Always make sure pip/setuptools are on latest first
+  pip install --user --quiet --upgrade pip setuptools
+  < "$HOME/dotfiles/scripts/python-packages" xargs pip install --user --quiet --upgrade
+  echo "Python packages installed"
+}
+
+lock_local_files() {
+  for local_file in $(git ls-files | grep -e '\.local$'); do
+    if ! git locked | grep --quiet --fixed-strings "$local_file"; then
+      echo "Locking $local_file"
+      git lock "$local_file"
+    fi
+  done
+}
+
+remove_default_dotfile() {
+  local filename=$1
+  if [[ -f "$HOME/$filename" && ! -L "$HOME/$filename" ]]; then
+    echo "Moving default $filename"
+    mv "$HOME/$filename" "$HOME/original$filename"
+  fi
+}
+
+set_default_applications() {
+  if command_exists nvim && [[ -z $(update-alternatives --get-selections | grep editor | grep nvim) ]]; then
+    echo "Setting Neovim as default text editor (requires sudo)"
+    sudo update-alternatives --install /usr/bin/editor editor "$(command -v nvim)" 60
+  fi
+
+  if command_exists kitty && [[ -z $(update-alternatives --get-selections | grep kitty) ]]; then
+    echo "Setting Kitty as default terminal (requires sudo)"
+    sudo update-alternatives --set x-terminal-emulator "$(command -v kitty)"
+  fi
+
+  if command_exists chromium && [[ -z $(update-alternatives --get-selections | grep chromium) ]]; then
+    echo "Setting Chromium as default browser (requires sudo)"
+    sudo update-alternatives --set x-www-browser "$(command -v chromium)"
+  fi
+
+  if command_exists yarnpkg && [[ -z $(update-alternatives --get-selections | grep yarn) ]]; then
+    echo "Setting 'yarn' as system alias to 'yarnpkg' (requires sudo)"
+    sudo update-alternatives --install /usr/bin/yarn yarn /usr/bin/yarnpkg 10
+  fi
+}
+
+set_dotfiles_remote() {
+  (
+    cd "$HOME/dotfiles"
+    if git remote get-url "$(git remote)" | grep -q https; then
+      echo "Setting dotfiles git remote"
+      git remote set-url origin git@github.com:fortes/dotfiles.git
+    fi
+  )
+}
+
+setup_docker_sudo() {
+  local user="$(whoami)"
+  if [ ! -f "/etc/sudoers.d/$user-docker" ]; then
+    echo "Allowing $user to run docker without sudo prompt (requires sudo)"
+    echo "$user  ALL=(ALL) NOPASSWD: /usr/bin/docker" |
+      sudo tee &> /dev/null "/etc/sudoers.d/$user-docker"
+  fi
+}
+
 main() {
   check_prerequisites
 
+  local dotfiles_path="$HOME/dotfiles"
   local local_profile_path="$HOME/.profile.local"
+
   if [[ ! -f "$local_profile_path" ]]; then
     echo "Generating $local_profile_path"
-    create_local_profile > "$local_profile_path"
+    "$dotfiles_path/scripts/create_local_profile" > "$local_profile_path"
+
+    . "$local_profile_path"
   fi
 
-  . "$local_profile_path"
+  set_dotfiles_remote
+
+  install_apt_packages
+
+  # Debian ships with these two by default
+  remove_default_dotfile .bashrc
+  remove_default_dotfile .profile
+
+  "$dotfiles_path/scripts/stow"
+
+  # Misc system configs
+  increase_max_watchers
+  lock_local_files
+  set_default_applications
+  setup_docker_sudo
+
+  install_node_packages
+  install_python_packages
+  install_neovim_plugins
 }
 
 main "${@}"

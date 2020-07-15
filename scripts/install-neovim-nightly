@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+#
+# Download and install the nightly neovim
+
+main() {
+  local nvim_path="$HOME/.local/bin/nvim"
+
+  wget -q "https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage"
+  mv nvim.appimage "$nvim_path"
+  chmod +x "$nvim_path"
+  echo "Nightly neovim installed"
+}
+
+main

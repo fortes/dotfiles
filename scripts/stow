@@ -1,0 +1,15 @@
+#!/bin/bash
+#
+# Call stow with correct paths for dotfiles
+
+set -euo pipefail
+IFS=$'\n\t'
+
+main() {
+  local dotfiles_path="$HOME/dotfiles"
+
+  stow --dir="$dotfiles_path/stowed-files/" --target="$HOME" \
+    $(ls "$dotfiles_path/stowed-files") $@
+}
+
+main "${@}"

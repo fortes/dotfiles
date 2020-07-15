@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 # run this in cmus ":set status_display_program=/path/to/last-cmus.py"
 # it will submit the song info to the last.fm
 

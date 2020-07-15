@@ -1,4 +1,4 @@
-# !/usr/bin/env bash
+#!/usr/bin/env bash
 #
 # Generate variable declarations based on machine attributes / settings
 #

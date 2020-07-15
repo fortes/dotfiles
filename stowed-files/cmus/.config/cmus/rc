@@ -8,7 +8,7 @@ colorscheme gruvbox
 set mouse=true
 
 # Scrobber
-set status_display_program=~/dotfiles/stowed-files/cmus/.local/bin/cmus-status.sh
+set status_display_program=cmus-status
 
 # Sort order
 set lib_sort=albumartist date album discnumber tracknumber title

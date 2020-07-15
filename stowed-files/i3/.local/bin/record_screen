@@ -27,6 +27,6 @@ touch "$SCREEN_CAP_INPUT_FILE"
   "$FILENAME" \
   > /dev/null 2> /tmp/i3-screencap.log
 
-if command -v video_to_gif.sh > /dev/null; then
-  video_to_gif.sh "$FILENAME"
+if command -v video_to_gif > /dev/null; then
+  video_to_gif "$FILENAME"
 fi

@@ -163,9 +163,9 @@ bindsym --release $mod+F12 exec "maim ~/Downloads/screenshot-$(date +%F-%T).png 
 # Capture portion of screen with mod-Shift-F12
 bindsym --release $mod+Shift+F12 exec "maim -s --highlight --nokeyboard --color=0.25,0.5,1,0.25 ~/Downloads/screenshot-$(date +%F-%T).png && notify-send -t 2 -u low 'Screen Captured'"
 # Toggle full screen recording with mod-F11
-bindsym --release $mod+F11 exec "record_screen.sh"
+bindsym --release $mod+F11 exec "record_screen"
 # Current window with mod-Shift-F11
-bindsym --release $mod+Shift+F11 exec "record_window.sh"
+bindsym --release $mod+Shift+F11 exec "record_window"
 
 ## Base16 Default Dark
 # Author: Chris Kempson (http://chriskempson.com)

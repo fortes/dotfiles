@@ -268,6 +268,7 @@ let g:coc_global_extensions = [
       \ 'coc-python',
       \ 'coc-tsserver',
       \ 'coc-ultisnips',
+      \ 'coc-vimlsp',
       \ 'coc-yaml'
       \]
 

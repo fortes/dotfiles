@@ -39,10 +39,6 @@ if commandExists yarnpkg; then
   addToPath "$(yarnpkg global bin)"
 fi
 
-# cargo
-export CARGO_HOME="$HOME/.local/cargo"
-addToPath "$HOME/.local/cargo/bin"
-
 # Make sure to use system for virsh by default
 export LIBVIRT_DEFAULT_URI="qemu:///system"
 

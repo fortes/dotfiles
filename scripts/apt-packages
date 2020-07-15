@@ -26,6 +26,7 @@ redshift
 redshift-gtk
 rofi
 slop
+software-properties-common
 wicd-curses
 xdotool
 xinit

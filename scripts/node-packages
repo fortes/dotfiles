@@ -5,6 +5,7 @@ n
 prettier
 ts-node
 typescript
+vim-language-server
 vscode-css-languageserver-bin
 vscode-html-languageserver-bin
 vscode-json-languageserver-bin
