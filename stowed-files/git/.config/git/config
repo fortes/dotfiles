@@ -8,6 +8,8 @@
   append = "commit --all --amend --no-edit"
   # Fuzzy checkout a branch, showing most recent commit
   cb = "!git branch --all | grep -v '* ' | awk '{print $1}' | fzf-tmux -0 --preview 'git show --color=always {-1}' | xargs --no-run-if-empty 'git checkout'"
+  # Fuzzy apply a stash
+  cs = "!git stash list | fzf --preview 'git show --pretty=oneline --color=always --patch \"$(echo {} | cut -d: -f1)\"' | cut -d: -f1 | xargs --no-run-if-empty git stash pop"
   # Fuzzy (force) delete a branch, showing most recent commit
   db = "!git branch | grep -v '* ' | awk '{print $1}' | fzf-tmux --multi --preview 'git show --color=always {-1}' | xargs --no-run-if-empty git branch --delete"
   Db = "!git branch | grep -v '* ' | awk '{print $1}' | fzf-tmux --multi --preview 'git show --color=always {-1}' | xargs --no-run-if-empty git branch --delete --force"
