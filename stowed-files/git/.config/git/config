@@ -27,6 +27,8 @@
   prune = true
 [help]
   autocorrect = 1
+[push]
+  default = current
 [rebase]
   autosquash = 1
 [status]
