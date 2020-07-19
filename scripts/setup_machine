@@ -25,10 +25,10 @@ check_prerequisites() {
     echo_stderr "Only works on Debian-like systems"
   fi
 
-  if ! commandExists lsb_release || ! commandExists add-apt-repository; then
+  if ! command_exists lsb_release || ! command_exists add-apt-repository; then
     echo "Installing add-apt-repository and lsb-release (requires sudo)"
     apt_update_once
-    sudo -E apt-get install --qq --assume-yes --fix-broken --no-install-recommends software-properties-common lsb_release
+    sudo -E apt-get install -qq --assume-yes --fix-broken --no-install-recommends software-properties-common lsb-release
   fi
 
   if ! lsb_release -ds | grep -iq debian; then
@@ -78,7 +78,7 @@ install_node_packages() {
 }
 
 install_neovim_plugins() {
-  local nvim_config_dir="$XDG_CONFIG_HOME/nvim"
+  local nvim_config_dir="$HOME/.config/nvim"
 
   if [ ! -f "$nvim_config_dir/autoload/plug.vim" ]; then
     echo "Installing vim-plug"
@@ -93,9 +93,9 @@ install_neovim_plugins() {
 install_python_packages() {
   echo "Installing global python packages"
   # Always make sure pip/setuptools are on latest first
-  pip install --user --quiet --upgrade pip setuptools
-  grep -v "^#" "$HOME/dotfiles/scripts/python-packages" xargs --no-run-if-empty \
-    pip install --user --quiet --upgrade
+  python3 -m pip install --user --quiet --upgrade --no-warn-script-location pip setuptools
+  grep -v "^#" "$HOME/dotfiles/scripts/python-packages" | xargs --no-run-if-empty \
+    python3 -m pip install --user --quiet --upgrade --no-warn-script-location
   echo "Python packages installed"
 }
 
@@ -234,9 +234,9 @@ main() {
   if [[ ! -f "$local_profile_path" ]]; then
     echo "Generating $local_profile_path"
     "$dotfiles_path/scripts/create_local_profile" > "$local_profile_path"
-
-    . "$local_profile_path"
   fi
+
+  . "$local_profile_path"
 
   setup_nonfree
   setup_backports
