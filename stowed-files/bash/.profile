@@ -34,10 +34,10 @@ export EDITOR VISUAL
 # Locally-installed packages belong in path
 addToPath "$HOME/.local/bin"
 
-if commandExists yarnpkg; then
-  # Add global packages to path (TODO: This might be too slow, may need to cache)
-  addToPath "$(yarnpkg global bin)"
-fi
+# Defaults to "$HOME/.local/bin", avoid running since it slows shell creation
+# if commandExists yarnpkg; then
+#   addToPath "$(yarnpkg global bin)"
+# fi
 
 # Make sure to use system for virsh by default
 export LIBVIRT_DEFAULT_URI="qemu:///system"

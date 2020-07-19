@@ -10,9 +10,30 @@ IFS=$'\n\t'
 # Make sure not to get stuck on any prompts
 export DEBIAN_FRONTEND=noninteractive
 
+has_updated=""
+
+# Avoid running multiple times
+apt_update_once() {
+  if [[ -z "$has_updated" ]]; then
+    has_updated=1
+    echo "Running apt-get update (requires sudo)"
+    sudo -E apt-get update --quiet --quiet
+  fi
+}
+
 check_prerequisites() {
   if ! command_exists apt-get; then
     echo_stderr "Only works on Debian-like systems"
+  fi
+
+  if ! commandExists lsb_release || ! commandExists add-apt-repository; then
+    echo "Installing add-apt-repository and lsb-release (requires sudo)"
+    apt_update_once
+    sudo -E apt-get install --quiet --assume-yes --fix-broken --no-install-recommends software-properties-common lsb_release
+  fi
+
+  if ! lsb_release -ds | grep -iq debian; then
+    echo_stderr "Warning: Things might break outside of Debian"
   fi
 }
 
@@ -42,8 +63,9 @@ install_apt_packages() {
     apt_packages=$(cat "$dotfiles_path/scripts/apt-packages"*)
   fi
 
+  apt_update_once
+
   echo "Ensuring apt packages installed (requires sudo)"
-  #sudo apt-get --quiet --quiet update
   echo $apt_packages | xargs sudo -E apt-get install --quiet --assume-yes --fix-broken --no-install-recommends
   echo "Apt packages installed"
 }
@@ -132,6 +154,20 @@ set_dotfiles_remote() {
   )
 }
 
+setup_backports() {
+  local $codename="$(lsb_release -cs)"
+  local sources_path="/etc/apt/sources.list.d/${codename}-backports.list"
+
+  if [[ ! -f "sources_path" ]]; then
+    echo "Backports not in sources.list, adding (requires sudo)"
+    echo "deb http://ftp.debian.org/debian ${codename}-backports main contrib non-free" | sudo tee "$sources_path"
+
+    # New source requires forced updates
+    has_updated=""
+    apt_update_once
+  fi
+}
+
 setup_docker_sudo() {
   local user="$(whoami)"
   if [ ! -f "/etc/sudoers.d/$user-docker" ]; then
@@ -157,8 +193,38 @@ setup_keyboard() {
   fi
 }
 
+setup_multimedia() {
+  local $codename="$(lsb_release -cs)"
+  local sources_path="/etc/apt/sources.list.d/debian-multimedia.list"
+
+  if [[ ! -f "sources_path" ]]; then
+    echo "Debian Multimedia not in sources.list, adding (requires sudo)"
+    echo "deb http://www.deb-multimedia.org ${codename} main non-free" | sudo tee "$sources_path"
+
+    # Must do this insecurely once in order to add keyring
+    sudo -E apt-get update -oAcquire::AllowInsecureRepositories=true -qq
+    echo "Getting keyring for Multimedia"
+    sudo -E apt-get install deb-multimedia-keyring -oAcquire::AllowInsecureRepositories=true
+
+    # Ran outside of apt_update_once
+    has_updated=1
+  fi
+}
+
+setup_nonfree() {
+  # Assume contrib and non-free always travel together
+  if ! grep -q non-free /etc/apt/sources.list; then
+    echo "Adding contrib & non-free to sources (requires sudo)"
+    sudo -E add-apt-repository -y contrib > /dev/null
+    sudo -E add-apt-repository -y non-free > /dev/null
+
+    apt_update_once
+  fi
+}
+
 main() {
   check_prerequisites
+  set_dotfiles_remote
 
   local dotfiles_path="$HOME/dotfiles"
   local local_profile_path="$HOME/.profile.local"
@@ -170,8 +236,9 @@ main() {
     . "$local_profile_path"
   fi
 
-  set_dotfiles_remote
-
+  setup_nonfree
+  setup_backports
+  [[ -z "${IS_HEADLESS}" ]] && setup_multimedia
   install_apt_packages
 
   # Debian ships with these two by default
@@ -193,9 +260,7 @@ main() {
   install_neovim_plugins
 
   # TODO:
-  # - backports
   # - unstable
-  # - multimedia
   # - tailscale / wireguard / zerotier
   # - locale
   # - chrome / kvm / steam / wine / others that require custom stuff
