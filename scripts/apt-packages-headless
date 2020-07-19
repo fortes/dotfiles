@@ -6,6 +6,7 @@ avahi-dnsconfd
 avahi-utils
 bash-completion
 build-essential
+ca-certificates
 curl
 docker.io
 dnsutils
