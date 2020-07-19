@@ -23,8 +23,9 @@ main() {
   fi
 
   echo "Installing unstable packages (requires sudo)"
-  < "$HOME/dotfiles/scripts/apt-packages-unstable" xargs \
-    sudo -E apt-get install --target-release unstable --quiet --assume-yes \
+  grep -v "^#" "$HOME/dotfiles/scripts/apt-packages-unstable" | \
+    xargs --no-run-if-empty \
+    sudo -E apt-get install -qq --target-release unstable --assume-yes \
     --fix-broken --no-install-recommends
 }
 

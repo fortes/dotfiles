@@ -16,7 +16,7 @@ apt_update_once() {
   if [[ -z "$has_updated" ]]; then
     has_updated=1
     echo "Running apt-get update (requires sudo)"
-    sudo -E apt-get update --quiet --quiet
+    sudo -E apt-get update -qq
   fi
 }
 
@@ -28,7 +28,7 @@ check_prerequisites() {
   if ! commandExists lsb_release || ! commandExists add-apt-repository; then
     echo "Installing add-apt-repository and lsb-release (requires sudo)"
     apt_update_once
-    sudo -E apt-get install --quiet --assume-yes --fix-broken --no-install-recommends software-properties-common lsb_release
+    sudo -E apt-get install --qq --assume-yes --fix-broken --no-install-recommends software-properties-common lsb_release
   fi
 
   if ! lsb_release -ds | grep -iq debian; then
@@ -57,21 +57,23 @@ increase_max_watchers() {
 }
 
 install_apt_packages() {
-  local apt_packages=$(cat "$dotfiles_path/scripts/apt-packages-headless")
+  local apt_packages=$(grep -v "^#" "$dotfiles_path/scripts/apt-packages-headless")
   if [[ -z "${IS_HEADLESS:-}" ]]; then
-    apt_packages=$(cat "$dotfiles_path/scripts/apt-packages"*)
+    apt_packages=$(grep --no-filename -v "^#" "$dotfiles_path/scripts/apt-packages"*)
   fi
 
   apt_update_once
 
   echo "Ensuring apt packages installed (requires sudo)"
-  echo $apt_packages | xargs sudo -E apt-get install --quiet --assume-yes --fix-broken --no-install-recommends
+  echo $apt_packages | xargs --no-run-if-empty \
+    sudo -E apt-get install -qq --assume-yes --fix-broken --no-install-recommends
   echo "Apt packages installed"
 }
 
 install_node_packages() {
   echo "Installing global node packages"
-  < "$HOME/dotfiles/scripts/node-packages" xargs yarnpkg global add --ignore-engines --non-interactive --silent
+  grep -v "^#" "$HOME/dotfiles/scripts/node-packages" | xargs --no-run-if-empty \
+    yarnpkg global add --ignore-engines --non-interactive --silent
   echo "Node packages installed"
 }
 
@@ -92,7 +94,8 @@ install_python_packages() {
   echo "Installing global python packages"
   # Always make sure pip/setuptools are on latest first
   pip install --user --quiet --upgrade pip setuptools
-  < "$HOME/dotfiles/scripts/python-packages" xargs pip install --user --quiet --upgrade
+  grep -v "^#" "$HOME/dotfiles/scripts/python-packages" xargs --no-run-if-empty \
+    pip install --user --quiet --upgrade
   echo "Python packages installed"
 }
 
@@ -154,10 +157,10 @@ set_dotfiles_remote() {
 }
 
 setup_backports() {
-  local $codename="$(lsb_release -cs)"
+  local codename="$(lsb_release -cs)"
   local sources_path="/etc/apt/sources.list.d/${codename}-backports.list"
 
-  if [[ ! -f "sources_path" ]]; then
+  if [[ ! -f "${sources_path}" ]]; then
     echo "Backports not in sources.list, adding (requires sudo)"
     echo "deb http://ftp.debian.org/debian ${codename}-backports main contrib non-free" | sudo tee "$sources_path"
 
@@ -193,17 +196,17 @@ setup_keyboard() {
 }
 
 setup_multimedia() {
-  local $codename="$(lsb_release -cs)"
+  local codename="$(lsb_release -cs)"
   local sources_path="/etc/apt/sources.list.d/debian-multimedia.list"
 
-  if [[ ! -f "sources_path" ]]; then
+  if [[ ! -f "${sources_path}" ]]; then
     echo "Debian Multimedia not in sources.list, adding (requires sudo)"
     echo "deb http://www.deb-multimedia.org ${codename} main non-free" | sudo tee "$sources_path"
 
     # Must do this insecurely once in order to add keyring
-    sudo -E apt-get update -oAcquire::AllowInsecureRepositories=true -qq
+    sudo -E apt-get update -qq -oAcquire::AllowInsecureRepositories=true
     echo "Getting keyring for Multimedia"
-    sudo -E apt-get install deb-multimedia-keyring -oAcquire::AllowInsecureRepositories=true
+    sudo -E apt-get install -qq --allow-unauthenticated --assume-yes deb-multimedia-keyring -oAcquire::AllowInsecureRepositories=true
 
     # Ran outside of apt_update_once
     has_updated=1
@@ -237,7 +240,7 @@ main() {
 
   setup_nonfree
   setup_backports
-  [[ -z "${IS_HEADLESS}" ]] && setup_multimedia
+  [[ -z "${IS_HEADLESS:-}" ]] && setup_multimedia
   install_apt_packages
 
   # Debian ships with these two by default
