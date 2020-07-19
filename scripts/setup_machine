@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-#
 # Make your machine usable
 #
 # Usage: setup_machine
@@ -260,7 +259,6 @@ main() {
   install_neovim_plugins
 
   # TODO:
-  # - unstable
   # - tailscale / wireguard / zerotier
   # - locale
   # - chrome / kvm / steam / wine / others that require custom stuff

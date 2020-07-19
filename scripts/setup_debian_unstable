@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# Setup Debian unstable source and install packages
+#
+# Usage: setup_debian_unstable
+
+set -euo pipefail
+IFS=$'\n\t'
+export DEBIAN_FRONTEND=noninteractive
+
+main() {
+  declare -r unstable_sources_list="/etc/apt/sources.list.d/debian-unstable.list"
+
+  if [ ! -f "$unstable_sources_list" ]; then
+    echo "Debian unstable sources list missing, adding (requires sudo)"
+    echo "deb http://deb.debian.org/debian/ unstable main" \
+      | sudo tee "$unstable_sources_list"
+    echo "Decreasing priority of unstable packages"
+    printf 'Package: *\nPin: release a=unstable\nPin-Priority: 90\n' \
+      | sudo tee /etc/apt/preferences.d/limit-unstable
+
+    echo "Unstable sources added, updating packages"
+    sudo -E apt-get update -qq
+  fi
+
+  echo "Installing unstable packages (requires sudo)"
+  < "$HOME/dotfiles/scripts/apt-packages-unstable" xargs \
+    sudo -E apt-get install --target-release unstable --quiet --assume-yes \
+    --fix-broken --no-install-recommends
+}
+
+main

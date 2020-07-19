@@ -1,6 +1,7 @@
-#!/bin/bash
-#
+#!/usr/bin/env bash
 # Call stow with correct paths for dotfiles
+#
+# Usage: stow [-nv]
 
 set -euo pipefail
 IFS=$'\n\t'
