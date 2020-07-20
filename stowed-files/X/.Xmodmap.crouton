@@ -1,6 +1,0 @@
-! Order is important here in order to get the search / caps lock key to work as
-! control.
-clear Control
-clear Mod4
-keycode 133 = Control_L
-add Control = Control_L Control_R
