@@ -5,16 +5,9 @@ This is only public so I can easily share it across machines. There is probably 
 ## Letting me own your machine
 
 ```sh
-bash <(curl -fsSL https://raw.github.com/fortes/dotfiles/master/bootstrap.sh)
+git checkout https://github.com/fortes/dotfiles.git
+./dotfiles/scripts/setup_machine
 ```
-
-If for some reason, you don't have `curl` installed (why?):
-
-```sh
-bash <(wget -qO- https://raw.github.com/fortes/dotfiles/master/bootstrap.sh)
-```
-
-You may need to add `--no-check-certificate` for the `wget` call, but that's kinda dangerous.
 
 ## Setup
 
@@ -79,6 +72,12 @@ TODO: Automate these steps.
 - Setup Smart Lock & PIN unlock
 - Enable Linux
 - Enable cloud storage for uBlock
+
+### Windows
+
+- Make sure WSL2 is setup
+- Get WinGet
+- Install Windows Terminal
 
 #### TODO
 
