@@ -195,6 +195,27 @@ setup_keyboard() {
   fi
 }
 
+setup_locale() {
+  local locale="en_US.UTF-8"
+
+  if ! is_package_installed locales; then
+    apt_update_once
+
+    echo "Installing locales package (requires sudo)"
+    sudo -E apt-get install -qq --assume-yes --fix-broken --no-install-recommends locales
+  fi
+
+  if ! locale | grep -q "LANG=${locale}"; then
+    echo "Generating locale ${locale} (requires sudo)"
+    # Uncomment from `locale.gen` file
+    sudo sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
+    echo "Setting locale to ${locale}"
+    sudo sudo -E dpkg-reconfigure --frontend=noninteractive locales && \
+      sudo -E update-locale LANG=${locale}
+    sudo debconf-set-selections -c <<< "locales locales/default_environment_locale select ${locale}"
+  fi
+}
+
 setup_multimedia() {
   local codename="$(lsb_release -cs)"
   local sources_path="/etc/apt/sources.list.d/debian-multimedia.list"
@@ -224,8 +245,19 @@ setup_nonfree() {
   fi
 }
 
+setup_shell() {
+  local bash_path="$(which bash)"
+  local current_shell="$(getent passwd $(id -un) | awk -F : '{print $NF}')"
+
+  if [[ "${current_shell}" != "${bash_path}" ]]; then
+    echo "Changing shell to bash"
+    chsh -s "${bash_path}"
+  fi
+}
+
 main() {
   check_prerequisites
+  setup_shell
   set_dotfiles_remote
 
   local dotfiles_path="$HOME/dotfiles"
@@ -255,6 +287,7 @@ main() {
   set_default_applications
   setup_docker_sudo
   setup_keyboard
+  setup_locale
 
   # Non-apt package managers
   install_node_packages
@@ -263,7 +296,6 @@ main() {
 
   # TODO:
   # - tailscale / wireguard / zerotier
-  # - locale
   # - chrome / kvm / steam / wine / others that require custom stuff
 }
 
