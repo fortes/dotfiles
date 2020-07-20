@@ -265,7 +265,6 @@ main() {
   # - tailscale / wireguard / zerotier
   # - locale
   # - chrome / kvm / steam / wine / others that require custom stuff
-  # - bat / others from unstable / nightlies
 }
 
 main "${@}"

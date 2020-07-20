@@ -1,0 +1,67 @@
+#/usr/bin/env bash
+
+# Install some specific packages directly from GitHub. Specifically:
+#
+# - Bat
+# - Hugo
+# - Neovim
+#
+# Usage `install_github_packages`
+
+set -euo pipefail
+IFS=$'\n\t'
+export DEBIAN_FRONTEND=noninteractive
+
+get_latest_release_url() {
+  local repo="$1"
+  local match="$2"
+
+  local release_json_url="https://api.github.com/repos/${repo}/releases/latest"
+  curl --silent "${release_json_url}" | jq -r '.assets[].browser_download_url' | grep "${match}"
+}
+
+install_bat() {
+  local url="$(get_latest_release_url 'sharkdp/bat' 'bat_.*amd64.deb')"
+  pushd /tmp > /dev/null
+  wget --quiet -O bat.deb "${url}"
+  echo "Installing bat (requires sudo)"
+  sudo dpkg -i bat.deb
+  rm bat.deb
+  popd > /dev/null
+}
+
+install_hugo() {
+  local url="$(get_latest_release_url 'gohugoio/hugo' 'hugo_extended.*Linux-64bit\.deb')"
+  pushd /tmp > /dev/null
+  wget --quiet -O hugo.deb "${url}"
+  echo "Installing hugo (requires sudo)"
+  sudo dpkg -i hugo.deb
+  rm hugo.deb
+  popd > /dev/null
+}
+
+install_neovim_nightly() {
+  echo "Installing neovim nightly"
+  wget "https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage" \
+    --quiet --output-document "$HOME/.local/bin/nvim"
+  chmod +x "$HOME/.local/bin/nvim"
+
+  if [[ -n "$IS_DOCKER" ]]; then
+    echo "Expanding neovim AppImage"
+    mkdir -p "$HOME/.local/appimages/nvim"
+    (
+      cd "$HOME/.local/appimages/nvim"
+      mv "$HOME/.local/bin/nvim" .
+      "$HOME/.local/appimages/nvim/nvim" --appimage-extract
+      ln -s "$HOME/.local/appimages/nvim/squashfs-root/AppRun" "$HOME/.local/bin/nvim"
+    )
+  fi
+}
+
+main() {
+  install_neovim_nightly
+  install_bat
+  install_hugo
+}
+
+main
