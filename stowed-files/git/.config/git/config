@@ -42,4 +42,4 @@
   showUntrackedFiles = all
 [include]
   # Local modifications / auth
-  path=~/.gitconfig.local
+  path = ~/.gitconfig.local
