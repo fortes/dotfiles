@@ -52,7 +52,7 @@ install_neovim_nightly() {
     (
       cd "$HOME/.local/appimages/nvim"
       mv "$HOME/.local/bin/nvim" .
-      "$HOME/.local/appimages/nvim/nvim" --appimage-extract
+      "$HOME/.local/appimages/nvim/nvim" --appimage-extract > /dev/null
       ln -s "$HOME/.local/appimages/nvim/squashfs-root/AppRun" "$HOME/.local/bin/nvim"
     )
   fi

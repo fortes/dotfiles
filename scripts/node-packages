@@ -1,7 +1,7 @@
 bash-language-server
 dockerfile-language-server-nodejs
 typescript-language-server
-n
+npm
 prettier
 ts-node
 typescript

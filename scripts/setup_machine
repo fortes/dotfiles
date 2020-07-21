@@ -51,7 +51,7 @@ increase_max_watchers() {
   if [ ! -f  "$conf_file_path" ]; then
     echo "Increasing max watchers (requires sudo)"
     echo "fs.inotify.max_user_watches=$max_watches" | \
-      sudo tee -a "$conf_file_path" && sudo sysctl -p
+      sudo tee &> /dev/null -a "$conf_file_path" && sudo sysctl -p
     echo "Max watchers set to $max_watches"
   fi
 }
@@ -162,11 +162,11 @@ setup_backports() {
 
   if [[ ! -f "${sources_path}" ]]; then
     echo "Backports not in sources.list, adding (requires sudo)"
-    echo "deb http://ftp.debian.org/debian ${codename}-backports main contrib non-free" | sudo tee "$sources_path"
+    echo "deb http://ftp.debian.org/debian ${codename}-backports main contrib non-free" |
+      sudo tee &> /dev/null "$sources_path"
 
     # New source requires forced updates
     has_updated=""
-    apt_update_once
   fi
 }
 
@@ -222,7 +222,8 @@ setup_multimedia() {
 
   if [[ ! -f "${sources_path}" ]]; then
     echo "Debian Multimedia not in sources.list, adding (requires sudo)"
-    echo "deb http://www.deb-multimedia.org ${codename} main non-free" | sudo tee "$sources_path"
+    echo "deb http://www.deb-multimedia.org ${codename} main non-free" |
+      sudo tee &> /dev/null "$sources_path"
 
     # Must do this insecurely once in order to add keyring
     sudo -E apt-get update -qq -oAcquire::AllowInsecureRepositories=true
@@ -240,8 +241,6 @@ setup_nonfree() {
     echo "Adding contrib & non-free to sources (requires sudo)"
     sudo -E add-apt-repository -y contrib > /dev/null
     sudo -E add-apt-repository -y non-free > /dev/null
-
-    apt_update_once
   fi
 }
 
