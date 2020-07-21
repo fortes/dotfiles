@@ -17,6 +17,8 @@
   dm = "!git fetch && git branch --merged | grep -v '* ' | xargs --no-run-if-empty git branch --delete --force"
   # Fuzzy delete a stash
   ds = "!git stash list | fzf-tmux --preview 'git show --pretty=oneline --color=always --patch \"$(echo {} | cut -d: -f1)\"' | cut -d: -f1 | xargs --no-run-if-empty git stash drop"
+  # Select modified files to edit
+  edit = "!git ls-files --modified --other --exclude-standard | sort -u | fzf-tmux --multi --preview 'git diff --color {}' | xargs --no-run-if-empty $EDITOR -p"
   # Create a fixup commit to the selected commit
   fixup = "!git log --oneline --no-decorate --no-merges | fzf-tmux --preview 'git show --color=always --format=oneline {1}' | xargs --no-run-if-empty git commit --fixup"
   # Fetch and rebase
