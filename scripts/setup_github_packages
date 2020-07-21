@@ -46,7 +46,7 @@ install_neovim_nightly() {
     --quiet --output-document "$HOME/.local/bin/nvim"
   chmod +x "$HOME/.local/bin/nvim"
 
-  if [[ -n "$IS_DOCKER" ]]; then
+  if [[ -n "${IS_DOCKER:-}" ]]; then
     echo "Expanding neovim AppImage"
     mkdir -p "$HOME/.local/appimages/nvim"
     (
@@ -59,6 +59,8 @@ install_neovim_nightly() {
 }
 
 main() {
+  . "$HOME/.profile.local"
+
   install_neovim_nightly
   install_bat
   install_hugo
