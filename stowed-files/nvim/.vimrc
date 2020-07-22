@@ -127,6 +127,11 @@ if exists('&inccommand')
   set inccommand=split
 endif
 
+" TODO: Feature check
+augroup HiglightedYank
+  au TextYankPost * silent! lua vim.highlight.on_yank {on_visual=false}
+augroup END
+
 " Always show statusline
 set laststatus=2
 
@@ -394,7 +399,7 @@ function! IsInsideGitRepo()
     return 0
   else
     return 1
-  fi
+  endif
 endfunction
 
 " Change to git root of current file (if in a repo)
