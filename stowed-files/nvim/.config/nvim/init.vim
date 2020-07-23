@@ -70,7 +70,7 @@ Plug 'justinmk/vim-sneak'
 " Share clipboard with tmux
 Plug 'cazador481/fakeclip.neovim'
 " Snippet support, see configuration below
-Plug 'SirVer/ultisnips'
+" Plug 'SirVer/ultisnips'
 " Fade inactive buffers
 Plug 'TaDaa/vimade'
 " Set `path` for various file types
