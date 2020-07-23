@@ -20,6 +20,7 @@ fzf
 git
 git-crypt
 git-extras
+gnupg
 htop
 iftop
 imagemagick
