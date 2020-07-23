@@ -381,19 +381,17 @@ if executable('fzf')
   " Fuzzy search help <leader>?
   nnoremap <leader>? :Helptags<CR>
 
-  " Search from git root via :Rag (Root Ag)
-  " :Rag  - hidden preview enabled with "?" key
-  " :Rag! - fullscreen and preview window above
-  command! -bang -nargs=* Rag
-    \ call GitRootCD() | call fzf#vim#ag(<q-args>,
-    \                 <bang>0 ? fzf#vim#with_preview('up:60%', '?')
-    \                         : fzf#vim#with_preview('right:50%:hidden', '?'),
-    \                 <bang>0)
+  " :Rg Search from git root ripgrep. Toggle preview with '?'
+  " :Rg! (fullscreen)
+  command! -bang -nargs=* Rg
+    \ call GitRootCD() | call fzf#vim#grep(
+    \                 'rg --column --line-number --no-heading --color=always --smart-case -- '.shellescape(<q-args>),
+    \                 1 , fzf#vim#with_preview('right:50%', '?'), <bang>0)
 
   " Use fuzzy searching for K & Q, select items to go into quickfix
-  nnoremap K :Rag! <C-R><C-W><cr>
-  vnoremap K :<C-u>norm! gv"sy<cr>:silent! Rag! <C-R>s<cr>
-  nnoremap Q :Rag!<SPACE>
+  nnoremap K :Rg <C-R><C-W><cr>
+  vnoremap K :<C-u>norm! gv"sy<cr>:silent! Rg <C-R>s<cr>
+  nnoremap Q :Rg<SPACE>
 end
 " }}}
 
