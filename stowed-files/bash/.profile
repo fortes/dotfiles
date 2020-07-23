@@ -12,10 +12,10 @@ export -f addToPath
 sourceIfExists() {
   for file in $@; do
     if [[ -f "${file}" ]]; then
-      [[ -r "${f}" ]] && . "${file}"
+      . "${file}"
     elif [[ -d "${file}" ]]; then
       for f in $(find "${file}" -type f); do
-        [[ -r "${f}" ]] && . "${f}"
+        . "${f}"
       done
     fi
   done

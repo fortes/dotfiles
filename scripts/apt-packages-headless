@@ -33,6 +33,7 @@ man-db
 mergerfs
 mosh
 ncdu
+ncurses-term
 neovim
 nodejs
 pydf
