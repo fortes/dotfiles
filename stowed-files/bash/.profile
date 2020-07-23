@@ -1,15 +1,15 @@
 # vim:ft=sh
 
 # Add path if not present
-addToPath() {
+add_to_path() {
   if echo ":$PATH:" | grep -vq ":$@:"; then
     export PATH="$@:$PATH"
   fi
 }
-export -f addToPath
+export -f add_to_path
 
 # Source file only if it exists
-sourceIfExists() {
+source_if_exists() {
   for file in $@; do
     if [[ -f "${file}" ]]; then
       . "${file}"
@@ -20,16 +20,16 @@ sourceIfExists() {
     fi
   done
 }
-export -f sourceIfExists
+export -f source_if_exists
 
 # Check for command in path
-commandExists() {
+command_exists() {
   command -v "$1" &> /dev/null
 }
-export -f commandExists
+export -f command_exists
 
 # Use NeoVim if we have it
-if commandExists nvim; then
+if command_exists nvim; then
   VISUAL=nvim
 else
   VISUAL=vim
@@ -38,11 +38,11 @@ EDITOR="$VISUAL"
 export EDITOR VISUAL
 
 # Locally-installed packages belong in path
-addToPath "$HOME/.local/bin"
+add_to_path "$HOME/.local/bin"
 
 # Defaults to "$HOME/.local/bin", avoid running since it slows shell creation
-# if commandExists yarnpkg; then
-#   addToPath "$(yarnpkg global bin)"
+# if command_exists yarnpkg; then
+#   add_to_path "$(yarnpkg global bin)"
 # fi
 
 # Make sure to use system for virsh by default
@@ -61,7 +61,7 @@ gitAwareFd() {
 export -f gitAwareFd
 
 fzf_preview_command=""
-if commandExists bat; then
+if command_exists bat; then
   fzf_preview_command="--preview 'bat --color always --style=grid,changes --line-range :300 {}'"
 else
   fzf_preview_command="--preview 'cat {}'"
@@ -85,10 +85,10 @@ fi
 # Rg, for whatever reason, needs to manually specify location for config
 export RIPGREP_CONFIG_PATH="$XDG_CONFIG_HOME/ripgrep/rc"
 
-if [ -z "$SSH_AUTH_SOCK" ] && commandExists keychain; then
+if [ -z "$SSH_AUTH_SOCK" ] && command_exists keychain; then
   # Don't prompt for password to load id_rsa if not already loaded
   eval "$(keychain --eval --noask --agents ssh --quiet)"
 fi
 
 # Local overrides
-sourceIfExists "$HOME/.profile.local"
+source_if_exists "$HOME/.profile.local"

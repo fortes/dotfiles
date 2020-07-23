@@ -36,10 +36,6 @@ check_prerequisites() {
   fi
 }
 
-command_exists() {
-  command -v "$1" &> /dev/null
-}
-
 echo_stderr() {
   >&2 echo "${@}"
 }
@@ -267,6 +263,9 @@ setup_shell() {
 }
 
 main() {
+  # Make sure to load `command_exists` helper
+  . "$HOME/dotfiles/stowed-files/bash/.profile"
+
   check_prerequisites
   setup_shell
   set_dotfiles_remote

@@ -125,15 +125,15 @@ if [ -r /etc/bash_completion.d/git-prompt ]; then
 fi
 
 # FZF keybindings
-sourceIfExists "/usr/share/doc/fzf/examples/key-bindings.bash"
+source_if_exists "/usr/share/doc/fzf/examples/key-bindings.bash"
 
 # Load system bash completion
-sourceIfExists "/etc/bash_completion"
+source_if_exists "/etc/bash_completion"
 # Load local bash completion
-sourceIfExists "$HOME/.local/completion.d"
+source_if_exists "$HOME/.local/completion.d"
 
 # Load aliases
-sourceIfExists "$HOME/.aliases"
+source_if_exists "$HOME/.aliases"
 
 # Load local overrides
-sourceIfExists "$HOME/.bashrc.local"
+source_if_exists "$HOME/.bashrc.local"
