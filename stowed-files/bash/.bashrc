@@ -128,10 +128,9 @@ fi
 sourceIfExists "/usr/share/doc/fzf/examples/key-bindings.bash"
 
 # Load system bash completion
-sourceIfExists "/usr/share/bash-completion/bash_completion"
+sourceIfExists "/etc/bash_completion"
 # Load local bash completion
-sourceIfExists "$HOME/.local/completions.d/*"
-sourceIfExists "$HOME/.local/etc/bash_completion.d/*"
+sourceIfExists "$HOME/.local/completion.d"
 
 # Load aliases
 sourceIfExists "$HOME/.aliases"

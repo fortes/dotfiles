@@ -11,7 +11,13 @@ export -f addToPath
 # Source file only if it exists
 sourceIfExists() {
   for file in $@; do
-    [ -f "$file" ] && . "$file"
+    if [[ -f "${file}" ]]; then
+      [[ -r "${f}" ]] && . "${file}"
+    elif [[ -d "${file}" ]]; then
+      for f in $(find "${file}" -type f); do
+        [[ -r "${f}" ]] && . "${f}"
+      done
+    fi
   done
 }
 export -f sourceIfExists

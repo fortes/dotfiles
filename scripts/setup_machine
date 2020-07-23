@@ -44,6 +44,18 @@ echo_stderr() {
   >&2 echo "${@}"
 }
 
+generate_completions() {
+  mkdir -p "$HOME/.local/completion.d"
+
+  if command_exists npm; then
+    npm completion > "$HOME/.local/completion.d/npm_completion"
+  fi
+
+  if command_exists beet; then
+    beet completion > "$HOME/.local/completion.d/beet_completion"
+  fi
+}
+
 increase_max_watchers() {
   declare -r conf_file_path="/etc/sysctl.d/20-increase-max-watchers.conf"
   declare -r max_watches="524288"
@@ -292,6 +304,8 @@ main() {
   install_node_packages
   install_python_packages
   install_neovim_plugins
+
+  generate_completions
 
   # TODO:
   # - tailscale / wireguard / zerotier
