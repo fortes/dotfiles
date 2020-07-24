@@ -343,7 +343,7 @@ if executable('fzf')
   command! -bang -nargs=? -complete=dir Files
   \ call fzf#vim#files(<q-args>, fzf#vim#with_preview(), <bang>0)
   command! -bang -nargs=? -complete=dir GFiles
-  \ call fzf#vim#gitfiles(<q-args>, fzf#vim#with_preview(), <bang>0)
+  \ call fzf#vim#gitfiles('--others '.<q-args>, fzf#vim#with_preview(), <bang>0)
 
   " Fallback to :Files when not in git repo
   function! GFilesOrFiles()
@@ -385,7 +385,7 @@ if executable('fzf')
   " :Rg! (fullscreen)
   command! -bang -nargs=* Rg
     \ call GitRootCD() | call fzf#vim#grep(
-    \                 'rg --column --line-number --no-heading --color=always --smart-case -- '.shellescape(<q-args>),
+    \                 'rg --column --line-number --hidden --no-heading --color=always --smart-case -- '.shellescape(<q-args>),
     \                 1 , fzf#vim#with_preview('right:50%', '?'), <bang>0)
 
   " Use fuzzy searching for K & Q, select items to go into quickfix
