@@ -28,11 +28,23 @@ command_exists() {
 }
 export -f command_exists
 
+is_inside_git_repo() {
+  git rev-parse --is-inside-work-tree &> /dev/null
+}
+export -f is_inside_git_repo
+
+fd_with_git() {
+  # Show hidden files only when in a git repository
+  fdfind --type file --follow \
+    $(is_inside_git_repo && echo . "$(git rev-parse --show-cdup)" --hidden) $@
+}
+export -f fd_with_git
+
 # Use NeoVim if we have it
 if command_exists nvim; then
-  VISUAL=nvim
+  VISUAL="$(command -v nvim)"
 else
-  VISUAL=vim
+  VISUAL="$(command -v vim)"
 fi
 EDITOR="$VISUAL"
 export EDITOR VISUAL
@@ -40,25 +52,8 @@ export EDITOR VISUAL
 # Locally-installed packages belong in path
 add_to_path "$HOME/.local/bin"
 
-# Defaults to "$HOME/.local/bin", avoid running since it slows shell creation
-# if command_exists yarnpkg; then
-#   add_to_path "$(yarnpkg global bin)"
-# fi
-
 # Make sure to use system for virsh by default
 export LIBVIRT_DEFAULT_URI="qemu:///system"
-
-isInsideGitRepo() {
-  git rev-parse --is-inside-work-tree &> /dev/null
-}
-export -f isInsideGitRepo
-
-gitAwareFd() {
-  # Show hidden files only when in a git repository
-  fdfind --type file --follow \
-    $(isInsideGitRepo && echo . "$(git rev-parse --show-cdup)" --hidden) $@
-}
-export -f gitAwareFd
 
 fzf_preview_command=""
 if command_exists bat; then
@@ -69,9 +64,12 @@ fi
 
 # $FZF_DEFAULT_COMMAND is executed with `sh -c`, so need to be careful with
 # POSIX compliance
-export FZF_DEFAULT_COMMAND='bash -c "fdfind --type file --follow . \$(git rev-parse --show-cdup 2>/dev/null && echo --hidden)"'
+if command_exists fdfind; then
+  # Use `fd` when possible for far better performance
+  export FZF_DEFAULT_COMMAND='bash -c "fdfind --type file --follow . \$(git rev-parse --show-cdup 2>/dev/null && echo --hidden)"'
+  export FZF_CTRL_T_COMMAND='fd_with_git --color always'
+fi
 export FZF_DEFAULT_OPTS="--height 60% --extended --bind ctrl-alt-a:select-all,ctrl-alt-d:deselect-all,F1:toggle-preview"
-export FZF_CTRL_T_COMMAND='gitAwareFd --color always'
 export FZF_CTRL_T_OPTS="--ansi --preview-window 'right:50%' $fzf_preview_command"
 # Case insensitive by default
 export FZF_COMPLETION_OPTS='-i'
