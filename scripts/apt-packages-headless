@@ -1,5 +1,7 @@
+apt-file
 apt-transport-https
 apt-utils
+aptitude
 autossh
 avahi-daemon
 avahi-dnsconfd
@@ -8,7 +10,6 @@ bash-completion
 build-essential
 ca-certificates
 curl
-docker.io
 dnsutils
 elinks
 exa

@@ -178,7 +178,13 @@ setup_backports() {
   fi
 }
 
-setup_docker_sudo() {
+setup_docker() {
+  if ! is_package_installed docker.io; then
+    apt_update_once
+    echo "Installing docker (requires sudo)"
+    sudo -E apt-get install -qq --assume-yes --fix-broken --no-install-recommends docker.io
+  fi
+
   local user="$(whoami)"
   if [ ! -f "/etc/sudoers.d/$user-docker" ]; then
     echo "Allowing $user to run docker without sudo prompt (requires sudo)"
@@ -295,7 +301,7 @@ main() {
   increase_max_watchers
   lock_local_files
   set_default_applications
-  setup_docker_sudo
+  [[ -z "${IS_DOCKER:-}" ]] && setup_docker
   setup_keyboard
   setup_locale
 
