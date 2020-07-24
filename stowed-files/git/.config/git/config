@@ -25,6 +25,8 @@
   frb = "!git fetch --prune && git rebase --autostash origin/master"
   # Undo last commit, but keeping changes
   undo = "reset --soft HEAD^"
+[commit]
+  verbose = true
 [core]
   excludesfile = ~/.config/git/ignore.global
 [diff]
