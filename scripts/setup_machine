@@ -306,6 +306,8 @@ main() {
 
   generate_completions
 
+  echo "Setup complete!"
+
   # TODO:
   # - tailscale / wireguard / zerotier
   # - chrome / kvm / steam / wine / others that require custom stuff
