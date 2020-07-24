@@ -1,5 +1,4 @@
-#/usr/bin/env bash
-
+#!/usr/bin/env bash
 # Install some specific packages directly from GitHub. Specifically:
 #
 # - Bat
