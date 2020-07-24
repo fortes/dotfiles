@@ -370,7 +370,7 @@ if executable('fzf')
   imap <c-x><c-l> <plug>(fzf-complete-line)
 
   " Use fuzzy completion relative filepaths across directory with <c-x><c-j>
-  imap <expr> <c-x><c-j> fzf#vim#complete#path('git ls-files $(git rev-parse --show-toplevel)')
+  imap <expr> <c-x><c-j> fzf#vim#complete#path('git ls-files --others $(git rev-parse --show-toplevel)')
 
   " Better command history with <leader>:
   nnoremap <leader>: :History:<CR>
