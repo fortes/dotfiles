@@ -116,10 +116,10 @@ if [ -r /etc/bash_completion.d/git-prompt ]; then
   export GIT_PS1_SHOWCOLORHINTS=1
   # Show staged/unstaged changes marker
   export GIT_PS1_SHOWDIRTYSTATE=1
-  # Show a $ next to branch name if something stashed
-  export GIT_PS1_SHOWSTASHSTATE=1
   # Note untracked files
   export GIT_PS1_SHOWUNTRACKEDFILES=1
+  # Suppress prompt when within an ignored dir
+  export GIT_PS1_HIDE_IF_PWD_IGNORED=1
   source /etc/bash_completion.d/git-prompt
   export PROMPT_COMMAND="$PROMPT_COMMAND; __git_ps1 \"$BASE_PROMPT\" \" \${HAS_JOBS:+$JOB_COUNT }\" \" %s$RESET\""
 fi
