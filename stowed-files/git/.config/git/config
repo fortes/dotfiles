@@ -29,12 +29,15 @@
   verbose = true
 [core]
   excludesfile = ~/.config/git/ignore.global
+  whitespace = space-before-tab,tab-in-indent,blank-at-eof,trailing-space,tabwidth=2
 [diff]
   algorithm = minimal
 [fetch]
   prune = true
 [help]
   autocorrect = 1
+[pull]
+  rebase = true
 [push]
   default = current
 [rebase]
