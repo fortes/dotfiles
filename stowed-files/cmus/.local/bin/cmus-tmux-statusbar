@@ -1,29 +1,35 @@
-#!/bin/bash
-if [[ $1 =~ ^[[:digit:]]+$ ]]; then
-  MAX_TITLE_WIDTH=$1
-else
-  MAX_TITLE_WIDTH=$(($(tmux display -p '#{window_width}' 2> /dev/null || echo 120) - 80))
-fi
+#!/usr/bin/env bash
+#
+# Display current track information if cmus is playing
 
-if cmus-remote -Q > /dev/null 2> /dev/null; then
-  CMUS_STATUS=$(cmus-remote -Q)
-  STATUS=$(echo "$CMUS_STATUS" | grep status | head -n 1 | cut -d' ' -f2-)
-  ARTIST=$(echo "$CMUS_STATUS" | grep 'tag artist' | head -n 1 | cut -d' ' -f3-)
-  TITLE=$(echo "$CMUS_STATUS" | grep 'tag title' | cut -d' ' -f3-)
-  if [ -n "$TITLE" ]; then
-    if [ "$STATUS" = "playing" ]; then
-      PLAY_STATE="$OUTPUT ▶"
-    else
-      PLAY_STATE="$OUTPUT ◊"
-    fi
-    OUTPUT="$ARTIST $PLAY_STATE $TITLE"
+set -euo pipefail
+IFS=$'\n\t'
 
-    # Only show the song title if we are over $MAX_TITLE_WIDTH characters
-    if [ "${#OUTPUT}" -ge $MAX_TITLE_WIDTH ]; then
-      OUTPUT="${TITLE:0:$MAX_TITLE_WIDTH-1}… $PLAY_STATE"
-    fi
-  else
-    OUTPUT=''
+main() {
+  if [[ ! -f /tmp/cmus-status.txt ]]; then
+    return
   fi
-fi
-echo $OUTPUT
+
+  local status="$(sed -n 1p /tmp/cmus-status.txt)"
+  if [[ "${status}" == "stopped" ]]; then
+    return
+  fi
+
+  # Sanity check that cmus hasn't exited, since status might not update
+  if ! cmus-remote -Q > /dev/null 2>&1; then
+    rm -f /tmp/cmus-status.txt
+    return
+  fi
+
+  if [[ "${status}" == "paused" ]]; then
+    local album="$(sed -n 4p /tmp/cmus-status.txt)"
+    local albumartist="$(sed -n 5p /tmp/cmus-status.txt)"
+    echo "${albumartist} ♪ ${album}  "
+  else
+    local title="$(sed -n 2p /tmp/cmus-status.txt)"
+    local artist="$(sed -n 3p /tmp/cmus-status.txt)"
+    echo "${artist} ▸ ${title}  "
+  fi
+}
+
+main "${@}"

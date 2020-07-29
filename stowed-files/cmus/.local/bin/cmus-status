@@ -1,16 +1,61 @@
 #!/bin/bash
 
-# Report to last.fm
-# Run last-cmus in background so we don't delay tmux status message
-if [[ -n $LAST_FM_USERNAME ]]; then
-  last-cmus "$@" >> /tmp/cmus-status.txt 2>&1 &
-fi
+set -euo pipefail
+IFS=$'\n\t'
 
-# Update the tmux status bar, if running in tmux
-if [[ -n $TMUX ]]; then
-  tmux refresh-client -S
-fi
+main() {
+  # Args are passed in but annoying to parse, easier to call into `cmus-remote`
+  if ! command_exists cmus-remote; then
+    return
+  fi
 
-if [[ -n $DISPLAY ]]; then
-  cmus-album-background >> /tmp/cmus-status.txt 2>&1 &
-fi
+  local cmus_status="$(cmus-remote -Q 2>&1)"
+  local status_file_path="/tmp/cmus-status.txt"
+
+  if grep -q "cmus is not running" <<< "${cmus_status}"; then
+    rm -f "${status_file_path}"
+    return
+  fi
+
+  local player_status="$(grep -e '^status' <<< "${cmus_status}" | head -n 1 | awk '{print $2}')"
+
+  if [[ "${player_status}" == "stopped" || "${player_status}" == "exiting" ]]; then
+    rm -f "${status_file_path}"
+    return
+  fi
+
+  local album="$(grep -oP '^tag album \K(.+)$' <<< "${cmus_status}")"
+  local albumartist="$(grep -oP '^tag albumartist \K(.+)$' <<< "${cmus_status}")"
+  local artist="$(grep -oP '^tag artist \K(.+)$' <<< "${cmus_status}")"
+  local file="$(grep -oP '^file \K(.+)$' <<< "${cmus_status}")"
+  local mb_track_id="$(grep -oP '^tag musicbrainz_trackid \K(.+)$' <<< "${cmus_status}")"
+  local title="$(grep -oP '^tag title \K(.+)$' <<< "${cmus_status}")"
+
+  cat > "${status_file_path}" <<CMUS_STATUS
+${player_status}
+${title}
+${artist}
+${album}
+${albumartist}
+${mb_track_id}
+${file}
+CMUS_STATUS
+
+  # Update status bar if running in tmux
+  if [[ -n "${TMUX:-}" ]]; then
+    tmux refresh-client -S
+  fi
+
+  if [[ -n $DISPLAY ]]; then
+    # Run in background since PNG generation can take a while
+    cmus-album-background >> /tmp/cmus-album-background.log 2>&1 &
+  fi
+
+  # Run last-cmus in background so we don't delay tmux status message
+  # Disabled, since still stuck on python2. Need to find a better solution
+  # if [[ -n $LAST_FM_USERNAME ]]; then
+  #   last-cmus "$@" >> /tmp/last-cmus-status.txt 2>&1 &
+  # fi
+}
+
+main "${@}"
