@@ -51,6 +51,8 @@ CMUS_STATUS
     cmus-album-background >> /tmp/cmus-album-background.log 2>&1 &
   fi
 
+  command_exists cmus-scrobbler && cmus-scrobbler >> /tmp/cmus-scrobbler.log
+
   # Run last-cmus in background so we don't delay tmux status message
   # Disabled, since still stuck on python2. Need to find a better solution
   # if [[ -n $LAST_FM_USERNAME ]]; then

@@ -1,0 +1,68 @@
+#!/usr/bin/env python3
+#
+# Submits listens to ListenBrainz
+import os
+import pylistenbrainz
+import sys
+import time
+
+# Copy from https://listenbrainz.org/profile/
+auth_token = os.environ.get('LISTENBRAINZ_AUTH_TOKEN')
+
+if not auth_token:
+    print("Must set $LISTENBRAINZ_AUTH_TOKEN environment variable")
+    sys.exit(1)
+
+if not os.path.exists('/tmp/cmus-status.txt'):
+    print("No /tmp/cmus-status.txt file, exiting")
+    sys.exit(1)
+
+with open('/tmp/cmus-status.txt') as status_file:
+    [status, title, artist, album, album_artist, track_id,
+     path] = [s.strip() for s in status_file.readlines()]
+
+is_new_listen = True
+
+if is_new_listen and os.path.exists('/tmp/previous-track-id.txt'):
+    with open('/tmp/previous-track-id.txt') as previous_file:
+        previous_track_id = previous_file.readlines()[0].strip()
+        is_new_listen = previous_track_id != track_id
+
+with open('/tmp/previous-track-id.txt', 'w') as previous_file:
+    previous_file.write(track_id)
+
+client = pylistenbrainz.ListenBrainz()
+client.set_auth_token(auth_token, check_validity=False)
+
+listen = pylistenbrainz.Listen(track_name=title,
+                               artist_name=artist,
+                               recording_mbid=track_id,
+                               release_name=album,
+                               listened_at=time.time())
+
+try:
+    if is_new_listen:
+        print("Submitting listen: %s - %s" % (artist, title))
+        response = client.submit_single_listen(listen)
+        if response['status'] == 'ok':
+            print("Successful!")
+        else:
+            print("Non-OK status code: %s" % response['status'])
+
+    if status == 'playing':
+        listen = pylistenbrainz.Listen(
+            track_name=title,
+            artist_name=artist,
+            recording_mbid=track_id,
+            release_name=album,
+        )
+        print("Submitting playing now: %s - %s" % (artist, title))
+        response = client.submit_playing_now(listen)
+        if response['status'] == 'ok':
+            print("Successful!")
+        else:
+            print("Non-OK status code: %s" % response['status'])
+except pylistenbrainz.errors.ListenBrainzAPIException as err:
+    print("ListenBrainzAPIException: %s" % err.message)
+except pylistenbrainz.errors.InvalidSubmitListensPayloadException as err:
+    print("InvalidSubmitListensPayloadException: %s" % err.message)
