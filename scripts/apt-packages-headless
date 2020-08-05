@@ -28,6 +28,7 @@ imagemagick
 jq
 keychain
 libimage-exiftool-perl
+libnss-mdns
 lsb-release
 lsof
 m4
