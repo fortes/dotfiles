@@ -24,8 +24,10 @@ export IS_WSL="${is_wsl:-}"
 export IS_HEADLESS="${is_headless:-}"
 
 # Add machine-specific items below
-# echo export LAST_FM_USERNAME="fortes"
-# echo export LAST_FM_PASSWORD="xxxxxx"
+# echo export LISTENBRAINZ_AUTH_TOKEN="xxxxxx"
+# echo export LIBRE_FM_USERNAME="fortes"
+# echo export LIBRE_FM_PASSWORD="xxxxxx"
+# echo export LIBRE_FM_SESSION_KEY="xxxxxx"
 PROFILE_TEMPLATE
 }
 
