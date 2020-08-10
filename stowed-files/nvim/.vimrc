@@ -129,7 +129,8 @@ endif
 
 " TODO: Feature check
 augroup HiglightedYank
-  au TextYankPost * silent! lua vim.highlight.on_yank {on_visual=false}
+  autocmd!
+  autocmd TextYankPost * silent! lua vim.highlight.on_yank {on_visual=false}
 augroup END
 
 " Always show statusline
