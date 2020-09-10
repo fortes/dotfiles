@@ -20,7 +20,7 @@
   # Select modified files to edit
   edit = "!git ls-files --modified --other --exclude-standard | sort -u | fzf-tmux -0 --multi --preview 'git diff --color {}' | xargs --no-run-if-empty $EDITOR -p"
   # Create a fixup commit to the selected commit
-  fixup = "!git log --oneline --no-decorate --no-merges | fzf-tmux -0 --preview 'git show --color=always --format=oneline {1}' | xargs --no-run-if-empty git commit --fixup"
+  fixup = "!git log --oneline --no-decorate --no-merges | fzf-tmux -0 --preview 'git show --color=always --format=oneline {1}' | awk '{print $1}' | xargs --no-run-if-empty git commit --fixup"
   # Fetch and rebase
   frb = "!git fetch --prune && git rebase --autostash origin/master"
   # Undo last commit, but keeping changes
