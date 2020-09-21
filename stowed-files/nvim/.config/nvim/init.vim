@@ -72,7 +72,7 @@ Plug 'cazador481/fakeclip.neovim'
 " Snippet support, see configuration below
 " Plug 'SirVer/ultisnips'
 " Fade inactive buffers
-if executable('python')
+if executable('python') && has("nvim-0.4.3")
   Plug 'TaDaa/vimade'
 endif
 " Set `path` for various file types
@@ -139,7 +139,7 @@ Plug 'tpope/vim-vinegar'
 " }}}
 
 " General coding {{{
-if executable('node')
+if executable('node') && has("nvim-0.4.3")
   Plug 'neoclide/coc.nvim', {'branch': 'release'}
 endif
 " Test.vim: Run tests based on cursor position / file
