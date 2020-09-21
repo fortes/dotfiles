@@ -37,38 +37,38 @@ if ! infocmp $TERM > /dev/null 2>&1; then
 fi
 
 # Bash Options {{{
-# cd without typing cd
-shopt -qs autocd
+# cd without typing cd (unsupported in Mac version)
+shopt -qs autocd 2> /dev/null || true
 # Auto-correct directory typos
 shopt -qs cdspell
 # Check hash before executing
 shopt -qs checkhash
-# Check for stopped jobs before exiting
-shopt -qs checkjobs
+# Check for stopped jobs before exiting (unsupported in Mac version)
+shopt -qs checkjobs 2> /dev/null || true
 # Check window size after each command, and update $LINES and $COLUMNS
-shopt -s checkwinsize
+shopt -qs checkwinsize
 # Save all lines of multiline commands
-shopt -s cmdhist
-# Expand directory names when doing file completion
-shopt -qs direxpand
-# Fix typos for directories in completion
-shopt -qs dirspell
+shopt -qs cmdhist
+# Expand directory names when doing file completion (unsupported in Mac version)
+shopt -qs direxpand 2> /dev/null || true
+# Fix typos for directories in completion (unsupported in Mac version)
+shopt -qs dirspell 2> /dev/null || true
 # Include filenames that begin with '.' in filename expansion
 shopt -qs dotglob
 # Extended pattern matching
 shopt -qs extglob
 # Allow escape sequencing within ${parameter} expansions
 shopt -qs extquote
-# Support ** for expansion
-shopt -qs globstar
+# Support ** for expansion (unsupported in Mac version)
+shopt -qs globstar 2> /dev/null || true
 # Append to history list. Allow editing of history substitution in readline
 shopt -qs histappend histreedit histverify
 # Do hostname completion on words that contain @
 shopt -qs hostcomplete
 # Don't search path for completions when on an empty line
-shopt -s no_empty_cmd_completion
+shopt -qs no_empty_cmd_completion
 # Case insensitive glob matching and case statements
-shopt -s nocaseglob nocasematch
+shopt -qs nocaseglob nocasematch
 # }}}
 
 BLACK="\[$(tput setaf 0)\]"
@@ -124,11 +124,15 @@ if [ -r /etc/bash_completion.d/git-prompt ]; then
   export PROMPT_COMMAND="$PROMPT_COMMAND; __git_ps1 \"$BASE_PROMPT\" \" \${HAS_JOBS:+$JOB_COUNT }\" \" %s$RESET\""
 fi
 
-# FZF keybindings
+# FZF keybindings (Debian)
 source_if_exists "/usr/share/doc/fzf/examples/key-bindings.bash"
+# FZF keybindings (Homebrew)
+source_if_exists "/usr/local/opt/fzf/shell/key-bindings.bash"
 
 # Load system bash completion
 source_if_exists "/etc/bash_completion"
+# Load homebrew bash completion
+source_if_exists "/usr/local/etc/bash_completion"
 # Load local bash completion
 source_if_exists "$HOME/.local/completion.d"
 

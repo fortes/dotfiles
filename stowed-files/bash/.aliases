@@ -38,16 +38,24 @@ if command -v docker > /dev/null; then
 fi
 
 # Map ls to be colorful and reasonable defaults
-alias ls='ls --color=auto -pFhv --quoting-style=shell-escape'
-alias la='ls --color=auto -ApFhv'
-alias ll='ls --color=auto -AlpFhv'
+if uname | grep -qv Darwin; then
+  alias ls='ls --color=auto -pFhv --quoting-style=shell-escape'
+  alias la='ls --color=auto -ApFhv'
+  alias ll='ls --color=auto -AlpFhv'
+fi
 
 # Make feh nicer in i3
-alias feh='feh --scale-down'
+if command -v feh > /dev/null; then
+  alias feh='feh --scale-down'
+fi
 
 # Shortcuts for copying from tmux clipboard to system clipboard
 if command -v xclip > /dev/null; then
   alias tcopy='tmux save-buffer - | xclip -i -sel clipboard'
+fi
+
+if command_exists fd; then
+  alias fdfind='fd'
 fi
 
 # Load local file if present

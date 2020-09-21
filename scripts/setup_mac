@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+# Work in progress setup for the Mac
+#
+# TODO:
+# - Use `/bin/sh` instead of bash, since will eventually go away
+#   - Or maybe `dash`?
+# - Move over to zsh
+#
+# Usage: setup_mac
+
+set -euo pipefail
+IFS=$'\n\t'
+
+setup_shell() {
+  local bash_path="$(which bash)"
+  local current_shell="$(getent passwd $(id -un) 2> /dev/null | awk -F : '{print $NF}')"
+
+  # TODO: Should really just move to zsh since Mac will probably ditch bash
+  if [[ "${current_shell}" != "${bash_path}" ]]; then
+    if ! grep -q "${bash_path}" /etc/shells; then
+      echo "Adding ${bash_path} to shell list"
+      echo "${bash_path}" | sudo tee -a /etc/shells > /dev/null
+    fi
+    echo "Changing shell to bash ($bash_path)"
+    chsh -s "${bash_path}"
+  fi
+}
+
+install_command_line_tools() {
+  if ! command_exists git; then
+    echo "Installing command line tools"
+    xcode-select --install
+  fi
+}
+
+install_homebrew() {
+  if ! command_exists brew; then
+    echo "Installing Homebrew"
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+  fi
+}
+
+install_homebrew_packages() {
+  echo "Installing homebrew packages (requires sudo)"
+  grep -v "^#" "$HOME/dotfiles/scripts/brew-packages" | \
+    xargs \
+    brew install --quiet
+}
+
+main() {
+  # Make sure to load `command_exists` helper
+  . "$HOME/dotfiles/stowed-files/bash/.profile"
+
+  setup_shell
+
+  local dotfiles_path="$HOME/dotfiles"
+  local local_profile_path="$HOME/.profile.local"
+
+  if [[ ! -f "$local_profile_path" ]]; then
+    echo "Generating $local_profile_path"
+    "$dotfiles_path/scripts/create_local_profile" > "$local_profile_path"
+  fi
+
+  . "$local_profile_path"
+
+  install_command_line_tools
+  install_homebrew
+  install_homebrew_packages
+}
+
+# main "${@}" does not work in ancient Mac bash version
+main
