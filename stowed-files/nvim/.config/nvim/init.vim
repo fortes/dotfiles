@@ -72,7 +72,7 @@ Plug 'cazador481/fakeclip.neovim'
 " Snippet support, see configuration below
 " Plug 'SirVer/ultisnips'
 " Fade inactive buffers
-if executable('python') && has("nvim-0.4.3")
+if has('python3') && has("nvim-0.4.3")
   Plug 'TaDaa/vimade'
 endif
 " Set `path` for various file types
