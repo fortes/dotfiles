@@ -142,8 +142,6 @@ Plug 'tpope/vim-vinegar'
 if executable('node') && has("nvim-0.4.3")
   Plug 'neoclide/coc.nvim', {'branch': 'release'}
 endif
-" Test.vim: Run tests based on cursor position / file
-Plug 'janko-m/vim-test', { 'for': ['javascript'] }
 " Syntax highlighting for a ton of languages
 Plug 'sheerun/vim-polyglot'
 " }}}
@@ -318,29 +316,6 @@ if executable('node')
   let g:coc_snippet_next = '<C-j>'
   let g:coc_snippet_prev = '<C-k>'
 endif
-" }}}
-
-" Test.vim {{{
-" Run test commands in NeoVim terminal
-let test#strategy = 'neovim'
-
-let test#javascript#mocha#options = {
-  \ 'nearest': '--reporter list',
-  \ 'file': '--reporter list',
-  \ 'suite': '--reporter dot',
-  \ }
-
-" Only works in JS for now
-augroup test_shortcuts
-  autocmd!
-
-  " <leader>tt to test based on cursor, <leader>twt to watch
-  autocmd FileType javascript,typescript nnoremap <buffer> <silent> <leader>tt :TestNearest<cr>
-  autocmd FileType javascript,typescript nnoremap <buffer> <silent> <leader>twt :TestNearest -w<cr><c-\><c-n><c-w><c-k>
-  " <leader>tf to test current file, <leader> twf to watch
-  autocmd FileType javascript nnoremap <buffer> <silent> <leader>tf :TestFile<cr>
-  autocmd FileType javascript nnoremap <buffer> <silent> <leader>twf :TestFile -w<cr><c-\><c-n><c-w><c-k>
-augroup END
 " }}}
 
 " Fuzzy Finding (FZF) {{{
