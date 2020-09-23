@@ -1,5 +1,6 @@
 bash-language-server
 dockerfile-language-server-nodejs
+fx
 typescript-language-server
 npm
 prettier
