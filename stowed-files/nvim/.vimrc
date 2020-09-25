@@ -240,24 +240,24 @@ let g:activeStatusLine.='%l:%2c '
 function! StatuslineTag()
   if exists('b:git_dir')
     " Shitty unicode character w/o patched fonts
-    return "‡".fugitive#head(7)
+    return '‡'.fugitive#head(7)
   else
     return fnamemodify(getwinvar(0, 'getcwd', getcwd()), ':t')
   endif
 endfunction
 
-let g:quickfixStatusLine="%t (%l of %L)"
+let g:quickfixStatusLine='%t (%l of %L)'
 let g:quickfixStatusLine.="%{exists('w:quickfix_title')? ' '.w:quickfix_title : ''}"
-let g:quickfixStatusLine.="%=%-15(%l,%c%V%) %P"
+let g:quickfixStatusLine.='%=%-15(%l,%c%V%) %P'
 
 " Default status line
 let statusline=g:activeStatusLine
 
 " Use different status line for active vs. inactive buffers
 function! UpdateStatusLine(status)
-  if &filetype=="qf"
+  if &filetype=='qf'
     let &l:statusline=g:quickfixStatusLine
-  elseif &filetype=="help" || &filetype=="netrw"
+  elseif &filetype=='help' || &filetype=='netrw'
     let &l:statusline=&filetype
   elseif a:status
     let &l:statusline=g:activeStatusLine
@@ -425,10 +425,10 @@ endfunction
 command! GitRootCD :call GitRootCD()
 
 " K searches for word under cursor in root of project (remove default binding)
-nnoremap K :GitRootCD<cr>:silent! lgrep! "<C-R><C-W>"<cr>
+" nnoremap K :GitRootCD<cr>:silent! lgrep! "<C-R><C-W>"<cr>
 " Grep for visual selection, just like in normal mode. Note that this clears /
 " uses the `s` register
-vnoremap K :<C-u>norm! gv"sy<cr>:GitRootCD<cr>:silent! lgrep! "<C-R>s"<cr>
+" vnoremap K :<C-u>norm! gv"sy<cr>:GitRootCD<cr>:silent! lgrep! "<C-R>s"<cr>
 " Never use Ex-mode, map to project search command instead
 nnoremap Q :GitRootCD<cr>:lgrep!<SPACE>
 

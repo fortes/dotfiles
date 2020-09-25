@@ -72,7 +72,7 @@ Plug 'cazador481/fakeclip.neovim'
 " Snippet support, see configuration below
 " Plug 'SirVer/ultisnips'
 " Fade inactive buffers
-if has('python3') && has("nvim-0.4.3")
+if has('python3') && has('nvim-0.4.3')
   Plug 'TaDaa/vimade'
 endif
 " Set `path` for various file types
@@ -139,8 +139,8 @@ Plug 'tpope/vim-vinegar'
 " }}}
 
 " General coding {{{
-if executable('node') && has("nvim-0.4.3")
-  Plug 'neoclide/coc.nvim', {'branch': 'release'}
+if has ('nvim-0.5')
+  Plug 'neovim/nvim-lspconfig'
 endif
 " Syntax highlighting for a ton of languages
 Plug 'sheerun/vim-polyglot'
@@ -227,7 +227,7 @@ augroup END
 if &t_Co >= 256
   " Upgrade colors if we have more colors, stays with default if not available
   let base16colorspace=256
-  if $COLOR_THEME == "light"
+  if $COLOR_THEME ==? 'light'
 
     silent! colorscheme base16-classic-light
   else
@@ -258,63 +258,38 @@ let g:matchup_surround_enabled = 1
 " Enable tmux to be mapped to '+' register
 let g:vim_fakeclip_tmux_plus=1
 
-" COC language server {{{
+" LSP {{{
+if has ('nvim-0.5')
+lua << EOF
+require'nvim_lsp'.pyls.setup{}
+require'nvim_lsp'.tsserver.setup{}
+require'nvim_lsp'.bashls.setup{}
+require'nvim_lsp'.vimls.setup{}
+EOF
 
-if executable('node')
-  let g:coc_global_extensions = [
-        \ 'coc-css',
-        \ 'coc-emoji',
-        \ 'coc-highlight',
-        \ 'coc-html',
-        \ 'coc-json',
-        \ 'coc-prettier',
-        \ 'coc-python',
-        \ 'coc-tsserver',
-        \ 'coc-ultisnips',
-        \ 'coc-vimlsp',
-        \ 'coc-yaml'
-        \]
+  function! LSPSetMappings()
+      setlocal omnifunc=v:lua.vim.lsp.omnifunc
 
-  " :Prettier/:PrettierAsync for formatting
-  command! -nargs=0 Prettier :call CocAction('runCommand', 'prettier.formatFile')
-  command! -nargs=0 PrettierAsync :call CocAction('runCommand', 'prettier.formatFile')
+      nnoremap <silent> <buffer> gd    <cmd>lua vim.lsp.buf.declaration()<CR>
+      nnoremap <silent> <buffer> <c-]> <cmd>lua vim.lsp.buf.definition()<CR>
+      nnoremap <silent> <buffer> K     <cmd>lua vim.lsp.buf.hover()<CR>
+      nnoremap <silent> <buffer> gD    <cmd>lua vim.lsp.buf.implementation()<CR>
+      nnoremap <silent> <buffer> <c-k> <cmd>lua vim.lsp.buf.signature_help()<CR>
+      nnoremap <silent> <buffer> 1gD   <cmd>lua vim.lsp.buf.type_definition()<CR>
+      nnoremap <silent> <buffer> gr    <cmd>lua vim.lsp.buf.references()<CR>
+      nnoremap <silent> <buffer> gR    <cmd>lua vim.lsp.buf.rename()<CR>
+      nnoremap <silent> <buffer> gW    <cmd>lua vim.lsp.buf.workspace_symbol()<CR>
+      " nnoremap <silent> <buffer> <leader>F    <cmd>lua vim.lsp.buf.formatting_sync(nil, 10000)<CR>
+  endfunction
 
-  augroup coc_setup
+  augroup lsp_mappings
     autocmd!
 
-    " Close preview window when completion is done
-    autocmd InsertLeave,CompleteDone * if pumvisible() == 0 | pclose | endif
+    autocmd FileType javascript,javascriptreact,javascript.tsx,python,sh,typescript,typescriptreact,typescript.tsx,vim :call LSPSetMappings()
+    autocmd BufWritePre javascript,python,sh,typescript,vim lua vim.lsp.buf.formatting_sync(nil, 1000)
   augroup END
 
-  augroup automake
-    autocmd!
 
-    " COC handles auto-linting . Setup formatting via prettier
-    autocmd BufWritePre *.js,*.json,*.ts Prettier
-  augroup END
-
-  " Trigger completion via same as omni-completion
-  inoremap <silent><expr> <C-x><C-o> coc#refresh()
-
-  nnoremap <silent> <leader>lk <Plug>(coc-action-doHover)
-
-  " Note: These do not work with `noremap`
-  nmap <leader>lc <Plug>(coc-references)
-  nmap <leader>ld <Plug>(coc-definition)
-  nmap <leader>li <Plug>(coc-implementation)
-  nmap <leader>lr <Plug>(coc-rename)
-  nmap <leader>ls <Plug>(coc-documentSymbols)
-  nmap <leader>lt <Plug>(coc-type-definition)
-
-  vmap <leader>lf <Plug>(coc-format-selected)
-  nmap <leader>lf <Plug>(coc-format-selected)
-
-  nmap <silent> [c <Plug>(coc-diagnostic-prev)
-  nmap <silent> ]c <Plug>(coc-diagnostic-next)
-
-  " Navigation snippet sections with C-j/k
-  let g:coc_snippet_next = '<C-j>'
-  let g:coc_snippet_prev = '<C-k>'
 endif
 " }}}
 
