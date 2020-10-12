@@ -72,9 +72,6 @@ Plug 'cazador481/fakeclip.neovim'
 " Snippet support, see configuration below
 " Plug 'SirVer/ultisnips'
 " Fade inactive buffers
-if has('python3') && has("nvim-0.4.3")
-  Plug 'TaDaa/vimade'
-endif
 " Set `path` for various file types
 " TODO: Learn more about this config
 Plug 'tpope/vim-apathy'
@@ -117,7 +114,9 @@ Plug 'vim-scripts/ReplaceWithRegister'
 if filereadable('/usr/share/doc/fzf/examples/fzf.vim')
   " Use locally-installed FZF plugin
   Plug '/usr/share/doc/fzf/examples'
-  Plug 'junegunn/fzf.vim'
+  Plug 'junegunn/fzf.vim', { 'commit': '23dda8602f138a9d75dd03803a79733ee783e356' }
+  " Workaround bug https://github.com/junegunn/fzf.vim/issues/1104
+  " Plug 'junegunn/fzf.vim'
 end
 " Show register contents when using " or @ in normal mode
 " Also shows when hitting <c-r> in insert mode
