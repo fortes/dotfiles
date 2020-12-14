@@ -74,7 +74,7 @@ export FZF_CTRL_T_OPTS="--ansi --preview-window 'right:50%' $fzf_preview_command
 # Case insensitive by default
 export FZF_COMPLETION_OPTS='-i'
 
-if [ -z "$XDG_CONFIG_HOME" ]; then
+if [ -z "${XDG_CONFIG_HOME:-}" ]; then
   export XDG_CACHE_HOME="$HOME/.cache"
   export XDG_CONFIG_HOME="$HOME/.config"
   export XDG_DATA_HOME="$HOME/.local/share"
