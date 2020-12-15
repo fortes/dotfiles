@@ -69,6 +69,8 @@ Plug 'inside/vim-search-pulse'
 Plug 'justinmk/vim-sneak'
 " Share clipboard with tmux
 Plug 'cazador481/fakeclip.neovim'
+" Copy via OSC52
+Plug 'ojroques/vim-oscyank'
 " Snippet support, see configuration below
 " Plug 'SirVer/ultisnips'
 " Fade inactive buffers
@@ -256,6 +258,10 @@ let g:matchup_surround_enabled = 1
 
 " Enable tmux to be mapped to '+' register
 let g:vim_fakeclip_tmux_plus=1
+
+" Copy yank register to system via <leader>y
+nnoremap <leader>y :OSCYank<cr>
+vnoremap <leader>y :<C-u>norm! gvy<cr>:OSCYank<cr>
 
 " COC language server {{{
 
