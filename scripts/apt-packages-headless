@@ -52,6 +52,7 @@ ssh-import-id
 sshfs
 stow
 sudo
+tig
 tmux
 unzip
 vifm
