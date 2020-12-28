@@ -69,6 +69,8 @@ Plug 'inside/vim-search-pulse'
 Plug 'justinmk/vim-sneak'
 " Share clipboard with tmux
 Plug 'cazador481/fakeclip.neovim'
+" Copy via OSC52
+Plug 'ojroques/vim-oscyank'
 " Snippet support, see configuration below
 " Plug 'SirVer/ultisnips'
 " Fade inactive buffers
@@ -117,7 +119,9 @@ Plug 'vim-scripts/ReplaceWithRegister'
 if filereadable('/usr/share/doc/fzf/examples/fzf.vim')
   " Use locally-installed FZF plugin
   Plug '/usr/share/doc/fzf/examples'
-  Plug 'junegunn/fzf.vim'
+  Plug 'junegunn/fzf.vim', { 'commit': '23dda8602f138a9d75dd03803a79733ee783e356' }
+  " Workaround bug https://github.com/junegunn/fzf.vim/issues/1104
+  " Plug 'junegunn/fzf.vim'
 end
 " Show register contents when using " or @ in normal mode
 " Also shows when hitting <c-r> in insert mode
@@ -288,10 +292,12 @@ EOF
     autocmd FileType javascript,javascriptreact,javascript.tsx,python,sh,typescript,typescriptreact,typescript.tsx,vim :call LSPSetMappings()
     autocmd BufWritePre javascript,python,sh,typescript,vim lua vim.lsp.buf.formatting_sync(nil, 1000)
   augroup END
-
-
 endif
 " }}}
+
+" Copy yank register to system via <leader>y
+nnoremap <leader>y :OSCYank<cr>
+vnoremap <leader>y :<C-u>norm! gvy<cr>:OSCYank<cr>
 
 " Fuzzy Finding (FZF) {{{
 if executable('fzf')

@@ -263,8 +263,8 @@ setup_shell() {
   local current_shell="$(getent passwd $(id -un) | awk -F : '{print $NF}')"
 
   if [[ "${current_shell}" != "${bash_path}" ]]; then
-    echo "Changing shell to bash"
-    chsh -s "${bash_path}"
+    echo "Changing shell to bash (requires sudo)"
+    sudo chsh -s "${bash_path}" "$(whoami)"
   fi
 }
 
