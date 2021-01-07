@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Setup Debian unstable source and install packages
+# Setup Zerotier
 #
 # Usage: setup_debian_unstable
 
@@ -19,7 +19,7 @@ main() {
     echo "deb http://download.zerotier.com/debian/buster buster main" \
       | sudo tee "$zerotier_sources_list"
 
-    echo "Unstable sources added, updating packages"
+    echo "Zerotier sources added, updating packages"
     sudo -E apt-get update -qq
   fi
 
