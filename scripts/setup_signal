@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# Install Signal Desktop Client
+#
+# Usage: setup_debian_unstable
+
+set -euo pipefail
+IFS=$'\n\t'
+export DEBIAN_FRONTEND=noninteractive
+
+main() {
+  declare -r signal_sources_list="/etc/apt/sources.list.d/signal-xenial.list"
+  declare -r signal_key_url="https://updates.signal.org/desktop/apt/keys.asc"
+
+  if [ ! -f "$signal_sources_list" ]; then
+    echo "Adding signal GPG key (requires sudo)"
+    curl -sS "$signal_key_url" | sudo -E apt-key add -
+
+    echo "signal sources list missing, adding (requires sudo)"
+    echo "deb [arch=amd64] https://updates.signal.org/desktop/apt xenial main" \
+      | sudo tee "$signal_sources_list"
+
+    echo "Signal sources added, updating packages"
+    sudo -E apt-get update -qq
+  fi
+
+  echo "Installing signal package (requires sudo)"
+  sudo -E apt-get install -qq --assume-yes \
+    --fix-broken --no-install-recommends signal-desktop
+}
+
+main
+
