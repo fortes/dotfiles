@@ -36,6 +36,8 @@ install_hugo() {
   echo "Installing hugo (requires sudo)"
   sudo dpkg -i hugo.deb
   rm hugo.deb
+  echo "Generating bash completion"
+  hugo gen autocomplete --completionfile="$HOME/.local/completion.d/hugo_completion"
   popd > /dev/null
 }
 
