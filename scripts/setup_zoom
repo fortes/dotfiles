@@ -17,8 +17,8 @@ main() {
 
   echo "Downloading latest Zoom .deb"
   wget "${zoom_deb_url}" -O "${zoom_deb_temp_path}"
-  echo "Installing latest Zoom .deb"
-  sudo dpkg -i "${zoom_deb_temp_path}"
+  echo "Installing latest Zoom .deb (requires sudo)"
+  sudo dpkg --install "${zoom_deb_temp_path}"
   rm -rf "${zoom_deb_temp_path}"
 }
 
