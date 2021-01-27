@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# Install Brave Web Browser
+#
+# Usage: setup_brave
+
+set -euo pipefail
+IFS=$'\n\t'
+export DEBIAN_FRONTEND=noninteractive
+
+main() {
+  declare -r brave_sources_list="/etc/apt/sources.list.d/brave.list"
+  declare -r brave_key_url="https://brave-browser-apt-release.s3.brave.com/brave-core.asc"
+
+  if [ ! -f "$brave_sources_list" ]; then
+    echo "Installing pre-requisites (requires sudo)"
+    sudo -E apt-get install -qq --assume-yes \
+      --fix-broken --no-install-recommends apt-transport-https curl gnupg
+
+    echo "Adding Brave GPG key (requires sudo)"
+    curl -sS "$brave_key_url" | sudo -E apt-key add -
+
+    echo "Brave sources list missing, adding (requires sudo)"
+    echo "deb [arch=amd64] https://brave-browser-apt-release.s3.brave.com/ stable main" \
+      | sudo tee "$brave_sources_list"
+
+    echo "Brave sources added, updating packages"
+    sudo -E apt-get update -qq
+  fi
+
+  echo "Installing Brave package (requires sudo)"
+  sudo -E apt-get install -qq --assume-yes \
+    --fix-broken --no-install-recommends brave-browser
+}
+
+main
