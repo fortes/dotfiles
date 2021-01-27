@@ -288,7 +288,8 @@ main() {
 
   setup_nonfree
   setup_backports
-  [[ -z "${IS_HEADLESS:-}" ]] && setup_multimedia
+  # cmus in backports is recent enough right now
+  # [[ -z "${IS_HEADLESS:-}" ]] && setup_multimedia
   install_apt_packages
 
   # Debian ships with these two by default
