@@ -83,7 +83,7 @@ fi
 # Rg, for whatever reason, needs to manually specify location for config
 export RIPGREP_CONFIG_PATH="$XDG_CONFIG_HOME/ripgrep/rc"
 
-if [ -z "$SSH_AUTH_SOCK" ] && command_exists keychain; then
+if [ -z "${SSH_AUTH_SOCK:-}" ] && command_exists keychain; then
   # Don't prompt for password to load id_rsa if not already loaded
   eval "$(keychain --eval --noask --agents ssh --quiet)"
 fi
