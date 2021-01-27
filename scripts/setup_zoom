@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Setup Zoom Meetings client
+#
+# Usage: setup_zoom
+
+set -euo pipefail
+IFS=$'\n\t'
+export DEBIAN_FRONTEND=noninteractive
+
+main() {
+  declare -r zoom_deb_url="https://zoom.us/client/latest/zoom_amd64.deb"
+  declare -r zoom_deb_temp_path="/tmp/zoom_amd64.deb"
+
+  echo "Installing pre-requisites"
+  sudo -E apt-get install -qq --assume-yes \
+    --fix-broken --no-install-recommends libgl1-mesa-glx libxcb-xtest0
+
+  echo "Downloading latest Zoom .deb"
+  wget "${zoom_deb_url}" -O "${zoom_deb_temp_path}"
+  echo "Installing latest Zoom .deb"
+  sudo dpkg -i "${zoom_deb_temp_path}"
+  rm -rf "${zoom_deb_temp_path}"
+}
+
+main

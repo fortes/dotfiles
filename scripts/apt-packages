@@ -28,6 +28,7 @@ rofi
 slop
 software-properties-common
 wicd-curses
+x11-xserver-utils
 xdotool
 xinit
 xsel
