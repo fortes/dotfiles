@@ -29,6 +29,8 @@
   verbose = true
 [core]
   excludesfile = ~/.config/git/ignore.global
+  # Don't fail if `diff-so-fancy` isn't installed
+  pager = command -v diff-so-fancy > /dev/null && diff-so-fancy | less --tabs=2 -RFX || less --tabs=2 -RFX
   whitespace = space-before-tab,tab-in-indent,blank-at-eof,trailing-space,tabwidth=2
 [diff]
   algorithm = minimal

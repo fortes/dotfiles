@@ -11,6 +11,10 @@ set -euo pipefail
 IFS=$'\n\t'
 export DEBIAN_FRONTEND=noninteractive
 
+echo_stderr() {
+  >&2 echo "${@}"
+}
+
 get_latest_release_url() {
   local repo="$1"
   local match="$2"
@@ -21,6 +25,10 @@ get_latest_release_url() {
 
 install_bat() {
   local url="$(get_latest_release_url 'sharkdp/bat' 'bat_.*amd64.deb')"
+  if [[ -z "${url}" ]]; then
+    echo_stderr "Could not find url"
+    exit 2
+  fi
   pushd /tmp > /dev/null
   wget --quiet -O bat.deb "${url}"
   echo "Installing bat (requires sudo)"
@@ -31,6 +39,10 @@ install_bat() {
 
 install_hugo() {
   local url="$(get_latest_release_url 'gohugoio/hugo' 'hugo_extended.*Linux-64bit\.deb')"
+  if [[ -z "${url}" ]]; then
+    echo_stderr "Could not find url"
+    exit 2
+  fi
   pushd /tmp > /dev/null
   wget --quiet -O hugo.deb "${url}"
   echo "Installing hugo (requires sudo)"
@@ -38,6 +50,20 @@ install_hugo() {
   rm hugo.deb
   echo "Generating bash completion"
   hugo gen autocomplete --completionfile="$HOME/.local/completion.d/hugo_completion"
+  popd > /dev/null
+}
+
+install_sad() {
+  local url="$(get_latest_release_url 'ms-jpq/sad' 'x86_64-unknown-linux-gnu.deb')"
+  if [[ -z "${url}" ]]; then
+    echo_stderr "Could not find url"
+    exit 2
+  fi
+  pushd /tmp > /dev/null
+  wget -O sad.deb "${url}"
+  echo "Installing sad (requires sudo)"
+  sudo dpkg -i sad.deb
+  rm sad.deb
   popd > /dev/null
 }
 
@@ -62,9 +88,10 @@ install_neovim_nightly() {
 main() {
   . "$HOME/.profile.local"
 
-  install_neovim_nightly
   install_bat
   install_hugo
+  install_neovim_nightly
+  install_sad
 }
 
 main
