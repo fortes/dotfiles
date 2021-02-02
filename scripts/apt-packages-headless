@@ -54,6 +54,7 @@ stow
 sudo
 tig
 tmux
+trash-cli
 unzip
 vifm
 wamerican
