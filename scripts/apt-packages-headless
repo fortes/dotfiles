@@ -7,6 +7,7 @@ avahi-daemon
 avahi-dnsconfd
 avahi-utils
 bash-completion
+bat
 build-essential
 ca-certificates
 curl

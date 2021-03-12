@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Install some specific packages directly from GitHub. Specifically:
 #
-# - Bat
 # - Hugo
 # - Neovim
+# - Sad
 #
 # Usage `install_github_packages`
 
@@ -21,20 +21,6 @@ get_latest_release_url() {
 
   local release_json_url="https://api.github.com/repos/${repo}/releases/latest"
   curl --silent "${release_json_url}" | jq -r '.assets[].browser_download_url' | grep "${match}"
-}
-
-install_bat() {
-  local url="$(get_latest_release_url 'sharkdp/bat' 'bat_.*amd64.deb')"
-  if [[ -z "${url}" ]]; then
-    echo_stderr "Could not find url"
-    exit 2
-  fi
-  pushd /tmp > /dev/null
-  wget --quiet -O bat.deb "${url}"
-  echo "Installing bat (requires sudo)"
-  sudo dpkg -i bat.deb
-  rm bat.deb
-  popd > /dev/null
 }
 
 install_hugo() {
@@ -88,7 +74,6 @@ install_neovim_nightly() {
 main() {
   . "$HOME/.profile.local"
 
-  install_bat
   install_hugo
   install_neovim_nightly
   install_sad
