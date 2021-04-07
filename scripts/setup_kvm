@@ -11,7 +11,7 @@ main() {
   echo "Installing KVM packages (requires sudo)"
   sudo -E apt-get install -qq --assume-yes \
     --fix-broken --no-install-recommends \
-    qemu-kvm libvirt-clients libvirt-daemon-system virtinst dnsmasq-base
+    qemu-kvm libvirt-clients libvirt-daemon-system virtinst dnsmasq-base ovmf
 
   # Can hit all sorts of polkit errors if you don't do this
   echo "Add user to libvirt group (requires sudo)"
