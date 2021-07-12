@@ -53,9 +53,9 @@ install_sad() {
   popd > /dev/null
 }
 
-install_neovim_nightly() {
-  echo "Installing neovim nightly"
-  wget "https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage" \
+install_neovim_stable() {
+  echo "Installing neovim stable"
+  wget "https://github.com/neovim/neovim/releases/download/stable/nvim.appimage" \
     --quiet --output-document "$HOME/.local/bin/nvim"
   chmod +x "$HOME/.local/bin/nvim"
 
@@ -75,7 +75,7 @@ main() {
   . "$HOME/.profile.local"
 
   install_hugo
-  install_neovim_nightly
+  install_neovim_stable
   install_sad
 }
 
