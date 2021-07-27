@@ -16,7 +16,7 @@ Once you've run setup, you'll still have to do the following manual steps:
 1. Generate this machine's SSH keys:
 
    ```sh
-   ssh-keygen -t rsa -b 4096 -C "$(hostname)"
+   ssh-keygen -t ed25519 -C "$(hostname)"
    ```
 
 Then add the key into GitHub and wherever else
