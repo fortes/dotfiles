@@ -115,10 +115,8 @@ Plug 'vim-scripts/ReplaceWithRegister'
 " Use FZF for fuzzy finding
 if filereadable('/usr/share/doc/fzf/examples/fzf.vim')
   " Use locally-installed FZF plugin
-  Plug '/usr/share/doc/fzf/examples'
-  Plug 'junegunn/fzf.vim', { 'commit': '23dda8602f138a9d75dd03803a79733ee783e356' }
-  " Workaround bug https://github.com/junegunn/fzf.vim/issues/1104
-  " Plug 'junegunn/fzf.vim'
+  Plug 'junegunn/fzf'
+  Plug 'junegunn/fzf.vim'
 end
 " Show register contents when using " or @ in normal mode
 " Also shows when hitting <c-r> in insert mode
