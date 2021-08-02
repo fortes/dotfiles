@@ -16,7 +16,7 @@ main() {
       --recv-key C99B11DEB97541F0
 
     echo "GitHub CLI sources list missing, adding (requires sudo)"
-    echo "deb https://cli.github.com/packages buster main" \
+    echo "deb https://cli.github.com/packages bullseye main" \
       | sudo tee "$github_cli_sources_list"
 
     echo "GitHub CLI sources added, updating packages"
