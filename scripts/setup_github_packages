@@ -2,8 +2,10 @@
 # Install some specific packages directly from GitHub. Specifically:
 #
 # - Bat
+# - FZF
 # - Hugo
 # - Neovim
+# - Sad
 #
 # Usage `install_github_packages`
 
@@ -34,6 +36,20 @@ install_bat() {
   echo "Installing bat (requires sudo)"
   sudo dpkg -i bat.deb
   rm bat.deb
+  popd > /dev/null
+}
+
+install_fzf() {
+  local url="$(get_latest_release_url 'junegunn/fzf' 'linux_amd64.tar.gz')"
+  if [[ -z "${url}" ]]; then
+    echo_stderr "Could not find url"
+    exit 2
+  fi
+  pushd /tmp > /dev/null
+  wget --quiet -O fzf.tar.gz "${url}"
+  echo "Installing fzf"
+  tar -zxvf fzf.tar.gz > /dev/null
+  mv fzf "$HOME/.local/bin/fzf"
   popd > /dev/null
 }
 
@@ -89,6 +105,7 @@ main() {
   . "$HOME/.profile.local"
 
   install_bat
+  install_fzf
   install_hugo
   install_neovim_stable
   install_sad
