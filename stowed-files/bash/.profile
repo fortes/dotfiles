@@ -56,8 +56,8 @@ add_to_path "$HOME/.local/bin"
 export LIBVIRT_DEFAULT_URI="qemu:///system"
 
 fzf_preview_command=""
-if command_exists bat; then
-  fzf_preview_command="--preview 'bat --color always --style=grid,changes --line-range :300 {}'"
+if command_exists batcat; then
+  fzf_preview_command="--preview 'batcat --color always --style=grid,changes --line-range :300 {}'"
 else
   fzf_preview_command="--preview 'cat {}'"
 fi
