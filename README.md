@@ -5,7 +5,7 @@ This is only public so I can easily share it across machines. There is probably 
 ## Letting me own your machine
 
 ```sh
-git checkout https://github.com/fortes/dotfiles.git
+git clone https://github.com/fortes/dotfiles.git --branch debian-bullseye
 ./dotfiles/scripts/setup_machine
 ```
 
