@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Setup GitHub CLI utility
 #
-# Usage: setup_debian_unstable
+# Usage: setup_github_cli
 
 set -euo pipefail
 IFS=$'\n\t'

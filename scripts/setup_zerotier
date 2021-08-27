@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Setup Zerotier
 #
-# Usage: setup_debian_unstable
+# Usage: setup_zerotier
 
 set -euo pipefail
 IFS=$'\n\t'
