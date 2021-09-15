@@ -111,7 +111,13 @@ JOB_COUNT="$BOLD$BLUE[\j]$RESET "
 export PROMPT_COMMAND="history -a; HAS_JOBS=\`jobs -p\` "
 PS1="$BASE_PROMPT ""\${HAS_JOBS:+$JOB_COUNT}"
 
-if [ -r /etc/bash_completion.d/git-prompt ]; then
+git_prompt_location="/etc/bash_completion.d/git-prompt"
+if [ ! -r "$git_prompt_location" ]; then
+  # Homebrew
+  git_prompt_location="/usr/local/etc/bash_completion.d/git-prompt.sh"
+fi
+
+if [ -r "$git_prompt_location" ]; then
   # Show colored hint about dirty state
   export GIT_PS1_SHOWCOLORHINTS=1
   # Show staged/unstaged changes marker
@@ -120,7 +126,7 @@ if [ -r /etc/bash_completion.d/git-prompt ]; then
   export GIT_PS1_SHOWUNTRACKEDFILES=1
   # Suppress prompt when within an ignored dir
   export GIT_PS1_HIDE_IF_PWD_IGNORED=1
-  source /etc/bash_completion.d/git-prompt
+  source "$git_prompt_location"
   export PROMPT_COMMAND="$PROMPT_COMMAND; __git_ps1 \"$BASE_PROMPT\" \" \${HAS_JOBS:+$JOB_COUNT }\" \" %s$RESET\""
 fi
 
@@ -132,11 +138,15 @@ if command_exists dircolors; then
   fi
 fi
 
-# FZF keybindings
+# FZF keybindings (Debian)
 source_if_exists "/usr/share/doc/fzf/examples/key-bindings.bash"
+# FZF keybindings (Homebrew)
+source_if_exists "/usr/local/opt/fzf/shell/key-bindings.bash"
 
 # Load system bash completion
 source_if_exists "/etc/bash_completion"
+# Load homebrew bash completion
+source_if_exists "/usr/local/etc/bash_completion"
 # Load local bash completion
 source_if_exists "$HOME/.local/completion.d"
 
