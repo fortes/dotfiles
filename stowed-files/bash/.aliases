@@ -8,7 +8,7 @@ alias sf='TZ="America/Los_Angeles" date'
 alias rio='TZ="America/Sao_Paulo" date'
 alias utc='TZ="UTC" date'
 
-if command -v dig > /dev/null; then
+if command_exists dig > /dev/null; then
   alias myip="dig +short myip.opendns.com @resolver1.opendns.com"
   alias mygeo="curl -w \"\\n\" http://api.hackertarget.com/geoip/\?q=\`myip\`"
 fi
@@ -19,7 +19,7 @@ alias mv='mv -i'
 # CD into root of git project via `...`
 alias ...="cd \$(git rev-parse --show-toplevel 2>/dev/null || echo '.')"
 
-if command -v fzf-tmux > /dev/null; then
+if command_exists fzf-tmux > /dev/null; then
   # CD into a directory within the project, selecting via fzf
   alias cdp="git ls-files \$(git rev-parse --show-toplevel) | xargs -n1 dirname | sort | uniq | fzf-tmux || echo '.' | xargs --no-run-if-empty cd"
 
@@ -28,11 +28,11 @@ if command -v fzf-tmux > /dev/null; then
 fi
 
 # Add current project NPM to path
-if command -v npm > /dev/null; then
+if command_exists npm > /dev/null; then
   alias npath='export PATH=$(npm bin):$PATH'
 fi
 
-if command -v docker > /dev/null; then
+if command_exists docker > /dev/null; then
   # Always use docker with sudo
   alias docker="sudo docker"
 fi
@@ -46,7 +46,7 @@ alias ll='ls --color=auto -AlpFhv'
 alias feh='feh --scale-down'
 
 # Shortcuts for copying from tmux clipboard to system clipboard
-if command -v xclip > /dev/null; then
+if command_exists xclip > /dev/null; then
   alias tcopy='tmux save-buffer - | xclip -i -sel clipboard'
 fi
 
