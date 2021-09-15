@@ -43,7 +43,9 @@ alias la='ls --color=auto -ApFhv'
 alias ll='ls --color=auto -AlpFhv'
 
 # Make feh nicer in i3
-alias feh='feh --scale-down'
+if command -v feh > /dev/null; then
+  alias feh='feh --scale-down'
+fi
 
 # Shortcuts for copying from tmux clipboard to system clipboard
 if command_exists xclip > /dev/null; then
