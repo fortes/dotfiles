@@ -124,6 +124,14 @@ if [ -r /etc/bash_completion.d/git-prompt ]; then
   export PROMPT_COMMAND="$PROMPT_COMMAND; __git_ps1 \"$BASE_PROMPT\" \" \${HAS_JOBS:+$JOB_COUNT }\" \" %s$RESET\""
 fi
 
+if command_exists dircolors; then
+  if [[ -r "$HOME/.dircolors" ]]; then
+    eval $(dircolors -b "$HOME/.dircolors")
+  else
+    eval $(dircolors -b)
+  fi
+fi
+
 # FZF keybindings
 source_if_exists "/usr/share/doc/fzf/examples/key-bindings.bash"
 
