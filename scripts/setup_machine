@@ -86,15 +86,14 @@ install_node_packages() {
 }
 
 install_neovim_plugins() {
-  local nvim_config_dir="$HOME/.config/nvim"
+  local nvim_share_dir="$HOME/.local/share/nvim"
 
-  if [ ! -f "$nvim_config_dir/autoload/plug.vim" ]; then
-    echo "Installing vim-plug"
-    curl -fLo "$nvim_config_dir/autoload/plug.vim" --create-dirs \
-      https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim \
-      2> /dev/null
-    echo "vim-plug installed, installing Neovim plugins"
-    nvim +PlugInstall +UpdateRemotePlugins +qall
+  if [ ! -d "$nvim_share_dir/site/pack/packer" ]; then
+    echo "Installing packer.nvim"
+    git clone --depth 1 https://github.com/wbthomason/packer.nvim \
+      "${nvim_share_dir}/site/pack/packer/start/packer.nvim"
+    echo "packer.nvim installed, installing packages"
+    nvim --headless -c 'autocmd User PackerComplete quitall' -c 'PackerSync'
   fi
 }
 

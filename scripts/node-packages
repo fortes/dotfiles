@@ -2,12 +2,10 @@ bash-language-server
 diff-so-fancy
 dockerfile-language-server-nodejs
 fx
-typescript-language-server
 npm
 prettier
 ts-node
 typescript
+typescript-language-server
 vim-language-server
-vscode-css-languageserver-bin
-vscode-html-languageserver-bin
-vscode-json-languageserver-bin
+vscode-langservers-extracted

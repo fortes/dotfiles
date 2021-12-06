@@ -10,7 +10,7 @@ pygments
 pylast
 pylint
 pylistenbrainz
-python-language-server
+python-lsp-server
 tldr
 vim-vint
 virtualenv

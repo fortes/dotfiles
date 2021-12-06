@@ -713,8 +713,9 @@ if has('eval')
 endif
 " }}}
 
-" Re-generate spelling files if modified
 if has('spell')
+  set spelllang=en_us,pt_pt
+  " Re-generate spelling files if modified
   for d in glob(fnamemodify($MYVIMRC, ':h').'/spell/*.add', 1, 1)
     if getftime(d) > getftime(d.'.spl')
       exec 'mkspell! ' . fnameescape(d)
