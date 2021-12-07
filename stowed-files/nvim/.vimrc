@@ -208,12 +208,8 @@ set wildignorecase
 
 " Status line {{{
 if has('statusline')
-  if v:version >= 704
-    " Show git repo information (if available)
-    let g:activeStatusLine='%{StatuslineTag()}»'
-  else
-    let g:activeStatusLine=''
-  endif
+  " Show git repo information (if available)
+  let g:activeStatusLine='%{StatuslineTag()}»'
   " Relative path to file in current buffer
   let g:activeStatusLine.='%<%f '
   " Exclamation mark if not modifiable, + if modified
@@ -223,9 +219,9 @@ if has('statusline')
   " Line/col/percent
   let g:activeStatusLine.='%l:%2c '
   function! StatuslineTag()
-    if exists('b:git_dir')
+    if exists('g:loaded_fugitive')
       " Shitty unicode character w/o patched fonts
-      return '‡'.fugitive#head(7)
+      return '‡'.fugitive#head()
     else
       return fnamemodify(getwinvar(0, 'getcwd', getcwd()), ':t')
     endif
