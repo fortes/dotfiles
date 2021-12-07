@@ -2,25 +2,25 @@
 
 [alias]
   # Fuzzy add modified files, optionally via patch
-  addm = "!git ls-files --deleted --modified --other --exclude-standard | fzf-tmux -0 -m --preview 'git diff --color=always {-1}' | xargs --no-run-if-empty git add"
-  addmp = "!git ls-files --deleted --modified --exclude-standard | fzf-tmux -0 -m --preview 'git diff --color=always {-1}' | xargs --open-tty --no-run-if-empty git add -p"
+  addm = "!git ls-files --deleted --modified --other --exclude-standard | fzf-tmux -0 -m --preview 'git diff --color=always {-1}' | xargs -r git add"
+  addmp = "!git ls-files --deleted --modified --exclude-standard | fzf-tmux -0 -m --preview 'git diff --color=always {-1}' | xargs -r -o git add -p"
   # Add all changes to last commit
   append = "commit --all --amend --no-edit"
   # Fuzzy checkout a branch, showing most recent commit
-  cb = "!git branch --all | grep -v '^[*+]' | awk '{print $1}' | fzf-tmux -0 --preview 'git show --color=always {-1}' | sed 's/remotes\\/origin\\///g' | xargs --no-run-if-empty git checkout"
+  cb = "!git branch --all | grep -v '^[*+]' | awk '{print $1}' | fzf-tmux -0 --preview 'git show --color=always {-1}' | sed 's/remotes\\/origin\\///g' | xargs -r git checkout"
   # Fuzzy apply a stash
-  cs = "!git stash list | fzf-tmux -0 --preview 'git show --pretty=oneline --color=always --patch \"$(echo {} | cut -d: -f1)\"' | cut -d: -f1 | xargs --no-run-if-empty git stash pop"
+  cs = "!git stash list | fzf-tmux -0 --preview 'git show --pretty=oneline --color=always --patch \"$(echo {} | cut -d: -f1)\"' | cut -d: -f1 | xargs -r git stash pop"
   # Fuzzy (force) delete a branch, showing most recent commit
-  db = "!git branch | grep -v '^[*+]' | awk '{print $1}' | fzf-tmux -0 --multi --preview 'git show --color=always {-1}' | xargs --no-run-if-empty git branch --delete"
-  Db = "!git branch | grep -v '^[*+]' | awk '{print $1}' | fzf-tmux -0 --multi --preview 'git show --color=always {-1}' | xargs --no-run-if-empty git branch --delete --force"
+  db = "!git branch | grep -v '^[*+]' | awk '{print $1}' | fzf-tmux -0 --multi --preview 'git show --color=always {-1}' | xargs -r git branch --delete"
+  Db = "!git branch | grep -v '^[*+]' | awk '{print $1}' | fzf-tmux -0 --multi --preview 'git show --color=always {-1}' | xargs -r git branch --delete --force"
   # Delete merged branches
-  dm = "!git fetch && git branch --merged | grep -v '^[*+]' | xargs --no-run-if-empty git branch --delete --force"
+  dm = "!git fetch && git branch --merged | grep -v '^[*+]' | xargs -r git branch --delete --force"
   # Fuzzy delete a stash
-  ds = "!git stash list | fzf-tmux -0 --preview 'git show --pretty=oneline --color=always --patch \"$(echo {} | cut -d: -f1)\"' | cut -d: -f1 | xargs --no-run-if-empty git stash drop"
+  ds = "!git stash list | fzf-tmux -0 --preview 'git show --pretty=oneline --color=always --patch \"$(echo {} | cut -d: -f1)\"' | cut -d: -f1 | xargs -r git stash drop"
   # Select modified files to edit
-  edit = "!git ls-files --modified --other --exclude-standard | sort -u | fzf-tmux -0 --multi --preview 'git diff --color {}' | xargs --no-run-if-empty $EDITOR -p"
+  edit = "!git ls-files --modified --other --exclude-standard | sort -u | fzf-tmux -0 --multi --preview 'git diff --color {}' | xargs -r $EDITOR -p"
   # Create a fixup commit to the selected commit
-  fixup = "!git log --oneline --no-decorate --no-merges | fzf-tmux -0 --preview 'git show --color=always --format=oneline {1}' | awk '{print $1}' | xargs --no-run-if-empty git commit --fixup"
+  fixup = "!git log --oneline --no-decorate --no-merges | fzf-tmux -0 --preview 'git show --color=always --format=oneline {1}' | awk '{print $1}' | xargs -r git commit --fixup"
   # Fetch and rebase
   frb = "!git fetch --prune && git rebase --autostash origin/master"
   # Undo last commit, but keeping changes
