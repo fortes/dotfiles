@@ -344,8 +344,10 @@ set showbreak=«
 " }}}
 
 " Colors & Syntax Highlighting {{{
-" Base install has some lame themes, this one is OK, I guess
-silent! colorscheme desert
+if !exists('g:colors_name')
+  " Base install has some lame themes, this one is OK, I guess
+  silent! colorscheme desert
+endif
 
 " Enable syntax highlighting by default
 if has('syntax')
