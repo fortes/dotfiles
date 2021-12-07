@@ -1,7 +1,4 @@
-" vim:fdm=marker et fdl=2 ft=vim sts=2 sw=2 ts=2
-" Use modern encoding
-set encoding=utf-8
-scriptencoding utf-8
+" vim:fdm=marker et fdl=3 ft=vim sts=2 sw=2 ts=2
 
 " Configuration for vanilla (neo)vim, with no plugins
 
@@ -10,61 +7,58 @@ if !has('nvim')
   " Default vaules (or removed) in Neovim (see :help vim-differences). Make sure
   " we're working with the same baseline here.
 
-  " Basic auto indentation
   set autoindent
-  " Automatically reload modified files
   set autoread
-  " Remove silly restrictions from backspace
+  set background=dark
   set backspace=indent,eol,start
-  " Shhhh
   set belloff=all
-  " Don't scan included files for keyword completion (too slow)
+  " vint: -ProhibitSetNoCompatible
+  set nocompatible
+  " vint: +ProhibitSetNoCompatible
   set complete-=i
-  " Display as much as possible as last line, instead of just showing @
-  set display=lastline,msgsep
-  " Default formatoptions in neovim: tcqj
-  " t Wrap text using textwidth
-  " c Wrap comments using textwidth, inserting comment leader automatically.
-  " q Allow formatting of comments with "gq"
+  set cscopeverbose
+  " nvim also sets `msgsep`, but that doesn't exist in vim 8.2 on Mac
+  set display=lastline
+  set encoding=utf-8
   set formatoptions=tcq
   if v:version >= 704
-    " j Remove comment leader when joining lines (added in Vim 7.4)
     set formatoptions+=j
   endif
-  " Default history store
+  set nofsync
+  set hidden
   set history=10000
-  " Highlight search results
   set hlsearch
-  " Show incremental search matches
   set incsearch
+  set nojoinspaces
   if has('langmap') && (v:version > 704 || v:version == 704 && has('patch502'))
-    " Disable langmap for characters from a mapping (on by default in neovim)
     set langnoremap
   endif
-  " Support mouse
-  set mouse=a
-  " The future is now!
-  set nocompatible
-  " Show cursor position in bottom right
+  set laststatus=2
+  set nrformats=bin,hex
   set ruler
-  " Neovim default
   set sessionoptions-=options
-  " Backspace should delete tabwidth of characters
+  set showcmd
+  set sidescroll=1
   set smarttab
-  " More tabs at once (match neovim default)
+  set nostartofline
   set tabpagemax=50
-  " Default tag store
   set tags="./tags;,tags"
-  " On modern terminals
   set ttyfast
-  " No longer exists in Neovim
-  set ttymouse=xterm2
-  " Makes filename tab completion more bash-like
+  set viewoptions=folds,cursor,curdir,unix,slash
   set wildmenu
+  " nvim also sets `pum`, which doesn't exist in vim 8.2 on Mac
+  set wildoptions=tagfile
+
+  nnoremap Y y$
+  nnoremap <C-L> <Cmd>nohlsearch<Bar>diffupdate<CR><C-L>
+  inoremap <C-U> <C-G>u<C-U>
+  inoremap <C-W> <C-G>u<C-W>
 endif
 " }}}
 
 " Base Configuration {{{
+
+scriptencoding utf-8
 
 " Load matchit.vim, but only if the user hasn't installed a newer version.
 if !exists('g:loaded_matchit') && findfile('plugin/matchit.vim', &runtimepath) ==# ''
@@ -133,9 +127,6 @@ augroup HiglightedYank
   autocmd TextYankPost * silent! lua vim.highlight.on_yank {on_visual=false}
 augroup END
 
-" Always show statusline
-set laststatus=2
-
 " Let same document scroll differently in separate panes
 set noscrollbind
 
@@ -152,14 +143,10 @@ set visualbell t_vb=
 " Keep lines in view at edges of screen
 set scrolloff=5
 set sidescrolloff=5
-set sidescroll=1
 
 " Hide the intro screen, use [+] instead of [Modified], use [RO] instead
 " of [readyonly], and don't give completion match messages
 set shortmess+=Imrc
-
-" Display incomplete commands
-set showcmd
 
 " Always show the signcolumn to avoid jitter
 set signcolumn=yes
@@ -197,9 +184,6 @@ augroup END
 " Support mac files
 set fileformats+=mac
 
-" Hide buffers instead of closing them (useful for switching between files)
-set hidden
-
 " Don't use backup files, we have Git for that
 set nobackup
 set noswapfile
@@ -223,55 +207,57 @@ set wildignorecase
 " }}}
 
 " Status line {{{
-if v:version >= 704
-  " Show git repo information (if available)
-  let g:activeStatusLine='%{StatuslineTag()}»'
-else
-  let g:activeStatusLine=''
+if has('statusline')
+  if v:version >= 704
+    " Show git repo information (if available)
+    let g:activeStatusLine='%{StatuslineTag()}»'
+  else
+    let g:activeStatusLine=''
+  endif
+  " Relative path to file in current buffer
+  let g:activeStatusLine.='%<%f '
+  " Exclamation mark if not modifiable, + if modified
+  let g:activeStatusLine.="%{&readonly ? \"! \" : &modified ? '+ ' : ''}"
+  " Start left align, show filetype
+  let g:activeStatusLine.="%= %{&filetype == '' ? 'none' : &filetype} "
+  " Line/col/percent
+  let g:activeStatusLine.='%l:%2c '
+  function! StatuslineTag()
+    if exists('b:git_dir')
+      " Shitty unicode character w/o patched fonts
+      return '‡'.fugitive#head(7)
+    else
+      return fnamemodify(getwinvar(0, 'getcwd', getcwd()), ':t')
+    endif
+  endfunction
+
+  let g:quickfixStatusLine='%t (%l of %L)'
+  let g:quickfixStatusLine.='%{exists("w:quickfix_title")? " ".w:quickfix_title : ""}'
+  let g:quickfixStatusLine.='%=%-15(%l,%c%V%) %P'
+
+  " Default status line
+  let statusline=g:activeStatusLine
+
+  " Use different status line for active vs. inactive buffers
+  function! UpdateStatusLine(status)
+    if &filetype==?'qf'
+      let &l:statusline=g:quickfixStatusLine
+    elseif &filetype==?'help' || &filetype==?'netrw'
+      let &l:statusline=&filetype
+    elseif a:status
+      let &l:statusline=g:activeStatusLine
+    else
+      " Just show filename & modified when inactive
+      let &l:statusline='%f %{&modified ? "+" : ""}'
+    endif
+  endfunction
+
+  augroup status_line
+    autocmd!
+    autocmd BufWinEnter,BufEnter,TabEnter,VimEnter,WinEnter * call UpdateStatusLine(1)
+    autocmd BufLeave,TabLeave,WinLeave * call UpdateStatusLine(0)
+  augroup END
 endif
-" Relative path to file in current buffer
-let g:activeStatusLine.='%<%f '
-" Exclamation mark if not modifiable, + if modified
-let g:activeStatusLine.="%{&readonly ? \"! \" : &modified ? '+ ' : ''}"
-" Start left align, show filetype
-let g:activeStatusLine.="%= %{&filetype == '' ? 'none' : &filetype} "
-" Line/col/percent
-let g:activeStatusLine.='%l:%2c '
-function! StatuslineTag()
-  if exists('b:git_dir')
-    " Shitty unicode character w/o patched fonts
-    return "‡".fugitive#head(7)
-  else
-    return fnamemodify(getwinvar(0, 'getcwd', getcwd()), ':t')
-  endif
-endfunction
-
-let g:quickfixStatusLine="%t (%l of %L)"
-let g:quickfixStatusLine.="%{exists('w:quickfix_title')? ' '.w:quickfix_title : ''}"
-let g:quickfixStatusLine.="%=%-15(%l,%c%V%) %P"
-
-" Default status line
-let statusline=g:activeStatusLine
-
-" Use different status line for active vs. inactive buffers
-function! UpdateStatusLine(status)
-  if &filetype=="qf"
-    let &l:statusline=g:quickfixStatusLine
-  elseif &filetype=="help" || &filetype=="netrw"
-    let &l:statusline=&filetype
-  elseif a:status
-    let &l:statusline=g:activeStatusLine
-  else
-    " Just show filename & modified when inactive
-    let &l:statusline='%f %{&modified ? "+" : ""}'
-  endif
-endfunction
-
-augroup status_line
-  autocmd!
-  autocmd BufWinEnter,BufEnter,TabEnter,VimEnter,WinEnter * call UpdateStatusLine(1)
-  autocmd BufLeave,TabLeave,WinLeave * call UpdateStatusLine(0)
-augroup END
 " }}}
 
 " Editing Behavior {{{
@@ -359,10 +345,19 @@ set showbreak=«
 
 " Colors & Syntax Highlighting {{{
 " Base install has some lame themes, this one is OK, I guess
-silent! colorscheme delek
+silent! colorscheme desert
 
 " Enable syntax highlighting by default
-syntax enable
+if has('syntax')
+  syntax enable
+endif
+
+if has('termguicolors')
+  " Mac doesn't ship with tmux terminfo
+  if $TERM =~ '^\(xterm\|tmux\)-256'
+    set termguicolors
+  endif
+endif
 
 " Only highlight first 500 chars for better performance
 set synmaxcol=500
@@ -376,17 +371,6 @@ set gdefault
 set ignorecase
 set smartcase
 
-" Clear search highlights with <C-L>
-nnoremap <silent> <C-L> :nohlsearch<cr><C-L>
-
-" Helper for visual search
-function! s:VisualSetSearch(cmdtype)
-  let temp = @s
-  norm! gv"sy
-  let @/ = '\V' . substitute(escape(@s, a:cmdtype.'\'), '\n', '\\n', 'g')
-  let @s = temp
-endfunction
-
 " */# in visual mode searches for selected text, similar to normal mode
 vnoremap * :<C-u>call <SID>VisualSetSearch('/')<cr>/<C-R>=@/<cr><cr>
 vnoremap # :<C-u>call <SID>VisualSetSearch('#')<cr>/<C-R>=@/<cr><cr>
@@ -394,43 +378,53 @@ vnoremap # :<C-u>call <SID>VisualSetSearch('#')<cr>/<C-R>=@/<cr><cr>
 " <leader>s starts a find a replace for word under cursor
 nnoremap <leader>s :%s/\<<C-R><C-W>\>/<C-R><C-W>/g<Left><Left>
 
-function! IsInsideGitRepo()
-  let result=systemlist('git rev-parse --is-inside-work-tree')
-  if v:shell_error
-    return 0
-  else
-    return 1
-  endif
-endfunction
+if has('eval')
+  " Helper for visual search
+  function! s:VisualSetSearch(cmdtype)
+    let temp = @s
+    norm! gv"sy
+    let @/ = '\V' . substitute(escape(@s, a:cmdtype.'\'), '\n', '\\n', 'g')
+    let @s = temp
+  endfunction
 
-" Change to git root of current file (if in a repo)
-function! FindGitRootCD()
-  let root = systemlist('git -C ' . expand('%:p:h') . ' rev-parse --show-toplevel')[0]
-  if v:shell_error
-    return ''
-  else
-    return {'dir': root}
-  endif
-endfunction
+  function! IsInsideGitRepo()
+    let result=systemlist('git rev-parse --is-inside-work-tree')
+    if v:shell_error
+      return 0
+    else
+      return 1
+    endif
+  endfunction
 
-function! GitRootCD()
-  let result = FindGitRootCD()
-  if type(result) == type({})
-    execute 'lcd' fnameescape(result['dir'])
-    echo 'Now in '.result['dir']
-  else
-    echo 'Not in git repo!'
-  endif
-endfunction
-command! GitRootCD :call GitRootCD()
+  " Change to git root of current file (if in a repo)
+  function! FindGitRootCD()
+    let root = systemlist('git -C ' . expand('%:p:h') . ' rev-parse --show-toplevel')[0]
+    if v:shell_error
+      return ''
+    else
+      return {'dir': root}
+    endif
+  endfunction
 
-" K searches for word under cursor in root of project (remove default binding)
-nnoremap K :GitRootCD<cr>:silent! lgrep! "<C-R><C-W>"<cr>
-" Grep for visual selection, just like in normal mode. Note that this clears /
-" uses the `s` register
-vnoremap K :<C-u>norm! gv"sy<cr>:GitRootCD<cr>:silent! lgrep! "<C-R>s"<cr>
-" Never use Ex-mode, map to project search command instead
-nnoremap Q :GitRootCD<cr>:lgrep!<SPACE>
+  function! GitRootCD()
+    let result = FindGitRootCD()
+    if type(result) == type({})
+      execute 'lcd' fnameescape(result['dir'])
+      echo 'Now in '.result['dir']
+    else
+      echo 'Not in git repo!'
+    endif
+  endfunction
+  command! GitRootCD :call GitRootCD()
+
+  " K searches for word under cursor in root of project (remove default binding)
+  nnoremap K :GitRootCD<cr>:silent! lgrep! "<C-R><C-W>"<cr>
+  " Grep for visual selection, just like in normal mode. Note that this clears /
+  " uses the `s` register
+  vnoremap K :<C-u>norm! gv"sy<cr>:GitRootCD<cr>:silent! lgrep! "<C-R>s"<cr>
+  " Never use Ex-mode, map to project search command instead
+  nnoremap Q :GitRootCD<cr>:lgrep!<SPACE>
+endif
 
 " Automatically open quickfix/location list after grep/make
 augroup auto_quickfix
@@ -441,12 +435,11 @@ augroup auto_quickfix
 augroup END
 
 " Use ag instead of grep, if available
-if executable('ag')
+if executable('rg')
   " Use smart case, match whole words, and output in vim-friendly format
-  set grepprg=ag\ -S\ -Q\ --nogroup\ --nocolor\ --vimgrep
-  set grepformat^=%f:%l:%c:%m
+  set grepprg=rg\ --vimgrep
 else
-  " Mimic ag settings (literal, recursive, ignore common directories)
+  " Mimic rg settings (literal, recursive, ignore common directories)
   set grepprg=grep\ -FIinrw\ --exclude-dir=.git\ --exclude-dir=node_modules
 
   " Unlike ag, grep needs to have a file path after the search command. Add that
@@ -458,9 +451,12 @@ endif
 " }}}
 
 " Efficiency Shortcuts {{{
-" Use space as leader
-let mapleader=" "
-let maplocalleader=" "
+
+if has('eval')
+  " Use space as leader
+  let mapleader=' '
+  let maplocalleader=' '
+endif
 
 " Use enter as colon for faster commands
 nnoremap <cr> :
@@ -477,11 +473,11 @@ inoremap <C-c> <C-[>:echom "Use C-[ instead!"<cr>
 " Also, keep default <cr> binding
 augroup easy_close
   autocmd!
-  autocmd FileType help,qf nnoremap <buffer> q :q<cr>
-  autocmd FileType help,qf nnoremap <buffer> <Esc> :q<cr>
-  autocmd FileType help,qf nnoremap <buffer> <C-c> :q<cr>
+  autocmd FileType help,qf,lspinfo nnoremap <buffer> q :q<cr>
+  autocmd FileType help,qf,lspinfo nnoremap <buffer> <Esc> :q<cr>
+  autocmd FileType help,qf,lspinfo nnoremap <buffer> <C-c> :q<cr>
   " Undo <cr> -> : shortcut
-  autocmd FileType help,qf nnoremap <buffer> <cr> <cr>
+  autocmd FileType help,qf,lspinfo nnoremap <buffer> <cr> <cr>
 augroup END
 
 " Map jj and jk to <ESC> to leave insert mode quickly
@@ -575,12 +571,8 @@ augroup filetype_tweaks
   " ES6 is JS
   autocmd BufRead,BufNewFile *.es6 set filetype=javascript
 
-  let s:automake_filetypes = []
-
   " Set up linting for JS
   if executable('eslint')
-    let s:automake_filetypes += ['*.js']
-
     autocmd FileType javascript setlocal makeprg=eslint\ -f\ compact\ %
 
     " Parse eslint errors correctly
@@ -594,8 +586,6 @@ augroup filetype_tweaks
 
   " TypeScript type checking
   if executable('tsc')
-    let s:automake_filetypes += ['*.ts']
-
     autocmd FileType typescript setlocal makeprg=tsc\ --allowJs\ --noEmit\ --strict\ %\
 
     autocmd FileType typescript setlocal errorformat=%E%f(%l\\,%c):\ error\ %m
@@ -610,8 +600,6 @@ augroup filetype_tweaks
 
   " Linting for LESS
   if executable('lessc')
-    let s:automake_filetypes += ['*.less']
-
     autocmd FileType less setlocal makeprg=lessc\ --lint\ --no-color\ %
     autocmd FileType less setlocal
           \ errorformat=%E%.%#Error:\ %m\ in\ %f\ on\ line\ %l\\,\ column\ %c:
@@ -621,8 +609,6 @@ augroup filetype_tweaks
 
   " CSS linting
   if executable('stylelint')
-    let s:automake_filetypes += ['*.css']
-
     autocmd FileType css setlocal
           \ makeprg=stylelint\ %\ --no-color\ --fix\ --cache
     " Push/pop filename on stack with %P%f
@@ -634,31 +620,18 @@ augroup filetype_tweaks
 
   " Linting for shell scripts
   if executable('shellcheck')
-    let s:automake_filetypes += ['*.sh']
-
     autocmd FileType sh setlocal makeprg=shellcheck\ -x\ -f\ gcc\ %
   endif
 
   " Linting for prose
   if executable('proselint')
-    let s:automake_filetypes += ['*.md', '*.txt']
-
     autocmd FileType markdown,text setlocal makeprg=proselint\ %
   endif
 
   " Linting for vimscript
   if executable('vint')
-    let s:automake_filetypes += ['*.vim', '*.vimrc']
-
     autocmd FileType vim setlocal makeprg=vint\ --enable-neovim\ \-s\ %
   endif
-
-  " Auto-make for supported filetypes
-  augroup automake
-    autocmd!
-    " TODO: This may be breaking disabling automake because of this eval
-    execute 'autocmd BufWritePost ' . join(s:automake_filetypes, ',') . ' make!'
-  augroup END
 
   if executable('beautysh')
     autocmd FileType sh setlocal formatprg=beautysh\ -i\ 2\ -f\ -
@@ -728,30 +701,35 @@ augroup END
 " }}}
 
 " Markdown config {{{
-" Syntax highlight within fenced code blocks
-let g:markdown_fenced_languages = ['bash=sh', 'css', 'html', 'js=javascript',
-      \ 'less', 'typescript=javascript', 'python', 'sh']
+if has('syntax')
+  " Syntax highlight within fenced code blocks
+  let g:markdown_fenced_languages = ['bash=sh', 'css', 'html', 'js=javascript',
+        \ 'less', 'typescript=javascript', 'python', 'sh']
+endif
 " }}}
 
 " Netrw config {{{
-" Disable annoying banner
-let g:netrw_banner=0
+" Netrw requires `eval`, not present in `vim.tiny`
+if has('eval')
+  " Disable annoying banner
+  let g:netrw_banner=0
 
-" Open in same window
-let g:netrw_browse_split=0
+  " Open in same window
+  let g:netrw_browse_split=0
 
-" Open splits to the right
-let g:netrw_altv=1
+  " Open splits to the right
+  let g:netrw_altv=1
 
-" Tree view
-let g:netrw_liststyle=3
+  " Tree view
+  let g:netrw_liststyle=3
 
-" Sensible limit to the width of the file explorer
-let g:netrw_winsize = 25
+  " Sensible limit to the width of the file explorer
+  let g:netrw_winsize = 25
 
-" Hide files in .gitignore
-let g:netrw_list_hide=netrw_gitignore#Hide()
-let g:netrw_list_hide.=',\(^\|\s\s\)\zs\.\S\+'
+  " Hide files in .gitignore
+  let g:netrw_list_hide=netrw_gitignore#Hide()
+  let g:netrw_list_hide.=',\(^\|\s\s\)\zs\.\S\+'
+endif
 " }}}
 
 " Local Settings {{{
