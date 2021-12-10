@@ -373,8 +373,9 @@ set smartcase
 vnoremap * :<C-u>call <SID>VisualSetSearch('/')<cr>/<C-R>=@/<cr><cr>
 vnoremap # :<C-u>call <SID>VisualSetSearch('#')<cr>/<C-R>=@/<cr><cr>
 
-" <leader>s starts a find a replace for word under cursor
-nnoremap <leader>s :%s/\<<C-R><C-W>\>/<C-R><C-W>/g<Left><Left>
+" <leader>s starts a find a replace for word under cursor / selection
+nnoremap <leader>s :%s/<C-R><C-W>/<C-R><C-W>/g<Left><Left>
+vnoremap <leader>s :%s/<C-R><C-W>/<C-R><C-W>/g<Left><Left>
 
 if has('eval')
   " Helper for visual search
@@ -463,10 +464,6 @@ vnoremap <cr> :
 nnoremap <M-cr> <cr>
 vnoremap <M-cr> <cr>
 
-" Kick the habit of using <C-c> instead of <C-[>, since <C-c> breaks
-" nvim-completion-manager
-inoremap <C-c> <C-[>:echom "Use C-[ instead!"<cr>
-
 " Close quickfix & help with q, Escape, or Control-C
 " Also, keep default <cr> binding
 augroup easy_close
@@ -514,7 +511,7 @@ vnoremap @ :normal @
 nnoremap <expr><silent> <Bar> v:count == 0 ? "<C-W>v<C-W><Right>" : ":<C-U>normal! 0".v:count."<Bar><CR>"
 nnoremap <expr><silent> _     v:count == 0 ? "<C-W>s<C-W><Down>"  : ":<C-U>normal! ".v:count."_<CR>"
 
-" Delete buffer via <C-W>d since I don't use tags
+" Delete buffer via <C-W>d
 nnoremap <C-w>d :bd<cr>
 nnoremap <C-w><C-d> :bd<cr>
 
@@ -526,21 +523,6 @@ nnoremap <leader>lcd :lcd %:p:h<cr>
 " Go back to root
 nnoremap <leader>cd :GitRootCD<cr>
 
-" Quickly edit current buffer in a new tab (poor-man's maximize)
-nnoremap <leader>te :tabedit %<cr>
-
-" Quickly open tab
-nnoremap <leader>tn :tabnew<cr>
-
-" Close a tab
-nnoremap <leader>tc :tabclose<cr>
-
-" Easy editing & reloading of .nvimrc
-nnoremap <leader>ev :tabedit $MYVIMRC<cr>
-nnoremap <leader>sv :source $MYVIMRC<cr>
-
-" Sort lines within braces with <leader>s{
-nnoremap <leader>s{ vi{:sort<cr>
 " }}}
 
 " }}}
@@ -565,9 +547,6 @@ augroup filetype_tweaks
 
   " Disable spell checking on unmodifiable files (what's the point?)
   autocmd BufReadPost * if !&modifiable | setlocal nospell | endif
-
-  " ES6 is JS
-  autocmd BufRead,BufNewFile *.es6 set filetype=javascript
 
   " Set up linting for JS
   if executable('eslint')
@@ -658,7 +637,7 @@ augroup filetype_tweaks
 
   " Find .js files when using `gf` (useful with require)
   autocmd FileType javascript setlocal suffixesadd=.js,.json,index.js
-  autocmd FileType typescript setlocal suffixesadd=.ts,.tsx,.js,.jsx,.json,index.js
+  autocmd FileType typescript setlocal suffixesadd=.ts,.tsx,.js,.jsx,.json,index.js,index.ts
 
   autocmd FileType markdown setlocal suffixesadd=.md,index.md
 
@@ -676,8 +655,8 @@ augroup filetype_tweaks
   " Simple folding for CSS/LESS
   autocmd FileType css,less setlocal fdm=marker fmr={,}
 
-  " Fold via indent in CoffeeScript and Python
-  autocmd FileType coffee,python setlocal foldmethod=indent
+  " Fold via indent in Python
+  autocmd FileType python setlocal foldmethod=indent
 
   " Fold via syntax for JS/TypeScript
   autocmd FileType javascript,typescript setlocal foldmethod=syntax
