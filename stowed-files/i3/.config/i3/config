@@ -267,7 +267,7 @@ for_window [class="(?i)\.exe"] floating enable, border none, move position cente
 # Plain background
 exec --no-startup-id hsetroot -solid "#222222"
 # Needed for inactive window transparency
-exec --no-startup-id compton -b
+exec --no-startup-id picom -b
 # Save my eyes
 exec --no-startup-id redshift-gtk || redshift -l 27.3:-82.5
 # Notifications

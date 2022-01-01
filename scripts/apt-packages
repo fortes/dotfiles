@@ -2,7 +2,6 @@ alsa-utils
 chromium
 cmake
 cmus
-compton
 exfat-fuse
 exfat-utils
 feh
@@ -21,6 +20,7 @@ kitty
 libnotify-bin
 maim
 mpv
+picom
 pulseaudio
 redshift
 redshift-gtk
