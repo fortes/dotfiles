@@ -15,6 +15,7 @@ fonts-noto-ui-core
 hsetroot
 i3
 i3blocks
+i3lock
 imv
 kitty
 libnotify-bin
