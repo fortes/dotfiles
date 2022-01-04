@@ -138,6 +138,10 @@ if command_exists dircolors; then
   fi
 fi
 
+if command_exists zoxide; then
+  eval "$(zoxide init bash)"
+fi
+
 # FZF keybindings (Debian)
 source_if_exists "/usr/share/doc/fzf/examples/key-bindings.bash"
 # FZF keybindings (Homebrew)
