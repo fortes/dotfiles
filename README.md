@@ -16,7 +16,7 @@ Once you've run setup, you'll still have to do the following manual steps:
 1. Generate this machine's SSH keys:
 
    ```sh
-   ssh-keygen -t rsa -b 4096 -C "$(hostname)"
+   ssh-keygen -t ed25519 -C "$(hostname)"
    ```
 
 Then add the key into GitHub and wherever else
@@ -62,15 +62,12 @@ TODO: Automate these steps.
 - Depending on the machine, you may need `pavucontrol` in order to unmute your audio output via GUI.
   \*\* Alternatively, find the name of the desired output via `pacmd list-sinks` then run `pacmd set-default-sink $SINK_NAME` and make sure to unmute via `pacmd set-sink-mute [name] 0`
 
-### EC2
-
-- None?
-
 ### Chromebook
 
 - Extensions should automatically sync and install
-- Setup Smart Lock & PIN unlock
+- Setup Phone Smart Lock & PIN unlock
 - Enable Linux
+- Share `Downloads` folder with Linux
 - Enable cloud storage for uBlock
 
 ### Windows
@@ -79,7 +76,18 @@ TODO: Automate these steps.
 - Get WinGet
 - Install Windows Terminal
 
+### EC2
+
+- None?
+
+### Docker
+
+- None?
+
 #### TODO
 
+- [ ] Fix initial neovim setup, since runs on older version (0.4) until app image version installed
+- [ ] Use `fnm` everywhere instead of Debian node
+  - [ ] Need to figure out `yarn` compat, or just move everything to npm
 - [ ] Better colorschemes
 - [ ] Setup [textlint](https://github.com/textlint/textlint)
