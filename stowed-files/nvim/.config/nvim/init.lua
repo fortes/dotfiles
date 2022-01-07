@@ -411,6 +411,9 @@ require('packer').startup(function(use)
   -- Add `.` repeat functionality to plugins that support it
   use {'tpope/vim-repeat'}
 
+  -- Readline-like bindings in insert/command mode
+  use {'tpope/vim-rsi'}
+
   -- Automatically insert closing parens, etc
   use {
     'windwp/nvim-autopairs',
