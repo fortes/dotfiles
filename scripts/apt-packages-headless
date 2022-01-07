@@ -25,6 +25,7 @@ gnupg
 htop
 iftop
 imagemagick
+info
 jq
 keychain
 libimage-exiftool-perl
