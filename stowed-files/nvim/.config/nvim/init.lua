@@ -370,15 +370,6 @@ require('packer').startup(function(use)
     end
   }
 
-  -- Adds helpers for UNIX shell commands
-  -- * :Remove Delete buffer and file at same time
-  -- * :Unlink Delete file, keep buffer
-  -- * :Move Rename buffer and file
-  use {'tpope/vim-eunuch'}
-
-  -- Run git commands in editor, also used by other packages
-  use {'tpope/vim-fugitive'}
-
   -- Shows git diff in signs column
   -- `[c` / `]c` to jump between hunks
   -- <leader>hs to stage hunk
@@ -393,6 +384,21 @@ require('packer').startup(function(use)
       require('gitsigns').setup()
     end
   }
+
+  -- Better text objects, will seek to nearest match on line
+  use {'wellle/targets.vim'}
+
+  -- Extend normal mode `ga` with more info like digraphs and emoji code
+  use {'tpope/vim-characterize'}
+
+  -- Adds helpers for UNIX shell commands
+  -- * :Remove Delete buffer and file at same time
+  -- * :Unlink Delete file, keep buffer
+  -- * :Move Rename buffer and file
+  use {'tpope/vim-eunuch'}
+
+  -- Run git commands in editor, also used by other packages
+  use {'tpope/vim-fugitive'}
 
   -- Make netrw better
   -- * '-' in any buffer to go up to directory listing
