@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # Install some specific packages directly from GitHub. Specifically:
 #
-# - Duf
 # - Hugo
 # - Neovim (latest)
 # - Sad
@@ -22,20 +21,6 @@ get_latest_release_url() {
 
   local release_json_url="https://api.github.com/repos/${repo}/releases/latest"
   curl --silent "${release_json_url}" | jq -r '.assets[].browser_download_url' | grep "${match}"
-}
-
-install_duf() {
-  local url="$(get_latest_release_url 'muesli/duf' 'linux_amd64.deb')"
-  if [[ -z "${url}" ]]; then
-    echo_stderr "Could not find url"
-    exit 2
-  fi
-  pushd /tmp > /dev/null
-  wget -O duf.deb "${url}"
-  echo "Installing duf (requires sudo)"
-  sudo dpkg -i duf.deb
-  rm duf.deb
-  popd > /dev/null
 }
 
 install_hugo() {
@@ -89,7 +74,6 @@ install_neovim_stable() {
 main() {
   . "$HOME/.profile.local"
 
-  install_duf
   install_hugo
   install_neovim_stable
   install_sad

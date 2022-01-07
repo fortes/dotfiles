@@ -12,6 +12,7 @@ build-essential
 ca-certificates
 curl
 dnsutils
+duf/bullseye-backports
 exa
 exiv2
 fd-find
@@ -56,7 +57,7 @@ sshfs
 stow
 sudo
 tig
-tmux
+tmux/bullseye-backports
 trash-cli
 unzip
 vifm
