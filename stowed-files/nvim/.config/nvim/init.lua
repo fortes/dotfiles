@@ -1,5 +1,4 @@
 -- vim:et ft=lua sts=2 sw=2 ts=2
-
 -- Load all base / legacy options from ~/.vimrc
 vim.cmd('source ~/.vimrc')
 
@@ -432,10 +431,14 @@ require('packer').startup(function(use)
   -- Run git commands in editor, also used by other packages
   use {'tpope/vim-fugitive'}
 
-  -- Make netrw better
-  -- * '-' in any buffer to go up to directory listing
-  -- * ! to use the file in a command
-  use {'tpope/vim-vinegar'}
+  -- netrw, but better
+  use {'justinmk/vim-dirvish'}
+
+  -- git status for dirvish
+  use {
+    'kristijanhusak/vim-dirvish-git',
+    after = {'vim-dirvish-git'},
+  }
 
   -- Comment / uncomment things quickly
   use {'tpope/vim-commentary'}
