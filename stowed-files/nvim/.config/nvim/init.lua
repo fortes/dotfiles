@@ -370,6 +370,9 @@ require('packer').startup(function(use)
     end
   }
 
+  -- Very simple tab completion
+  use { 'ackyshake/VimCompletesMe'}
+
   -- Honor `.editorconfig`
   use {'editorconfig/editorconfig-vim'}
 
