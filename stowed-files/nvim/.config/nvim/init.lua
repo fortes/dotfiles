@@ -382,6 +382,15 @@ require('packer').startup(function(use)
   -- Honor `.editorconfig`
   use {'editorconfig/editorconfig-vim'}
 
+  -- Copy to system via OSC52
+  use {
+    'ojroques/vim-oscyank',
+    config = function()
+      vim.api.nvim_set_keymap('v', '<leader>y', ':OSCYank<cr>',
+        {noremap=true, silent=true})
+    end
+  }
+
   -- Autoformatting
   use {'prettier/vim-prettier'}
 
