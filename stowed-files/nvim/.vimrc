@@ -112,6 +112,7 @@ set foldenable
 set foldmethod=marker
 
 " Default to having all folds open
+set foldlevel=99
 set foldlevelstart=99
 
 " Limit folds when using indent or syntax
