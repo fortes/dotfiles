@@ -346,17 +346,9 @@ require('packer').startup(function(use)
     requires = {
       -- Uses telescope for selection
       {'nvim-telescope/telescope.nvim'},
-      -- Persist between sessions
-      {
-        'tami5/sqlite.lua',
-        module = 'sqlite'
-      },
     },
     config = function()
-      require('neoclip').setup({
-        history = 1000,
-        enable_persistant_history = true,
-      })
+      require('neoclip').setup({})
 
       vim.api.nvim_set_keymap('n', '<leader>cl',
         ':lua require("telescope").extensions.neoclip.default()<cr>',
