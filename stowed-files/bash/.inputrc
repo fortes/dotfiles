@@ -4,21 +4,32 @@ $include /etc/inputrc
 # Use vi mode
 set editing-mode vi
 
-# Keep vi insert mode tolerable with common shortcuts
-set keymap vi-insert
-"jj": vi-movement-mode
-"jk": vi-movement-mode
-Control-a: beginning-of-line
-Control-e: end-of-line
-Control-l: clear-screen
-Control-n: history-search-forward
-Control-p: history-search-backward
-# Default is unix-word-rubout
-Control-w: unix-filename-rubout
-"\C-x\C-e": edit-and-execute-command
+$if mode=vi
+  # Keep vi insert mode tolerable with common shortcuts
+  set keymap vi-insert
+  "jj": vi-movement-mode
+  "jk": vi-movement-mode
+  Control-a: beginning-of-line
+  Control-e: end-of-line
+  Control-k: kill-line
+  Control-l: clear-screen
+  Control-n: history-search-forward
+  Control-p: history-search-backward
+  # Default is unix-word-rubout
+  Control-w: unix-filename-rubout
+  "\C-x\C-e": edit-and-execute-command
+
+  # Maintain some emacs-isms in command mode too
+  set keymap vi-command
+  Control-a: beginning-of-line
+  Control-e: end-of-line
+  Control-k: kill-line
+  Control-l: clear-screen
+$endif
+
 # Auto expand history
 $if Bash
-Space: magic-space
+  Space: magic-space
 $endif
 Control-j: menu-complete
 Control-k: menu-complete-backward
@@ -31,6 +42,8 @@ set blink-matching-paren on
 set colored-stats on
 # Use case-insensitive filename matching
 set completion-ignore-case on
+# Treat hyphens and underscores as equivalent when matching
+set completion-map-case on
 # Hide what's already been completed with ...
 set completion-prefix-display-length 1
 # Treat _ and - as equivalent when matching
@@ -43,8 +56,6 @@ set mark-directories on
 set mark-symlinked-directories on
 # Show what mode we are in (see if insert or command mode)
 set show-mode-in-prompt on
-# Don't duplicate text that already matches when completing from inside the word
-set skip-completed-text off
 # Bash 4.4 allows setting custom mode strings. Blank for insert, [cmd] for cmd
 set vi-ins-mode-string
 set vi-cmd-mode-string \033[1;33m[cmd]\033[0m
