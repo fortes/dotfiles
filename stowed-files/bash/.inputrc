@@ -1,31 +1,9 @@
 # Include system defaults
 $include /etc/inputrc
 
-# Use vi mode
-set editing-mode vi
-
-$if mode=vi
-  # Keep vi insert mode tolerable with common shortcuts
-  set keymap vi-insert
-  "jj": vi-movement-mode
-  "jk": vi-movement-mode
-  Control-a: beginning-of-line
-  Control-e: end-of-line
-  Control-k: kill-line
-  Control-l: clear-screen
-  Control-n: history-search-forward
-  Control-p: history-search-backward
-  # Default is unix-word-rubout
-  Control-w: unix-filename-rubout
-  "\C-x\C-e": edit-and-execute-command
-
-  # Maintain some emacs-isms in command mode too
-  set keymap vi-command
-  Control-a: beginning-of-line
-  Control-e: end-of-line
-  Control-k: kill-line
-  Control-l: clear-screen
-$endif
+# Though life is mostly in vim, not worthwhile in bash, makes things confusing
+# when using other systems. Plus, vim is always a <c-x><c-e> away
+set editing-mode emacs
 
 # Auto expand history
 $if Bash
@@ -54,8 +32,6 @@ set completion-query-items 300
 set mark-directories on
 # Append slash on completed symlinks
 set mark-symlinked-directories on
-# Show what mode we are in (see if insert or command mode)
-set show-mode-in-prompt on
 # Bash 4.4 allows setting custom mode strings. Blank for insert, [cmd] for cmd
 set vi-ins-mode-string
 set vi-cmd-mode-string \033[1;33m[cmd]\033[0m
