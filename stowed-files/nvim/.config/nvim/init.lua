@@ -427,7 +427,24 @@ require('packer').startup(function(use)
   use {'tpope/vim-fugitive'}
 
   -- netrw, but better
-  use {'justinmk/vim-dirvish'}
+  use {
+    'justinmk/vim-dirvish',
+    config = function()
+      -- Unsupported with dirvish
+      vim.o.autochdir = false
+
+      -- Override `:Explore` and friends
+      vim.g['loaded_netrwPlugin'] = 1
+      vim.cmd([[
+        command! -nargs=? -complete=dir Explore Dirvish <args>
+        command! -nargs=? -complete=dir Sexplore belowright split | silent Dirvish <args>
+        command! -nargs=? -complete=dir Vexplore leftabove vsplit | silent Dirvish <args>
+        command! -nargs=? -complete=dir Lexplore topleft vsplit | silent Dirvish <args>
+        command! -nargs=? -complete=dir Texplore tabnew | silent Dirvish <args>
+      ]])
+
+    end
+  }
 
   -- git status for dirvish
   use {
