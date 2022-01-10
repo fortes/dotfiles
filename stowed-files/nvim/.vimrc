@@ -473,11 +473,11 @@ vnoremap <M-cr> <cr>
 " Also, keep default <cr> binding
 augroup easy_close
   autocmd!
-  autocmd FileType help,qf,lspinfo nnoremap <buffer> q :q<cr>
-  autocmd FileType help,qf,lspinfo nnoremap <buffer> <Esc> :q<cr>
-  autocmd FileType help,qf,lspinfo nnoremap <buffer> <C-c> :q<cr>
+  autocmd FileType help,qf,lspinfo,dirvish nnoremap <buffer> q :q<cr>
+  autocmd FileType help,qf,lspinfo,dirvish nnoremap <buffer> <Esc> :q<cr>
+  autocmd FileType help,qf,lspinfo,dirvish nnoremap <buffer> <C-c> :q<cr>
   " Undo <cr> -> : shortcut
-  autocmd FileType help,qf,lspinfo nnoremap <buffer> <cr> <cr>
+  autocmd FileType help,qf,lspinfo,dirvish nnoremap <buffer> <cr> <cr>
 augroup END
 
 " Map jj and jk to <ESC> to leave insert mode quickly
