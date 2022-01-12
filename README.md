@@ -86,7 +86,7 @@ TODO: Automate these steps.
 
 #### TODO
 
-- [ ] Fix initial neovim setup, since runs on older version (0.4) until app image version installed
+- [ ] Fix initial Neovim setup, since runs on older version (0.4) until app image version installed
 - [ ] Use `fnm` everywhere instead of Debian node
   - [ ] Need to figure out `yarn` compat, or just move everything to npm
 - [ ] Better colorschemes
