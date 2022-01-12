@@ -10,8 +10,10 @@ import time
 
 # Copy from https://listenbrainz.org/profile/
 listenbrainz_auth_token = os.environ.get('LISTENBRAINZ_AUTH_TOKEN')
+
 librefm_username = os.environ.get('LIBRE_FM_USERNAME')
 librefm_password = os.environ.get('LIBRE_FM_PASSWORD')
+# Generate once via this script
 librefm_session_key = os.environ.get('LIBRE_FM_SESSION_KEY')
 
 if not listenbrainz_auth_token:
@@ -66,12 +68,13 @@ def listenbrainz_scrobble():
 
     try:
         if is_new_listen:
-            print("Submitting listen: %s - %s" % (artist, title))
+            print("ListenBrainz: Submitting %s - %s" % (artist, title))
             response = client.submit_single_listen(listen)
             if response['status'] == 'ok':
-                print("Successful!")
+                print("ListenBrainz: Successful!")
             else:
-                print("Non-OK status code: %s" % response['status'])
+                print("ListenBrainz: Non-OK status code: %s" %
+                      response['status'])
 
         if status == 'playing':
             listen = pylistenbrainz.Listen(
@@ -80,12 +83,14 @@ def listenbrainz_scrobble():
                 recording_mbid=track_id,
                 release_name=album,
             )
-            print("Submitting playing now: %s - %s" % (artist, title))
+            print("ListenBrainz: Submitting playing now: %s - %s" %
+                  (artist, title))
             response = client.submit_playing_now(listen)
             if response['status'] == 'ok':
-                print("Successful!")
+                print("ListenBrainz: Successful!")
             else:
-                print("Non-OK status code: %s" % response['status'])
+                print("ListenBrainz: Non-OK status code: %s" %
+                      response['status'])
     except pylistenbrainz.errors.ListenBrainzAPIException as err:
         print("ListenBrainzAPIException: %s" % err.message)
     except pylistenbrainz.errors.InvalidSubmitListensPayloadException as err:
@@ -106,7 +111,7 @@ def librefm_scrobble():
                              timestamp=timestamp,
                              album_artist=album_artist,
                              mbid=track_id)
-    print('%s - %s scrobbled to libre.fm' % (artist, title))
+    print('libre.fm: %s - %s scrobbled' % (artist, title))
 
 
 listenbrainz_scrobble()
