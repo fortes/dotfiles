@@ -81,7 +81,7 @@ install_apt_packages() {
 install_node_packages() {
   echo "Installing global node packages"
   grep -v "^#" "$HOME/dotfiles/scripts/node-packages" | xargs --no-run-if-empty \
-    yarnpkg global add --ignore-engines --non-interactive --silent
+    npm install -g --fund false
   echo "Node packages installed"
 }
 
@@ -290,6 +290,8 @@ main() {
   # cmus in backports is recent enough right now
   # [[ -z "${IS_HEADLESS:-}" ]] && setup_multimedia
   install_apt_packages
+  "$dotfiles_path/scripts/setup_github_packages"
+  "$dotfiles_path/scripts/setup_fnm"
 
   # Debian ships with these two by default
   remove_default_dotfile .bashrc

@@ -33,10 +33,15 @@ main() {
   mv "${download_dir}/fnm" "$HOME/.local/bin/fnm"
   chmod u+x "$HOME/.local/bin/fnm"
 
+  . "$HOME/.profile"
+
   echo "fnm installed. Generating completions"
   "$HOME/.local/bin/fnm" completions > "$HOME/.local/completion.d/fnm_completion"
 
   echo "Complete!"
+
+  echo "Installing latest"
+  "$HOME/.local/bin/fnm" install --lts
 }
 
 main
