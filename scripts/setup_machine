@@ -79,6 +79,9 @@ install_apt_packages() {
 }
 
 install_node_packages() {
+  # Pick up `fnm`-provided paths on first run
+  . "$HOME/.profile"
+
   echo "Installing global node packages"
   grep -v "^#" "$HOME/dotfiles/scripts/node-packages" | xargs --no-run-if-empty \
     npm install -g --fund false

@@ -29,6 +29,7 @@ imagemagick
 info
 jq
 keychain
+less
 libimage-exiftool-perl
 libnss-mdns
 lsb-release

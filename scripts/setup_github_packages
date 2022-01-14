@@ -35,6 +35,7 @@ install_hugo() {
   sudo dpkg -i hugo.deb
   rm hugo.deb
   echo "Generating bash completion"
+  mkdir -p "$HOME/.local/completion.d"
   hugo gen autocomplete --completionfile="$HOME/.local/completion.d/hugo_completion"
   popd > /dev/null
 }
@@ -54,21 +55,31 @@ install_sad() {
 }
 
 install_neovim_stable() {
+  local vim_path="$HOME/.local/bin/nvim"
+
   echo "Installing neovim stable"
+  mkdir -p "$(dirname ${vim_path})"
   wget "https://github.com/neovim/neovim/releases/download/stable/nvim.appimage" \
-    --quiet --output-document "$HOME/.local/bin/nvim"
-  chmod +x "$HOME/.local/bin/nvim"
+    --quiet --output-document "$vim_path"
+  chmod +x "$vim_path"
 
   if [[ -n "${IS_DOCKER:-}" ]]; then
+    local vim_appimage_dir_path="$HOME/.local/appimages/nvim"
     echo "Expanding neovim AppImage"
-    mkdir -p "$HOME/.local/appimages/nvim"
+    mkdir -p "${vim_appimage_dir_path}"
     (
-      cd "$HOME/.local/appimages/nvim"
-      mv "$HOME/.local/bin/nvim" .
-      "$HOME/.local/appimages/nvim/nvim" --appimage-extract > /dev/null
-      ln -s "$HOME/.local/appimages/nvim/squashfs-root/AppRun" "$HOME/.local/bin/nvim"
+      cd "${vim_appimage_dir_path}"
+      mv "${vim_path}" .
+      "${vim_appimage_dir_path}/nvim" --appimage-extract > /dev/null
+      ln -s "${vim_appimage_dir_path}/squashfs-root/AppRun" "{$vim_path}"
     )
   fi
+
+  sudo update-alternatives --install /usr/bin/ex ex "${vim_path}" 110
+  sudo update-alternatives --install /usr/bin/vi vi "${vim_path}" 110
+  sudo update-alternatives --install /usr/bin/view view "${vim_path}" 110
+  sudo update-alternatives --install /usr/bin/vim vim "${vim_path}" 110
+  sudo update-alternatives --install /usr/bin/vimdiff vimdiff "${vim_path}" 110
 }
 
 main() {

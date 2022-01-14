@@ -43,11 +43,14 @@ export -f fd_with_git
 # Use NeoVim if we have it
 if command_exists nvim; then
   VISUAL="$(command -v nvim)"
-else
+elif command_exists vim; then
   VISUAL="$(command -v vim)"
 fi
-EDITOR="$VISUAL"
-export EDITOR VISUAL
+
+if [[ -n ${VISUAL:-} ]]; then
+  EDITOR="$VISUAL"
+  export EDITOR VISUAL
+fi
 
 # Locally-installed packages belong in path
 add_to_path "$HOME/.local/bin"
