@@ -247,6 +247,16 @@ require('packer').startup(function(use)
     after = {'nvim-treesitter'}
   }
 
+  -- Enable spellchecking in buffers that use Treesitter
+  use {
+    'lewis6991/spellsitter.nvim',
+    after = {'nvim-treesitter'},
+    config = function()
+      -- Can also be a list of filetypes
+      require('spellsitter').setup({enable = true})
+    end
+  }
+
   -- Indentation guides
   use {
     'lukas-reineke/indent-blankline.nvim',
