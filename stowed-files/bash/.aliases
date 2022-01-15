@@ -6,7 +6,7 @@ alias nyc='TZ="America/New_York" date'
 alias seattle='TZ="America/Los_Angeles" date'
 alias sf='TZ="America/Los_Angeles" date'
 alias rio='TZ="America/Sao_Paulo" date'
-alias utc='TZ="UTC" date'
+alias utc='date -u'
 
 if command_exists dig; then
   alias myip="dig +short myip.opendns.com @resolver1.opendns.com"
