@@ -8,7 +8,7 @@ alias sf='TZ="America/Los_Angeles" date'
 alias rio='TZ="America/Sao_Paulo" date'
 alias utc='TZ="UTC" date'
 
-if command_exists dig > /dev/null; then
+if command_exists dig; then
   alias myip="dig +short myip.opendns.com @resolver1.opendns.com"
   alias mygeo="curl -w \"\\n\" http://api.hackertarget.com/geoip/\?q=\`myip\`"
 fi
@@ -19,7 +19,7 @@ alias mv='mv -i'
 # CD into root of git project via `...`
 alias ...="cd \$(git rev-parse --show-toplevel 2>/dev/null || echo '.')"
 
-if command_exists fzf-tmux > /dev/null; then
+if command_exists fzf-tmux; then
   # CD into a directory within the project, selecting via fzf
   alias cdp="git ls-files \$(git rev-parse --show-toplevel) | xargs -n1 dirname | sort | uniq | fzf-tmux || echo '.' | xargs --no-run-if-empty cd"
 
@@ -28,13 +28,18 @@ if command_exists fzf-tmux > /dev/null; then
 fi
 
 # Add current project NPM to path
-if command_exists npm > /dev/null; then
+if command_exists npm; then
   alias npath='export PATH=$(npm bin):$PATH'
 fi
 
-if command_exists docker > /dev/null; then
+if command_exists docker; then
   # Always use docker with sudo
   alias docker="sudo docker"
+fi
+
+if [[ -x "$HOME/.local/bin/docker-compose" ]]; then
+  # Use local install
+  alias docker-compose="sudo ${HOME}/.local/bin/docker-compose"
 fi
 
 # Map ls to be colorful and reasonable defaults
@@ -43,12 +48,12 @@ alias la='ls --color=auto -ApFhv'
 alias ll='ls --color=auto -AlpFhv'
 
 # Make feh nicer in i3
-if command -v feh > /dev/null; then
+if command_exists feh; then
   alias feh='feh --scale-down'
 fi
 
 # Shortcuts for copying from tmux clipboard to system clipboard
-if command_exists xclip > /dev/null; then
+if command_exists xclip; then
   alias tcopy='tmux save-buffer - | xclip -i -sel clipboard'
 fi
 
