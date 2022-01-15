@@ -20,7 +20,21 @@ get_latest_release_url() {
   local match="$2"
 
   local release_json_url="https://api.github.com/repos/${repo}/releases/latest"
-  curl --silent "${release_json_url}" | jq -r '.assets[].browser_download_url' | grep "${match}"
+  curl --silent "${release_json_url}" | jq -r '.assets[].browser_download_url' | grep "${match}" | head -n 1
+}
+
+install_docker_compose() {
+  local url="$(get_latest_release_url 'docker/compose' 'linux-x86_64')"
+  if [[ -z "${url}" ]]; then
+    echo_stderr "Could not find url"
+    exit 2
+  fi
+  local install_location="$HOME/.local/bin"
+  mkdir -p "${install_location}"
+  echo "Downloading docker-compose"
+  wget --quiet -O "${install_location}/docker-compose" "${url}"
+  chmod +x "${install_location}/docker-compose"
+  echo "docker-compose installed"
 }
 
 install_hugo() {
@@ -85,6 +99,7 @@ install_neovim_stable() {
 main() {
   . "$HOME/.profile.local"
 
+  install_docker_compose
   install_hugo
   install_neovim_stable
   install_sad
