@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 # Install some specific packages directly from GitHub. Specifically:
 #
-# - Hugo
-# - Neovim (latest)
-# - Sad
+# - docker-compose
+# - hugo
+# - neovim (latest)
+# - sad
 #
 # Usage `install_github_packages`
 
@@ -85,7 +86,7 @@ install_neovim_stable() {
       cd "${vim_appimage_dir_path}"
       mv "${vim_path}" .
       "${vim_appimage_dir_path}/nvim" --appimage-extract > /dev/null
-      ln -s "${vim_appimage_dir_path}/squashfs-root/AppRun" "{$vim_path}"
+      ln -s "${vim_appimage_dir_path}/squashfs-root/AppRun" "${vim_path}"
     )
   fi
 
