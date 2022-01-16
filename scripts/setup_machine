@@ -188,10 +188,13 @@ setup_docker() {
   fi
 
   local user="$(whoami)"
-  if [ ! -f "/etc/sudoers.d/$user-docker" ]; then
+  local sudoers_file="/etc/sudoers.d/${user}-docker"
+  if [ ! -f "$sudoers_file" ]; then
     echo "Allowing $user to run docker without sudo prompt (requires sudo)"
     echo "$user  ALL=(ALL) NOPASSWD: /usr/bin/docker" |
-      sudo tee &> /dev/null "/etc/sudoers.d/$user-docker"
+      sudo tee &> /dev/null "$sudoers_file"
+    echo "$user  ALL=(ALL) NOPASSWD: $HOME/.local/bin/docker-compose" |
+      sudo tee -a &> /dev/null "$sudoers_file"
   fi
 }
 
