@@ -95,8 +95,13 @@ install_neovim_plugins() {
     echo "Installing packer.nvim"
     git clone --depth 1 https://github.com/wbthomason/packer.nvim \
       "${nvim_share_dir}/site/pack/packer/start/packer.nvim"
-    echo "packer.nvim installed, installing packages"
-    nvim --headless -es -c 'autocmd User PackerComplete quitall' -c 'PackerSync'
+    if [[ -z "${IS_DOCKER:-} " ]]; then
+      echo "packer.nvim installed, installing packages"
+      nvim --headless -es -c 'autocmd User PackerComplete quitall' -c 'PackerSync'
+    else
+      # Interactive prompts don't work while building
+      echo "Skipping packer package installation in Docker env"
+    fi
   fi
 }
 
