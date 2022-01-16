@@ -96,7 +96,7 @@ install_neovim_plugins() {
     git clone --depth 1 https://github.com/wbthomason/packer.nvim \
       "${nvim_share_dir}/site/pack/packer/start/packer.nvim"
     echo "packer.nvim installed, installing packages"
-    nvim --headless -c 'autocmd User PackerComplete quitall' -c 'PackerSync'
+    nvim --headless -es -c 'autocmd User PackerComplete quitall' -c 'PackerSync'
   fi
 }
 
