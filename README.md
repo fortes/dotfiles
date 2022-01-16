@@ -82,7 +82,7 @@ TODO: Automate these steps.
 
 ### Docker
 
-- None?
+- Must manually setup neovim. Launch and run `:PackerSync`
 
 #### TODO
 
