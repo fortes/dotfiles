@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# Setup Eternal Terminal
+#
+# Usage: setup_et
+
+set -euo pipefail
+IFS=$'\n\t'
+export DEBIAN_FRONTEND=noninteractive
+
+main() {
+  declare -r et_sources_list="/etc/apt/sources.list.d/et.list"
+  declare -r et_key_url="https://github.com/MisterTea/debian-et/raw/master/et.gpg"
+
+  if [ ! -f "${et_sources_list}" ]; then
+    echo "Adding Eternal Terminal GPG key (requires sudo)"
+    curl -sSL "${et_key_url}" | sudo -E apt-key add -
+
+    echo "Eternal Terminal sources list missing, adding (requires sudo)"
+    echo "deb https://github.com/MisterTea/debian-et/raw/master/debian-source/ bullseye main" \
+      | sudo tee "${et_sources_list}"
+
+    echo "Eternal Terminal sources added, updating packages"
+    sudo -E apt-get update -qq
+  fi
+
+  echo "Installing et package (requires sudo)"
+  sudo -E apt-get install -qq --assume-yes \
+    --fix-broken --no-install-recommends et
+}
+
+main
