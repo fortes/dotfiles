@@ -16,7 +16,7 @@ main() {
     curl -sS "$zerotier_key_url" | sudo -E apt-key add -
 
     echo "Zerotier sources list missing, adding (requires sudo)"
-    echo "deb http://download.zerotier.com/debian/buster buster main" \
+    echo "deb http://download.zerotier.com/debian/bullseye bullseye main" \
       | sudo tee "$zerotier_sources_list"
 
     echo "Zerotier sources added, updating packages"
@@ -26,6 +26,8 @@ main() {
   echo "Installing zerotier package (requires sudo)"
   sudo -E apt-get install -qq --assume-yes \
     --fix-broken --no-install-recommends zerotier-one
+
+  echo 'Join network via `sudo zerotier-cli join xxxxxxxxx`'
 }
 
 main
