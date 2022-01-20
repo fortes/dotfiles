@@ -19,12 +19,12 @@ alias mv='mv -i'
 # CD into root of git project via `...`
 alias ...="cd \$(git rev-parse --show-toplevel 2>/dev/null || echo '.')"
 
-if command_exists fzf-tmux; then
+if command_exists fzf; then
   # CD into a directory within the project, selecting via fzf
-  alias cdp="git ls-files \$(git rev-parse --show-toplevel) | xargs -n1 dirname | sort | uniq | fzf-tmux || echo '.' | xargs --no-run-if-empty cd"
+  alias cdp="git ls-files \$(git rev-parse --show-toplevel) | xargs -n1 dirname | sort | uniq | fzf || echo '.' | xargs --no-run-if-empty cd"
 
   # Fuzzy find for killing processes
-  alias fkill="ps afx | fzf-tmux | cut -f1 -d' ' | xargs --no-run-if-empty kill"
+  alias fkill="ps afx | fzf | cut -f1 -d' ' | xargs --no-run-if-empty kill"
 fi
 
 # Add current project NPM to path
