@@ -13,11 +13,11 @@ main() {
 
   if [ ! -f "${et_sources_list}" ]; then
     echo "Adding Eternal Terminal GPG key (requires sudo)"
-    curl -sSL "${et_key_url}" | sudo -E apt-key add -
+    curl -sSL "${et_key_url}" | sudo -E apt-key add - > /dev/null
 
     echo "Eternal Terminal sources list missing, adding (requires sudo)"
     echo "deb https://github.com/MisterTea/debian-et/raw/master/debian-source/ bullseye main" \
-      | sudo tee "${et_sources_list}"
+      | sudo tee "${et_sources_list}" > /dev/null
 
     echo "Eternal Terminal sources added, updating packages"
     sudo -E apt-get update -qq

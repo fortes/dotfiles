@@ -17,11 +17,11 @@ main() {
       --fix-broken --no-install-recommends apt-transport-https curl gnupg
 
     echo "Adding Brave GPG key (requires sudo)"
-    curl -sS "$brave_key_url" | sudo -E apt-key add -
+    curl -sS "$brave_key_url" | sudo -E apt-key add - > /dev/null
 
     echo "Brave sources list missing, adding (requires sudo)"
     echo "deb [arch=amd64] https://brave-browser-apt-release.s3.brave.com/ stable main" \
-      | sudo tee "$brave_sources_list"
+      | sudo tee "$brave_sources_list" > /dev/null
 
     echo "Brave sources added, updating packages"
     sudo -E apt-get update -qq

@@ -13,11 +13,11 @@ main() {
   if [ ! -f "$github_cli_sources_list" ]; then
     echo "Adding GitHub CLI GPG key (requires sudo)"
     sudo apt-key adv --keyserver keyserver.ubuntu.com \
-      --recv-key C99B11DEB97541F0
+      --recv-key C99B11DEB97541F0 > /dev/null
 
     echo "GitHub CLI sources list missing, adding (requires sudo)"
     echo "deb https://cli.github.com/packages bullseye main" \
-      | sudo tee "$github_cli_sources_list"
+      | sudo tee "$github_cli_sources_list" > /dev/null
 
     echo "GitHub CLI sources added, updating packages"
     sudo -E apt-get update -qq

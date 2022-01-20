@@ -13,11 +13,11 @@ main() {
 
   if [ ! -f "$zerotier_sources_list" ]; then
     echo "Adding Zerotier GPG key (requires sudo)"
-    curl -sS "$zerotier_key_url" | sudo -E apt-key add -
+    curl -sS "$zerotier_key_url" | sudo -E apt-key add - > /dev/null
 
     echo "Zerotier sources list missing, adding (requires sudo)"
     echo "deb http://download.zerotier.com/debian/bullseye bullseye main" \
-      | sudo tee "$zerotier_sources_list"
+      | sudo tee "$zerotier_sources_list" > /dev/null
 
     echo "Zerotier sources added, updating packages"
     sudo -E apt-get update -qq
