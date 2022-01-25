@@ -33,9 +33,6 @@ require('packer').startup(function(use)
         local function buf_set_option(...)
           vim.api.nvim_buf_set_option(bufnr, ...)
         end
-        function _G.warn_lsp_unsupported(name)
-          print(name .. ' unsupported by language server')
-        end
 
         -- Take over omnicompletion via <c-x><c-o>
         if client.resolved_capabilities.completion then
@@ -59,62 +56,38 @@ require('packer').startup(function(use)
 
         if client.resolved_capabilities.declaration then
           buf_set_keymap('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<cr>', opts)
-        else
-          buf_set_keymap('n', 'gD', '<cmd>lua warn_lsp_unsupported("Declaration")<cr>', opts)
         end
         if client.resolved_capabilities.goto_definition then
           buf_set_keymap('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>', opts)
           buf_set_keymap('n', '<C-]>', '<cmd>lua vim.lsp.buf.definition()<cr>', opts)
-        else
-          buf_set_keymap('n', 'gd', '<cmd>lua warn_lsp_unsupported("Definition")<cr>', opts)
-          buf_set_keymap('n', '<C-]>', '<cmd>lua warn_lsp_unsupported("Definition")<cr>', opts)
         end
         if client.resolved_capabilities.find_references then
           buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<cr>', opts)
           buf_set_keymap('n', 'gR', '<cmd>Telescope lsp_references<cr>', opts)
-        else
-          buf_set_keymap('n', 'gr', '<cmd>lua warn_lsp_unsupported("References")<cr>', opts)
-          buf_set_keymap('n', 'gR', '<cmd>lua warn_lsp_unsupported("References")<cr>', opts)
         end
         if client.resolved_capabilities.rename then
           buf_set_keymap('n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<cr>', opts)
-        else
-          buf_set_keymap('n', '<leader>rn', '<cmd>lua warn_lsp_unsupported("Rename")<cr>', opts)
         end
         if client.resolved_capabilities.hover then
           buf_set_keymap('n', 'gh', '<cmd>lua vim.lsp.buf.hover()<cr>', opts)
-        else
-          buf_set_keymap('n', 'gh', '<cmd>lua warn_lsp_unsupported("Hover")<cr>', opts)
         end
         if client.resolved_capabilities.implementation then
           buf_set_keymap('n', 'gI', '<cmd>lua vim.lsp.buf.implementation()<cr>', opts)
-        else
-          buf_set_keymap('n', 'gI', '<cmd>lua warn_lsp_unsupported("Implementation")<cr>', opts)
         end
         if client.resolved_capabilities.type_definition then
           buf_set_keymap('n', 'gD', '<cmd>lua vim.lsp.buf.type_definition()<cr>', opts)
-        else
-          buf_set_keymap('n', 'gD', '<cmd>lua warn_lsp_unsupported("Type definition")<cr>', opts)
         end
         if client.resolved_capabilities.signature_help then
           buf_set_keymap('n', 'g?', '<cmd>lua vim.lsp.buf.signature_help()<cr>', opts)
-        else
-          buf_set_keymap('n', 'g?', '<cmd>lua warn_lsp_unsupported("Signature help")<cr>', opts)
         end
         if client.resolved_capabilities.code_action then
           buf_set_keymap('n', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<cr>', opts)
-        else
-          buf_set_keymap('n', '<leader>ca', '<cmd>lua warn_lsp_unsupported("Code action")<cr>', opts)
         end
         if client.resolved_capabilities.document_formatting then
           buf_set_keymap('n', '<leader>f', '<cmd>lua vim.lsp.buf.formatting()<cr>', opts)
-        else
-          buf_set_keymap('n', '<leader>f', '<cmd>lua warn_lsp_unsupported("Formatting")<cr>', opts)
         end
         if client.resolved_capabilities.document_range_formatting then
           buf_set_keymap('v', '<leader>f', '<cmd>lua vim.lsp.buf.range_formatting()<cr>', opts)
-        else
-          buf_set_keymap('v', '<leader>f', '<cmd>lua warn_lsp_unsupported("Range formatting")<cr>', opts)
         end
         if client.resolved_capabilities.document_symbol then
           buf_set_keymap('n', '<leader>ds', '<cmd>Telescope lsp_document_symbols<cr>', opts)
@@ -123,8 +96,6 @@ require('packer').startup(function(use)
         end
         if client.resolved_capabilities.workspace_symbol then
           buf_set_keymap('n', '<leader>ws', '<cmd>Telescope lsp_dynamic_workspace_symbols<cr>', opts)
-        else
-          buf_set_keymap('n', '<leader>ws', '<cmd>lua warn_lsp_unsupported("Workspace symbol")<cr>', opts)
         end
 
         buf_set_keymap('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<cr>', opts)
