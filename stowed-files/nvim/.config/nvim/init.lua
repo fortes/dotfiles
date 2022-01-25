@@ -377,6 +377,14 @@ require('packer').startup(function(use)
     end
   }
 
+  -- Preview line number via `:XXX` before moving
+  use {
+    'nacro90/numb.nvim',
+    config = function()
+      require('numb').setup()
+    end
+  }
+
   -- Shows git diff in signs column
   -- `[c` / `]c` to jump between hunks
   -- <leader>hs to stage hunk
