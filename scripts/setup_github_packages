@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Install some specific packages directly from GitHub. Specifically:
 #
+# - deno
 # - docker-compose
 # - hugo
 # - neovim (latest)
@@ -22,6 +23,27 @@ get_latest_release_url() {
 
   local release_json_url="https://api.github.com/repos/${repo}/releases/latest"
   curl --silent "${release_json_url}" | jq -r '.assets[].browser_download_url' | grep "${match}" | head -n 1
+}
+
+install_deno() {
+  local url="$(get_latest_release_url 'denoland/deno' 'deno-x86_64-unknown-linux-gnu.zip')"
+  if [[ -z "${url}" ]]; then
+    echo_stderr "Could not find url"
+    exit 2
+  fi
+  echo "Downloading deno"
+  local install_location="$HOME/.local/bin"
+  mkdir -p "${install_location}"
+  pushd /tmp > /dev/null
+  wget --quiet -O "/tmp/deno.zip" "${url}"
+  unzip -o -d "${install_location}" /tmp/deno.zip
+  rm /tmp/deno.zip
+  popd > /dev/null
+  chmod +x "${install_location}/deno"
+  echo "deno installed"
+  echo "Generating bash completion"
+  mkdir -p "$HOME/.local/completion.d"
+  "${install_location}"/deno completions bash > "$HOME/.local/completion.d/deno_completion"
 }
 
 install_docker_compose() {
@@ -100,6 +122,7 @@ install_neovim_stable() {
 main() {
   . "$HOME/.profile.local"
 
+  install_deno
   install_docker_compose
   install_hugo
   install_neovim_stable
