@@ -140,22 +140,22 @@ remove_default_dotfile() {
 }
 
 set_default_applications() {
-  if command_exists nvim && [[ -z $(update-alternatives --get-selections | grep editor | grep nvim) ]]; then
+  if command_exists nvim && [[ -z $(update-alternatives --query editor | grep ^Value | grep nvim) ]]; then
     echo "Setting Neovim as default text editor (requires sudo)"
     sudo update-alternatives --install /usr/bin/editor editor "$(command -v nvim)" 60
   fi
 
-  if command_exists kitty && [[ -z $(update-alternatives --get-selections | grep kitty) ]]; then
+  if command_exists kitty && [[ -z $(update-alternatives --query x-terminal-editor | grep ^Value | grep kitty) ]]; then
     echo "Setting Kitty as default terminal (requires sudo)"
     sudo update-alternatives --set x-terminal-emulator "$(command -v kitty)"
   fi
 
-  if command_exists chromium && [[ -z $(update-alternatives --get-selections | grep chromium) ]]; then
-    echo "Setting Chromium as default browser (requires sudo)"
-    sudo update-alternatives --set x-www-browser "$(command -v chromium)"
+  if command_exists firefox-esr && [[ -z $(update-alternatives --query  x-www-browser | grep ^Value | grep firefox) ]]; then
+    echo "Setting Firefox as default browser (requires sudo)"
+    sudo update-alternatives --set x-www-browser "$(command -v firefox-esr)"
   fi
 
-  if command_exists yarnpkg && [[ -z $(update-alternatives --get-selections | grep yarn) ]]; then
+  if command_exists yarnpkg && [[ -z $(update-alternatives --query yarn | grep ^Value | grep yarnpkg) ]]; then
     echo "Setting 'yarn' as system alias to 'yarnpkg' (requires sudo)"
     sudo update-alternatives --install /usr/bin/yarn yarn /usr/bin/yarnpkg 10
   fi
