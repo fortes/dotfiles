@@ -94,14 +94,14 @@ fi
 # Different host colors for different environments
 if [ "$IS_DOCKER" == "1" ]; then
   HOST_COLOR="$GREEN"
-elif [ ! -z "$SSH_TTY" ]; then
+elif [[ ! -z "$SSH_TTY" && ! -z "$ET_VERSION" ]]; then
   HOST_COLOR="$RED"
 else
   HOST_COLOR="$CYAN"
 fi
 
 # [[user@]host]:pwd $
-if [ -z "$SSH_TTY" ]; then
+if [[ -z "$SSH_TTY" && -z "$ET_VERSION" ]]; then
   BASE_PROMPT="$BASE_PROMPT$YELLOW\w$RESET"
 else
   BASE_PROMPT="$BASE_PROMPT$HOST_COLOR\h:$YELLOW\w$RESET"

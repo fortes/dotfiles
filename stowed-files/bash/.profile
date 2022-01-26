@@ -91,6 +91,11 @@ export RIPGREP_CONFIG_PATH="$XDG_CONFIG_HOME/ripgrep/rc"
 if [ -z "${SSH_AUTH_SOCK:-}" ] && command_exists keychain; then
   # Don't prompt for password to load id_rsa if not already loaded
   eval "$(keychain --eval --noask --agents ssh --quiet)"
+
+  SSH_SOCKET_LOCATION="$HOME/.ssh/ssh_auth_sock"
+  if [ ! -S "${SSH_SOCKET_LOCATION}" ] && [ -S "${SSH_AUTH_SOCK}" ]; then
+    ln -sf "${SSH_AUTH_SOCK}" "${SSH_SOCKET_LOCATION}"
+  fi
 fi
 
 # Local overrides
