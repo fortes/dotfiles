@@ -145,7 +145,7 @@ set_default_applications() {
     sudo update-alternatives --install /usr/bin/editor editor "$(command -v nvim)" 60
   fi
 
-  if command_exists kitty && [[ -z $(update-alternatives --query x-terminal-editor | grep ^Value | grep kitty) ]]; then
+  if command_exists kitty && [[ -z $(update-alternatives --query x-terminal-emulator | grep ^Value | grep kitty) ]]; then
     echo "Setting Kitty as default terminal (requires sudo)"
     sudo update-alternatives --set x-terminal-emulator "$(command -v kitty)"
   fi
