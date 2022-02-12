@@ -13,7 +13,7 @@ main() {
 
   echo "Installing pre-requisites"
   sudo -E apt-get install -qq --assume-yes \
-    --fix-broken --no-install-recommends libgl1-mesa-glx libxcb-xtest0
+    --fix-broken --no-install-recommends libgl1-mesa-glx libxcb-xtest0 libegl1-mesa
 
   echo "Downloading latest Zoom .deb"
   wget "${zoom_deb_url}" -O "${zoom_deb_temp_path}"
