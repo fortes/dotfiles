@@ -202,6 +202,19 @@ require('packer').startup(function(use)
     after = {'nvim-treesitter'},
   }
 
+  -- Use Treesitter to add `end` in Lua, Bash, etc
+  use {
+    'RRethy/nvim-treesitter-endwise',
+    after = {'nvim-treesitter'},
+    config = function()
+      require('nvim-treesitter.configs').setup {
+        endwise = {
+          enable = true
+        }
+      }
+    end,
+  }
+
   -- Use Treesitter to do LSP-like things:
   use {
     'nvim-treesitter/nvim-treesitter-refactor',
