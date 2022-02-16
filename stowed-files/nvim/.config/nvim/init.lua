@@ -126,6 +126,15 @@ require('packer').startup(function(use)
     end
   }
 
+  -- Show LSP progress in lower right
+  use {
+    'j-hui/fidget.nvim',
+    after = {'nvim-lspconfig'},
+    config = function()
+      require('fidget').setup({})
+    end
+  }
+
   -- Treesitter for better highlighting, indent, etc
   use {
     'nvim-treesitter/nvim-treesitter',
