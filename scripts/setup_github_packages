@@ -71,9 +71,14 @@ install_hugo() {
   echo "Installing hugo (requires sudo)"
   sudo dpkg -i hugo.deb
   rm hugo.deb
-  echo "Generating bash completion"
+  echo "Generating bash completion & man pages"
   mkdir -p "$HOME/.local/completion.d"
-  hugo gen autocomplete --completionfile="$HOME/.local/completion.d/hugo_completion"
+  hugo completion bash > "$HOME/.local/completion.d/hugo_completion"
+  cd "$(mktemp -d)"
+  hugo gen man
+  local man_dir_path="$HOME/.local/share/man/man1"
+  mkdir -p "${man_dir_path}"
+  mv man/* "${man_dir_path}"
   popd > /dev/null
 }
 
