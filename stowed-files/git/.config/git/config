@@ -39,6 +39,8 @@
   autocorrect = 1
 [interactive]
   diffFilter = "diff-so-fancy-with-fallback --patch"
+[merge]
+  conflictStyle = diff3
 [pull]
   rebase = true
 [push]
