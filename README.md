@@ -66,15 +66,36 @@ TODO: Automate these steps.
 
 - Extensions should automatically sync and install
 - Setup Phone Smart Lock & PIN unlock
-- Enable Linux
+- Enable Linux, run `setup_machine`
 - Share `Downloads` folder with Linux
-- Enable cloud storage for uBlock
 
 ### Windows
 
-- Make sure WSL2 is setup
-- Get WinGet
-- Install Windows Terminal
+- Run all Windows Updates
+- Install drivers, update BIOS, etc
+- Enable BitLocker
+- Uninstall Teams, and other pre-installed unwanted things
+- Adjust taskbar settings
+- Set Windows Terminal as default terminal application
+- Get WinGet via MS Store via `App Installer`
+  - `winget install 1Password`
+  - `winget install Firefox.Firefox`
+  - `winget install Google.Chrome.Dev`
+  - `winget install Zoom.Zoom`
+  - `winget install Plex.PlexAmp`
+  - `winget install vscode`
+    - Install vim, WSL, and SSH extensions
+- WSL
+  - `wsl --install --distribution Debian` in admin command line
+  - If not on `bullseye` (was `stretch` last tried in April 2022), then need to update `/etc/apt/sources.list`:
+    ```
+deb http://deb.debian.org/debian bullseye main
+deb http://deb.debian.org/debian bullseye-updates main
+deb http://security.debian.org/debian-security/ bullseye-security main
+    ```
+  - `sudo apt update && sudo apt dist-upgrade`
+  - Run `setup_machine`
+- Set Debian as default terminal
 
 ### EC2
 
