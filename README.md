@@ -83,6 +83,7 @@ TODO: Automate these steps.
   - `winget install Google.Chrome.Dev`
   - `winget install Zoom.Zoom`
   - `winget install Plex.PlexAmp`
+  - `winget install ShareX.ShareX`
   - `winget install vscode`
     - Install vim, WSL, and SSH extensions
 - WSL
