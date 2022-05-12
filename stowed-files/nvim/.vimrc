@@ -226,7 +226,7 @@ if has('statusline')
   function! StatuslineTag()
     if exists('g:loaded_fugitive')
       " Shitty unicode character w/o patched fonts
-      return '‡'.fugitive#head()
+      return '‡'.FugitiveHead()
     else
       return fnamemodify(getwinvar(0, 'getcwd', getcwd()), ':t')
     endif
