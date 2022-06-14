@@ -39,6 +39,11 @@ require('packer').startup(function(use)
           buf_set_option('omnifunc', 'v:lua.vim.lsp.omnifunc')
         end
 
+        -- Never use tsserver formatting, it's not very good
+        if client.name == 'tsserver' then
+          client.resolved_capabilities.document_formatting = false
+        end
+
         -- Format on save, where supported
         if client.resolved_capabilities.document_formatting then
           vim.cmd([[
