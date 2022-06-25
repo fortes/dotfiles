@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+#
+# Subtract two numbers
+main() {
+  VAL=$(("${1:0}" - "${2:0}"))
+  if [ "${VAL}" -lt 0 ]; then
+    echo 1
+  else
+    echo $VAL
+  fi
+}
+
+main "${@}"
