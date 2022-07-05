@@ -11,7 +11,7 @@ main() {
     --preview 'batcat --color always --style=grid,changes \
                 --highlight-line {2} \
                 --paging=never \
-                --line-range $(rgvf_subtract_helper {2} 5 || echo 1): {1}'
+                --line-range $(rgfzf_subtract_helper {2} 5 || echo 1): {1}'
 }
 
 main "${@}"
