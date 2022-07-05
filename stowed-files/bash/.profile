@@ -85,6 +85,14 @@ if [ -z "${XDG_CONFIG_HOME:-}" ]; then
   export XDG_CONFIG_HOME="$HOME/.config"
 fi
 
+if [ -z "${XDG_DOWNLOAD_DIR}" ]; then
+  if [ -d "$HOME/downloads" ]; then
+    export XDG_DOWNLOAD_DIR="$HOME/downloads"
+  elif [ -d "$HOME/Downloads" ]; then
+    export XDG_DOWNLOAD_DIR="$HOME/Downloads"
+  fi
+fi
+
 # Rg, for whatever reason, needs to manually specify location for config
 export RIPGREP_CONFIG_PATH="$XDG_CONFIG_HOME/ripgrep/rc"
 
