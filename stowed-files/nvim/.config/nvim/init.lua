@@ -418,12 +418,11 @@ require('packer').startup(function(use)
   -- <leader>hp to preview hunk
   use {
     'lewis6991/gitsigns.nvim',
-    requires = {
-      -- Helper functions
-      'nvim-lua/plenary.nvim',
-    },
     config = function()
-      require('gitsigns').setup()
+      require('gitsigns').setup({
+        signcolumn = true,
+        current_line_blame = true,
+      })
     end
   }
 
