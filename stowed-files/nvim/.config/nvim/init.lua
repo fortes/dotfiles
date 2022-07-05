@@ -335,7 +335,7 @@ require('packer').startup(function(use)
         vim.api.nvim_set_keymap('n', '<m-p>',
           [[<cmd>Telescope oldfiles<cr>]],
           opts)
-        vim.api.nvim_set_keymap('n', '<c-b>',
+        vim.api.nvim_set_keymap('n', '<m-b>',
           [[<cmd>Telescope buffers show_all_buffers=true<cr>]],
           opts)
         vim.api.nvim_set_keymap('n', 'Q',
@@ -398,7 +398,7 @@ require('packer').startup(function(use)
 
   -- Display available key bindings, marks, registers, etc
   use {
-    "folke/which-key.nvim",
+    'folke/which-key.nvim',
     config = function()
       require("which-key").setup()
     end
