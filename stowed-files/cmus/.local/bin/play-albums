@@ -5,11 +5,12 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
+# shellcheck disable=SC2016
 BEET_FORMAT_STRING='$mb_albumid $albumartist - [$original_year] $album%aunique{albumartist album original_year, albumtype albumdisambig label year catalognum}'
 
 main() {
-  declare -r cmus_status=$(cmus-remote -Q)
-  declare -r album_ids=$(beet ls -f"$BEET_FORMAT_STRING" -a "$@" added- albumartist+ | \
+  cmus_status=$(cmus-remote -Q)
+  album_ids=$(beet ls -f"$BEET_FORMAT_STRING" -a "$@" added- albumartist+ | \
     fzf --multi -1 -0 --with-nth 2.. | awk '{print $1}')
 
   if [ -z "$album_ids" ]; then
@@ -17,7 +18,7 @@ main() {
     return 1
   fi
 
-  declare query=""
+  query=""
   for album_id in $album_ids; do
     query="$query, mb_albumid:${album_id}"
   done
@@ -25,11 +26,13 @@ main() {
   # Remove initial ', '
   query=$(echo "$query" | cut -c3-)
 
-  declare -r num_albums=$(wc -l <<< "$album_ids")
+  num_albums=$(wc -l <<< "$album_ids")
   echo "Playing $num_albums albums"
 
   # Pause
   cmus-remote -C 'view queue'
+  # TODO: Add --args in order to add `-c` for clearing, then make parameterized
+  # shellcheck disable=SC2086
   beet play -y $query year- album- track+
 
   # Wait a beat in order to make sure cmus has queued the album
@@ -44,7 +47,7 @@ main() {
 }
 
 if cmus-remote -Q > /dev/null 2>&1; then
-  if [[ -z "$@" ]]; then
+  if [[ -z "$*" ]]; then
     main "added:-1w.."
   else
     main "$@"
