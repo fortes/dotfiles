@@ -25,7 +25,7 @@ main() {
 
   echo "Installing signal package (requires sudo)"
   sudo -E apt-get install -qq --assume-yes \
-    --fix-broken --no-install-recommends signal-desktop
+    --fix-broken --no-install-recommends signal-desktop desktop-file-utils
 }
 
 main
