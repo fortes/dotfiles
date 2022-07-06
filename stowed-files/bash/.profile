@@ -85,7 +85,7 @@ if [ -z "${XDG_CONFIG_HOME:-}" ]; then
   export XDG_CONFIG_HOME="$HOME/.config"
 fi
 
-if [ -z "${XDG_DOWNLOAD_DIR}" ]; then
+if [ -z "${XDG_DOWNLOAD_DIR:-}" ]; then
   if [ -d "$HOME/downloads" ]; then
     export XDG_DOWNLOAD_DIR="$HOME/downloads"
   elif [ -d "$HOME/Downloads" ]; then
