@@ -23,6 +23,12 @@ Then add the key into GitHub and wherever else
 
 2. Add any additional ssh keys into `~/.ssh`
 
+Might need to extract out of 1Password, once downloaded will have the password removed. To restore, do
+
+```sh
+ssh-keygen -p -f KEY_FILE
+```
+
 3. Authorize your public keys on the new machine:
 
    ```sh
@@ -73,17 +79,17 @@ TODO: Automate these steps.
 
 - Run all Windows Updates
 - Install drivers, update BIOS, etc
-- Enable BitLocker
 - Uninstall Teams, and other pre-installed unwanted things
+- Enable BitLocker
 - Adjust taskbar settings
-- Set Windows Terminal as default terminal application
 - Get WinGet via MS Store via `App Installer`
   - `winget install 1Password`
-  - `winget install Firefox.Firefox`
   - `winget install Google.Chrome.Dev`
-  - `winget install Zoom.Zoom`
+  - `winget install Mozilla.Firefox`
   - `winget install Plex.PlexAmp`
   - `winget install ShareX.ShareX`
+  - `winget install VideoLAN.VLC`
+  - `winget install Zoom.Zoom`
   - `winget install vscode`
     - Install vim, WSL, and SSH extensions
 - WSL
@@ -95,7 +101,8 @@ deb http://deb.debian.org/debian bullseye-updates main
 deb http://security.debian.org/debian-security/ bullseye-security main
     ```
   - `sudo apt update && sudo apt dist-upgrade`
-  - Run `setup_machine`
+  - Run `~/dotfiles/setup_machine`
+- Set Windows Terminal as default terminal application
 - Set Debian as default terminal
 
 ### EC2
