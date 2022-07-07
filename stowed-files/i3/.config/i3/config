@@ -155,6 +155,12 @@ mode "resize" {
 
 bindsym $mod+r mode "resize"
 
+# Quick resize w/o mode or mouse
+bindsym $mod+Ctrl+Shift+Right resize grow width 5 px or 5 ppt
+bindsym $mod+Ctrl+Shift+Left resize shrink width 5 px or 5 ppt
+bindsym $mod+Ctrl+Shift+Up resize grow height 5 px or 5 ppt
+bindsym $mod+Ctrl+Shift+Down resize shrink height 5 px or 5 ppt
+
 # Use hardware key to start/stop music
 bindsym XF86AudioPlay exec --no-startup-id cmus-remote --pause
 
