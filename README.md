@@ -19,15 +19,15 @@ Once you've run setup, you'll still have to do the following manual steps:
    ssh-keygen -t ed25519 -C "$(hostname)"
    ```
 
-Then add the key into GitHub and wherever else
+   Then add the key into GitHub and wherever else
 
 2. Add any additional ssh keys into `~/.ssh`
 
-Might need to extract out of 1Password, once downloaded will have the password removed. To restore, do
+   Might need to extract out of 1Password, once downloaded will have the password removed. To restore, do
 
-```sh
-ssh-keygen -p -f KEY_FILE
-```
+   ```sh
+   ssh-keygen -p -f KEY_FILE
+   ```
 
 3. Authorize your public keys on the new machine:
 
@@ -67,6 +67,13 @@ TODO: Automate these steps.
 
 - Depending on the machine, you may need `pavucontrol` in order to unmute your audio output via GUI.
   \*\* Alternatively, find the name of the desired output via `pacmd list-sinks` then run `pacmd set-default-sink $SINK_NAME` and make sure to unmute via `pacmd set-sink-mute [name] 0`
+- If running multiple monitors, need to configure Wacom tablet to only use a specific monitor:
+  ```sh
+  xsetwacom --list | grep stylus # get id, e.g. "21"
+  xrandr --listactivemonitors # get id, e.g. DP-2
+
+  xsetwacom --set "21" MapToOutput DP-2
+  ```
 
 ### Chromebook
 
