@@ -116,7 +116,7 @@ require('packer').startup(function(use)
         'eslint',
         'html',
         'jsonls',
-        'pylsp',
+        'pyright',
         'tsserver',
         'vimls'
       }
