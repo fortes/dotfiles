@@ -471,7 +471,14 @@ require('packer').startup(function(use)
   use {'tpope/vim-commentary'}
 
   -- Edit surrounding quotes / parents / etc
-  use {'tpope/vim-surround'}
+  use {
+    'kylechui/nvim-surround',
+    config = function()
+      require('nvim-surround').setup({
+        -- Use defaults
+      })
+    end
+  }
 
   -- Movement and option switches via `[` and `]` (toggle with `y`)
   use {'tpope/vim-unimpaired'}
