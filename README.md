@@ -116,6 +116,10 @@ deb http://security.debian.org/debian-security/ bullseye-security main
   - Run `~/dotfiles/setup_machine`
 - Set Windows Terminal as default terminal application
 - Set Debian as default terminal
+- To mount network shares, do something like this in `/etc/fstab`:
+  ```
+  \\machine-name\share	/mnt/machine-share	drvfs	defaults,ro,noatime,uid=1000,gid=1000,umask=022	0	0
+  ```
 
 ### EC2
 
