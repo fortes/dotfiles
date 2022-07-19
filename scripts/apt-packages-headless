@@ -10,6 +10,7 @@ bash-completion
 bat
 build-essential
 ca-certificates
+cifs-utils
 curl
 dnsutils
 duf/bullseye-backports

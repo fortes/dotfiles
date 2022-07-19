@@ -74,6 +74,11 @@ TODO: Automate these steps.
 
   xsetwacom --set "21" MapToOutput DP-2
   ```
+- To mount SMB shares on boot, add something like the following to `/etc/fstab`:
+
+  ```
+  //machine-name/share /media/share cifs nofail,user=,password=,ro	0	0
+  ```
 
 ### Chromebook
 
