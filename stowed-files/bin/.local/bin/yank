@@ -36,7 +36,11 @@ main() {
 
   if inX; then
     echo "$buf" | xsel -ib
-    notify-send --hint=int:transient:1 -u low -t 1000 'Copied!'
+    if command -v notify-send > /dev/null; then
+      notify-send --hint=int:transient:1 -u low -t 1000 'Copied!'
+    elif isWithinTmux; then
+      tmux display-message 'Copied!'
+    fi
   else
     # Use OSC52 to copy over SSH
     output=$(get_osc52 "$buf")
