@@ -26,7 +26,8 @@ get_latest_release_url() {
 }
 
 install_deno() {
-  local url="$(get_latest_release_url 'denoland/deno' 'deno-x86_64-unknown-linux-gnu.zip')"
+  local url
+  url="$(get_latest_release_url 'denoland/deno' 'deno-x86_64-unknown-linux-gnu.zip')"
   if [[ -z "${url}" ]]; then
     echo_stderr "Could not find url"
     exit 2
@@ -47,7 +48,8 @@ install_deno() {
 }
 
 install_docker_compose() {
-  local url="$(get_latest_release_url 'docker/compose' 'linux-x86_64')"
+  local url
+  url="$(get_latest_release_url 'docker/compose' 'linux-x86_64')"
   if [[ -z "${url}" ]]; then
     echo_stderr "Could not find url"
     exit 2
@@ -61,7 +63,8 @@ install_docker_compose() {
 }
 
 install_hugo() {
-  local url="$(get_latest_release_url 'gohugoio/hugo' 'hugo_extended.*Linux-64bit\.deb')"
+  local url
+  url="$(get_latest_release_url 'gohugoio/hugo' 'hugo_.*_linux-amd64.deb')"
   if [[ -z "${url}" ]]; then
     echo_stderr "Could not find url"
     exit 2
@@ -83,7 +86,8 @@ install_hugo() {
 }
 
 install_sad() {
-  local url="$(get_latest_release_url 'ms-jpq/sad' 'x86_64-unknown-linux-gnu.deb')"
+  local url
+  url="$(get_latest_release_url 'ms-jpq/sad' 'x86_64-unknown-linux-gnu.deb')"
   if [[ -z "${url}" ]]; then
     echo_stderr "Could not find url"
     exit 2
