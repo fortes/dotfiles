@@ -62,6 +62,22 @@ install_docker_compose() {
   echo "docker-compose installed"
 }
 
+install_helix() {
+  local url
+  url="$(get_latest_release_url 'helix-editor/helix' 'x86_64.AppImage')"
+  if [[ -z "${url}" ]]; then
+    echo_stderr "Could not find url"
+    exit 2
+  fi
+
+  local install_location="$HOME/.local/bin"
+  mkdir -p "${install_location}"
+  echo "Downloading helix"
+  wget --quiet -O "${install_location}/hx" "${url}"
+  chmod +x "${install_location}/hx"
+  echo "helix installed"
+}
+
 install_hugo() {
   local url
   url="$(get_latest_release_url 'gohugoio/hugo' 'hugo_.*_linux-amd64.deb')"
@@ -133,6 +149,7 @@ main() {
 
   install_deno
   install_docker_compose
+  install_helix
   install_hugo
   install_neovim_stable
   install_sad
