@@ -35,14 +35,6 @@ require('packer').startup(function(use)
           }
           vim.keymap.set(...)
         end
-        local function buf_set_option(...)
-          vim.api.nvim_buf_set_option(bufnr, ...)
-        end
-
-        -- Take over omnicompletion via <c-x><c-o>
-        if client.server_capabilities.completionProvider then
-          buf_set_option('omnifunc', 'v:lua.vim.lsp.omnifunc')
-        end
 
         -- Never use tsserver formatting, it's not very good
         if client.name == 'tsserver' then
@@ -51,7 +43,7 @@ require('packer').startup(function(use)
 
         if client.server_capabilities.definitionProvider then
           map('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>')
-          map('n', '<C-]>', '<cmd>lua vim.lsp.buf.definition()<cr>')
+          -- <C-]> automapped via `tagfunc`
         end
         if client.server_capabilities.referencesProvider then
           map('n', 'gr', '<cmd>lua vim.lsp.buf.references()<cr>')
@@ -76,13 +68,13 @@ require('packer').startup(function(use)
           map('n', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<cr>')
         end
         if client.server_capabilities.documentFormattingProvider then
-          map('n', '<leader>f', '<cmd>lua vim.lsp.buf.formatting()<cr>')
+          map('n', '<leader>f', '<cmd>lua vim.lsp.buf.format({async = true})<cr>')
 
           -- Format on save, where supported
           vim.cmd([[
             augroup lsp_format_on_save
               autocmd!
-              autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync()
+              autocmd BufWritePre <buffer> lua vim.lsp.buf.format({async = true})
             augroup end
           ]])
         end
