@@ -35,23 +35,13 @@ require('packer').startup(function(use)
         end
 
         -- Take over omnicompletion via <c-x><c-o>
-        if client.server_capabilities.completion then
+        if client.server_capabilities.completionProvider then
           buf_set_option('omnifunc', 'v:lua.vim.lsp.omnifunc')
         end
 
         -- Never use tsserver formatting, it's not very good
         if client.name == 'tsserver' then
-          client.server_capabilities.document_formatting = false
-        end
-
-        -- Format on save, where supported
-        if client.server_capabilities.document_formatting then
-          vim.cmd([[
-            augroup lsp_format_on_save
-              autocmd!
-              autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync()
-            augroup end
-          ]])
+          client.server_capabilities.documentFormattingProvider = false
         end
 
         local opts = {
@@ -59,47 +49,52 @@ require('packer').startup(function(use)
           silent=true
         }
 
-        if client.server_capabilities.declaration then
-          buf_set_keymap('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<cr>', opts)
-        end
-        if client.server_capabilities.goto_definition then
+        if client.server_capabilities.definitionProvider then
           buf_set_keymap('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>', opts)
           buf_set_keymap('n', '<C-]>', '<cmd>lua vim.lsp.buf.definition()<cr>', opts)
         end
-        if client.server_capabilities.find_references then
+        if client.server_capabilities.referencesProvider then
           buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<cr>', opts)
           buf_set_keymap('n', 'gR', '<cmd>Telescope lsp_references<cr>', opts)
         end
-        if client.server_capabilities.rename then
+        if client.server_capabilities.renameProvider then
           buf_set_keymap('n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<cr>', opts)
         end
-        if client.server_capabilities.hover then
+        if client.server_capabilities.hoverProvider then
           buf_set_keymap('n', 'gh', '<cmd>lua vim.lsp.buf.hover()<cr>', opts)
         end
-        if client.server_capabilities.implementation then
+        if client.server_capabilities.implementationProvider then
           buf_set_keymap('n', 'gI', '<cmd>lua vim.lsp.buf.implementation()<cr>', opts)
         end
-        if client.server_capabilities.type_definition then
+        if client.server_capabilities.typeDefinitionProvider then
           buf_set_keymap('n', 'gD', '<cmd>lua vim.lsp.buf.type_definition()<cr>', opts)
         end
-        if client.server_capabilities.signature_help then
+        if client.server_capabilities.signatureHelpProvider then
           buf_set_keymap('n', 'g?', '<cmd>lua vim.lsp.buf.signature_help()<cr>', opts)
         end
-        if client.server_capabilities.code_action then
+        if client.server_capabilities.codeActionProvider then
           buf_set_keymap('n', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<cr>', opts)
         end
-        if client.server_capabilities.document_formatting then
+        if client.server_capabilities.documentFormattingProvider then
           buf_set_keymap('n', '<leader>f', '<cmd>lua vim.lsp.buf.formatting()<cr>', opts)
+
+          -- Format on save, where supported
+          vim.cmd([[
+            augroup lsp_format_on_save
+              autocmd!
+              autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync()
+            augroup end
+          ]])
         end
-        if client.server_capabilities.document_range_formatting then
+        if client.server_capabilities.documentRangeFormattingProvider then
           buf_set_keymap('v', '<leader>f', '<cmd>lua vim.lsp.buf.range_formatting()<cr>', opts)
         end
-        if client.server_capabilities.document_symbol then
+        if client.server_capabilities.documentSymbolProvider then
           buf_set_keymap('n', '<leader>ds', '<cmd>Telescope lsp_document_symbols<cr>', opts)
         else
           buf_set_keymap('n', '<leader>ds', '<cmd>Telescope treesitter<cr>', opts)
         end
-        if client.server_capabilities.workspace_symbol then
+        if client.server_capabilities.workspaceSymbolProvider then
           buf_set_keymap('n', '<leader>ws', '<cmd>Telescope lsp_dynamic_workspace_symbols<cr>', opts)
         end
 
