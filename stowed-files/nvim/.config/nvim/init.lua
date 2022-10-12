@@ -414,8 +414,40 @@ require('packer').startup(function(use)
       require('gitsigns').setup({
         signcolumn = true,
         current_line_blame = true,
+        on_attach = function(bufnr)
+          local gs = package.loaded.gitsigns
+
+          local function map(...)
+            opts = {
+              buffer=bufnr,
+              noremap=true,
+              silent=true
+            }
+            vim.keymap.set(...)
+          end
+
+          -- Toggle staging
+          -- <leader>hs Stage current hunk
+          map('n', '<leader>hs', ':Gitsigns stage_hunk<CR>')
+          -- <leader>hS Unstage current hunk
+          map('n', '<leader>hS', ':Gitsigns undo_stage_hunk<CR>')
+          -- <leader>hP Preview current hunk
+          map('n', '<leader>hP', ':Gitsigns preview_hunk<CR>')
+
+          -- Toggle options
+          -- <leader>gB show blame for current line
+          map('n', '<leader>gB', ':Gitsigns blame_line<CR>')
+          -- <leader>gbl toggle current line blame
+          map('n', '<leader>gbl', ':Gitsigns toggle_current_line_blame<CR>')
+          -- <leader>gd toggle deleted
+          map('n', '<leader>gd', ':Gitsigns toggle_deleted<CR>')
+          -- <leader>gs toggle signs
+          map('n', '<leader>gs', ':Gitsigns toggle_signs<CR>')
+          -- <leader>gw toggle word diff
+          map('n', '<leader>gw', ':Gitsigns toggle_word_diff<CR>')
+        end
       })
-    end
+    end,
   }
 
   -- Better text objects, will seek to nearest match on line
