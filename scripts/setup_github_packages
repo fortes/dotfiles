@@ -80,7 +80,7 @@ install_helix() {
 
 install_hugo() {
   local url
-  url="$(get_latest_release_url 'gohugoio/hugo' 'hugo_.*_linux-amd64.deb')"
+  url="$(get_latest_release_url 'gohugoio/hugo' 'hugo_extended_.*_linux-amd64.deb')"
   if [[ -z "${url}" ]]; then
     echo_stderr "Could not find url"
     exit 2
