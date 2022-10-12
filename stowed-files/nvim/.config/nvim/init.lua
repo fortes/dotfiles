@@ -27,8 +27,13 @@ require('packer').startup(function(use)
 
       -- Only map keys after language server has attached to buffer
       local lsp_on_attach = function(client, bufnr)
-        local function buf_set_keymap(...)
-          vim.api.nvim_buf_set_keymap(bufnr, ...)
+        local function map(...)
+          opts = {
+            buffer=bufnr,
+            noremap=true,
+            silent=true
+          }
+          vim.keymap.set(...)
         end
         local function buf_set_option(...)
           vim.api.nvim_buf_set_option(bufnr, ...)
@@ -44,39 +49,34 @@ require('packer').startup(function(use)
           client.server_capabilities.documentFormattingProvider = false
         end
 
-        local opts = {
-          noremap=true,
-          silent=true
-        }
-
         if client.server_capabilities.definitionProvider then
-          buf_set_keymap('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>', opts)
-          buf_set_keymap('n', '<C-]>', '<cmd>lua vim.lsp.buf.definition()<cr>', opts)
+          map('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>')
+          map('n', '<C-]>', '<cmd>lua vim.lsp.buf.definition()<cr>')
         end
         if client.server_capabilities.referencesProvider then
-          buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<cr>', opts)
-          buf_set_keymap('n', 'gR', '<cmd>Telescope lsp_references<cr>', opts)
+          map('n', 'gr', '<cmd>lua vim.lsp.buf.references()<cr>')
+          map('n', 'gR', '<cmd>Telescope lsp_references<cr>')
         end
         if client.server_capabilities.renameProvider then
-          buf_set_keymap('n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<cr>', opts)
+          map('n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<cr>')
         end
         if client.server_capabilities.hoverProvider then
-          buf_set_keymap('n', 'gh', '<cmd>lua vim.lsp.buf.hover()<cr>', opts)
+          map('n', 'gh', '<cmd>lua vim.lsp.buf.hover()<cr>')
         end
         if client.server_capabilities.implementationProvider then
-          buf_set_keymap('n', 'gI', '<cmd>lua vim.lsp.buf.implementation()<cr>', opts)
+          map('n', 'gI', '<cmd>lua vim.lsp.buf.implementation()<cr>')
         end
         if client.server_capabilities.typeDefinitionProvider then
-          buf_set_keymap('n', 'gD', '<cmd>lua vim.lsp.buf.type_definition()<cr>', opts)
+          map('n', 'gD', '<cmd>lua vim.lsp.buf.type_definition()<cr>')
         end
         if client.server_capabilities.signatureHelpProvider then
-          buf_set_keymap('n', 'g?', '<cmd>lua vim.lsp.buf.signature_help()<cr>', opts)
+          map('n', 'g?', '<cmd>lua vim.lsp.buf.signature_help()<cr>')
         end
         if client.server_capabilities.codeActionProvider then
-          buf_set_keymap('n', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<cr>', opts)
+          map('n', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<cr>')
         end
         if client.server_capabilities.documentFormattingProvider then
-          buf_set_keymap('n', '<leader>f', '<cmd>lua vim.lsp.buf.formatting()<cr>', opts)
+          map('n', '<leader>f', '<cmd>lua vim.lsp.buf.formatting()<cr>')
 
           -- Format on save, where supported
           vim.cmd([[
@@ -87,21 +87,21 @@ require('packer').startup(function(use)
           ]])
         end
         if client.server_capabilities.documentRangeFormattingProvider then
-          buf_set_keymap('v', '<leader>f', '<cmd>lua vim.lsp.buf.range_formatting()<cr>', opts)
+          map('v', '<leader>f', '<cmd>lua vim.lsp.buf.range_formatting()<cr>')
         end
         if client.server_capabilities.documentSymbolProvider then
-          buf_set_keymap('n', '<leader>ds', '<cmd>Telescope lsp_document_symbols<cr>', opts)
+          map('n', '<leader>ds', '<cmd>Telescope lsp_document_symbols<cr>')
         else
-          buf_set_keymap('n', '<leader>ds', '<cmd>Telescope treesitter<cr>', opts)
+          map('n', '<leader>ds', '<cmd>Telescope treesitter<cr>')
         end
         if client.server_capabilities.workspaceSymbolProvider then
-          buf_set_keymap('n', '<leader>ws', '<cmd>Telescope lsp_dynamic_workspace_symbols<cr>', opts)
+          map('n', '<leader>ws', '<cmd>Telescope lsp_dynamic_workspace_symbols<cr>')
         end
 
-        buf_set_keymap('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<cr>', opts)
-        buf_set_keymap('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<cr>', opts)
-        buf_set_keymap('n', '<leader>e', '<cmd>lua vim.diagnostic.open_float()<cr>', opts)
-        buf_set_keymap('n', '<leader>q', '<cmd>lua vim.diagnostic.setloclist()<cr>', opts)
+        map('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<cr>')
+        map('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<cr>')
+        map('n', '<leader>e', '<cmd>lua vim.diagnostic.open_float()<cr>')
+        map('n', '<leader>q', '<cmd>lua vim.diagnostic.setloclist()<cr>')
       end
 
       local lsp_servers = {
@@ -325,18 +325,14 @@ require('packer').startup(function(use)
         }
 
         -- Key mappings
-        vim.api.nvim_set_keymap('n', '<leader>t', '<cmd>Telescope<cr>', opts)
-        vim.api.nvim_set_keymap('n', 'z=', '<cmd>Telescope spell_suggest<cr>', opts)
-        vim.api.nvim_set_keymap('n', '<c-p>', ':lua project_files()<cr>', opts)
-        vim.api.nvim_set_keymap('n', '<m-p>',
-          [[<cmd>Telescope oldfiles<cr>]],
-          opts)
-        vim.api.nvim_set_keymap('n', '<m-b>',
+        vim.keymap.set('n', '<leader>t', '<cmd>Telescope<cr>', opts)
+        vim.keymap.set('n', 'z=', '<cmd>Telescope spell_suggest<cr>', opts)
+        vim.keymap.set('n', '<c-p>', ':lua project_files()<cr>', opts)
+        vim.keymap.set('n', '<m-p>', [[<cmd>Telescope oldfiles<cr>]], opts)
+        vim.keymap.set('n', '<m-b>',
           [[<cmd>Telescope buffers show_all_buffers=true<cr>]],
           opts)
-        vim.api.nvim_set_keymap('n', 'Q',
-          [[<cmd>Telescope live_grep<cr>]],
-          opts)
+        vim.keymap.set('n', 'Q', [[<cmd>Telescope live_grep<cr>]], opts)
       end
     },
     {
@@ -354,7 +350,7 @@ require('packer').startup(function(use)
     config = function()
       require('neoclip').setup({})
 
-      vim.api.nvim_set_keymap('n', '<leader>cl',
+      vim.keymap.set('n', '<leader>cl',
         ':lua require("telescope").extensions.neoclip.default()<cr>',
         {noremap=true, silent=true})
     end
@@ -384,7 +380,7 @@ require('packer').startup(function(use)
   use {
     'ojroques/vim-oscyank',
     config = function()
-      vim.api.nvim_set_keymap('v', '<leader>y', ':OSCYank<cr>',
+      vim.keymap.set('v', '<leader>y', ':OSCYank<cr>',
         {noremap=true, silent=true})
     end
   }
