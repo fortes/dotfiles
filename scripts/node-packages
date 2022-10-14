@@ -4,6 +4,7 @@ dockerfile-language-server-nodejs
 fkill-cli
 fx
 npm
+npm-check-updates
 prettier
 ts-node
 typescript
