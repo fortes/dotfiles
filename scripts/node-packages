@@ -6,6 +6,7 @@ fx
 npm
 npm-check-updates
 prettier
+rome
 ts-node
 typescript
 typescript-language-server
