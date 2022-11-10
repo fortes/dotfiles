@@ -47,6 +47,8 @@
   rebase = true
 [push]
   default = current
+  # Automatically set upstream when pushing (basically `-u` by default)
+  autoSetupRemote = true
 [rebase]
   autosquash = 1
 [status]
