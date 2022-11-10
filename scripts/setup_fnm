@@ -42,6 +42,9 @@ main() {
 
   echo "Installing latest"
   "$HOME/.local/bin/fnm" install --lts
+
+  echo "Setting node version to LTS"
+  "$HOME/.local/bin/fnm" default lts-latest
 }
 
 main
