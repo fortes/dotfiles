@@ -481,7 +481,7 @@ require('packer').startup(function(use)
   -- git status for dirvish
   use {
     'kristijanhusak/vim-dirvish-git',
-    after = {'vim-dirvish-git'},
+    after = {'vim-dirvish'},
   }
 
   -- Comment / uncomment things quickly
