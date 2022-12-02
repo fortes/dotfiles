@@ -28,6 +28,7 @@ export IS_HEADLESS="${is_headless:-}"
 # export LIBRE_FM_USERNAME="fortes"
 # export LIBRE_FM_PASSWORD="xxxxxx"
 # export LIBRE_FM_SESSION_KEY="xxxxxx"
+# export BEETSDIR=/data/media/music/beets
 PROFILE_TEMPLATE
 }
 
