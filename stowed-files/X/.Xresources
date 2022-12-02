@@ -1,0 +1,5 @@
+# Create `~/.Xresources.local` and set an appropriate value here for High DPI
+# e.g. 144, 192 or whatever
+# Xft.dpi: 144
+
+#include ".Xresources.local"

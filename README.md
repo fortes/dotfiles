@@ -74,6 +74,7 @@ TODO: Automate these steps.
 
   xsetwacom --set "21" MapToOutput DP-2
   ```
+- For High DPI displays, create a `~/.Xresources.local` file with the proper `Xft.dpi`
 - To mount SMB shares on boot, add something like the following to `/etc/fstab`:
 
   ```
