@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 #
 # Toggle pause state for cmus
+#
+# Usage: cmus-pause [-qt]
+#
+# -q No output
+# -t Output to tmux message instead of stdout
 
 set -euo pipefail
 IFS=$'\n\t'
@@ -10,11 +15,28 @@ main() {
   local verb
   local title
   local albumartist
+  local tmux_output
+  local quiet_output
+
+  while getopts 'qt' option; do
+    case "${option}" in
+      q)
+        quiet_output=1
+        ;;
+      t)
+        tmux_output=1
+        ;;
+      ?)
+        echo "usage: $(basename \$0) [-qt]"
+        exit 1
+        ;;
+    esac
+  done
 
   if local_status=$(cmus-remote -Q 2> /dev/null); then
     local play_status
 
-    play_status=$(echo "${local_status}" | head -n 1 | cut -d' ' -f2)
+    play_status=$(echo "${local_status}" | cut -d' ' -f2 | head -n 1)
     if [[ "${play_status}" == "stopped" ]]; then
       echo "Not playing music"
       exit 1
@@ -24,10 +46,21 @@ main() {
       verb="Playing"
     fi
 
-    albumartist=$(echo "${local_status}" | grep "tag albumartist" | head -n 1 | cut -d' ' -f3-)
-    title=$(echo "${local_status}" | grep "tag title" | head -n 1 | cut -d' ' -f3-)
+    albumartist=$(echo "${local_status}" | grep "tag albumartist" | cut -d' ' -f3- | head -n1)
+    title=$(echo "${local_status}" | grep "tag title" | cut -d' ' -f3- | head -n1)
 
-    cmus-remote -u && echo "$verb: $albumartist - $title"
+    local output
+    if cmus-remote --pause; then
+      output="$verb: $albumartist - $title"
+    else
+      output="Couldn't pause"
+    fi
+
+    if [[ -n "${tmux_output:-}" ]]; then
+      tmux display-message "${output}"
+    elif [[ -z "${quiet_output:-}" ]]; then
+      echo "${output}"
+    fi
   else
     echo "cmus not running"
     exit 1

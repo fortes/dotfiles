@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+#
+# Tmux menu for controlling cmus
+
+set -euo pipefail
+IFS=$'\n\t'
+
+main() {
+  local local_status
+
+  if local_status=$(cmus-remote -Q 2> /dev/null); then
+    local play_status
+    local title
+    local artist
+    local album
+
+    play_status=$(echo "${local_status}" | cut -d' ' -f2 | head -n 1)
+    if [[ "${play_status}" == "stopped" ]]; then
+      tmux display-message "Not playing music"
+      return
+    fi
+
+    artist=$(echo "${local_status}" | grep "tag artist" | cut -d' ' -f3- | head -n 1)
+    album=$(echo "${local_status}" | grep "tag album " | cut -d' ' -f3- | head -n 1)
+    title=$(echo "${local_status}" | grep "tag title" | cut -d' ' -f3- | head -n 1)
+
+    if [[ "${play_status}" == "playing" ]]; then
+      verb="Pause"
+    else
+      verb="Play"
+    fi
+
+    tmux display-menu -T "#[fg=cyan]cmus" -x R -y P \
+      "" \
+      "-Title    #[nodim align=right]${title:0:60}" "" "" \
+      "-Artist   #[nodim align=right]${artist:0:60}" "" "" \
+      "-Album    #[nodim align=right]${album:0:60}" "" "" \
+      "" \
+      "Previous" "z" "run-shell -b 'cmus-remote --prev" \
+      "${verb}" "c" "run-shell -b 'cmus-pause -t'" \
+      "Next" "b" "run-shell -b 'cmus-remote --next'" \
+      "" \
+      "Close" "q" ""
+  else
+    tmux display-message "cmus not running"
+  fi
+}
+
+main "${@}"
+
