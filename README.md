@@ -33,8 +33,8 @@ Once you've run setup, you'll still have to do the following manual steps:
 
    ```sh
    op item get SSH_KEY_ITEM_ID --fields "private key" > ~/.ssh/xxx &&
-    op item get SSH_KEY_ITEM_ID --fields "public key" > ~/.ssh/xxx.pub
-    chmod 400 ~/.ssh/xxx*
+   op item get SSH_KEY_ITEM_ID --fields "public key" > ~/.ssh/xxx.pub
+   chmod 400 ~/.ssh/xxx*
    ```
 
 3. Authorize your public keys on the new machine:
@@ -72,7 +72,7 @@ TODO: Automate these steps.
 - (Optional) Enable GitHub copilot via `~/.profile.local`, then run `:Copilot setup` in NeoVim to authenticate
 - Install `kindlegen` [from Amazon](https://www.amazon.com/gp/feature.html?ie=UTF8&docId=1000765211)
 
-### Debian / Ubuntu
+### Debian
 
 - Depending on the machine, you may need `pavucontrol` in order to unmute your audio output via GUI.
   \*\* Alternatively, find the name of the desired output via `pacmd list-sinks` then run `pacmd set-default-sink $SINK_NAME` and make sure to unmute via `pacmd set-sink-mute [name] 0`
