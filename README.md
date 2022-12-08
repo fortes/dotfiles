@@ -114,6 +114,7 @@ TODO: Automate these steps.
   - `winget install AgileBits.1Password`
   - `winget install Google.Chrome.Dev`
   - `winget install Microsoft.PowerShell`
+  - `winget install Microsoft.PowerToys`
   - `winget install Microsoft.VisualStudioCode`
   - `winget install Mozilla.Firefox`
   - `winget install Plex.PlexAmp`
