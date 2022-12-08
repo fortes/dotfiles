@@ -173,6 +173,13 @@ set_dotfiles_remote() {
 
 setup_backports() {
   local codename="$(lsb_release -cs)"
+
+  # WSL comes with backports pre-enabled
+  if grep -q "${codename}-backports" /etc/apt/sources.list; then
+    echo "Backports already in sources.list"
+    return
+  fi
+
   local sources_path="/etc/apt/sources.list.d/${codename}-backports.list"
 
   if [[ ! -f "${sources_path}" ]]; then
