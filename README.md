@@ -29,6 +29,14 @@ Once you've run setup, you'll still have to do the following manual steps:
    ssh-keygen -p -f KEY_FILE
    ```
 
+   Alternatively, try using the command line `op` to get the keys:
+
+   ```sh
+   op item get SSH_KEY_ITEM_ID --fields "private key" > ~/.ssh/xxx &&
+    op item get SSH_KEY_ITEM_ID --fields "public key" > ~/.ssh/xxx.pub
+    chmod 400 ~/.ssh/xxx*
+   ```
+
 3. Authorize your public keys on the new machine:
 
    ```sh
@@ -96,32 +104,47 @@ TODO: Automate these steps.
 - Uninstall Teams, and other pre-installed unwanted things
 - Enable BitLocker
 - Adjust taskbar settings
+- Turn on clipboard history by hitting Windows-V
+- Set Windows Terminal as default terminal application
+- Enable Hyper-V (required for WSL)
+  - Search for `hyper-v` in start menu, will show up in obscure UI for settings
+- Install `Windows Subsystem for Linux` via MS Store (doesn't seem to work in `winget`)
+- Accept MS Store terms for `winget`, running `winget list` should prompt
 - Get WinGet via MS Store via `App Installer`
-  - `winget install 1Password`
+  - `winget install AgileBits.1Password`
   - `winget install Google.Chrome.Dev`
+  - `winget install Microsoft.PowerShell`
+  - `winget install Microsoft.VisualStudioCode`
   - `winget install Mozilla.Firefox`
   - `winget install Plex.PlexAmp`
   - `winget install ShareX.ShareX`
+  - `winget install Valve.Steam` (if gaming)
   - `winget install VideoLAN.VLC`
   - `winget install Zoom.Zoom`
-  - `winget install vscode`
-    - Install vim, WSL, and SSH extensions
+- Install Battle.net (Optional, if gaming)
 - WSL
-  - `wsl --install --distribution Debian` in admin command line
-  - If not on `bullseye` (was `stretch` last tried in April 2022), then need to update `/etc/apt/sources.list`:
-    ```
-deb http://deb.debian.org/debian bullseye main
-deb http://deb.debian.org/debian bullseye-updates main
-deb http://security.debian.org/debian-security/ bullseye-security main
-    ```
+  - `winget install Debian.Debian`
   - `sudo apt update && sudo apt dist-upgrade`
   - Run `~/dotfiles/setup_machine`
-- Set Windows Terminal as default terminal application
-- Set Debian as default terminal
-- To mount network shares, do something like this in `/etc/fstab`:
-  ```
-  \\machine-name\share	/mnt/machine-share	drvfs	defaults,ro,noatime,uid=1000,gid=1000,umask=022	0	0
-  ```
+  - Set Debian as default terminal
+  - To mount network shares, do something like this in `/etc/fstab`:
+    ```
+    \\machine-name\share	/mnt/machine-share	drvfs	defaults,ro,noatime,uid=1000,gid=1000,umask=022	0	0
+    ```
+- 1Password
+  - Sign into account
+- VS Code
+  - Sign in via GitHub to sync
+  - (optional) Sign into GitHub Co-pilot
+  - Install extensions (in case sync doesn't work)
+    - Copilot
+    - SSH
+    - WSL
+    - vim
+- ShareX
+  - Configure output location to be `Downloads`
+- Steam & Battle.net
+  - Sign in and install games locally
 
 ### EC2
 
@@ -133,8 +156,5 @@ deb http://security.debian.org/debian-security/ bullseye-security main
 
 #### TODO
 
-- [ ] Fix initial Neovim setup, since runs on older version (0.4) until app image version installed
-- [ ] Use `fnm` everywhere instead of Debian node
-  - [ ] Need to figure out `yarn` compat, or just move everything to npm
 - [ ] Better colorschemes
 - [ ] Setup [textlint](https://github.com/textlint/textlint)
