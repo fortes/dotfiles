@@ -61,6 +61,7 @@ git update-index --no-skip-worktree ./symlinks/npmrc
 
 TODO: Automate these steps.
 
+- (Optional) Enable GitHub copilot via `~/.profile.local`, then run `:Copilot setup` in NeoVim to authenticate
 - Install `kindlegen` [from Amazon](https://www.amazon.com/gp/feature.html?ie=UTF8&docId=1000765211)
 
 ### Debian / Ubuntu

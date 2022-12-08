@@ -23,6 +23,9 @@ export IS_DOCKER="${is_docker:-}"
 export IS_WSL="${is_wsl:-}"
 export IS_HEADLESS="${is_headless:-}"
 
+# Enable if GitHub account has Copilot access
+# export ENABLE_GITHUB_COPILOT=1
+
 # Add machine-specific items below
 # export LISTENBRAINZ_AUTH_TOKEN="xxxxxx"
 # export LIBRE_FM_USERNAME="fortes"

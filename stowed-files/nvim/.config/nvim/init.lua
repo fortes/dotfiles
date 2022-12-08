@@ -17,6 +17,15 @@ require('packer').startup(function(use)
     end
   }
 
+  -- GitHub Co-Pilot is paid, so only load if #ENABLE_GITHUB_COPILOT is set
+  -- locally
+  use {
+    'github/copilot.vim',
+    cond = function()
+      return os.getenv('ENABLE_GITHUB_COPILOT') == '1'
+    end
+  }
+
   -- Language Server for all sorts of goodness
   use {
     'neovim/nvim-lspconfig',
