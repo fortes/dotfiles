@@ -316,8 +316,13 @@ require('packer').startup(function(use)
 
         -- Fallback to file search if not in git repo
         function _G.project_files()
-          local ok = pcall(require"telescope.builtin".git_files, opts)
-          if not ok then require"telescope.builtin".find_files(opts) end
+          local ok = pcall(require"telescope.builtin".git_files, {
+            use_git_root = true,
+            show_untracked = true
+          })
+          if not ok then require"telescope.builtin".find_files({
+            hidden = true
+          }) end
         end
 
         local opts = {
