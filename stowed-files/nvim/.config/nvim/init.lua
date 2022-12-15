@@ -50,6 +50,11 @@ require('packer').startup(function(use)
           client.server_capabilities.documentFormattingProvider = false
         end
 
+        if client.name == 'eslint' then
+          -- <leader>x to autofix via eslint
+          map('n', '<leader>x', '<cmd>EslintFixAll<cr>')
+        end
+
         if client.server_capabilities.definitionProvider then
           map('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>')
           -- <C-]> automapped via `tagfunc`
@@ -77,7 +82,7 @@ require('packer').startup(function(use)
           map('n', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<cr>')
         end
         if client.server_capabilities.documentFormattingProvider then
-          map('n', '<leader>f', '<cmd>lua vim.lsp.buf.format({async = true})<cr>')
+          map('n', '<leader>f', '<cmd>lua vim.lsp.buf.format({async = false})<cr>')
 
           -- Format on save, where supported
           vim.cmd([[
@@ -105,25 +110,38 @@ require('packer').startup(function(use)
         map('n', '<leader>q', '<cmd>lua vim.diagnostic.setloclist()<cr>')
       end
 
-      local lsp_servers = {
-        'bashls',
-        'cssls',
-        'dockerls',
-        'eslint',
-        'html',
-        'jsonls',
-        'pyright',
-        'tsserver',
-        'vimls',
-        'yamlls'
-      }
-      for _, lsp in ipairs(lsp_servers) do
-        nvim_lsp[lsp].setup {
-          on_attach = lsp_on_attach,
-          flags = {
-            debounce_text_changes = 150
-          }
+      local default_lsp_opts = {
+        on_attach = lsp_on_attach,
+        flags = {
+          debounce_text_changes = 150
         }
+      }
+
+      local lsp_configs = {
+        bashls = default_lsp_opts,
+        cssls = default_lsp_opts,
+        dockerls = default_lsp_opts,
+        eslint =  vim.tbl_deep_extend('force', default_lsp_opts, {
+          root_dir = nvim_lsp.util.root_pattern('.git', vim.fn.getcwd())
+        }) ,
+        html = default_lsp_opts,
+        jsonls = default_lsp_opts,
+        pyright = default_lsp_opts,
+        tsserver = vim.tbl_deep_extend('force', default_lsp_opts, {
+          -- Increase memory limit to 16GB, might need to adjust on weaker
+          -- machines
+          init_options = {
+            maxTsServerMemory = 16384
+          },
+          -- Use repository root instead of basing off of `tsconfig.json`
+          root_dir = nvim_lsp.util.root_pattern('.git', vim.fn.getcwd())
+        }),
+        vimls = default_lsp_opts,
+        yamlls = default_lsp_opts
+      }
+
+      for lsp, opts in pairs(lsp_configs) do
+        nvim_lsp[lsp].setup(opts)
       end
     end
   }
