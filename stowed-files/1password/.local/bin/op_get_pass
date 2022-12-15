@@ -10,7 +10,8 @@ main() {
   local -r variable_name="OP_SESSION_${user_id}"
   local op_session
 
-  op_session="$(tmux show-environment -g "${variable_name}" | cut -d= -f2-)"
+  op_session="$(tmux show-environment -g "${variable_name}" 2> /dev/null \
+    | cut -d= -f2- || echo '')"
 
   if ! op whoami --session "${op_session}" &> /dev/null; then
     echo "Sign in to 1password first"
