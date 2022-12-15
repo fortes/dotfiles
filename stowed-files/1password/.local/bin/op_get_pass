@@ -21,7 +21,7 @@ main() {
   # Select item via FZF and output password
   # shellcheck disable=SC2068
   op item list --session "${op_session}" ${@} \
-    | fzf --no-multi --header-lines=1 --nth=1.. --with-nth=2.. --exit-0 \
+    | fzf --height=100% --no-multi --header-lines=1 --nth=1.. --with-nth=2.. --exit-0 \
     | cut -d' ' -f1 \
     | xargs --no-run-if-empty \
       op item get --fields=password --session "${op_session}"
