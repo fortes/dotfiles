@@ -34,27 +34,17 @@ require('packer').startup(function(use)
     config = function()
       local nvim_lsp = require('lspconfig')
 
+      local function map(...)
+        opts = {
+          buffer=bufnr,
+          noremap=true,
+          silent=true
+        }
+        vim.keymap.set(...)
+      end
+
       -- Only map keys after language server has attached to buffer
       local lsp_on_attach = function(client, bufnr)
-        local function map(...)
-          opts = {
-            buffer=bufnr,
-            noremap=true,
-            silent=true
-          }
-          vim.keymap.set(...)
-        end
-
-        -- Never use tsserver formatting, it's not very good
-        if client.name == 'tsserver' then
-          client.server_capabilities.documentFormattingProvider = false
-        end
-
-        if client.name == 'eslint' then
-          -- <leader>x to autofix via eslint
-          map('n', '<leader>x', '<cmd>EslintFixAll<cr>')
-        end
-
         if client.server_capabilities.definitionProvider then
           map('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>')
           -- <C-]> automapped via `tagfunc`
@@ -120,8 +110,21 @@ require('packer').startup(function(use)
       local lsp_configs = {
         bashls = default_lsp_opts,
         cssls = default_lsp_opts,
+        cssmodules_ls =  vim.tbl_deep_extend('force', default_lsp_opts, {
+          on_attach = function(client, bufnr)
+            -- Don't use `definitionProvider` since it conflicts with tsserver
+            client.server_capabilities.definitionProvider = false
+
+            lsp_on_attach(client, bufnr)
+          end,
+        }) ,
         dockerls = default_lsp_opts,
         eslint =  vim.tbl_deep_extend('force', default_lsp_opts, {
+          on_attach = function(client, bufnr)
+            -- <leader>x to autofix via eslint
+            map('n', '<leader>x', '<cmd>EslintFixAll<cr>')
+            lsp_on_attach(client, bufnr)
+          end,
           root_dir = nvim_lsp.util.root_pattern('.git', vim.fn.getcwd())
         }) ,
         html = default_lsp_opts,
@@ -133,6 +136,11 @@ require('packer').startup(function(use)
           init_options = {
             maxTsServerMemory = 16384
           },
+          on_attach = function(client, bufnr)
+            -- Never use tsserver formatting, it's not very good
+            client.server_capabilities.documentFormattingProvider = false
+            lsp_on_attach(client, bufnr)
+          end,
           -- Use repository root instead of basing off of `tsconfig.json`
           root_dir = nvim_lsp.util.root_pattern('.git', vim.fn.getcwd())
         }),
@@ -395,7 +403,7 @@ require('packer').startup(function(use)
   }
 
   -- Very simple tab completion
-  use { 'ackyshake/VimCompletesMe'}
+  use {'ackyshake/VimCompletesMe'}
 
   -- Honor `.editorconfig`
   use {'editorconfig/editorconfig-vim'}
