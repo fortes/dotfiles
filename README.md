@@ -70,10 +70,16 @@ git update-index --no-skip-worktree ./symlinks/npmrc
 TODO: Automate these steps.
 
 - (Optional) Enable GitHub copilot via `~/.profile.local`, then run `:Copilot setup` in NeoVim to authenticate
-- Install `kindlegen` [from Amazon](https://www.amazon.com/gp/feature.html?ie=UTF8&docId=1000765211)
+- Install `kindlegen` [from Amazon](https://www.amazon.com/gp/feature.html?ie=UTF8&docId=1000765211) (TODO: See if possible to script this)
 
 ### Debian
 
+- Log in to Firefox / Chrome for syncing
+- Can install some optional apps via scripts:
+  - `dotfiles/scripts/setup_kvm`
+  - `dotfiles/scripts/setup_signal`
+  - `dotfiles/scripts/setup_zerotier`
+  - `dotfiles/scripts/setup_zoom`
 - Depending on the machine, you may need `pavucontrol` in order to unmute your audio output via GUI.
   \*\* Alternatively, find the name of the desired output via `pacmd list-sinks` then run `pacmd set-default-sink $SINK_NAME` and make sure to unmute via `pacmd set-sink-mute [name] 0`
 - If running multiple monitors, need to configure Wacom tablet to only use a specific monitor:
@@ -83,12 +89,16 @@ TODO: Automate these steps.
 
   xsetwacom --set "21" MapToOutput DP-2
   ```
-- For High DPI displays, create a `~/.Xresources.local` file with the proper `Xft.dpi`
+- For High DPI displays, create a `~/.Xresources.local` file with the proper `Xft.dpi` (see `.Xresources` for example)
 - To mount SMB shares on boot, add something like the following to `/etc/fstab`:
 
   ```
   //machine-name/share /media/share cifs nofail,user=,password=,ro	0	0
   ```
+
+#### Docker
+
+- Must manually setup neovim. Launch and run `:PackerSync`
 
 ### Chromebook
 
@@ -147,15 +157,12 @@ TODO: Automate these steps.
 - Steam & Battle.net
   - Sign in and install games locally
 
-### EC2
+### Mac
 
-- None?
-
-### Docker
-
-- Must manually setup neovim. Launch and run `:PackerSync`
+- Not fully functional, see `mac-setup` branch for current status
 
 #### TODO
 
-- [ ] Better colorschemes
+- [ ] Better colorschemes, coordinated everywhere
+  - [ ] Easier swapping into light mode
 - [ ] Setup [textlint](https://github.com/textlint/textlint)

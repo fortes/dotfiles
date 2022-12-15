@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Make your machine usable
 #
-# Usage: setup_machine
+# Usage: setup_machine [--python-only] [--node-only]
 
 set -euo pipefail
 IFS=$'\n\t'
@@ -10,6 +10,10 @@ IFS=$'\n\t'
 export DEBIAN_FRONTEND=noninteractive
 
 has_updated=""
+
+usage() {
+  echo "Usage: setup_machine [--python-only] [--node-only]"
+}
 
 # Avoid running multiple times
 apt_update_once() {
@@ -276,8 +280,11 @@ setup_nonfree() {
 }
 
 setup_shell() {
-  local bash_path="$(which bash)"
-  local current_shell="$(getent passwd $(id -un) | awk -F : '{print $NF}')"
+  local bash_path
+  local current_shell
+
+  bash_path="$(which bash)"
+  current_shell="$(getent passwd $(id -un) | awk -F : '{print $NF}')"
 
   if [[ "${current_shell}" != "${bash_path}" ]]; then
     echo "Changing shell to bash (requires sudo)"
@@ -287,35 +294,72 @@ setup_shell() {
 
 main() {
   # Make sure to load `command_exists` helper
+  # shellcheck source=/dev/null
   . "$HOME/dotfiles/stowed-files/bash/.profile"
+
+  local node_only=''
+  local python_only=''
+
+  # Parse arguments
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --node-only)
+        node_only=1
+        ;;
+      --python-only)
+        python_only=1
+        ;;
+      --help)
+        usage
+        exit 0
+        ;;
+      *)
+        echo_stderr "Unknown argument: $1"
+        usage
+        exit 1
+        ;;
+    esac
+    shift
+  done
+
+  if [[ -n "${node_only}" ]]; then
+    install_node_packages
+    exit 0
+  elif [[ -n "${python_only}" ]]; then
+    install_python_packages
+    exit 0
+  fi
 
   check_prerequisites
   setup_shell
   set_dotfiles_remote
 
-  local dotfiles_path="$HOME/dotfiles"
-  local local_profile_path="$HOME/.profile.local"
+  local -r dotfiles_path="$HOME/dotfiles"
+  local -r local_profile_path="$HOME/.profile.local"
 
-  if [[ ! -f "$local_profile_path" ]]; then
-    echo "Generating $local_profile_path"
-    "$dotfiles_path/scripts/create_local_profile" > "$local_profile_path"
+  if [[ ! -f "${local_profile_path}" ]]; then
+    echo "Generating ${local_profile_path}"
+    "${dotfiles_path}/scripts/create_local_profile" > "${local_profile_path}"
   fi
 
-  . "$local_profile_path"
+  # shellcheck source=/dev/null
+  . "${local_profile_path}"
 
   setup_nonfree
   setup_backports
   # cmus in backports is recent enough right now
   # [[ -z "${IS_HEADLESS:-}" ]] && setup_multimedia
   install_apt_packages
-  "$dotfiles_path/scripts/setup_github_packages"
-  "$dotfiles_path/scripts/setup_fnm"
+  "${dotfiles_path}/scripts/setup_1password"
+  "${dotfiles_path}/scripts/setup_et"
+  "${dotfiles_path}/scripts/setup_github_packages"
+  "${dotfiles_path}/scripts/setup_fnm"
 
   # Debian ships with these two by default
   remove_default_dotfile .bashrc
   remove_default_dotfile .profile
 
-  "$dotfiles_path/scripts/stow"
+  "${dotfiles_path}/scripts/stow"
 
   # Misc system configs
   increase_max_watchers
@@ -335,8 +379,8 @@ main() {
   echo "Setup complete!"
 
   # TODO:
-  # - tailscale / wireguard / zerotier
-  # - chrome / kvm / steam / wine / others that require custom stuff
+  # - tailscale / wireguard
+  # - chrome / steam / wine / others that require custom stuff
 }
 
 main "${@}"
