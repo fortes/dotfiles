@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+#
+# Use 1Password to unlock SSH keys
+#
+# Usage:
+#
+# echo | SSH_ASKPASS=op_ask_pass ssh-add
+
+set -euo pipefail
+IFS=$'\n\t'
+
+main() {
+  op_get_pass --categories "SSH Key"
+}
+
+main "${@}"
