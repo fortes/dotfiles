@@ -117,6 +117,9 @@ require('packer').startup(function(use)
 
             lsp_on_attach(client, bufnr)
           end,
+        }),
+        denols = vim.tbl_deep_extend('force', default_lsp_opts, {
+          root_dir = nvim_lsp.util.root_pattern('deno.json')
         }) ,
         dockerls = default_lsp_opts,
         eslint =  vim.tbl_deep_extend('force', default_lsp_opts, {
@@ -125,8 +128,8 @@ require('packer').startup(function(use)
             map('n', '<leader>x', '<cmd>EslintFixAll<cr>')
             lsp_on_attach(client, bufnr)
           end,
-          root_dir = nvim_lsp.util.root_pattern('.git', vim.fn.getcwd())
-        }) ,
+          root_dir = nvim_lsp.util.root_pattern('.git')
+        }),
         html = default_lsp_opts,
         jsonls = default_lsp_opts,
         pyright = default_lsp_opts,
@@ -141,8 +144,7 @@ require('packer').startup(function(use)
             client.server_capabilities.documentFormattingProvider = false
             lsp_on_attach(client, bufnr)
           end,
-          -- Use repository root instead of basing off of `tsconfig.json`
-          root_dir = nvim_lsp.util.root_pattern('.git', vim.fn.getcwd())
+          root_dir = nvim_lsp.util.find_node_modules_ancestor
         }),
         vimls = default_lsp_opts,
         yamlls = default_lsp_opts

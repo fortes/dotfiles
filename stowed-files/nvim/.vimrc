@@ -686,7 +686,7 @@ augroup END
 if has('syntax')
   " Syntax highlight within fenced code blocks
   let g:markdown_fenced_languages = ['bash=sh', 'css', 'html', 'js=javascript',
-        \ 'less', 'typescript=javascript', 'python', 'sh']
+        \ 'less', 'ts=typescript', 'python', 'sh']
 endif
 " }}}
 
