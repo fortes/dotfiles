@@ -6,6 +6,11 @@ set -euo pipefail
 IFS=$'\n\t'
 
 main() {
+  if [[ -z "$(op account list)" ]]; then
+    >&2 echo "No 1Password account detected"
+    exit 1
+  fi
+
   local -r user_id="$(op account list --format json | jq -r '.[].user_uuid')"
   local -r variable_name="OP_SESSION_${user_id}"
   local op_session
