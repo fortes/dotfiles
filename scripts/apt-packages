@@ -23,6 +23,7 @@ libnotify-bin
 maim
 mpv
 picom
+playerctl
 pulseaudio
 rofi
 slop

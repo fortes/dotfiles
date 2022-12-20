@@ -161,8 +161,10 @@ bindsym $mod+Ctrl+Shift+Left resize shrink width 5 px or 5 ppt
 bindsym $mod+Ctrl+Shift+Up resize grow height 5 px or 5 ppt
 bindsym $mod+Ctrl+Shift+Down resize shrink height 5 px or 5 ppt
 
-# Use hardware key to start/stop music
-bindsym XF86AudioPlay exec --no-startup-id cmus-remote --pause
+# Use hardware keys to control music
+bindsym XF86AudioPrev exec --no-startup-id playerctl previous
+bindsym XF86AudioPlay exec --no-startup-id playerctl play-pause
+bindsym XF86AudioNext exec --no-startup-id playerctl next
 
 # Capture entire screen with mod-F12
 bindsym --release $mod+F12 exec "maim ~/Downloads/screenshot-$(date +%F-%T).png && notify-send -t 2 -u low 'Screen Captured'"

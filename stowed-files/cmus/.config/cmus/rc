@@ -7,8 +7,8 @@ colorscheme gruvbox
 # Enable mouse
 set mouse=true
 
-# Causes issues in WSL2 / Crostini, gotta figure out how to make it work
-set mpris=false
+# Enable use of `playerctl` and other standard utilities
+set mpris=true
 
 # Scrobber
 set status_display_program=cmus-status
