@@ -123,6 +123,7 @@ TODO: Automate these steps.
 - Get WinGet via MS Store via `App Installer`
   - `winget install AgileBits.1Password`
   - `winget install Google.Chrome.Dev`
+  - `winget install Microsoft.MouseandKeyboardCenter`
   - `winget install Microsoft.PowerShell`
   - `winget install Microsoft.PowerToys`
   - `winget install Microsoft.VisualStudioCode`
