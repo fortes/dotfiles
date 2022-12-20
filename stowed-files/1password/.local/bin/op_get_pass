@@ -19,7 +19,7 @@ main() {
     | cut -d= -f2- || echo '')"
 
   if ! op whoami --session "${op_session}" &> /dev/null; then
-    echo "Sign in to 1password first"
+    >&2 echo "Sign in to 1password first"
     op_session="$(op signin --raw)"
     tmux set-environment -g "${variable_name}" "${op_session}"
   fi
