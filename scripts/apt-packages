@@ -12,6 +12,7 @@ fonts-noto
 fonts-noto-color-emoji
 fonts-noto-mono
 fonts-noto-ui-core
+gammastep
 hsetroot
 i3
 i3blocks
@@ -23,8 +24,6 @@ maim
 mpv
 picom
 pulseaudio
-redshift
-redshift-gtk
 rofi
 slop
 software-properties-common
