@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+#
+# Display current track information if cmus is playing
+
+set -euo pipefail
+IFS=$'\n\t'
+
+main() {
+  local play_status
+
+  play_status=$(playerctl status 2>&1 || echo)
+  if echo "${play_status}" | grep -qiE '(no players found|stopped)'; then
+    return
+  fi
+
+  local album
+  local artist
+  local title
+
+  album=$(playerctl metadata xesam:album)
+  artist=$(playerctl metadata xesam:albumArtist)
+  title=$(playerctl metadata xesam:title)
+
+  if echo "${play_status}" | grep -qi "playing"; then
+    echo "${artist} ▸ ${title}  "
+  else
+    echo "${artist} ♪ ${album}  "
+  fi
+}
+
+main "${@}"

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# Submits listens to ListenBrainz
+# Submits listens to ListenBrainz & Libre.fm
 import datetime
 import os
 import pylast

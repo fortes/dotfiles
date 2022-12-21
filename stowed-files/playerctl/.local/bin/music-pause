@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+#
+# Toggle pause state for MPRIS music players
+#
+# Usage: music-pause [-qt]
+#
+# -q No output
+# -t Output to tmux message instead of stdout
+
+set -euo pipefail
+IFS=$'\n\t'
+
+main() {
+  local play_status
+  local tmux_output
+  local quiet_output
+  local output
+
+  while getopts 'qt' option; do
+    case "${option}" in
+      q)
+        quiet_output=1
+        ;;
+      t)
+        tmux_output=1
+        ;;
+      ?)
+        echo "usage: $(basename \$0) [-qt]"
+        exit 1
+        ;;
+    esac
+  done
+
+  play_status=$(playerctl status 2>&1 || echo)
+  if echo "${play_status}" | grep -qiE '(no players found|stopped)'; then
+    output="Not playing music"
+    return
+  else
+    local artist
+    local title
+    local verb
+
+    artist=$(playerctl metadata xesam:albumArtist)
+    title=$(playerctl metadata xesam:title)
+
+    if echo "${play_status}" | grep -qi "playing"; then
+      verb="Paused"
+    else
+      verb="Playing"
+    fi
+
+    local output
+    if playerctl play-pause; then
+      output="$verb: $artist - $title"
+    else
+      output="Couldn't pause"
+    fi
+  fi
+
+  if [[ -n "${tmux_output:-}" ]]; then
+    tmux display-message "${output}"
+  elif [[ -z "${quiet_output:-}" ]]; then
+    echo "${output}"
+  fi
+}
+
+main "${@}"
+
