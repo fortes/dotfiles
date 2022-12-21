@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Name=Dunst
+GenericName=
+Comment=Lightweight notification daemon
+Exec=dunst
+Icon=dunst
+StartupNotify=true
+Type=Application
+Categories=Utility;
+Keywords=notification;
+OnlyShowIn=i3;

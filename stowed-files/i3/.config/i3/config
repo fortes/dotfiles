@@ -276,11 +276,7 @@ for_window [class="(?i)\.exe"] floating enable, border none, move position cente
 exec --no-startup-id hsetroot -solid "#222222"
 # Needed for inactive window transparency
 exec --no-startup-id picom -b
-# Save my eyes
-exec --no-startup-id gammastep-indicator
-# Notifications
-exec --no-startup-id dunst
 # Try to get right primary monitor
 exec --no-startup-id guess_primary_monitor
-# Tray applets
-exec --no-startup-id pasystray
+# Start XDG autostart .desktop files (see ~/.config/autostart)
+exec --no-startup-id dex --autostart --environment i3

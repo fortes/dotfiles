@@ -1,0 +1,15 @@
+[Desktop Entry]
+Version=1.0
+Name=Gammastep Indicator
+GenericName=Indicator for color temperature adjustment
+GenericName[es]=Ajuste de la temperatura de color
+Comment=Indicator for color temperature adjustment
+Comment[es]=Ajuste de la temperatura de color
+Keywords=display;color;soft;hue;temperature;eyes;strain;
+Exec=gammastep-indicator
+Icon=gammastep
+Terminal=false
+Type=Application
+Categories=Utility;
+StartupNotify=true
+OnlyShowIn=i3;
