@@ -3,6 +3,7 @@ chromium
 cmake
 cmus
 dex
+dbus-x11
 dunst
 exfat-fuse
 exfat-utils
@@ -15,6 +16,7 @@ fonts-noto-color-emoji
 fonts-noto-mono
 fonts-noto-ui-core
 gammastep
+gnome-keyring
 hsetroot
 i3
 i3blocks
@@ -22,6 +24,8 @@ i3lock
 imv
 kitty
 libnotify-bin
+libpam-gnome-keyring
+lxqt-policykit
 maim
 mpv
 pasystray

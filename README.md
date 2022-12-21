@@ -162,8 +162,18 @@ TODO: Automate these steps.
 
 - Not fully functional, see `mac-setup` branch for current status
 
-#### TODO
+## Known Issues
 
+- Media keys on Microsoft Ergonomic Keyboard sometimes aren't detected, disconnect/reconnect USB may be enough to fix?
+- Mouse wheel speed also sometimes goes to a better default after disconnect/reconnect
+- 1Password can't manage to save authentication, dies trying to talk to keychain via dbus (for some reason, looking for `org.kde.kwalletd5` and ignores gnome keyring)
+- Gammastep tray indicator displays bogus information, likely [this issue](https://gitlab.com/chinstrap/gammastep/-/issues/21) (Debian has an outdated package)
+
+### Improvements
+
+- [ ] Setup [textlint](https://github.com/textlint/textlint)
 - [ ] Better colorschemes, coordinated everywhere
   - [ ] Easier swapping into light mode
-- [ ] Setup [textlint](https://github.com/textlint/textlint)
+- [ ] Setup `xautolock` or similar to automatically lock screen on idle
+- [ ] Figure out rofi / dmenu whatever else would make sense to do more in i3
+- [ ] Migrate off of X11 to Wayland: Either use nouveau or wait until Sway has Nvidia support (or get an AMD card)
