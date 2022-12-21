@@ -175,6 +175,9 @@ bindsym --release $mod+F11 exec "record_screen"
 # Current window with mod-Shift-F11
 bindsym --release $mod+Shift+F11 exec "record_window"
 
+# Clear notifications with mod-BackSpace
+bindsym $mod+BackSpace exec dunstctl close
+
 ## Base16 Default Dark
 # Author: Chris Kempson (http://chriskempson.com)
 #
