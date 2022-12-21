@@ -162,14 +162,14 @@ bindsym $mod+Ctrl+Shift+Up resize grow height 5 px or 5 ppt
 bindsym $mod+Ctrl+Shift+Down resize shrink height 5 px or 5 ppt
 
 # Use hardware keys to control music
-bindsym XF86AudioPrev exec --no-startup-id playerctl previous
-bindsym XF86AudioPlay exec --no-startup-id playerctl play-pause
-bindsym XF86AudioNext exec --no-startup-id playerctl next
+bindsym XF86AudioPrev exec "playerctl previous && notify-send -t 600 -a i3 -u low 'Previous track'"
+bindsym XF86AudioPlay exec "playerctl play-pause && notify-send -t 600 -a i3 -u low 'Paused'"
+bindsym XF86AudioNext exec "playerctl next && notify-send -t 600 -a i3 -u low 'Next track'"
 
 # Capture entire screen with mod-F12
-bindsym --release $mod+F12 exec "maim ~/Downloads/screenshot-$(date +%F-%T).png && notify-send -t 2 -u low 'Screen Captured'"
+bindsym --release $mod+F12 exec "maim ~/Downloads/screenshot-$(date +%F-%T).png && notify-send -t 1000 -a i3 -u low 'Screen Captured'"
 # Capture portion of screen with mod-Shift-F12
-bindsym --release $mod+Shift+F12 exec "maim -s --highlight --nokeyboard --color=0.25,0.5,1,0.25 ~/Downloads/screenshot-$(date +%F-%T).png && notify-send -t 2 -u low 'Screen Captured'"
+bindsym --release $mod+Shift+F12 exec "maim -s --highlight --nokeyboard --color=0.25,0.5,1,0.25 ~/Downloads/screenshot-$(date +%F-%T).png && notify-send -t 1000 -a i3 -u low 'Region Captured'"
 # Toggle full screen recording with mod-F11
 bindsym --release $mod+F11 exec "record_screen"
 # Current window with mod-Shift-F11
