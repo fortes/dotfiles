@@ -2,6 +2,7 @@ alsa-utils
 chromium
 cmake
 cmus
+dunst
 exfat-fuse
 exfat-utils
 feh
@@ -22,6 +23,7 @@ kitty
 libnotify-bin
 maim
 mpv
+pasystray
 picom
 playerctl
 pulseaudio
