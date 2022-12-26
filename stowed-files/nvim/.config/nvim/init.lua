@@ -301,6 +301,20 @@ require('packer').startup(function(use)
     end
   }
 
+  -- Generate code annotations, e.g. JSDoc
+  use {
+    'danymat/neogen',
+    requires = 'nvim-treesitter',
+    config = function()
+      require('neogen').setup {
+        enabled = true
+      }
+
+      local opts = {noremap = true, silent = true}
+      vim.api.nvim_set_keymap("n", "<Leader>nf", ":lua require('neogen').generate()<cr>", opts)
+    end
+  }
+
   -- Fuzzy finder for all the things
   use {
     {
