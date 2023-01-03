@@ -192,10 +192,6 @@ require('packer').startup(function(use)
         },
         -- Enable `=` for indentation based on treesitter (experimental)
         indent = {enable = true},
-        rainbow = {
-          enable = true,
-          extended_mode = true,
-        }
       }
 
       vim.wo.foldmethod = 'expr'
@@ -261,12 +257,6 @@ require('packer').startup(function(use)
   -- Use Treesitter to infer correct `commentstring`
   use {
     'joosepalviste/nvim-ts-context-commentstring',
-    after = {'nvim-treesitter'}
-  }
-
-  -- Rainbow parens, etc
-  use {
-    'p00f/nvim-ts-rainbow',
     after = {'nvim-treesitter'}
   }
 
