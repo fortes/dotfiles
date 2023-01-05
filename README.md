@@ -118,6 +118,7 @@ TODO: Automate these steps.
 - Set Windows Terminal as default terminal application
 - Enable Hyper-V (required for WSL)
   - Search for `hyper-v` in start menu, will show up in obscure UI for settings
+- Enable [Windows Sandbox](https://learn.microsoft.com/en-us/windows/security/threat-protection/windows-sandbox/windows-sandbox-overview)
 - Install `Windows Subsystem for Linux` via MS Store (doesn't seem to work in `winget`)
 - Accept MS Store terms for `winget`, running `winget list` should prompt
 - Get WinGet via MS Store via `App Installer`
@@ -128,6 +129,7 @@ TODO: Automate these steps.
   - `winget install Microsoft.PowerToys`
   - `winget install Microsoft.VisualStudioCode`
   - `winget install Mozilla.Firefox`
+  - `winget install Neovim.Neovim`
   - `winget install Plex.PlexAmp`
   - `winget install ShareX.ShareX`
   - `winget install Valve.Steam` (if gaming)
