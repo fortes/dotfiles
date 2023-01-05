@@ -23,6 +23,12 @@ require('packer').startup(function(use)
     'github/copilot.vim',
     cond = function()
       return os.getenv('ENABLE_GITHUB_COPILOT') == '1'
+    end,
+    config = function()
+      vim.g.copilot_filetypes = {
+        -- Disable in places where it doesn't make sense
+        TelescopePrompt = 0
+      }
     end
   }
 
@@ -412,6 +418,7 @@ require('packer').startup(function(use)
   use {'ackyshake/VimCompletesMe'}
 
   -- Honor `.editorconfig`
+  -- Should be able to remove in NeoVim 0.9, which will build this in
   use {'editorconfig/editorconfig-vim'}
 
   -- Copy to system via OSC52 via <leader>c
