@@ -36,7 +36,6 @@ libimage-exiftool-perl
 libnss-mdns
 lsb-release
 lsof
-lynx
 m4
 man-db
 mergerfs
@@ -64,6 +63,7 @@ tmux/bullseye-backports
 trash-cli
 unzip
 vifm
+w3m
 wamerican
 wget
 yank
