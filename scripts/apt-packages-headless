@@ -23,6 +23,7 @@ fzf
 git
 git-crypt
 git-extras
+git-lfs
 gnupg
 htop
 iftop
