@@ -127,7 +127,7 @@ if exists('&inccommand')
 endif
 
 " TODO: Feature check
-augroup HiglightedYank
+augroup HighlightedYank
   autocmd!
   autocmd TextYankPost * silent! lua vim.highlight.on_yank {on_visual=false}
 augroup END
