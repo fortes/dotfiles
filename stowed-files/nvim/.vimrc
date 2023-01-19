@@ -440,8 +440,9 @@ augroup END
 
 " Use ag instead of grep, if available
 if executable('rg')
-  " Use smart case, match whole words, and output in vim-friendly format
-  set grepprg=rg\ --vimgrep
+  " Use smart case, match whole words, use literal string, and output in
+  " vim-friendly format
+  set grepprg=rg\ --vimgrep\ -F
 else
   " Mimic rg settings (literal, recursive, ignore common directories)
   set grepprg=grep\ -FIinrw\ --exclude-dir=.git\ --exclude-dir=node_modules
