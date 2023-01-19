@@ -69,6 +69,8 @@ shopt -qs hostcomplete
 shopt -s no_empty_cmd_completion
 # Case insensitive glob matching and case statements
 shopt -s nocaseglob nocasematch
+# Expand aliases in order to find completions
+shopt -s progcomp_alias
 # }}}
 
 BLACK="\[$(tput setaf 0)\]"
@@ -112,12 +114,12 @@ export PROMPT_COMMAND="history -a; HAS_JOBS=\`jobs -sp\` "
 PS1="$BASE_PROMPT ""\${HAS_JOBS:+$JOB_COUNT}"
 
 git_prompt_location="/etc/bash_completion.d/git-prompt"
-if [ ! -r "$git_prompt_location" ]; then
+if [ ! -r "${git_prompt_location}" ]; then
   # Homebrew
   git_prompt_location="/usr/local/etc/bash_completion.d/git-prompt.sh"
 fi
 
-if [ -r "$git_prompt_location" ]; then
+if [ -r "${git_prompt_location}" ]; then
   # Show colored hint about dirty state
   export GIT_PS1_SHOWCOLORHINTS=1
   # Show staged/unstaged changes marker
@@ -126,7 +128,7 @@ if [ -r "$git_prompt_location" ]; then
   export GIT_PS1_SHOWUNTRACKEDFILES=1
   # Suppress prompt when within an ignored dir
   export GIT_PS1_HIDE_IF_PWD_IGNORED=1
-  source "$git_prompt_location"
+  source "${git_prompt_location}"
   export PROMPT_COMMAND="$PROMPT_COMMAND; __git_ps1 \"$BASE_PROMPT\" \" \${HAS_JOBS:+$JOB_COUNT }\" \" %s$RESET\""
 fi
 
@@ -141,6 +143,9 @@ fi
 if command_exists zoxide; then
   eval "$(zoxide init bash)"
 fi
+
+# Opt-out of Eternal Terminal telemetry
+export ET_NO_TELEMETRY=1
 
 # FZF keybindings (Debian)
 source_if_exists "/usr/share/doc/fzf/examples/key-bindings.bash"
