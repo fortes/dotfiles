@@ -615,7 +615,13 @@ require('packer').startup(function(use)
     'EdenEast/nightfox.nvim',
     config = function()
       if vim.o.termguicolors then
-        vim.cmd('silent! colorscheme nightfox')
+        if os.getenv('COLOR_THEME') == 'light' then
+          print('Using light theme')
+          vim.cmd('silent! colorscheme dayfox')
+        else
+          print('Using default theme')
+          vim.cmd('silent! colorscheme nightfox')
+        end
       end
     end
   }
