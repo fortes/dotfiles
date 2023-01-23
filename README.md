@@ -2,6 +2,19 @@
 
 This is only public so I can easily share it across machines. There is probably nothing of interest for you here ... or is there?
 
+My usage is mostly terminal-based, via Crostini on Chromebook, WSL2 on Windows, and (rarely) MacOS terminal. Making heavy use of:
+
+* Bash / Tmux
+* FZF
+* Neovim
+* cmus
+
+Graphical sections are Linux-only, and use:
+
+* i3wm & picom & dunst & rofi
+* Kitty
+* Firefox
+
 ## Letting me own your machine
 
 ```sh
