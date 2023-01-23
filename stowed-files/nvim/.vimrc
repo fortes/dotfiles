@@ -357,7 +357,7 @@ endif
 
 if has('termguicolors')
   " Mac doesn't ship with tmux terminfo
-  if $TERM =~ '^\(xterm\|tmux\)-256'
+  if $COLORTERM == 'truecolor' || $TERM =~ '^\(xterm\|tmux\)-256'
     set termguicolors
   endif
 endif
