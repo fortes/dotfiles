@@ -616,11 +616,9 @@ require('packer').startup(function(use)
     config = function()
       if vim.o.termguicolors then
         if os.getenv('COLOR_THEME') == 'light' then
-          print('Using light theme')
           vim.cmd('silent! colorscheme dayfox')
         else
-          print('Using default theme')
-          vim.cmd('silent! colorscheme nightfox')
+          vim.cmd('silent! colorscheme carbonfox')
         end
       end
     end
