@@ -3,6 +3,7 @@
 #
 # - deno
 # - docker-compose
+# - foliate (on non-headless only)
 # - hugo
 # - neovim (latest)
 # - sad
@@ -60,6 +61,24 @@ install_docker_compose() {
   wget --quiet -O "${install_location}/docker-compose" "${url}"
   chmod +x "${install_location}/docker-compose"
   echo "docker-compose installed"
+}
+
+install_foliate() {
+  local url
+  url="$(get_latest_release_url 'johnfactotum/foliate' 'com.github.johnfactotum.foliate_.*_all.deb')"
+  if [[ -z "${url}" ]]; then
+    echo_stderr "Could not find url"
+    exit 2
+  fi
+  pushd /tmp > /dev/null
+  wget --quiet -O foliate.deb "${url}"
+  echo "Installing foliate dependencies (requires sudo)"
+  sudo apt-get install -qq --assume-yes --fix-broken --no-install-recommends \
+    gjs gir1.2-webkit2-4.0
+  echo "Installing foliate (requires sudo)"
+  sudo dpkg -i foliate.deb
+  rm foliate.deb
+  popd > /dev/null
 }
 
 install_helix() {
@@ -149,6 +168,8 @@ main() {
 
   install_deno
   install_docker_compose
+  # TODO: Test on more machines
+  # [[ -z "${IS_HEADLESS:-}" ]] && install_foliate
   install_helix
   install_hugo
   install_neovim_stable
