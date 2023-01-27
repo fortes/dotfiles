@@ -192,4 +192,6 @@ TODO: Automate these steps.
 - [ ] Setup `xautolock` or similar to automatically lock screen on idle
 - [ ] Figure out rofi / dmenu whatever else would make sense to do more in i3
 - [ ] Migrate off of X11 to Wayland: Either use nouveau or wait until Sway has Nvidia support (or get an AMD card)
+- [ ] Consider `alacritty` once it moves from `sid` into mainline
+  - [ ] `foot` on Wayland seems to be quite good
 - [ ] Figure out how to get USB-C DP Alt devices to work, might need [displaylink-debian](https://github.com/AdnanHodzic/displaylink-debian) or at the very least `evdi-dkms`
