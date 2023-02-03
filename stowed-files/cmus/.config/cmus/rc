@@ -36,3 +36,6 @@ set format_trackwin_va=   %03n %t (%a)%= %g %d
 # Include year in tree view
 set format_treewin=  %l [%y]
 set format_treewin_artist=%a
+
+# Handy filters
+fset this_year=originaldate=2023
