@@ -195,3 +195,7 @@ TODO: Automate these steps.
 - [ ] Consider `alacritty` once it moves from `sid` into mainline
   - [ ] `foot` on Wayland seems to be quite good
 - [ ] Figure out how to get USB-C DP Alt devices to work, might need [displaylink-debian](https://github.com/AdnanHodzic/displaylink-debian) or at the very least `evdi-dkms`
+- [ ] Get [Nvidia Drivers](https://wiki.debian.org/NvidiaGraphicsDrivers) drivers with a reasonable resolution for linux console
+  - Install `nvidia-detect` and run to check support
+  - Install `nvidia-driver`
+  - Get better resolution when booted into console by adding `GRUB_GFXMODE=auto` in `/etc/default/grub`, then run `sudo update-grub`
