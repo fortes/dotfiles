@@ -446,9 +446,6 @@ require('packer').startup(function(use)
     end
   }
 
-  -- Very simple tab completion
-  use {'ackyshake/VimCompletesMe'}
-
   -- Honor `.editorconfig`
   -- Should be able to remove in NeoVim 0.9, which will build this in
   use {'editorconfig/editorconfig-vim'}
