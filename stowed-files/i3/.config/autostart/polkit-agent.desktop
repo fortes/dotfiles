@@ -1,7 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=PolicyKit Agent
-Comment=
-Exec=/usr/bin/lxqt-policykit-agent
-OnlyShowIn=i3;
-NoDisplay=true
