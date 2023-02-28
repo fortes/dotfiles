@@ -43,6 +43,10 @@
   diffFilter = "diff-so-fancy-with-fallback --patch"
 [merge]
   conflictStyle = diff3
+  prompt = false
+  tool = nvim
+[mergetool "nvim"]
+  cmd = "nvim -d"
 [pull]
   rebase = true
 [push]
