@@ -127,6 +127,7 @@ TODO: Automate these steps.
 - Uninstall Teams, and other pre-installed unwanted things
 - Enable BitLocker
 - Adjust taskbar settings
+- Disable browser tabs from being in Alt-Tab list (Settings -> System -> Multitasking)
 - Turn on clipboard history by hitting Windows-V
 - Set Windows Terminal as default terminal application
 - Enable Hyper-V (required for WSL)
