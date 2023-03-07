@@ -46,7 +46,7 @@
   prompt = false
   tool = nvim
 [mergetool "nvim"]
-  cmd = "nvim -d"
+  cmd = "nvim -d $MERGED $LOCAL $REMOTE"
 [pull]
   rebase = true
 [push]
