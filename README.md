@@ -151,11 +151,21 @@ TODO: Automate these steps.
   - `winget install Zoom.Zoom`
 - Install Battle.net (Optional, if gaming)
 - WSL
+  - [Optional] Allocate more memory for WSL VM by creating/adding to `%UserProfile%\.wslconfig`:
+    ```
+    [wsl2]
+    memory=16G
+    ```
+  - [Optional] Enable `systemd` for VM by creating/adding to `/etc/wsl.conf`:
+    ```
+    [boot]
+    systemd=true
+    ```
   - `winget install Debian.Debian`
   - `sudo apt update && sudo apt dist-upgrade`
   - Run `~/dotfiles/setup_machine`
   - Set Debian as default terminal
-  - To mount network shares, do something like this in `/etc/fstab`:
+  - To mount network shares, do something like this in `/etc/fstab` (`drvfs` special for WSL):
     ```
     \\machine-name\share	/mnt/machine-share	drvfs	defaults,ro,noatime,uid=1000,gid=1000,umask=022	0	0
     ```
