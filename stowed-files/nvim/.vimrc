@@ -153,8 +153,8 @@ set sidescrolloff=5
 " of [readyonly], and don't give completion match messages
 set shortmess+=Imrc
 
-" Always show the signcolumn to avoid jitter
-set signcolumn=yes
+" Always show the signcolumn to avoid jitter, but show if multiple
+set signcolumn=auto:1-3
 
 " Open new split panes to right and bottom, which feels more natural
 set splitbelow
