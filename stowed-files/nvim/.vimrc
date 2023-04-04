@@ -484,10 +484,6 @@ augroup easy_close
   autocmd FileType help,qf,lspinfo,dirvish nnoremap <buffer> <cr> <cr>
 augroup END
 
-" Map jj and jk to <ESC> to leave insert mode quickly
-inoremap jj <ESC>
-inoremap jk <ESC>
-
 " Make j/k move screen visible lines, not file lines
 nnoremap j gj
 nnoremap k gk
