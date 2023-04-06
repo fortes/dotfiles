@@ -275,8 +275,6 @@ for_window [class="(?i)wine"] floating enable, border none, move position center
 # Wine programs end in '.exe' a bunch
 for_window [class="(?i)\.exe"] floating enable, border none, move position center
 
-# Plain background
-exec --no-startup-id hsetroot -solid "#222222"
 # Needed for inactive window transparency
 exec --no-startup-id picom -b
 # Try to get right primary monitor
