@@ -26,8 +26,10 @@ require('packer').startup(function(use)
     end,
     config = function()
       vim.g.copilot_filetypes = {
+        -- Override default, which disables markdown
+        markdown = true,
         -- Disable in places where it doesn't make sense
-        TelescopePrompt = 0
+        TelescopePrompt = false
       }
     end
   }
