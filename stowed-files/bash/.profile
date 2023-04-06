@@ -40,8 +40,10 @@ fd_with_git() {
 }
 export -f fd_with_git
 
-# Use NeoVim if we have it
-if command_exists nvim; then
+# Use local NeoVim if we have it
+if [[ -x "$HOME/.local/bin/nvim" ]]; then
+  VISUAL="$HOME/.local/bin/nvim"
+elif command_exists nvim; then
   VISUAL="$(command -v nvim)"
 elif command_exists vim; then
   VISUAL="$(command -v vim)"
