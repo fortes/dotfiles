@@ -5,6 +5,7 @@
 # - deno
 # - docker-compose
 # - foliate (on non-headless only)
+# - github cli
 # - hugo
 # - neovim (latest)
 # - sad
@@ -94,6 +95,21 @@ install_foliate() {
   echo "Installing foliate (requires sudo)"
   sudo dpkg -i foliate.deb
   rm foliate.deb
+  popd > /dev/null
+}
+
+install_github_cli() {
+  local url
+  url="$(get_latest_release_url 'cli/cli' 'gh_.*_linux_amd64.deb')"
+  if [[ -z "${url}" ]]; then
+    echo_stderr "Could not find url"
+    exit 2
+  fi
+  pushd /tmp > /dev/null
+  wget --quiet -O github-cli.deb "${url}"
+  echo "Installing GitHub CLI (requires sudo)"
+  sudo dpkg -i github-cli.deb
+  rm github-cli.deb
   popd > /dev/null
 }
 
@@ -187,6 +203,7 @@ main() {
   install_docker_compose
   # TODO: Test on more machines
   # [[ -z "${IS_HEADLESS:-}" ]] && install_foliate
+  install_github_cli
   install_helix
   install_hugo
   install_neovim_stable
