@@ -256,25 +256,6 @@ setup_locale() {
   fi
 }
 
-setup_multimedia() {
-  local codename="$(lsb_release -cs)"
-  local sources_path="/etc/apt/sources.list.d/debian-multimedia.list"
-
-  if [[ ! -f "${sources_path}" ]]; then
-    echo "Debian Multimedia not in sources.list, adding (requires sudo)"
-    echo "deb http://www.deb-multimedia.org ${codename} main non-free" |
-      sudo tee &> /dev/null "$sources_path"
-
-    # Must do this insecurely once in order to add keyring
-    sudo -E apt-get update -qq -oAcquire::AllowInsecureRepositories=true
-    echo "Getting keyring for Multimedia"
-    sudo -E apt-get install -qq --allow-unauthenticated --assume-yes deb-multimedia-keyring -oAcquire::AllowInsecureRepositories=true
-
-    # Ran outside of apt_update_once
-    has_updated=1
-  fi
-}
-
 setup_nonfree() {
   # Assume contrib and non-free always travel together
   if ! grep -q non-free /etc/apt/sources.list; then
@@ -352,8 +333,6 @@ main() {
 
   setup_nonfree
   setup_backports
-  # cmus in backports is recent enough right now
-  # [[ -z "${IS_HEADLESS:-}" ]] && setup_multimedia
   install_apt_packages
   "${dotfiles_path}/scripts/setup_1password"
   "${dotfiles_path}/scripts/setup_et"
