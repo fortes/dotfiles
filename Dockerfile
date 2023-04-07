@@ -5,7 +5,6 @@ ARG USER_NAME=fortes \
     USER_ID=1000 \
     GROUP_ID=1000 \
     TZ=America/New_York \
-    DEBIAN_VERSION=bullseye \
     DEBIAN_FRONTEND=noninteractive
 
 ENV LANG=en_US.UTF-8 \
@@ -31,9 +30,9 @@ RUN addgroup --gid $GROUP_ID $USER_NAME && \
 USER $USER_NAME
 WORKDIR /home/$USER_NAME
 
-RUN git clone https://github.com/fortes/dotfiles.git \
-  --branch debian-$DEBIAN_VERSION && \
-  ./dotfiles/scripts/setup_machine
+ADD --chown=$USER_NAME:$USER_NAME . /home/$USER_NAME/dotfiles
+
+RUN ./dotfiles/scripts/setup_machine
 
 SHELL ["/bin/bash", "-c"]
 CMD ["/bin/bash"]
