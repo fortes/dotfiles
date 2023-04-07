@@ -127,12 +127,16 @@ is_package_installed() {
 }
 
 lock_local_files() {
-  for local_file in $(git ls-files | grep -e '\.local$'); do
-    if ! git locked | grep --quiet --fixed-strings "$local_file"; then
-      echo "Locking $local_file"
-      git lock "$local_file"
-    fi
-  done
+  if git rev-parse --is-inside-work-tree &> /dev/null; then
+    for local_file in $(git ls-files | grep -e '\.local$'); do
+      if ! git locked | grep --quiet --fixed-strings "$local_file"; then
+        echo "Locking $local_file"
+        git lock "$local_file"
+      fi
+    done
+  else
+    echo "Not in a git repo, skipping local file locking"
+  fi
 }
 
 remove_default_dotfile() {
@@ -364,7 +368,9 @@ main() {
 
   # Misc system configs
   increase_max_watchers
+  pushd "${dotfiles_path}" > /dev/null
   lock_local_files
+  popd > /dev/null
   set_default_applications
   [[ -z "${IS_DOCKER:-}" ]] && setup_docker
   setup_keyboard
