@@ -55,12 +55,12 @@ install_deno() {
   mkdir -p "${install_location}"
   pushd /tmp > /dev/null
   wget --quiet -O "/tmp/deno.zip" "${url}"
-  unzip -o -d "${install_location}" /tmp/deno.zip
+  unzip -q -o -d "${install_location}" /tmp/deno.zip
   rm /tmp/deno.zip
   popd > /dev/null
   chmod +x "${install_location}/deno"
   echo "deno installed"
-  echo "Generating bash completion"
+  echo "Generating deno bash completion"
   mkdir -p "$HOME/.local/completion.d"
   "${install_location}"/deno completions bash > "$HOME/.local/completion.d/deno_completion"
 }
@@ -141,7 +141,7 @@ install_hugo() {
   echo "Installing hugo (requires sudo)"
   sudo dpkg -i hugo.deb
   rm hugo.deb
-  echo "Generating bash completion & man pages"
+  echo "Generating hugo bash completion & man pages"
   mkdir -p "$HOME/.local/completion.d"
   hugo completion bash > "$HOME/.local/completion.d/hugo_completion"
   cd "$(mktemp -d)"
@@ -160,7 +160,7 @@ install_sad() {
     exit 2
   fi
   pushd /tmp > /dev/null
-  wget -O sad.deb "${url}"
+  wget --quiet -O sad.deb "${url}"
   echo "Installing sad (requires sudo)"
   sudo dpkg -i sad.deb
   rm sad.deb
