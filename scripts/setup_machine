@@ -96,23 +96,6 @@ install_node_packages() {
   echo "Node packages installed"
 }
 
-install_neovim_plugins() {
-  local nvim_share_dir="$HOME/.local/share/nvim"
-
-  if [ ! -d "$nvim_share_dir/site/pack/packer" ]; then
-    echo "Installing packer.nvim"
-    git clone --depth 1 https://github.com/wbthomason/packer.nvim \
-      "${nvim_share_dir}/site/pack/packer/start/packer.nvim"
-    if [[ -z "${IS_DOCKER:-} " ]]; then
-      echo "packer.nvim installed, installing packages"
-      nvim --headless -es -c 'autocmd User PackerComplete quitall' -c 'PackerSync'
-    else
-      # Interactive prompts don't work while building
-      echo "Skipping packer package installation in Docker env"
-    fi
-  fi
-}
-
 install_python_packages() {
   local venv_path="$HOME/.local/venv"
 
@@ -379,7 +362,6 @@ main() {
   # Non-apt package managers
   install_node_packages
   install_python_packages
-  install_neovim_plugins
 
   generate_completions
 
