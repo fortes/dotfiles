@@ -18,7 +18,7 @@ main() {
       sudo tee "$zerotier_key_path" > /dev/null
 
     echo "Zerotier sources list missing, adding (requires sudo)"
-    echo "deb [signed-by=${zerotier_key_path}] http://download.zerotier.com/debian/bookworm bookworm main" \
+    echo "deb [signed-by=${zerotier_key_path}] http://download.zerotier.com/debian/bullseye bullseye main" \
       | sudo tee "$zerotier_sources_list" > /dev/null
 
     echo "Zerotier sources added, updating packages"

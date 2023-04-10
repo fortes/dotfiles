@@ -18,7 +18,7 @@ main() {
       sudo tee "$et_key_path" > /dev/null
 
     echo "Eternal Terminal sources list missing, adding (requires sudo)"
-    echo "deb [signed-by=${et_key_path}] https://github.com/MisterTea/debian-et/raw/master/debian-source/ bookworm main" \
+    echo "deb [signed-by=${et_key_path}] https://github.com/MisterTea/debian-et/raw/master/debian-source/ bullseye main" \
       | sudo tee "${et_sources_list}" > /dev/null
 
     echo "Eternal Terminal sources added, updating packages"
