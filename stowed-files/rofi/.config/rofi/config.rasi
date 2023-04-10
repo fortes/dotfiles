@@ -1,0 +1,9 @@
+@import "/usr/share/rofi/themes/Monokai.rasi"
+
+configuration {
+  case-sensitive: false;
+  font: "Noto Sans Medium 18";
+  matching: "glob";
+  display-drun: "👉";
+  display-window: "📋";
+}
