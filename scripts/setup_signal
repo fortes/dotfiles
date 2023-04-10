@@ -10,13 +10,15 @@ export DEBIAN_FRONTEND=noninteractive
 main() {
   declare -r signal_sources_list="/etc/apt/sources.list.d/signal-xenial.list"
   declare -r signal_key_url="https://updates.signal.org/desktop/apt/keys.asc"
+  declare -r signal_key_path="/etc/apt/trusted.gpg.d/signal-xenial.asc"
 
   if [ ! -f "$signal_sources_list" ]; then
     echo "Adding signal GPG key (requires sudo)"
-    curl -sS "$signal_key_url" | sudo -E apt-key add -
+    curl -sS "$signal_key_url" | \
+      sudo tee "$signal_key_path" > /dev/null
 
     echo "signal sources list missing, adding (requires sudo)"
-    echo "deb [arch=amd64] https://updates.signal.org/desktop/apt xenial main" \
+    echo "deb [arch=amd64 signed-by=${signal_key_path}] https://updates.signal.org/desktop/apt xenial main" \
       | sudo tee "$signal_sources_list"
 
     echo "Signal sources added, updating packages"

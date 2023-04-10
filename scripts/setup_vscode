@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# Install VSCode
+#
+# Usage: setup_vscode
+
+set -euo pipefail
+IFS=$'\n\t'
+export DEBIAN_FRONTEND=noninteractive
+
+main() {
+  declare -r vscode_sources_list="/etc/apt/sources.list.d/vscode.list"
+  declare -r vscode_key_url="https://packages.microsoft.com/keys/microsoft.asc"
+  declare -r vscode_key_path="/etc/apt/trusted.gpg.d/microsoft.asc"
+
+  if [ ! -f "$vscode_sources_list" ]; then
+    echo "Adding Microsoft GPG key (requires sudo)"
+    curl -sS "$vscode_key_url" | \
+      sudo tee "$vscode_key_path" > /dev/null
+
+    echo "Microsoft VSCode sources list missing, adding (requires sudo)"
+    echo "deb [arch=amd64 signed-by=${vscode_key_path}] https://packages.microsoft.com/repos/vscode stable main" \
+      | sudo tee "$vscode_sources_list"
+
+    echo "Microsoft VSCode sources added, updating packages"
+    sudo -E apt-get update -qq
+  fi
+
+  echo "Installing code package (requires sudo)"
+  sudo -E apt-get install -qq --assume-yes \
+    --fix-broken --no-install-recommends code
+}
+
+main

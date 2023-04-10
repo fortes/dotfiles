@@ -10,6 +10,7 @@ export DEBIAN_FRONTEND=noninteractive
 main() {
   declare -r brave_sources_list="/etc/apt/sources.list.d/brave.list"
   declare -r brave_key_url="https://brave-browser-apt-release.s3.brave.com/brave-core.asc"
+  declare -r brave_key_path="/etc/apt/trusted.gpg.d/brave-core.asc"
 
   if [ ! -f "$brave_sources_list" ]; then
     echo "Installing pre-requisites (requires sudo)"
@@ -17,10 +18,10 @@ main() {
       --fix-broken --no-install-recommends apt-transport-https curl gnupg
 
     echo "Adding Brave GPG key (requires sudo)"
-    curl -sS "$brave_key_url" | sudo -E apt-key add - > /dev/null
+    curl -sS "$brave_key_url" | sudo tee ${brave_key_path} > /dev/null
 
     echo "Brave sources list missing, adding (requires sudo)"
-    echo "deb [arch=amd64] https://brave-browser-apt-release.s3.brave.com/ stable main" \
+    echo "deb [arch=amd64 signed-by=${brave_key_path}] https://brave-browser-apt-release.s3.brave.com/ stable main" \
       | sudo tee "$brave_sources_list" > /dev/null
 
     echo "Brave sources added, updating packages"

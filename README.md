@@ -113,6 +113,14 @@ TODO: Automate these steps.
 
 - Must manually setup neovim. Launch and run `:PackerSync`
 
+#### Bookworm Upgrade
+
+The Bullseye to Bookworm upgrade requires a few manual steps that I'm too lazy to automate:
+
+- Must call `apt-key delete` on keys for `et`, `signal`, etc repos that were added via the now deprecated `apt-key`. Find the key id by taking the last eight digits of the hex displayed (no space). E.g. `apt-key del 57F6FB06` for Signal. Need to then delete the relevant fiels in `/etc/apt/sources.list.d` as well
+- `pip` user packages no longer work, everything got moved to `pipx`/`venv` and there may be some strays left in `~/.local/bin` that need to be manually removed
+- Remove `/etc/apt/sources.list.d/bullseye-backports.list` and let the script add the new one
+
 ### Chromebook
 
 - Extensions should automatically sync and install
@@ -195,7 +203,7 @@ TODO: Automate these steps.
 - 1Password can't manage to save authentication, dies trying to talk to keychain via dbus (for some reason, looking for `org.kde.kwalletd5` and ignores gnome keyring)
 - Gammastep tray indicator displays bogus information, likely [this issue](https://gitlab.com/chinstrap/gammastep/-/issues/21) (Debian has an outdated package)
 
-### Improvements
+## Future Improvements
 
 - [ ] Setup [textlint](https://github.com/textlint/textlint)
 - [ ] Better colorschemes, coordinated everywhere

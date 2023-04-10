@@ -10,13 +10,15 @@ export DEBIAN_FRONTEND=noninteractive
 main() {
   declare -r zerotier_sources_list="/etc/apt/sources.list.d/zerotier.list"
   declare -r zerotier_key_url="https://raw.githubusercontent.com/zerotier/ZeroTierOne/master/doc/contact%40zerotier.com.gpg"
+  declare -r zerotier_key_path="/etc/apt/trusted.gpg.d/microsoft.asc"
 
   if [ ! -f "$zerotier_sources_list" ]; then
     echo "Adding Zerotier GPG key (requires sudo)"
-    curl -sS "$zerotier_key_url" | sudo -E apt-key add - > /dev/null
+    curl -sS "$zerotier_key_url" | \
+      sudo tee "$zerotier_key_path" > /dev/null
 
     echo "Zerotier sources list missing, adding (requires sudo)"
-    echo "deb http://download.zerotier.com/debian/bullseye bullseye main" \
+    echo "deb [signed-by=${zerotier_key_path}] http://download.zerotier.com/debian/bookworm bookworm main" \
       | sudo tee "$zerotier_sources_list" > /dev/null
 
     echo "Zerotier sources added, updating packages"
