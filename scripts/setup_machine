@@ -56,7 +56,7 @@ generate_completions() {
   fi
 
   if command_exists pipx; then
-    register-python-argcomplete --shell bash pipx > "$HOME/.local/completion.d/pipx_completion"
+    register-python-argcomplete3 --shell bash pipx > "$HOME/.local/completion.d/pipx_completion"
   fi
 }
 
