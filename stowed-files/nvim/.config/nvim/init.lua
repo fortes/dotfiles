@@ -2,24 +2,23 @@
 -- Load all base / legacy options from ~/.vimrc
 vim.cmd('source ~/.vimrc')
 
-require('packer').startup(function(use)
-  -- Let packer manage itself
-  use {
-    'wbthomason/packer.nvim',
-    config = function()
-      -- Automatically reload options and update plugins after changing config
-      vim.cmd([[
-        augroup packer_reload_config
-          autocmd!
-          autocmd BufWritePost $MYVIMRC source <afile> | PackerCompile
-        augroup end
-      ]])
-    end
-  }
+-- Bootstrap lazy.nvim
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not vim.loop.fs_stat(lazypath) then
+  vim.fn.system({
+    "git",
+    "clone",
+    "--filter=blob:none",
+    "https://github.com/folke/lazy.nvim.git",
+    "--branch=stable",
+    lazypath,
+  })
+end
+vim.opt.rtp:prepend(lazypath)
 
+require("lazy").setup({
   -- GitHub Co-Pilot is paid, so only load if #ENABLE_GITHUB_COPILOT is set
-  -- locally
-  use {
+  {
     'github/copilot.vim',
     cond = function()
       return os.getenv('ENABLE_GITHUB_COPILOT') == '1'
@@ -32,13 +31,15 @@ require('packer').startup(function(use)
         TelescopePrompt = false
       }
     end
-  }
+  },
 
   -- Language Server for all sorts of goodness
-  use {
+  {
     'neovim/nvim-lspconfig',
     -- Use telescope in keybindings
-    after = {'telescope.nvim'},
+    dependencies = {
+      'nvim-telescope/telescope.nvim'
+    },
     config = function()
       local nvim_lsp = require('lspconfig')
 
@@ -84,10 +85,10 @@ require('packer').startup(function(use)
 
           -- Format on save, where supported
           vim.cmd([[
-            augroup lsp_format_on_save
-              autocmd!
-              autocmd BufWritePre <buffer> lua vim.lsp.buf.format({async = true})
-            augroup end
+          augroup lsp_format_on_save
+            autocmd!
+            autocmd BufWritePre <buffer> lua vim.lsp.buf.format({async = true})
+          augroup end
           ]])
         end
         if client.server_capabilities.documentRangeFormattingProvider then
@@ -162,21 +163,24 @@ require('packer').startup(function(use)
         nvim_lsp[lsp].setup(opts)
       end
     end
-  }
+  },
+
 
   -- Show LSP progress in lower right
-  use {
+  {
     'j-hui/fidget.nvim',
-    after = {'nvim-lspconfig'},
+    dependencies = {
+      'neovim/nvim-lspconfig'
+    },
     config = function()
       require('fidget').setup({})
     end
-  }
+  },
 
   -- Treesitter for better highlighting, indent, etc
-  use {
+  {
     'nvim-treesitter/nvim-treesitter',
-    run = ':TSUpdate',
+    build = ':TSUpdate',
     cond = function()
       return vim.fn.has('nvim-0.6') == 1
     end,
@@ -205,12 +209,14 @@ require('packer').startup(function(use)
       vim.wo.foldmethod = 'expr'
       vim.wo.foldexpr = 'nvim_treesitter#foldexpr()'
     end
-  }
+  },
 
   -- Create text objects using Treesitter queries
-  use {
+  {
     'nvim-treesitter/nvim-treesitter-textobjects',
-    after = {'nvim-treesitter'},
+    dependencies = {
+      'nvim-treesitter/nvim-treesitter'
+    },
     config = function()
       require('nvim-treesitter.configs').setup {
         autotag = {
@@ -228,18 +234,22 @@ require('packer').startup(function(use)
         }
       }
     end
-  }
+  },
 
   -- Use Treesitter to autoclose / rename tags
-  use {
+  {
     'windwp/nvim-ts-autotag',
-    after = {'nvim-treesitter'},
-  }
+    dependencies = {
+      'nvim-treesitter/nvim-treesitter'
+    },
+  },
 
   -- Use Treesitter to add `end` in Lua, Bash, etc
-  use {
+  {
     'RRethy/nvim-treesitter-endwise',
-    after = {'nvim-treesitter'},
+    dependencies = {
+      'nvim-treesitter/nvim-treesitter'
+    },
     config = function()
       require('nvim-treesitter.configs').setup {
         endwise = {
@@ -247,13 +257,15 @@ require('packer').startup(function(use)
         }
       }
     end,
-  }
+  },
 
   -- Use Treesitter for rainbow delimiters
-  use {
+  {
     'https://gitlab.com/HiPhish/nvim-ts-rainbow2',
-    as = 'nvim-ts-rainbow2',
-    after = {'nvim-treesitter'},
+    name = 'nvim-ts-rainbow2',
+    dependencies = {
+      'nvim-treesitter/nvim-treesitter'
+    },
     config = function()
       require('nvim-treesitter.configs').setup {
         rainbow = {
@@ -265,12 +277,14 @@ require('packer').startup(function(use)
         }
       }
     end
-  }
+  },
 
   -- Use Treesitter to do LSP-like things:
-  use {
+  {
     'nvim-treesitter/nvim-treesitter-refactor',
-    after = {'nvim-treesitter'},
+    dependencies = {
+      'nvim-treesitter/nvim-treesitter'
+    },
     config = function()
       require('nvim-treesitter.configs').setup {
         refactor = {
@@ -278,29 +292,35 @@ require('packer').startup(function(use)
         },
       }
     end
-  }
+  },
 
   -- Use Treesitter to infer correct `commentstring`
-  use {
+  {
     'joosepalviste/nvim-ts-context-commentstring',
-    after = {'nvim-treesitter'}
-  }
+    dependencies = {
+      'nvim-treesitter/nvim-treesitter'
+    },
+  },
 
   -- Enable spellchecking in buffers that use Treesitter
-  use {
+  {
     'lewis6991/spellsitter.nvim',
-    after = {'nvim-treesitter'},
+    dependencies = {
+      'nvim-treesitter/nvim-treesitter'
+    },
     config = function()
       -- Can also be a list of filetypes
       require('spellsitter').setup({enable = true})
     end
-  }
+  },
 
   -- Indentation guides
-  use {
+  {
     'lukas-reineke/indent-blankline.nvim',
     -- Used for context highlighting
-    after = {'nvim-treesitter'},
+    dependencies = {
+      'nvim-treesitter/nvim-treesitter'
+    },
     config = function()
       require('indent_blankline').setup {
         filetype_exclude = {
@@ -315,12 +335,14 @@ require('packer').startup(function(use)
         use_treesitter = true,
       }
     end
-  }
+  },
 
   -- Generate code annotations, e.g. JSDoc
-  use {
+  {
     'danymat/neogen',
-    requires = 'nvim-treesitter',
+    dependencies = {
+      'nvim-treesitter/nvim-treesitter'
+    },
     config = function()
       require('neogen').setup {
         enabled = true
@@ -329,12 +351,14 @@ require('packer').startup(function(use)
       local opts = {noremap = true, silent = true}
       vim.api.nvim_set_keymap("n", "<Leader>nf", ":lua require('neogen').generate()<cr>", opts)
     end
-  }
+  },
 
   -- Split or Join blocks of code
-  use {
+  {
     'Wansmer/treesj',
-    after = {'nvim-treesitter'},
+    dependencies = {
+      'nvim-treesitter/nvim-treesitter'
+    },
     config = function()
       require('treesj').setup({
         -- Use default keymaps
@@ -361,17 +385,19 @@ require('packer').startup(function(use)
         dot_repeat = true,
       })
     end,
-  }
+  },
 
   -- Fuzzy finder for all the things
-  use {
+  {
     {
       'nvim-telescope/telescope.nvim',
-      requires = {
+      dependencies = {
         -- Helper functions
         'nvim-lua/plenary.nvim',
         -- Support FZF syntax
-        'telescope-fzf-native.nvim'
+        'nvim-telescope/telescope-fzf-native.nvim',
+        -- Use telescope for `vim.ui.select`
+        'nvim-telescope/telescope-ui-select.nvim'
       },
       cond = function()
         return vim.fn.has('nvim-0.6') == 1
@@ -426,36 +452,36 @@ require('packer').startup(function(use)
         vim.keymap.set('n', '<c-p>', ':lua project_files()<cr>', opts)
         vim.keymap.set('n', '<m-p>', [[<cmd>Telescope oldfiles<cr>]], opts)
         vim.keymap.set('n', '<m-b>',
-          [[<cmd>Telescope buffers show_all_buffers=true<cr>]],
-          opts)
+        [[<cmd>Telescope buffers show_all_buffers=true<cr>]],
+        opts)
         vim.keymap.set('n', 'Q', [[<cmd>Telescope live_grep<cr>]], opts)
       end
     },
     {
       'nvim-telescope/telescope-fzf-native.nvim',
-      run = 'make'
+      build = 'make'
     }
-  }
+  },
 
-  use {
+  {
     'AckslD/nvim-neoclip.lua',
-    requires = {
+    dependencies = {
       -- Uses telescope for selection
-      {'nvim-telescope/telescope.nvim'},
+      'nvim-telescope/telescope.nvim',
     },
     config = function()
       require('neoclip').setup({})
 
       vim.keymap.set('n', '<leader>cl',
-        ':lua require("telescope").extensions.neoclip.default()<cr>',
-        {noremap=true, silent=true})
+      ':lua require("telescope").extensions.neoclip.default()<cr>',
+      {noremap=true, silent=true})
     end
-  }
+  },
 
   -- Highlight ranges in timeline
-  use {
+  {
     'winston0410/range-highlight.nvim',
-    requires = {
+    dependencies = {
       'winston0410/cmd-parser.nvim',
     },
     cond = function()
@@ -464,46 +490,47 @@ require('packer').startup(function(use)
     config = function()
       require('range-highlight').setup({})
     end
-  }
-
-  -- Honor `.editorconfig`
-  -- Should be able to remove in NeoVim 0.9, which will build this in
-  use {'editorconfig/editorconfig-vim'}
+  },
 
   -- Copy to system via OSC52 via <leader>c
-  use {
+  {
     'ojroques/nvim-osc52',
     config = function()
       vim.keymap.set('n', '<leader>c', require('osc52').copy_operator, {expr=true})
       vim.keymap.set('n', '<leader>cc', '<leader>c_', {remap=true})
       vim.keymap.set('x', '<leader>c', require('osc52').copy_visual)
     end
-  }
+  },
 
   -- Autoformatting
-  use {'prettier/vim-prettier'}
+  {
+    'prettier/vim-prettier',
+    event = "VeryLazy",
+  },
 
   -- Display available key bindings, marks, registers, etc
-  use {
+  {
     'folke/which-key.nvim',
+    event = "VeryLazy",
     config = function()
       require("which-key").setup()
     end
-  }
+  },
 
   -- Preview line number via `:XXX` before moving
-  use {
+  {
     'nacro90/numb.nvim',
+    event = "VeryLazy",
     config = function()
       require('numb').setup()
     end
-  }
+  },
 
   -- Shows git diff in signs column
   -- `[c` / `]c` to jump between hunks
   -- <leader>hs to stage hunk
   -- <leader>hp to preview hunk
-  use {
+  {
     'lewis6991/gitsigns.nvim',
     config = function()
       require('gitsigns').setup({
@@ -543,25 +570,37 @@ require('packer').startup(function(use)
         end
       })
     end,
-  }
+  },
 
   -- Better text objects, will seek to nearest match on line
-  use {'wellle/targets.vim'}
+  {
+    'wellle/targets.vim',
+    event = "VeryLazy",
+  },
 
   -- Extend normal mode `ga` with more info like digraphs and emoji code
-  use {'tpope/vim-characterize'}
+  {
+    'tpope/vim-characterize',
+    event = "VeryLazy",
+  },
 
   -- Adds helpers for UNIX shell commands
   -- * :Remove Delete buffer and file at same time
   -- * :Unlink Delete file, keep buffer
   -- * :Move Rename buffer and file
-  use {'tpope/vim-eunuch'}
+  {
+    'tpope/vim-eunuch',
+    event = "VeryLazy",
+  },
 
   -- Run git commands in editor, also used by other packages
-  use {'tpope/vim-fugitive'}
+  {
+    'tpope/vim-fugitive',
+    event = "VeryLazy",
+  },
 
   -- netrw, but better
-  use {
+  {
     'justinmk/vim-dirvish',
     config = function()
       -- Unsupported with dirvish
@@ -578,49 +617,63 @@ require('packer').startup(function(use)
       ]])
 
     end
-  }
+  },
 
   -- git status for dirvish
-  use {
+  {
     'kristijanhusak/vim-dirvish-git',
-    after = {'vim-dirvish'},
-  }
+    dependencies = {
+      'justinmk/vim-dirvish'
+    },
+  },
 
   -- Comment / uncomment things quickly
-  use {'tpope/vim-commentary'}
+  {
+    'tpope/vim-commentary'
+  },
 
   -- Edit surrounding quotes / parents / etc
-  use {
+  {
     'kylechui/nvim-surround',
+    event = "VeryLazy",
     config = function()
       require('nvim-surround').setup({
         -- Use defaults
       })
     end
-  }
+  },
 
   -- Movement and option switches via `[` and `]` (toggle with `y`)
-  use {'tpope/vim-unimpaired'}
+  {
+    'tpope/vim-unimpaired'
+  },
 
   -- Add `.` repeat functionality to plugins that support it
-  use {'tpope/vim-repeat'}
+  {
+    'tpope/vim-repeat'
+  },
 
   -- Readline-like bindings in insert/command mode
-  use {'tpope/vim-rsi'}
+  {
+    'tpope/vim-rsi'
+  },
 
   -- Automatically insert closing parens, etc
-  use {
+  {
     'windwp/nvim-autopairs',
+    dependencies = {
+      'nvim-treesitter/nvim-treesitter'
+    },
     config = function()
       require('nvim-autopairs').setup({
         -- Use Treesitter to check for pair
         check_ts = true,
       })
     end
-  }
+  },
 
   -- Better Markdown handling
-  use {
+  {
     'plasticboy/vim-markdown',
     config = function()
       vim.g['vim_markdown_fenced_languages'] = {
@@ -637,31 +690,33 @@ require('packer').startup(function(use)
       }
       vim.g['vim_markdown_frontmatter'] = 1
     end
-  }
+  },
 
-  -- Mostly for Hugo template syntax
-  use {
+  -- Only for Hugo template syntax
+  {
     'fatih/vim-go',
+    ft = 'gohtmltmpl',
     cond = function()
       return vim.fn.has('nvim-0.4') == 1
     end,
     -- Since only using for syntax for now, don't do full setup
-    -- run = ':GoUpdateBinaries'
-  }
+    -- build = ':GoUpdateBinaries'
+  },
 
   -- Show colors in actual color
-  use {
+  {
     'norcalli/nvim-colorizer.lua',
     config = function()
       if vim.o.termguicolors then
         require('colorizer').setup()
       end
     end
-  }
+  },
 
   -- Reasonable colors
-  use {
+  {
     'EdenEast/nightfox.nvim',
+    lazy = false,
     config = function()
       if vim.o.termguicolors then
         if os.getenv('COLOR_THEME') == 'light' then
@@ -672,11 +727,12 @@ require('packer').startup(function(use)
       end
     end
   }
-end)
+})
 
 -- Load local config, if present
 vim.cmd([[
-if filereadable(expand('~/.nvimrc.local'))
-  source ~/.nvimrc.local
-endif
-]])
+  if filereadable(expand('~/.nvimrc.local'))
+    source ~/.nvimrc.local
+    endif
+  ]]
+)
