@@ -40,6 +40,8 @@ fd_with_git() {
 }
 export -f fd_with_git
 
+source_if_exists "$HOME/.local/venv/bin/activate"
+
 # Use local NeoVim if we have it
 if [[ -x "$HOME/.local/bin/nvim" ]]; then
   VISUAL="$HOME/.local/bin/nvim"

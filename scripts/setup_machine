@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Make your machine usable
 #
-# Usage: setup_machine [--python-only] [--node-only]
+# Usage: setup_machine [--apt-only] [--node-only] [--python-only]
 
 set -euo pipefail
 IFS=$'\n\t'
@@ -12,7 +12,7 @@ export DEBIAN_FRONTEND=noninteractive
 has_updated=""
 
 usage() {
-  echo "Usage: setup_machine [--python-only] [--node-only]"
+  echo "Usage: setup_machine [--apt-only] [--node-only] [--python-only]"
 }
 
 # Avoid running multiple times
@@ -53,6 +53,10 @@ generate_completions() {
 
   if command_exists beet; then
     beet completion > "$HOME/.local/completion.d/beet_completion"
+  fi
+
+  if command_exists pipx; then
+    register-python-argcomplete --shell bash pipx > "$HOME/.local/completion.d/pipx_completion"
   fi
 }
 
@@ -110,12 +114,22 @@ install_neovim_plugins() {
 }
 
 install_python_packages() {
+  local venv_path="$HOME/.local/venv"
+
   echo "Installing global python packages"
-  # Always make sure pip/setuptools are on latest first
-  python3 -m pip install --user --quiet --upgrade --no-warn-script-location pip setuptools
-  grep -v "^#" "$HOME/dotfiles/scripts/python-packages" | xargs --no-run-if-empty \
-    python3 -m pip install --user --quiet --upgrade --no-warn-script-location
+  grep -v "^#" "$HOME/dotfiles/scripts/pipx-packages" | xargs --no-run-if-empty -L 1 pipx install --force
   echo "Python packages installed"
+
+  if [[ ! -d "${venv_path}" ]]; then
+    echo "Creating default venv"
+    python3 -m venv "${venv_path}"
+  fi
+
+  . "${venv_path}/bin/activate"
+
+  echo "Installing venv libraries"
+  grep -v "^#" "$HOME/dotfiles/scripts/python-libraries" | xargs --no-run-if-empty "${venv_path}/bin/python" -m pip install --quiet --upgrade
+  echo "venv libraries installed"
 }
 
 is_package_installed() {
@@ -283,12 +297,19 @@ main() {
   # shellcheck source=/dev/null
   . "$HOME/dotfiles/stowed-files/bash/.profile"
 
+  local -r dotfiles_path="$HOME/dotfiles"
+  local -r local_profile_path="$HOME/.profile.local"
+
+  local apt_only=''
   local node_only=''
   local python_only=''
 
   # Parse arguments
   while [[ $# -gt 0 ]]; do
     case "$1" in
+      --apt-only)
+        apt_only=1
+        ;;
       --node-only)
         node_only=1
         ;;
@@ -308,7 +329,10 @@ main() {
     shift
   done
 
-  if [[ -n "${node_only}" ]]; then
+  if [[ -n "${apt_only}" ]]; then
+    install_apt_packages
+    exit 0
+  elif [[ -n "${node_only}" ]]; then
     install_node_packages
     exit 0
   elif [[ -n "${python_only}" ]]; then
@@ -319,9 +343,6 @@ main() {
   check_prerequisites
   setup_shell
   set_dotfiles_remote
-
-  local -r dotfiles_path="$HOME/dotfiles"
-  local -r local_profile_path="$HOME/.profile.local"
 
   if [[ ! -f "${local_profile_path}" ]]; then
     echo "Generating ${local_profile_path}"
