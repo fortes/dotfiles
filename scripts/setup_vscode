@@ -10,7 +10,7 @@ export DEBIAN_FRONTEND=noninteractive
 main() {
   declare -r vscode_sources_list="/etc/apt/sources.list.d/vscode.list"
   declare -r vscode_key_url="https://packages.microsoft.com/keys/microsoft.asc"
-  declare -r vscode_key_path="/etc/apt/trusted.gpg.d/microsoft.asc"
+  declare -r vscode_key_path="/etc/apt/keyrings/microsoft.asc"
 
   if [ ! -f "$vscode_sources_list" ]; then
     echo "Adding Microsoft GPG key (requires sudo)"

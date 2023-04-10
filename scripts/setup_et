@@ -10,7 +10,7 @@ export DEBIAN_FRONTEND=noninteractive
 main() {
   declare -r et_sources_list="/etc/apt/sources.list.d/et.list"
   declare -r et_key_url="https://github.com/MisterTea/debian-et/raw/master/et.gpg"
-  declare -r et_key_path="/etc/apt/trusted.gpg.d/et.gpg"
+  declare -r et_key_path="/etc/apt/keyrings/et.gpg"
 
   if [ ! -f "${et_sources_list}" ]; then
     echo "Adding Eternal Terminal GPG key (requires sudo)"
@@ -18,7 +18,7 @@ main() {
       sudo tee "$et_key_path" > /dev/null
 
     echo "Eternal Terminal sources list missing, adding (requires sudo)"
-    echo "deb [signed-by=${et_key_path}] https://github.com/MisterTea/debian-et/raw/master/debian-source/ bullseye main" \
+    echo "deb [signed-by=${et_key_path}] https://github.com/MisterTea/debian-et/raw/master/debian-source/ bookworm main" \
       | sudo tee "${et_sources_list}" > /dev/null
 
     echo "Eternal Terminal sources added, updating packages"

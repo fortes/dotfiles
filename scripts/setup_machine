@@ -35,7 +35,7 @@ check_prerequisites() {
     sudo -E apt-get install -qq --assume-yes --fix-broken --no-install-recommends software-properties-common lsb-release
   fi
 
-  if ! lsb_release -ds | grep -iq debian; then
+  if ! lsb_release -ds | tail -n 1 | grep -iq debian; then
     echo_stderr "Warning: Things might break outside of Debian"
   fi
 }
@@ -56,7 +56,7 @@ generate_completions() {
   fi
 
   if command_exists pipx; then
-    register-python-argcomplete3 --shell bash pipx > "$HOME/.local/completion.d/pipx_completion"
+    register-python-argcomplete --shell bash pipx > "$HOME/.local/completion.d/pipx_completion"
   fi
 }
 
@@ -150,9 +150,9 @@ set_default_applications() {
     sudo update-alternatives --install /usr/bin/editor editor "$(command -v nvim)" 60
   fi
 
-  if command_exists kitty && [[ -z $(update-alternatives --query x-terminal-emulator | grep ^Value | grep kitty) ]]; then
-    echo "Setting Kitty as default terminal (requires sudo)"
-    sudo update-alternatives --set x-terminal-emulator "$(command -v kitty)"
+  if command_exists alacritty && [[ -z $(update-alternatives --query x-terminal-emulator | grep ^Value | grep alacritty) ]]; then
+    echo "Setting Alacritty as default terminal (requires sudo)"
+    sudo update-alternatives --set x-terminal-emulator "$(command -v alacritty)"
   fi
 
   if command_exists firefox-esr && [[ -z $(update-alternatives --query  x-www-browser | grep ^Value | grep firefox) ]]; then
@@ -178,7 +178,7 @@ set_dotfiles_remote() {
 }
 
 setup_backports() {
-  declare -r codename="$(lsb_release -cs)"
+  declare -r codename="$(lsb_release -cs | tail -n 1)"
 
   # WSL comes with backports pre-enabled
   if grep -q "${codename}-backports" /etc/apt/sources.list{,.d/*} 2> /dev/null; then
@@ -189,7 +189,7 @@ setup_backports() {
   declare -r sources_path="/etc/apt/sources.list.d/backports.list"
 
   echo "${codename}-backports not in sources.list, adding (requires sudo)"
-  echo "deb http://ftp.debian.org/debian ${codename}-backports main contrib non-free" | \
+  echo "deb http://ftp.debian.org/debian ${codename}-backports main contrib non-free non-free-firmware" | \
     sudo tee &> /dev/null "$sources_path"
 
   # New source requires forced updates
@@ -252,11 +252,25 @@ setup_locale() {
 }
 
 setup_nonfree() {
-  # Assume contrib and non-free always travel together
-  if ! grep -q non-free /etc/apt/sources.list; then
+  if [[ -f /etc/apt/sources.list.d/debian.sources ]]; then
+    if grep -q non-free /etc/apt/sources.list.d/debian.sources; then
+      echo "Non-free already in sources.list"
+      return
+    fi
+
+    # `add-apt-repository` doesn't seem to support the deb822 format
+    # TODO: Find a better way to do this
+    sudo sed -i.bak 's/Components: main$/Components: main contrib non-free non-free-firmware/' \
+      /etc/apt/sources.list.d/debian.sources
+  elif ! grep -q non-free /etc/apt/sources.list; then
+    # Assume contrib and non-free always travel together
     echo "Adding contrib & non-free to sources (requires sudo)"
-    sudo -E add-apt-repository -y contrib > /dev/null
-    sudo -E add-apt-repository -y non-free > /dev/null
+    sudo -E add-apt-repository --no-update --yes contrib > /dev/null
+    sudo -E add-apt-repository --no-update --yes non-free > /dev/null
+    sudo -E add-apt-repository --no-update --yes non-free-firmware > /dev/null
+
+    # New source requires forced updates
+    has_updated=""
   fi
 }
 
@@ -278,9 +292,9 @@ main() {
   declare -r dotfiles_path="$HOME/dotfiles"
   declare -r local_profile_path="$HOME/.profile.local"
 
-  local apt_only=''
-  local node_only=''
-  local python_only=''
+  declare apt_only=''
+  declare node_only=''
+  declare python_only=''
 
   # Parse arguments
   while [[ $# -gt 0 ]]; do

@@ -10,7 +10,7 @@ export DEBIAN_FRONTEND=noninteractive
 main() {
   declare -r yarn_sources_list="/etc/apt/sources.list.d/yarn.list"
   declare -r yarn_key_url="https://dl.yarnpkg.com/debian/pubkey.gpg"
-  declare -r yarn_key_path="/etc/apt/trusted.gpg.d/yarn.gpg"
+  declare -r yarn_key_path="/etc/apt/keyrings/yarn.gpg"
 
   if [ ! -f "$yarn_sources_list" ]; then
     echo "Adding Yarn GPG key (requires sudo)"

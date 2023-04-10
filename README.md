@@ -18,7 +18,7 @@ Graphical sections are Linux-only, and use:
 ## Letting me own your machine
 
 ```sh
-git clone https://github.com/fortes/dotfiles.git --branch debian-bullseye
+git clone https://github.com/fortes/dotfiles.git --branch debian-bookworm
 ./dotfiles/scripts/setup_machine
 ```
 
@@ -111,7 +111,7 @@ TODO: Automate these steps.
 
 #### Docker
 
-- Must manually setup neovim. Launch and run `:PackerSync`
+- Must start Neovim in order to install plugin manager
 
 #### Bookworm Upgrade
 
@@ -119,6 +119,7 @@ The Bullseye to Bookworm upgrade requires a few manual steps that I'm too lazy t
 
 - Must call `apt-key delete` on keys for `et`, `signal`, etc repos that were added via the now deprecated `apt-key`. Find the key id by taking the last eight digits of the hex displayed (no space). E.g. `apt-key del 57F6FB06` for Signal. Need to then delete the relevant fiels in `/etc/apt/sources.list.d` as well
 - `pip` user packages no longer work, everything got moved to `pipx`/`venv` and there may be some strays left in `~/.local/bin` that need to be manually removed
+  - `pip freeze --user | xargs pip uninstall` should work here
 - Remove `/etc/apt/sources.list.d/bullseye-backports.list` and let the script add the new one
 
 ### Chromebook
@@ -198,22 +199,20 @@ The Bullseye to Bookworm upgrade requires a few manual steps that I'm too lazy t
 
 ## Known Issues
 
+- Debian bookworm does a `debian.sources` file instead of `sources.list`, need to adjust `setup_machine`
 - Media keys on Microsoft Ergonomic Keyboard sometimes aren't detected, disconnect/reconnect USB may be enough to fix?
 - Mouse wheel speed also sometimes goes to a better default after disconnect/reconnect
 - 1Password can't manage to save authentication, dies trying to talk to keychain via dbus (for some reason, looking for `org.kde.kwalletd5` and ignores gnome keyring)
-- Gammastep tray indicator displays bogus information, likely [this issue](https://gitlab.com/chinstrap/gammastep/-/issues/21) (Debian has an outdated package)
 
 ## Future Improvements
 
 - [ ] [Auto-publish Docker images](https://docs.github.com/en/actions/publishing-packages/publishing-docker-images#publishing-images-to-github-packages)
-- [ ] Setup [textlint](https://github.com/textlint/textlint)
 - [ ] Better colorschemes, coordinated everywhere
   - [ ] Easier swapping into light mode
 - [ ] Setup `xautolock` or similar to automatically lock screen on idle
 - [ ] Figure out rofi / dmenu whatever else would make sense to do more in i3
 - [ ] Migrate off of X11 to Wayland: Either use nouveau or wait until Sway has Nvidia support (or get an AMD card)
-- [ ] Consider `alacritty` once it moves from `sid` into mainline
-  - [ ] `foot` on Wayland seems to be quite good
+  - [ ] `foot` on Wayland seems to be quite good for terminal
 - [ ] Figure out how to get USB-C DP Alt devices to work, might need [displaylink-debian](https://github.com/AdnanHodzic/displaylink-debian) or at the very least `evdi-dkms`
 - [ ] Get [Nvidia Drivers](https://wiki.debian.org/NvidiaGraphicsDrivers) drivers with a reasonable resolution for linux console
   - Install `nvidia-detect` and run to check support

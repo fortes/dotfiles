@@ -10,7 +10,7 @@ export DEBIAN_FRONTEND=noninteractive
 main() {
   declare -r brave_sources_list="/etc/apt/sources.list.d/brave.list"
   declare -r brave_key_url="https://brave-browser-apt-release.s3.brave.com/brave-core.asc"
-  declare -r brave_key_path="/etc/apt/trusted.gpg.d/brave-core.asc"
+  declare -r brave_key_path="/etc/apt/keyrings/brave-core.asc"
 
   if [ ! -f "$brave_sources_list" ]; then
     echo "Installing pre-requisites (requires sudo)"

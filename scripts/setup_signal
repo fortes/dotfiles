@@ -10,7 +10,7 @@ export DEBIAN_FRONTEND=noninteractive
 main() {
   declare -r signal_sources_list="/etc/apt/sources.list.d/signal-xenial.list"
   declare -r signal_key_url="https://updates.signal.org/desktop/apt/keys.asc"
-  declare -r signal_key_path="/etc/apt/trusted.gpg.d/signal-xenial.asc"
+  declare -r signal_key_path="/etc/apt/keyrings/signal-xenial.asc"
 
   if [ ! -f "$signal_sources_list" ]; then
     echo "Adding signal GPG key (requires sudo)"

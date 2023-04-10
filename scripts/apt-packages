@@ -1,3 +1,4 @@
+alacritty
 alsa-utils
 chromium
 cmake
@@ -6,9 +7,10 @@ dex
 dbus-x11
 dunst
 exfat-fuse
-exfat-utils
+exfatprogs
 feh
 firefox-esr
+foliate
 fonts-dejavu
 fonts-hack
 fonts-noto

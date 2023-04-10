@@ -1,5 +1,5 @@
 # Modify these to suit your needs
-FROM debian:bullseye
+FROM debian:bookworm
 
 ARG USER_NAME=fortes \
     USER_ID=1000 \
