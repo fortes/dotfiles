@@ -11,9 +11,9 @@ floating_modifier $mod
 
 # start a terminal with mod-enter
 bindsym $mod+Return exec i3-sensible-terminal
-# floating terminal with mod-`
-bindsym $mod+grave exec i3-sensible-terminal --class='console' --name='terminal' --override font_size=16
-# floating terminal with mod-`
+# floating terminal with mod-` (for some reason, not working with Alacritty)
+bindsym $mod+grave exec kitty --class='console' --override font_size=16
+# floating incognito browser with mod-~
 bindsym $mod+Shift+grave exec chromium --temp-profile --incognito --class='console'
 
 # start a browser with mod-shift-enter
@@ -248,7 +248,7 @@ for_window [window_role="browser"] border none
 for_window [window_role="console"] floating enable, border none
 for_window [class="console"] floating enable, border none
 # Move floating terminal to scratchpad at top of screen
-for_window [instance="terminal" class="console"] resize set 100ppt 20ppt, move position 0 px 0 px, move scratchpad, scratchpad show
+for_window [title="(?i)(alacr|k)itty" class="console"] resize set 100ppt 20ppt, move position 0 px 0 px, move scratchpad, scratchpad show
 
 # Hide title bar for terminals, which seem to have no unifying class / role :(
 for_window [class="(?i)x?term"] border none
