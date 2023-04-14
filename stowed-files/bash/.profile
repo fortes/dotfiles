@@ -40,7 +40,10 @@ fd_with_git() {
 }
 export -f fd_with_git
 
-source_if_exists "$HOME/.local/venv/bin/activate"
+if command_exists cmus && [[ -z "${VIRTUAL_ENV}" ]]; then
+  # cmus scrobbling requires virtualenv to work
+  source_if_exists "$HOME/.local/venv/bin/activate"
+fi
 
 # Use local NeoVim if we have it
 if [[ -x "$HOME/.local/bin/nvim" ]]; then
