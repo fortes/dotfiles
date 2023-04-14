@@ -73,7 +73,7 @@ increase_max_watchers() {
 }
 
 install_apt_packages() {
-  local apt_packages=$(grep -v "^#" "$dotfiles_path/scripts/apt-packages-headless")
+  declare apt_packages=$(grep -v "^#" "$dotfiles_path/scripts/apt-packages-headless")
   if [[ -z "${IS_HEADLESS:-}" ]]; then
     apt_packages=$(grep --no-filename -v "^#" "$dotfiles_path/scripts/apt-packages"*)
   fi
@@ -97,7 +97,7 @@ install_node_packages() {
 }
 
 install_python_packages() {
-  local venv_path="$HOME/.local/venv"
+  declare -r venv_path="$HOME/.local/venv"
 
   echo "Installing global python packages"
   grep -v "^#" "$HOME/dotfiles/scripts/pipx-packages" | xargs --no-run-if-empty -L 1 pipx install --force
@@ -137,7 +137,7 @@ lock_local_files() {
 }
 
 remove_default_dotfile() {
-  local filename=$1
+  declare -r filename=$1
   if [[ -f "$HOME/$filename" && ! -L "$HOME/$filename" ]]; then
     echo "Moving default $filename"
     mv "$HOME/$filename" "$HOME/original$filename"
@@ -178,7 +178,7 @@ set_dotfiles_remote() {
 }
 
 setup_backports() {
-  local codename="$(lsb_release -cs)"
+  declare -r codename="$(lsb_release -cs)"
 
   # WSL comes with backports pre-enabled
   if grep -q "${codename}-backports" /etc/apt/sources.list; then
@@ -186,7 +186,7 @@ setup_backports() {
     return
   fi
 
-  local sources_path="/etc/apt/sources.list.d/${codename}-backports.list"
+  declare -r sources_path="/etc/apt/sources.list.d/${codename}-backports.list"
 
   if [[ ! -f "${sources_path}" ]]; then
     echo "Backports not in sources.list, adding (requires sudo)"
@@ -205,13 +205,13 @@ setup_docker() {
     sudo -E apt-get install -qq --assume-yes --fix-broken --no-install-recommends docker.io
   fi
 
-  local user="$(whoami)"
-  local sudoers_file="/etc/sudoers.d/${user}-docker"
+  declare -r user="$(whoami)"
+  declare -r sudoers_file="/etc/sudoers.d/${user}-docker"
   if [ ! -f "$sudoers_file" ]; then
     echo "Allowing $user to run docker without sudo prompt (requires sudo)"
-    echo "$user  ALL=(ALL) NOPASSWD: /usr/bin/docker" |
+    echo "$user ALL=(ALL) NOPASSWD: /usr/bin/docker" |
       sudo tee &> /dev/null "$sudoers_file"
-    echo "$user  ALL=(ALL) NOPASSWD: $HOME/.local/bin/docker-compose" |
+    echo "$user ALL=(ALL) NOPASSWD: $HOME/.local/bin/docker-compose" |
       sudo tee -a &> /dev/null "$sudoers_file"
   fi
 }
@@ -233,7 +233,7 @@ setup_keyboard() {
 }
 
 setup_locale() {
-  local locale="en_US.UTF-8"
+  declare -r locale="en_US.UTF-8"
 
   if ! is_package_installed locales; then
     apt_update_once
@@ -263,11 +263,8 @@ setup_nonfree() {
 }
 
 setup_shell() {
-  local bash_path
-  local current_shell
-
-  bash_path="$(which bash)"
-  current_shell="$(getent passwd $(id -un) | awk -F : '{print $NF}')"
+  declare -r bash_path="$(which bash)"
+  declare -r current_shell="$(getent passwd "$(id -un)" | awk -F : '{print $NF}')"
 
   if [[ "${current_shell}" != "${bash_path}" ]]; then
     echo "Changing shell to bash (requires sudo)"
@@ -280,8 +277,8 @@ main() {
   # shellcheck source=/dev/null
   . "$HOME/dotfiles/stowed-files/bash/.profile"
 
-  local -r dotfiles_path="$HOME/dotfiles"
-  local -r local_profile_path="$HOME/.profile.local"
+  declare -r dotfiles_path="$HOME/dotfiles"
+  declare -r local_profile_path="$HOME/.profile.local"
 
   local apt_only=''
   local node_only=''
