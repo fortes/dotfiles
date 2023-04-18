@@ -210,6 +210,9 @@ install_yq() {
   wget --quiet -O "${install_location}/yq" "${url}"
   chmod +x "${install_location}/yq"
   echo "yq installed"
+  echo "Generating yq bash completion"
+  mkdir -p "$HOME/.local/completion.d"
+  "${install_location}"/yq shell-completion bash > "$HOME/.local/completion.d/yq_completion"
 }
 
 main() {
