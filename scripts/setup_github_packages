@@ -9,6 +9,7 @@
 # - hugo
 # - neovim (latest)
 # - sad
+# - yq
 #
 # Usage `install_github_packages`
 
@@ -195,6 +196,22 @@ install_neovim_stable() {
   sudo update-alternatives --install /usr/bin/vimdiff vimdiff "${vim_path}" 110
 }
 
+install_yq() {
+  local url
+  url="$(get_latest_release_url 'mikefarah/yq' 'yq_linux_amd64')"
+  if [[ -z "${url}" ]]; then
+    echo_stderr "Could not find url"
+    exit 2
+  fi
+
+  local install_location="$HOME/.local/bin"
+  mkdir -p "${install_location}"
+  echo "Downloading yq"
+  wget --quiet -O "${install_location}/yq" "${url}"
+  chmod +x "${install_location}/yq"
+  echo "yq installed"
+}
+
 main() {
   . "$HOME/.profile.local"
 
@@ -208,6 +225,7 @@ main() {
   install_hugo
   install_neovim_stable
   install_sad
+  install_yq
 }
 
 main
