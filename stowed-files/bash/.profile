@@ -40,7 +40,7 @@ fd_with_git() {
 }
 export -f fd_with_git
 
-if command_exists cmus && [[ -z "${VIRTUAL_ENV}" ]]; then
+if command_exists cmus && [[ -z "${VIRTUAL_ENV:-}" ]]; then
   # cmus scrobbling requires virtualenv to work
   source_if_exists "$HOME/.local/venv/bin/activate"
 fi
