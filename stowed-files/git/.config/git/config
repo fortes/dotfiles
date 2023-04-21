@@ -23,6 +23,8 @@
   fixup = "!git log --oneline --no-decorate --no-merges | fzf -0 --preview 'git show --color=always --format=oneline {1}' | awk '{print $1}' | xargs -r git commit --fixup"
   # Fetch and rebase
   frb = "!git fetch --prune && git rebase --autostash origin/master"
+  # checkout origin/main
+  main = "checkout origin/main"
   # Fuzzy reset staged files
   resetm = "!git diff --name-only --cached | fzf -0 -m --preview 'git diff --cached --color=always {-1}' | xargs -r git reset"
   # Undo last commit, but keeping changes
