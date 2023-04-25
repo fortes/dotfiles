@@ -40,8 +40,8 @@ fd_with_git() {
 }
 export -f fd_with_git
 
-if command_exists cmus; then
-  # cmus scrobbling requires virtualenv to work
+if [[ -n "${LISTENBRAINZ_AUTH_TOKEN:-}" ]]; then
+  # scrobbling requires `pylistenbrainz`, not available in Debian so need venv
   source_if_exists "$HOME/.local/venv/bin/activate"
 fi
 
