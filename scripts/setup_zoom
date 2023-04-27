@@ -15,8 +15,8 @@ main() {
   sudo -E apt-get install -qq --assume-yes \
     --fix-broken --no-install-recommends libgl1-mesa-glx libxcb-xtest0 libegl1-mesa
 
-  echo "Downloading latest Zoom .deb"
-  wget "${zoom_deb_url}" -O "${zoom_deb_temp_path}"
+  echo -n "Downloading latest Zoom .deb ... "
+  wget -q "${zoom_deb_url}" -O "${zoom_deb_temp_path}"
   echo "Installing latest Zoom .deb (requires sudo)"
   sudo dpkg --install "${zoom_deb_temp_path}"
   rm -rf "${zoom_deb_temp_path}"

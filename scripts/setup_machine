@@ -338,7 +338,6 @@ main() {
   "${dotfiles_path}/scripts/setup_1password"
   "${dotfiles_path}/scripts/setup_et"
   "${dotfiles_path}/scripts/setup_github_packages"
-  "${dotfiles_path}/scripts/setup_fnm"
 
   # Debian ships with these two by default
   remove_default_dotfile .bashrc

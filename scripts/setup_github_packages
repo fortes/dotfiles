@@ -6,6 +6,7 @@
 # - docker-compose
 # - foliate (on non-headless only)
 # - github cli
+# - fnm
 # - hugo
 # - neovim (latest)
 # - sad
@@ -38,7 +39,7 @@ install_agg() {
   fi
   local install_location="$HOME/.local/bin"
   mkdir -p "${install_location}"
-  echo "Downloading agg"
+  echo -n "Downloading agg ... "
   wget --quiet -O "${install_location}/agg" "${url}"
   chmod +x "${install_location}/agg"
   echo "agg installed"
@@ -51,7 +52,7 @@ install_deno() {
     echo_stderr "Could not find url"
     exit 2
   fi
-  echo "Downloading deno"
+  echo -n "Downloading deno ... "
   local install_location="$HOME/.local/bin"
   mkdir -p "${install_location}"
   pushd /tmp > /dev/null
@@ -75,7 +76,7 @@ install_docker_compose() {
   fi
   local install_location="$HOME/.local/bin"
   mkdir -p "${install_location}"
-  echo "Downloading docker-compose"
+  echo -n "Downloading docker-compose ... "
   wget --quiet -O "${install_location}/docker-compose" "${url}"
   chmod +x "${install_location}/docker-compose"
   echo "docker-compose installed"
@@ -108,10 +109,45 @@ install_github_cli() {
   fi
   pushd /tmp > /dev/null
   wget --quiet -O github-cli.deb "${url}"
-  echo "Installing GitHub CLI (requires sudo)"
+  echo -n "Installing GitHub CLI (requires sudo) ... "
   sudo dpkg -i github-cli.deb
   rm github-cli.deb
   popd > /dev/null
+}
+
+install_fnm() {
+  local url
+  url="$(get_latest_release_url 'Schniz/fnm' 'fnm-linux.zip')"
+
+  if [[ -z "${url}" ]]; then
+    echo_stderr "Could not find url"
+    exit 2
+  fi
+
+  local bin_path
+  bin_path="$HOME/.local/bin"
+
+  pushd "$(mktemp -d)" > /dev/null
+  echo -n "Downloading fnm.zip ... "
+  wget --quiet -O fnm.zip "${url}"
+  echo -n "unzipping ... "
+  unzip -q "fnm.zip" -d .
+  mv "./fnm" "${bin_path}/fnm"
+  popd > /dev/null
+  chmod u+x "${bin_path}/fnm"
+
+  echo "fnm installed"
+  echo -n "Generating completions ... "
+  mkdir -p "$HOME/.local/completion.d"
+  "${bin_path}/fnm" completions > "$HOME/.local/completion.d/fnm_completion"
+
+  echo "Complete!"
+
+  echo -n "Installing node LTS ... "
+  "${bin_path}/fnm" install --lts
+
+  echo "Setting node version to LTS"
+  "${bin_path}/fnm" default lts-latest
 }
 
 install_helix() {
@@ -124,7 +160,7 @@ install_helix() {
 
   local install_location="$HOME/.local/bin"
   mkdir -p "${install_location}"
-  echo "Downloading helix"
+  echo -n "Downloading helix ... "
   wget --quiet -O "${install_location}/hx" "${url}"
   chmod +x "${install_location}/hx"
   echo "helix installed"
@@ -171,11 +207,12 @@ install_sad() {
 install_neovim_stable() {
   local vim_path="$HOME/.local/bin/nvim"
 
-  echo "Installing neovim stable"
+  echo -n "Installing neovim stable ... "
   mkdir -p "$(dirname ${vim_path})"
   wget "https://github.com/neovim/neovim/releases/download/stable/nvim.appimage" \
     --quiet --output-document "$vim_path"
   chmod +x "$vim_path"
+  echo "neovim stable installed"
 
   echo "Syncing plugins"
   "${vim_path}" --headless "+Lazy! sync" +qa
@@ -210,7 +247,7 @@ install_yq() {
 
   local install_location="$HOME/.local/bin"
   mkdir -p "${install_location}"
-  echo "Downloading yq"
+  echo -n "Downloading yq ... "
   wget --quiet -O "${install_location}/yq" "${url}"
   chmod +x "${install_location}/yq"
   echo "yq installed"
@@ -228,6 +265,7 @@ main() {
   # TODO: Test on more machines
   # [[ -z "${IS_HEADLESS:-}" ]] && install_foliate
   install_github_cli
+  install_fnm
   install_helix
   install_hugo
   install_neovim_stable
