@@ -67,9 +67,9 @@ export LIBVIRT_DEFAULT_URI="qemu:///system"
 
 fzf_preview_command=""
 if command_exists batcat; then
-  fzf_preview_command="--preview 'batcat --color always --style=grid,changes --line-range :300 {}'"
+  fzf_preview_command="'batcat --color always --style=grid,changes --line-range :300 {}'"
 else
-  fzf_preview_command="--preview 'cat {}'"
+  fzf_preview_command="'cat {}'"
 fi
 
 # $FZF_DEFAULT_COMMAND is executed with `sh -c`, so need to be careful with
@@ -77,12 +77,29 @@ fi
 if command_exists fdfind; then
   # Use `fd` when possible for far better performance
   export FZF_DEFAULT_COMMAND='bash -c "fdfind --type file --follow . \$(git rev-parse --show-cdup 2>/dev/null && echo --hidden)"'
-  export FZF_CTRL_T_COMMAND='fd_with_git --color always'
+  export FZF_CTRL_T_COMMAND="fd_with_git --color always"
+  export FZF_ALT_C_COMMAND='fdfind --type directory --hidden --color always'
 fi
-export FZF_DEFAULT_OPTS="--height 60% --extended --bind ctrl-alt-a:select-all,ctrl-alt-d:deselect-all,F1:toggle-preview"
-export FZF_CTRL_T_OPTS="--ansi --preview-window 'right:50%' $fzf_preview_command"
-# Case insensitive by default
-export FZF_COMPLETION_OPTS='-i'
+if command_exists exa; then
+  # Show tree structure in preview window
+  export FZF_ALT_C_OPTS="
+    --preview 'exa -T -a {}'
+    "
+fi
+export FZF_DEFAULT_OPTS="
+  --ansi
+  --bind 'ctrl-alt-a:select-all'
+  --bind 'ctrl-alt-d:deselect-all'
+  --extended
+  --inline-info
+  "
+# Alt-C to choose directory file lives in
+export FZF_CTRL_T_OPTS="
+  --bind 'alt-c:execute(echo -n {} | xargs dirname)+abort'
+  --preview ${fzf_preview_command}
+  --preview-window 'right:50%'
+  "
+export FZF_COMPLETION_OPTS='--smart-case'
 
 if command_exists fnm; then
   eval "$(fnm env)"
