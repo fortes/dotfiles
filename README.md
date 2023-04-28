@@ -205,6 +205,7 @@ The Bullseye to Bookworm upgrade requires a few manual steps that I'm too lazy t
 
 ## Future Improvements
 
+- [ ] [Auto-publish Docker images](https://docs.github.com/en/actions/publishing-packages/publishing-docker-images#publishing-images-to-github-packages)
 - [ ] Setup [textlint](https://github.com/textlint/textlint)
 - [ ] Better colorschemes, coordinated everywhere
   - [ ] Easier swapping into light mode
