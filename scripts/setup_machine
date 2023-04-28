@@ -181,21 +181,19 @@ setup_backports() {
   declare -r codename="$(lsb_release -cs)"
 
   # WSL comes with backports pre-enabled
-  if grep -q "${codename}-backports" /etc/apt/sources.list; then
+  if grep -q "${codename}-backports" /etc/apt/sources.list{,.d/*} 2> /dev/null; then
     echo "Backports already in sources.list"
     return
   fi
 
-  declare -r sources_path="/etc/apt/sources.list.d/${codename}-backports.list"
+  declare -r sources_path="/etc/apt/sources.list.d/backports.list"
 
-  if [[ ! -f "${sources_path}" ]]; then
-    echo "Backports not in sources.list, adding (requires sudo)"
-    echo "deb http://ftp.debian.org/debian ${codename}-backports main contrib non-free" |
-      sudo tee &> /dev/null "$sources_path"
+  echo "${codename}-backports not in sources.list, adding (requires sudo)"
+  echo "deb http://ftp.debian.org/debian ${codename}-backports main contrib non-free" | \
+    sudo tee &> /dev/null "$sources_path"
 
-    # New source requires forced updates
-    has_updated=""
-  fi
+  # New source requires forced updates
+  has_updated=""
 }
 
 setup_docker() {
