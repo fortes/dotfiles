@@ -336,7 +336,7 @@ main() {
   setup_backports
   install_apt_packages
   "${dotfiles_path}/scripts/setup_1password"
-  "${dotfiles_path}/scripts/setup_et"
+  [[ -z "${IS_DOCKER:-}" ]] && "${dotfiles_path}/scripts/setup_et"
   "${dotfiles_path}/scripts/setup_github_packages"
 
   # Debian ships with these two by default
