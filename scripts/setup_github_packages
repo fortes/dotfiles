@@ -226,8 +226,12 @@ install_neovim_stable() {
     )
   fi
 
-  echo "Syncing plugins"
-  "${vim_path}" --headless "+Lazy! sync" +qa
+  if [[ -d "$HOME/.local/share/nvim/lazy/lazy.nvim" ]]; then
+    echo "Syncing plugins"
+    "${vim_path}" --headless "+Lazy! sync" +qa
+  else
+    echo "Must manually launch Neovim to install plugins"
+  fi
 
   echo "Setting neovim as default editor (requires sudo)"
   sudo update-alternatives --install /usr/bin/ex ex "${vim_path}" 110
