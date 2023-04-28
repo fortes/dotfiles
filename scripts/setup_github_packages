@@ -214,9 +214,6 @@ install_neovim_stable() {
   chmod +x "$vim_path"
   echo "neovim stable installed"
 
-  echo "Syncing plugins"
-  "${vim_path}" --headless "+Lazy! sync" +qa
-
   if [[ -n "${IS_DOCKER:-}" ]]; then
     local vim_appimage_dir_path="$HOME/.local/appimages/nvim"
     echo "Expanding neovim AppImage"
@@ -228,6 +225,9 @@ install_neovim_stable() {
       ln -s "${vim_appimage_dir_path}/squashfs-root/AppRun" "${vim_path}"
     )
   fi
+
+  echo "Syncing plugins"
+  "${vim_path}" --headless "+Lazy! sync" +qa
 
   echo "Setting neovim as default editor (requires sudo)"
   sudo update-alternatives --install /usr/bin/ex ex "${vim_path}" 110
