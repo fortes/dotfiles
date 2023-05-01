@@ -416,7 +416,7 @@ if has('eval')
   function! GitRootCD()
     let result = FindGitRootCD()
     if type(result) == type({})
-      execute 'lcd' fnameescape(result['dir'])
+      execute 'tcd' fnameescape(result['dir'])
       echo 'Now in '.result['dir']
     else
       echo 'Not in git repo!'
@@ -524,7 +524,7 @@ nnoremap <C-w><C-d> :bd<cr>
 nnoremap cop :set invpaste<cr>:set paste?<cr>
 
 " Change local directory to current file
-nnoremap <leader>lcd :lcd %:p:h<cr>
+nnoremap <leader>lcd :tcd %:p:h<cr>
 " Go back to root
 nnoremap <leader>cd :GitRootCD<cr>
 
