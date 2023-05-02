@@ -65,6 +65,12 @@ if !exists('g:loaded_matchit') && findfile('plugin/matchit.vim', &runtimepath) =
   runtime! macros/matchit.vim
 endif
 
+" Use `:Cfilter` / `:Lfilter` to filter quickfix / location lists
+" Useful with `:colder` and `:cnewer` to restore previous lists
+if has('packages')
+  packadd cfilter
+endif
+
 " Core Behavior {{{
 if exists('+modelineexpr')
   set nomodelineexpr
