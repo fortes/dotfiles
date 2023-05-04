@@ -211,6 +211,7 @@ The Bullseye to Bookworm upgrade requires a few manual steps that I'm too lazy t
   - [ ] Easier swapping into light mode
 - [ ] Setup `xautolock` or similar to automatically lock screen on idle
 - [ ] Figure out rofi / dmenu whatever else would make sense to do more in i3
+- [ ] Check out [`zutty` terminal](https://tomscii.sig7.se/zutty/)
 - [ ] Migrate off of X11 to Wayland: Either use nouveau or wait until Sway has Nvidia support (or get an AMD card)
   - [ ] `foot` on Wayland seems to be quite good for terminal
 - [ ] Figure out how to get USB-C DP Alt devices to work, might need [displaylink-debian](https://github.com/AdnanHodzic/displaylink-debian) or at the very least `evdi-dkms`
