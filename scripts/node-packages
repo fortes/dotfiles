@@ -9,7 +9,7 @@ npm
 npm-check-updates
 prettier
 rome
-ts-node
+tsx
 typescript
 typescript-language-server
 vim-language-server
