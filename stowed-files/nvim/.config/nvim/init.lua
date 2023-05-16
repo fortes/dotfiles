@@ -506,6 +506,10 @@ require("lazy").setup({
   {
     'prettier/vim-prettier',
     event = "VeryLazy",
+    config = function()
+      -- Don't use quickfix for syntax errors
+      vim.g['prettier#quickfix_enabled'] = 0
+    end
   },
 
   -- Display available key bindings, marks, registers, etc
