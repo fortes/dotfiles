@@ -41,6 +41,8 @@
   prune = true
 [help]
   autocorrect = 1
+[init]
+  defaultBranch = main
 [interactive]
   diffFilter = "diff-so-fancy-with-fallback --patch"
 [merge]
