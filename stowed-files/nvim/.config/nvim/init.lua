@@ -169,6 +169,8 @@ require("lazy").setup({
   -- Show LSP progress in lower right
   {
     'j-hui/fidget.nvim',
+    -- Re-write in progress, stay on stable
+    tag = 'legacy',
     dependencies = {
       'neovim/nvim-lspconfig'
     },
