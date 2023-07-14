@@ -605,6 +605,11 @@ require("lazy").setup({
     event = "VeryLazy",
   },
 
+  {
+    'NeogitOrg/neogit',
+    dependencies = 'nvim-lua/plenary.nvim'
+  },
+
   -- netrw, but better
   {
     'justinmk/vim-dirvish',
