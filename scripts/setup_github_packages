@@ -30,6 +30,29 @@ get_latest_release_url() {
   curl --silent "${release_json_url}" | jq -r '.assets[]?.browser_download_url' | grep "${match}" | head -n 1
 }
 
+install_deb() {
+  local repo="${1}"
+  local match="${2}"
+  local name
+  local install_dir
+
+  name="$(basename "${repo}" ".deb")"
+
+  local url
+  url="$(get_latest_release_url "${repo}" "${match}")"
+  if [[ -z "${url}" ]]; then
+    echo_stderr "Could not find url for ${repo} matching ${match}"
+    exit 2
+  fi
+  install_dir="$(mktemp --directory "${name}"XXX)"
+  pushd "${install_dir}" > /dev/null
+  wget --quiet -O "${name}.deb" "${url}"
+  echo -n "Installing ${repo} (requires sudo) ... "
+  sudo dpkg -i "${name}.deb"
+  popd > /dev/null
+  rm -rf "${install_dir}"
+}
+
 install_agg() {
   local url
   url="$(get_latest_release_url 'asciinema/agg' 'agg-x86_64-unknown-linux-musl')"
@@ -46,22 +69,11 @@ install_agg() {
 }
 
 install_browsh() {
-  local url
-  url="$(get_latest_release_url 'browsh-org/browsh' 'browsh_.*_linux_amd64.deb')"
-  if [[ -z "${url}" ]]; then
-    echo_stderr "Could not find url"
-    exit 2
-  fi
-  pushd /tmp > /dev/null
-  wget --quiet -O browsh.deb "${url}"
   echo "Installing browsh dependencies (requires sudo)"
   sudo apt-get install -qq --assume-yes --fix-broken --no-install-recommends \
     firefox-esr
-  echo -n "Installing browsh (requires sudo)..."
-  sudo dpkg -i browsh.deb
-  echo "browsh installed"
-  rm browsh.deb
-  popd > /dev/null
+
+  install_deb 'browsh-org/browsh' 'browsh_.*_linux_amd64.deb'
 }
 
 install_deno() {
@@ -102,18 +114,7 @@ install_docker_compose() {
 }
 
 install_github_cli() {
-  local url
-  url="$(get_latest_release_url 'cli/cli' 'gh_.*_linux_amd64.deb')"
-  if [[ -z "${url}" ]]; then
-    echo_stderr "Could not find url"
-    exit 2
-  fi
-  pushd /tmp > /dev/null
-  wget --quiet -O github-cli.deb "${url}"
-  echo -n "Installing GitHub CLI (requires sudo) ... "
-  sudo dpkg -i github-cli.deb
-  rm github-cli.deb
-  popd > /dev/null
+  install_deb 'cli/cli' 'gh_.*_linux_amd64.deb'
 }
 
 install_fnm() {
@@ -169,16 +170,8 @@ install_helix() {
 
 install_hugo() {
   local url
-  url="$(get_latest_release_url 'gohugoio/hugo' 'hugo_extended_.*_linux-amd64.deb')"
-  if [[ -z "${url}" ]]; then
-    echo_stderr "Could not find url"
-    exit 2
-  fi
-  pushd /tmp > /dev/null
-  wget --quiet -O hugo.deb "${url}"
-  echo "Installing hugo (requires sudo)"
-  sudo dpkg -i hugo.deb
-  rm hugo.deb
+  install_deb 'gohugoio/hugo' 'hugo_extended_.*_linux-amd64.deb'
+
   echo "Generating hugo bash completion & man pages"
   mkdir -p "$HOME/.local/completion.d"
   hugo completion bash > "$HOME/.local/completion.d/hugo_completion"
@@ -191,18 +184,7 @@ install_hugo() {
 }
 
 install_sad() {
-  local url
-  url="$(get_latest_release_url 'ms-jpq/sad' 'x86_64-unknown-linux-gnu.deb')"
-  if [[ -z "${url}" ]]; then
-    echo_stderr "Could not find url"
-    exit 2
-  fi
-  pushd /tmp > /dev/null
-  wget --quiet -O sad.deb "${url}"
-  echo "Installing sad (requires sudo)"
-  sudo dpkg -i sad.deb
-  rm sad.deb
-  popd > /dev/null
+  install_deb 'ms-jpq/sad' 'x86_64-unknown-linux-gnu.deb'
 }
 
 install_neovim_stable() {
