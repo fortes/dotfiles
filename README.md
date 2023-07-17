@@ -12,7 +12,7 @@ My usage is mostly terminal-based, via Crostini on Chromebook, WSL2 on Windows, 
 Graphical sections are Linux-only, and use:
 
 * i3wm & picom & dunst & rofi
-* Kitty
+* Alacritty
 * Firefox
 
 ## Letting me own your machine
