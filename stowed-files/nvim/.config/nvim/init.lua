@@ -263,22 +263,11 @@ require("lazy").setup({
 
   -- Use Treesitter for rainbow delimiters
   {
-    'https://gitlab.com/HiPhish/nvim-ts-rainbow2',
-    name = 'nvim-ts-rainbow2',
+    'HiPhish/rainbow-delimiters.nvim',
+    name = 'rainbow-delimiters',
     dependencies = {
       'nvim-treesitter/nvim-treesitter'
     },
-    config = function()
-      require('nvim-treesitter.configs').setup {
-        rainbow = {
-          enable = true,
-          -- Which query to use for finding delimiters
-          query = 'rainbow-parens',
-          -- Highlight the entire buffer all at once
-          strategy = require 'ts-rainbow'.strategy.global,
-        }
-      }
-    end
   },
 
   -- Use Treesitter to do LSP-like things:
