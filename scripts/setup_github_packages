@@ -7,7 +7,10 @@
 # - docker-compose
 # - github cli
 # - fnm
+# - helix
 # - hugo
+# - lazydocker
+# - lazygit
 # - neovim (latest)
 # - sad
 # - yq
@@ -25,47 +28,82 @@ echo_stderr() {
 get_latest_release_url() {
   local repo="$1"
   local match="$2"
+  local urls
 
   local release_json_url="https://api.github.com/repos/${repo}/releases/latest"
-  curl --silent "${release_json_url}" | jq -r '.assets[]?.browser_download_url' | grep "${match}" | head -n 1
+  urls=$(curl --silent "${release_json_url}" | jq -r '.assets[]?.browser_download_url' | grep "${match}")
+  if [[ -z "${urls}" ]]; then
+    echo_stderr "Error: Could not find url for ${repo} matching ${match}"
+    exit 2
+  fi
+  echo "${urls}"| head -n 1
+}
+
+install_bin() {
+  local repo="${1}"
+  local match="${2}"
+  local name
+  name="$(basename "${repo}")"
+
+  local url
+  url="$(get_latest_release_url "${repo}" "${match}")"
+
+  local install_location="$HOME/.local/bin"
+  mkdir -p "${install_location}"
+  echo -n "Downloading ${name} ... "
+  wget --quiet -O "${install_location}/${name}" "${url}"
+  chmod +x "${install_location}/${name}"
+  echo "${name} installed"
 }
 
 install_deb() {
   local repo="${1}"
   local match="${2}"
   local name
-  local install_dir
+  local download_dir
 
-  name="$(basename "${repo}" ".deb")"
+  name="$(basename "${repo}")"
 
   local url
   url="$(get_latest_release_url "${repo}" "${match}")"
-  if [[ -z "${url}" ]]; then
-    echo_stderr "Could not find url for ${repo} matching ${match}"
-    exit 2
-  fi
-  install_dir="$(mktemp --directory "${name}"XXX)"
-  pushd "${install_dir}" > /dev/null
+
+  download_dir="$(mktemp --directory "${name}"XXX)"
+  pushd "${download_dir}" > /dev/null
   wget --quiet -O "${name}.deb" "${url}"
   echo -n "Installing ${repo} (requires sudo) ... "
   sudo dpkg -i "${name}.deb"
   popd > /dev/null
-  rm -rf "${install_dir}"
+  rm -rf "${download_dir}"
+}
+
+# install_tarball() {
+#   # TODO
+# }
+
+install_zip() {
+  local repo="${1}"
+  local match="${2}"
+  local name
+  name="$(basename "${repo}")"
+
+  local url
+  url="$(get_latest_release_url "${repo}" "${match}")"
+
+  local install_location="$HOME/.local/bin"
+
+  download_dir="$(mktemp --directory "${name}"XXX)"
+  pushd "${download_dir}" > /dev/null
+  wget --quiet -O "${name}.zip" "${url}"
+  echo -n "Installing ${repo} (requires sudo) ... "
+  unzip -q -o -d "${install_location}" "${download_dir}/${name}.zip"
+  chmod +x "${install_location}/${name}"
+  popd > /dev/null
+  rm -rf "${download_dir}"
+  echo "${name} installed"
 }
 
 install_agg() {
-  local url
-  url="$(get_latest_release_url 'asciinema/agg' 'agg-x86_64-unknown-linux-musl')"
-  if [[ -z "${url}" ]]; then
-    echo_stderr "Could not find url"
-    exit 2
-  fi
-  local install_location="$HOME/.local/bin"
-  mkdir -p "${install_location}"
-  echo -n "Downloading agg ... "
-  wget --quiet -O "${install_location}/agg" "${url}"
-  chmod +x "${install_location}/agg"
-  echo "agg installed"
+  install_bin 'asciinema/agg' 'agg-x86_64-unknown-linux-musl'
 }
 
 install_browsh() {
@@ -79,10 +117,6 @@ install_browsh() {
 install_deno() {
   local url
   url="$(get_latest_release_url 'denoland/deno' 'deno-x86_64-unknown-linux-gnu.zip')"
-  if [[ -z "${url}" ]]; then
-    echo_stderr "Could not find url"
-    exit 2
-  fi
   echo -n "Downloading deno ... "
   local install_location="$HOME/.local/bin"
   mkdir -p "${install_location}"
@@ -99,18 +133,7 @@ install_deno() {
 }
 
 install_docker_compose() {
-  local url
-  url="$(get_latest_release_url 'docker/compose' 'linux-x86_64')"
-  if [[ -z "${url}" ]]; then
-    echo_stderr "Could not find url"
-    exit 2
-  fi
-  local install_location="$HOME/.local/bin"
-  mkdir -p "${install_location}"
-  echo -n "Downloading docker-compose ... "
-  wget --quiet -O "${install_location}/docker-compose" "${url}"
-  chmod +x "${install_location}/docker-compose"
-  echo "docker-compose installed"
+  install_bin 'docker/compose' 'linux-x86_64'
 }
 
 install_github_cli() {
@@ -120,11 +143,6 @@ install_github_cli() {
 install_fnm() {
   local url
   url="$(get_latest_release_url 'Schniz/fnm' 'fnm-linux.zip')"
-
-  if [[ -z "${url}" ]]; then
-    echo_stderr "Could not find url"
-    exit 2
-  fi
 
   local bin_path
   bin_path="$HOME/.local/bin"
@@ -155,11 +173,6 @@ install_fnm() {
 install_helix() {
   local url
   url="$(get_latest_release_url 'helix-editor/helix' 'x86_64.AppImage')"
-  if [[ -z "${url}" ]]; then
-    echo_stderr "Could not find url"
-    exit 2
-  fi
-
   local install_location="$HOME/.local/bin"
   mkdir -p "${install_location}"
   echo -n "Downloading helix ... "
@@ -175,12 +188,34 @@ install_hugo() {
   echo "Generating hugo bash completion & man pages"
   mkdir -p "$HOME/.local/completion.d"
   hugo completion bash > "$HOME/.local/completion.d/hugo_completion"
-  cd "$(mktemp -d)"
+  pushd "$(mktemp -d)" > /dev/null
   hugo gen man
   local man_dir_path="$HOME/.local/share/man/man1"
   mkdir -p "${man_dir_path}"
   mv man/* "${man_dir_path}"
   popd > /dev/null
+}
+
+install_lazygit() {
+  local url
+  url="$(get_latest_release_url 'jesseduffield/lazygit' 'lazygit_.*_Linux_x86_64.tar.gz')"
+  local install_location="$HOME/.local/bin"
+  mkdir -p "${install_location}"
+
+  local tmp_dir
+  tmp_dir="$(mktemp --directory lazygitXXX)"
+
+  pushd "${tmp_dir}" > /dev/null
+  echo "Downloading lazygit ... "
+  wget --quiet -O lazygit.tar.gz "${url}"
+  echo "downloaded"
+  tar xf lazygit.tar.gz lazygit
+  echo "expanded"
+  mv lazygit "${install_location}/lazygit"
+  chmod +x "${install_location}/lazygit"
+  popd > /dev/null
+  rm -rf "${tmp_dir}"
+  echo "lazygit installed"
 }
 
 install_sad() {
@@ -225,41 +260,32 @@ install_neovim_stable() {
 }
 
 install_yq() {
-  local url
-  url="$(get_latest_release_url 'mikefarah/yq' 'yq_linux_amd64')"
-  if [[ -z "${url}" ]]; then
-    echo_stderr "Could not find url"
-    exit 2
-  fi
+  install_bin 'mikefarah/yq' 'yq_linux_amd64'
 
-  local install_location="$HOME/.local/bin"
-  mkdir -p "${install_location}"
-  echo -n "Downloading yq ... "
-  wget --quiet -O "${install_location}/yq" "${url}"
-  chmod +x "${install_location}/yq"
-  echo "yq installed"
   echo "Generating yq bash completion"
   mkdir -p "$HOME/.local/completion.d"
   "${install_location}"/yq shell-completion bash > "$HOME/.local/completion.d/yq_completion"
 }
 
 main() {
-  . "$HOME/.profile.local"
+  . "${HOME}/.profile.local"
 
-  install_agg
+  # install_agg
   # Requries Firefox, may not be wanted on headless machines
-  [[ -z "${IS_HEADLESS:-}" ]] && install_browsh
-  install_deno
-  install_docker_compose
-  install_fnm
+  # [[ -z "${IS_HEADLESS:-}" ]] && install_browsh
+  # install_deno
+  # install_docker_compose
+  # install_fnm
   # Bookworm tracking recent version already, can use apt
   # install_github_cli
-  install_helix
+  # install_helix
   # Bookworm tracking recent version already, can use apt
   # install_hugo
-  install_neovim_stable
-  install_sad
-  install_yq
+  # install_lazydocker
+  install_lazygit
+  # install_neovim_stable
+  # install_sad
+  # install_yq
 }
 
 main
