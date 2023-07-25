@@ -42,8 +42,10 @@ get_latest_release_url() {
 install_bin() {
   local repo="${1}"
   local match="${2}"
-  local name
-  name="$(basename "${repo}")"
+  local name="${3:-}"
+  if [[ -z "${name}" ]]; then
+    name="$(basename "${repo}")"
+  fi
 
   local url
   url="$(get_latest_release_url "${repo}" "${match}")"
@@ -146,7 +148,7 @@ install_deno() {
 }
 
 install_docker_compose() {
-  install_bin 'docker/compose' 'linux-x86_64'
+  install_bin 'docker/compose' 'linux-x86_64' 'docker-compose'
 }
 
 install_github_cli() {
