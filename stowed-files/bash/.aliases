@@ -2,10 +2,11 @@
 
 # Easy timezones for places I care about
 alias lisbon='TZ="Europe/Lisbon" date'
+alias miami='TZ="America/New_York" date'
 alias nyc='TZ="America/New_York" date'
+alias rio='TZ="America/Sao_Paulo" date'
 alias seattle='TZ="America/Los_Angeles" date'
 alias sf='TZ="America/Los_Angeles" date'
-alias rio='TZ="America/Sao_Paulo" date'
 alias utc='date -u'
 
 if command_exists dig; then
@@ -37,9 +38,18 @@ if command_exists docker; then
   alias docker="sudo docker"
 fi
 
-if [[ -x "$HOME/.local/bin/docker-compose" ]]; then
+if command_exists lazydocker; then
+  alias lazydocker="sudo ~/.local/bin/lazydocker"
+fi
+
+if command_exists ctop; then
+  # Doesn't work well in tmux https://github.com/bcicen/ctop/issues/263
+  alias ctop='TERM="${TERM/#tmux/screen}" sudo ~/.local/bin/ctop'
+fi
+
+if [[ -x ~/.local/bin/docker-compose ]]; then
   # Use local install
-  alias docker-compose="sudo ${HOME}/.local/bin/docker-compose"
+  alias docker-compose="sudo ~/.local/bin/docker-compose"
 fi
 
 # Map ls to be colorful and reasonable defaults

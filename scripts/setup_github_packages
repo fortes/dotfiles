@@ -3,6 +3,7 @@
 #
 # - agg (asciinema gif generator)
 # - browsh
+# - ctop
 # - deno
 # - docker-compose
 # - github cli
@@ -139,6 +140,10 @@ install_browsh() {
   install_deb 'browsh-org/browsh' 'browsh_.*_linux_amd64.deb'
 }
 
+install_ctop() {
+  install_bin 'bcicen/ctop' 'ctop-.*-linux-amd64'
+}
+
 install_deno() {
   install_zip 'denoland/deno' 'deno-x86_64-unknown-linux-gnu.zip'
 
@@ -260,6 +265,7 @@ main() {
   install_agg
   # Requries Firefox, may not be wanted on headless machines
   [[ -z "${IS_HEADLESS:-}" ]] && install_browsh
+  install_ctop
   install_deno
   install_docker_compose
   install_fnm
