@@ -165,8 +165,7 @@ install_fnm() {
 
   echo -n "Generating completions ... "
   mkdir -p "$HOME/.local/completion.d"
-  # Temporarily disabled since crashing in 1.35.0
-  # fnm completions > "$HOME/.local/completion.d/fnm_completion"
+  fnm completions > "$HOME/.local/completion.d/fnm_completion"
   echo "Complete!"
 
   echo "Installing node LTS ... "
