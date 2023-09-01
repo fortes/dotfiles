@@ -3,6 +3,7 @@
 #
 # - agg (asciinema gif generator)
 # - browsh
+# - bun
 # - ctop
 # - deno
 # - docker-compose
@@ -121,7 +122,7 @@ install_zip() {
   pushd "${download_dir}" > /dev/null
   wget --quiet -O "${name}.zip" "${url}"
   echo -n "Unzipping ${name}.zip ... "
-  unzip -q -o -d "${install_location}" "${name}.zip"
+  unzip -q -o -j -d "${install_location}" "${name}.zip"
   chmod 755 "${install_location}/${name}"
   popd > /dev/null
   rm -rf "${download_dir}"
@@ -138,6 +139,14 @@ install_browsh() {
     firefox-esr
 
   install_deb 'browsh-org/browsh' 'browsh_.*_linux_amd64.deb'
+}
+
+install_bun() {
+  install_zip 'oven-sh/bun' 'bun-linux-x64-baseline.zip'
+
+  echo "Generating bun bash completion"
+  mkdir -p "$HOME/.local/completion.d"
+  bun completions "$HOME/.local/completion.d"
 }
 
 install_ctop() {
@@ -264,6 +273,7 @@ main() {
   install_agg
   # Requries Firefox, may not be wanted on headless machines
   [[ -z "${IS_HEADLESS:-}" ]] && install_browsh
+  install_bun
   install_ctop
   install_deno
   install_docker_compose
