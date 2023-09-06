@@ -352,9 +352,7 @@ require("lazy").setup({
     },
     config = function()
       require('treesj').setup({
-        -- Use default keymaps
-        -- (<space>m - toggle, <space>j - join, <space>s - split)
-        use_default_keymaps = true,
+        use_default_keymaps = false,
 
         -- Node with syntax error will not be formatted
         check_syntax_error = true,
@@ -375,6 +373,11 @@ require("lazy").setup({
         -- Use `dot` for repeat action
         dot_repeat = true,
       })
+
+      -- Key mappings: <space>m - toggle
+      vim.keymap.set('n', '<leader>m', function()
+        require('treesj').toggle()
+      end, {noremap=true, silent=true})
     end,
   },
 

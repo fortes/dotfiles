@@ -387,10 +387,6 @@ set smartcase
 vnoremap * :<C-u>call <SID>VisualSetSearch('/')<cr>/<C-R>=@/<cr><cr>
 vnoremap # :<C-u>call <SID>VisualSetSearch('#')<cr>/<C-R>=@/<cr><cr>
 
-" <leader>s starts a find a replace for word under cursor / selection
-nnoremap <leader>s :%s/<C-R><C-W>/<C-R><C-W>/g<Left><Left>
-vnoremap <leader>s :%s/<C-R><C-W>/<C-R><C-W>/g<Left><Left>
-
 if has('eval')
   " Helper for visual search
   function! s:VisualSetSearch(cmdtype)
@@ -494,40 +490,16 @@ augroup END
 nnoremap j gj
 nnoremap k gk
 
-" Move current line / visual line selection up or down.
-" Taken from https://github.com/airblade/dotvim/
-nnoremap <C-j> :m+<CR>==
-nnoremap <C-k> :m-2<CR>==
-vnoremap <C-j> :m'>+<CR>gv=gv
-vnoremap <C-k> :m-2<CR>gv=gv
-
 " CTRL-U for undo in insert mode
 inoremap <C-U> <C-G>u<C-U>
 
 " Never use ZZ, too dangerous
 nnoremap ZZ <nop>
 
-" Use tab and shift-tab to cycle through windows.
-nnoremap <Tab> <C-W>w
-nnoremap <S-Tab> <C-W>W
-
 " Run `.` or macro over selected lines, taken from:
 " https://reddit.com/r/vim/comments/3y2mgt
 vnoremap . :normal .<CR>
 vnoremap @ :normal @
-
-" Use | and _ to split windows (while preserving original behaviour of
-" [count]bar and [count]_).
-" Stolen from http://howivim.com/2016/andy-stewart/
-nnoremap <expr><silent> <Bar> v:count == 0 ? "<C-W>v<C-W><Right>" : ":<C-U>normal! 0".v:count."<Bar><CR>"
-nnoremap <expr><silent> _     v:count == 0 ? "<C-W>s<C-W><Down>"  : ":<C-U>normal! ".v:count."_<CR>"
-
-" Delete buffer via <C-W>d
-nnoremap <C-w>d :bd<cr>
-nnoremap <C-w><C-d> :bd<cr>
-
-" Unimpaired-style toggling of paste mode (and print result)
-nnoremap cop :set invpaste<cr>:set paste?<cr>
 
 " Change local directory to current file
 nnoremap <leader>lcd :tcd %:p:h<cr>
@@ -680,11 +652,6 @@ augroup filetype_tweaks
 
   " Don't wrap in quickfix, and don't show in buffer list
   autocmd FileType qf setlocal nowrap textwidth=0 nobuflisted
-  " Open in splits/tabs via s/v/t, partially cribbed from:
-  " https://github.com/romainl/vim-qf/blob/master/after/ftplugin/qf.vim
-  autocmd FileType qf nnoremap <buffer> s <C-W><CR><C-W>x<C-W>k
-  autocmd FileType qf nnoremap <buffer> v <C-W><CR><C-W>L<C-W>p<C-W>J<C-w>p
-  autocmd FileType qf nnoremap <buffer> t <C-W><CR><C-W>T
 augroup END
 " }}}
 
