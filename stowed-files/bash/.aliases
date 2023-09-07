@@ -52,10 +52,18 @@ if [[ -x ~/.local/bin/docker-compose ]]; then
   alias docker-compose="sudo ~/.local/bin/docker-compose"
 fi
 
-# Map ls to be colorful and reasonable defaults
-alias ls='ls --color=auto -pFhv --quoting-style=shell-escape'
-alias la='ls --color=auto -ApFhv'
-alias ll='ls --color=auto -AlpFhv'
+if command_exists exa; then
+  # Use exa if available
+  alias ls='exa --group-directories-first'
+  alias la='exa --all --group-directories-first'
+  alias ll='exa --header --git --long --group-directories-first'
+  alias ltree='exa --header --git --long --tree --level=2 --group-directories-first'
+else
+  # Map ls to be colorful and reasonable defaults
+  alias ls='ls --color=auto -pFhv --quoting-style=shell-escape'
+  alias la='ls --color=auto -ApFhv'
+  alias ll='ls --color=auto -AlpFhv'
+fi
 
 # Make feh nicer in i3
 if command_exists feh; then

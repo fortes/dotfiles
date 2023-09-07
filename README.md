@@ -203,6 +203,7 @@ The Bullseye to Bookworm upgrade requires a few manual steps that I'm too lazy t
 - Media keys on Microsoft Ergonomic Keyboard sometimes aren't detected, disconnect/reconnect USB may be enough to fix?
 - Mouse wheel speed also sometimes goes to a better default after disconnect/reconnect
 - 1Password can't manage to save authentication, dies trying to talk to keychain via dbus (for some reason, looking for `org.kde.kwalletd5` and ignores gnome keyring)
+- `exa` is now unmaintained, need to either go to [eza](https://github.com/eza-community/eza) or `lsd`
 
 ## Future Improvements
 
