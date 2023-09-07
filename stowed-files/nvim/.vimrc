@@ -629,20 +629,8 @@ augroup filetype_tweaks
     \  -range=% Isort :<line1>,<line2>sort/^const {\=/
   autocmd FileType javascript nnoremap <leader>s{ vip:Isort<cr>
 
-  " Use folds in .vimrc
-  autocmd FileType vim set fdm=marker fdl=9
-
   " Consider '-' part of a world when tab completion, etc in css/less
   autocmd FileType css,less setlocal iskeyword+=-
-
-  " Simple folding for CSS/LESS
-  autocmd FileType css,less setlocal fdm=marker fmr={,}
-
-  " Fold via indent in Python
-  autocmd FileType python setlocal foldmethod=indent
-
-  " Fold via syntax for JS/TypeScript
-  autocmd FileType javascript,typescript setlocal foldmethod=syntax
 
   " Makefiles use tabs
   autocmd FileType make setlocal noexpandtab shiftwidth=4
