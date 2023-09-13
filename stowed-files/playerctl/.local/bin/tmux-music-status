@@ -18,13 +18,14 @@ main() {
   local title
 
   album=$(playerctl metadata xesam:album)
-  artist=$(playerctl metadata xesam:albumArtist)
+  artist=$(playerctl metadata xesam:artist)
+  albumArtist=$(playerctl metadata xesam:albumArtist)
   title=$(playerctl metadata xesam:title)
 
   if echo "${play_status}" | grep -qi "playing"; then
     echo "${artist} ▸ ${title}  "
   else
-    echo "${artist} ♪ ${album}  "
+    echo "${albumArtist} ♪ ${album}  "
   fi
 }
 
