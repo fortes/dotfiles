@@ -146,7 +146,7 @@ install_bun() {
 
   echo "Generating bun bash completion"
   mkdir -p "$HOME/.local/completion.d"
-  bun completions "$HOME/.local/completion.d"
+  SHELL=bash bun completions "$HOME/.local/completion.d"
 }
 
 install_ctop() {
