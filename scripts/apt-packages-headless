@@ -80,5 +80,5 @@ wget
 yank
 yapf3
 yq
-yt-dlp
+yt-dlp/bookworm-backports
 zoxide
