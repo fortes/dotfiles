@@ -16,6 +16,7 @@
 # - neovim (latest)
 # - sad
 # - yq
+# - zellij
 #
 # Usage `install_github_packages`
 
@@ -267,6 +268,10 @@ install_yq() {
   yq shell-completion bash > "$HOME/.local/completion.d/yq_completion"
 }
 
+install_zellij() {
+  install_tarball 'zellij-org/zellij' 'zellij-x86_64-unknown-linux-musl.tar.gz'
+}
+
 main() {
   . "${HOME}/.profile.local"
 
@@ -288,6 +293,7 @@ main() {
   install_neovim_stable
   install_sad
   install_yq
+  install_zellij
 }
 
 main
