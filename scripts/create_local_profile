@@ -26,6 +26,9 @@ export IS_HEADLESS="${is_headless:-}"
 # Enable if GitHub account has Copilot access
 # export ENABLE_GITHUB_COPILOT=1
 
+# Used for `llm` command
+OPENAI_API_KEY="xxxxxx"
+
 # Add machine-specific items below
 # export LISTENBRAINZ_AUTH_TOKEN="xxxxxx"
 # export LIBRE_FM_USERNAME="fortes"
