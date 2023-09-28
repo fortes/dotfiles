@@ -313,17 +313,15 @@ require("lazy").setup({
       'nvim-treesitter/nvim-treesitter'
     },
     config = function()
-      require('indent_blankline').setup {
-        filetype_exclude = {
-          'help',
-          'markdown',
-          'packer',
-          'txt'
+      require('ibl').overwrite {
+        exclude = {
+          filetypes = {
+            'help',
+            'markdown',
+            'packer',
+            'txt'
+          },
         },
-        show_current_context = true,
-        show_current_context_start = true,
-        show_first_indent_level = false,
-        use_treesitter = true,
       }
     end
   },
