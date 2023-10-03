@@ -85,9 +85,18 @@ TODO: Automate these steps.
 - (Optional) Enable GitHub copilot via `~/.profile.local`, then run `:Copilot setup` in NeoVim to authenticate
 - Install `kindlegen` [from Amazon](https://www.amazon.com/gp/feature.html?ie=UTF8&docId=1000765211) (TODO: See if possible to script this)
 
+### Firefox / Chrome
+
+- Log into sync accounts, extensions should automatically install
+- Configure uBlock
+  - Enable in private mode
+  - Enable cloud storage mode. Should do the following, but doesn't always work:
+    - Enable annoyances filters
+    - Add [Bypass paywalls clean filter](https://gitlab.com/magnolia1234/bypass-paywalls-clean-filters/-/raw/main/bpc-paywall-filter.txt)
+
 ### Debian
 
-- Log in to Firefox / Chrome for syncing
+- Run browser setup above
 - Can install some optional apps via scripts:
   - `dotfiles/scripts/setup_kvm`
   - `dotfiles/scripts/setup_signal`
@@ -124,7 +133,6 @@ The Bullseye to Bookworm upgrade requires a few manual steps that I'm too lazy t
 
 ### Chromebook
 
-- Extensions should automatically sync and install
 - Setup Phone Smart Lock & PIN unlock
 - Enable Linux, run `setup_machine`
 - Share `Downloads` folder with Linux
