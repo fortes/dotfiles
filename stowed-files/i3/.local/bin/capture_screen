@@ -19,7 +19,7 @@ main() {
   fi
 
   local filename
-  filename="${XDG_DOWNLOAD_DIR:-$HOME}/screenshot-$(date '+%F-%T').png)"
+  filename="${XDG_DOWNLOAD_DIR:-$HOME}/screenshot-$(date '+%F-%T').png"
 
   # Mouse must move 5px after clicking to select region instead of window
   maim \
@@ -40,7 +40,7 @@ main() {
     "${filename}"
 
   # Weird if it does not exist, but not fatal
-  if ! command-exists notify-send; then
+  if ! command_exists notify-send; then
     echo "$(basename "${filename}") saved and copied to clipboard"
     exit 1
   fi
