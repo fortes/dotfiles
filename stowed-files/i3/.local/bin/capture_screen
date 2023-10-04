@@ -8,6 +8,16 @@ main() {
     exit 1
   fi
 
+  if ! command_exists maim; then
+    echo "maim not found" >&2
+    exit 1
+  fi
+
+  if ! command_exists xclip; then
+    echo "xclip not found" >&2
+    exit 1
+  fi
+
   local filename
   filename="${XDG_DOWNLOAD_DIR:-$HOME}/screenshot-$(date '+%F-%T').png)"
 
@@ -28,6 +38,12 @@ main() {
     -selection clipboard \
     -target image/png \
     "${filename}"
+
+  # Weird if it does not exist, but not fatal
+  if ! command-exists notify-send; then
+    echo "$(basename "${filename}") saved and copied to clipboard"
+    exit 1
+  fi
 
   notify-send \
     --urgency low \
