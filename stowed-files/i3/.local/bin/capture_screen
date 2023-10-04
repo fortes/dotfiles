@@ -1,6 +1,10 @@
 #!/bin/bash
 set -euo pipefail
 
+# Pick up `command_exists`
+# shellcheck source=/dev/null
+source ~/.profile
+
 main() {
   # Gotta have a display
   if [ -z "${DISPLAY:-}" ]; then
@@ -32,6 +36,7 @@ main() {
     --color=0.25,0.5,1,0.5 \
     --format png \
     "${filename}"
+  echo "$(basename "${filename}") saved to clipboard"
 
   # Also copy into clipboard
   xclip \
@@ -39,19 +44,18 @@ main() {
     -target image/png \
     "${filename}"
 
-  # Weird if it does not exist, but not fatal
-  if ! command_exists notify-send; then
-    echo "$(basename "${filename}") saved and copied to clipboard"
-    exit 1
-  fi
+  echo "$(basename "${filename}") copied to clipboard"
 
-  notify-send \
-    --urgency low \
-    --transient \
-    --expire-time 1000 \
-    --app-name "i3" \
-    --icon "camera-photo-symbolic" \
-    "$(basename "${filename}") saved and copied to clipboard"
+  # Weird if it does not exist, but not fatal
+  if command_exists notify-send; then
+    notify-send \
+      --urgency low \
+      --transient \
+      --expire-time 1000 \
+      --app-name "i3" \
+      --icon "camera-photo-symbolic" \
+      "$(basename "${filename}") saved and copied to clipboard"
+  fi
 }
 
 main "${@}"
