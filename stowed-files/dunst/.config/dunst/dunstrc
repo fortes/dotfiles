@@ -1,5 +1,6 @@
 [global]
   corner_radius = 4
+  enable_recursive_icon_lookup = true
   follow = mouse
   font = "Noto Sans 16"
   format = "<b>%s</b>\n<span font='12'>%b</span>"
@@ -11,7 +12,6 @@
   horizontal_padding = 8
   icon_position = left
   max_icon_size = 48
-  icon_path = /usr/share/icons/gnome/48x48/status/:/usr/share/icons/gnome/48x48/devices/
   idle_threshold = 120
   ignore_newline = no
   indicate_hidden = yes

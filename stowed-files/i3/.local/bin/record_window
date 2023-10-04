@@ -12,7 +12,13 @@ if [ -f "$SCREEN_CAP_INPUT_FILE" ]; then
   # Quit if already running
   echo 'q' > "$SCREEN_CAP_INPUT_FILE"
   rm "$SCREEN_CAP_INPUT_FILE"
-  notify 'Window recording saved' -t 2 -u low
+  notify-send \
+    --urgency low \
+    --transient \
+    --expire-time 1000 \
+    --app-name "i3" \
+    --icon "camera-video-symbolic" \
+    'Window recording saved'
   exit
 fi
 
@@ -29,7 +35,13 @@ touch "$SCREEN_CAP_INPUT_FILE"
   "$FILENAME" \
   > /dev/null 2> /tmp/i3-screencap.log
 
-notify-send -t 1000 -u low 'Window recording captured'
+notify-send \
+  --urgency low \
+  --transient \
+  --expire-time 1000 \
+  --app-name "i3" \
+  --icon "camera-video-symbolic" \
+  'Window recording captured'
 
 if command -v video_to_gif > /dev/null; then
   video_to_gif "$FILENAME"

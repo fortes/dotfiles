@@ -1,0 +1,41 @@
+#!/bin/bash
+set -euo pipefail
+
+main() {
+  # Gotta have a display
+  if [ -z "${DISPLAY:-}" ]; then
+    echo "No DISPLAY environment variable set" >&2
+    exit 1
+  fi
+
+  local filename
+  filename="${XDG_DOWNLOAD_DIR:-$HOME}/screenshot-$(date '+%F-%T').png)"
+
+  # Mouse must move 5px after clicking to select region instead of window
+  maim \
+    --select \
+    --tolerance 5 \
+    --bordersize 1 \
+    --hidecursor \
+    --highlight \
+    --nokeyboard \
+    --color=0.25,0.5,1,0.5 \
+    --format png \
+    "${filename}"
+
+  # Also copy into clipboard
+  xclip \
+    -selection clipboard \
+    -target image/png \
+    "${filename}"
+
+  notify-send \
+    --urgency low \
+    --transient \
+    --expire-time 1000 \
+    --app-name "i3" \
+    --icon "camera-photo-symbolic" \
+    "$(basename "${filename}") saved and copied to clipboard"
+}
+
+main "${@}"

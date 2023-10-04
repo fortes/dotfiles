@@ -168,12 +168,14 @@ bindsym XF86AudioNext exec "playerctl next && notify-send -t 600 -a i3 -u low 'N
 
 # Capture entire screen with mod-F12
 bindsym --release $mod+F12 exec "maim ~/Downloads/screenshot-$(date +%F-%T).png && notify-send -t 1000 -a i3 -u low 'Screen Captured'"
-# Capture portion of screen with mod-Shift-F12
-bindsym --release $mod+Shift+F12 exec "maim -s --highlight --nokeyboard --color=0.25,0.5,1,0.25 ~/Downloads/screenshot-$(date +%F-%T).png && notify-send -t 1000 -a i3 -u low 'Region Captured'"
+# Capture portion of screen with mod-Shift-F12 or PrintScreen
+bindsym --release $mod+Shift+F12 exec "capture_screen"
+bindsym --release Print exec "capture_screen"
 # Toggle full screen recording with mod-F11
 bindsym --release $mod+F11 exec "record_screen"
-# Current window with mod-Shift-F11
+# Current window with mod-Shift-F11 or Shift-PrintScreen
 bindsym --release $mod+Shift+F11 exec "record_window"
+bindsym --release Shift+Print exec "record_window"
 
 # Clear notifications with mod-BackSpace
 bindsym $mod+BackSpace exec dunstctl close

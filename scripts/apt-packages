@@ -3,8 +3,8 @@ alsa-utils
 chromium
 cmake
 cmus
-dex
 dbus-x11
+dex
 dunst
 exfat-fuse
 exfatprogs
@@ -38,6 +38,7 @@ rofi
 slop
 software-properties-common
 x11-xserver-utils
+xclip
 xdotool
 xinit
 xsel
