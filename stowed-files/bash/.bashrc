@@ -141,7 +141,7 @@ if command_exists dircolors; then
 fi
 
 if command_exists zoxide; then
-  eval "$(zoxide init bash)"
+  eval "$(zoxide init bash --hook pwd)"
 fi
 
 # Opt-out of Eternal Terminal telemetry
