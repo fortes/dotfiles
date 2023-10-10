@@ -31,7 +31,7 @@ main() {
     esac
   done
 
-  play_status=$(playerctl status 2>&1 || echo)
+  play_status=$(playerctl -p cmus status 2>&1 || echo)
   if echo "${play_status}" | grep -qiE '(no players found|stopped)'; then
     output="Not playing music"
     return
@@ -40,8 +40,8 @@ main() {
     local title
     local verb
 
-    artist=$(playerctl metadata xesam:albumArtist)
-    title=$(playerctl metadata xesam:title)
+    artist=$(playerctl -p cmus metadata xesam:albumArtist)
+    title=$(playerctl -p cmus metadata xesam:title)
 
     if echo "${play_status}" | grep -qi "playing"; then
       verb="Paused"
@@ -50,7 +50,7 @@ main() {
     fi
 
     local output
-    if playerctl play-pause; then
+    if playerctl -p cmus play-pause; then
       output="$verb: $artist - $title"
     else
       output="Couldn't pause"

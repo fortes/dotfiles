@@ -8,7 +8,7 @@ IFS=$'\n\t'
 main() {
   local play_status
 
-  play_status=$(playerctl status 2>&1 || echo)
+  play_status=$(playerctl status -p cmus 2>&1 || echo)
   if echo "${play_status}" | grep -qiE '(no players found|stopped)'; then
     return
   fi
@@ -17,10 +17,10 @@ main() {
   local artist
   local title
 
-  album=$(playerctl metadata xesam:album)
-  artist=$(playerctl metadata xesam:artist)
-  albumArtist=$(playerctl metadata xesam:albumArtist)
-  title=$(playerctl metadata xesam:title)
+  album=$(playerctl -p cmus metadata xesam:album)
+  artist=$(playerctl -p cmus metadata xesam:artist)
+  albumArtist=$(playerctl -p cmus metadata xesam:albumArtist)
+  title=$(playerctl -p cmus metadata xesam:title)
 
   if echo "${play_status}" | grep -qi "playing"; then
     echo "${artist} ▸ ${title}  "
