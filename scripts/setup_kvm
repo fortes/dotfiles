@@ -9,9 +9,15 @@ export DEBIAN_FRONTEND=noninteractive
 
 main() {
   echo "Installing KVM packages (requires sudo)"
+
+  declare packages="qemu-kvm qemu-utils libvirt-clients libvirt-daemon-system virtinst dnsmasq-base ovmf"
+  if [[ -z "${IS_HEADLESS:-}" ]]; then
+    packages="${packages} virt-manager"
+  fi
+
   sudo -E apt-get install -qq --assume-yes \
     --fix-broken --no-install-recommends \
-    qemu-kvm libvirt-clients libvirt-daemon-system virtinst dnsmasq-base ovmf
+    ${packages}
 
   # Can hit all sorts of polkit errors if you don't do this
   echo "Add user to libvirt group (requires sudo)"
