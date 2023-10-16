@@ -308,22 +308,24 @@ require("lazy").setup({
   -- Indentation guides
   {
     'lukas-reineke/indent-blankline.nvim',
-    -- Used for context highlighting
+    -- Required for scope
     dependencies = {
       'nvim-treesitter/nvim-treesitter'
     },
-    config = function()
-      require('ibl').overwrite {
-        exclude = {
-          filetypes = {
-            'help',
-            'markdown',
-            'packer',
-            'txt'
-          },
+    main = "ibl",
+    opts = {
+      exclude = {
+        filetypes = {
+          'help',
+          'markdown',
+          'packer',
+          'txt'
         },
-      }
-    end
+        buftypes = {
+          'terminal'
+        },
+      },
+    }
   },
 
   -- Generate code annotations, e.g. JSDoc
