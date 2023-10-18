@@ -84,12 +84,17 @@ require("lazy").setup({
           map('n', '<leader>f', '<cmd>lua vim.lsp.buf.format({async = false})<cr>')
 
           -- Format on save, where supported
-          vim.cmd([[
-          augroup lsp_format_on_save
-            autocmd!
-            autocmd BufWritePre <buffer> lua vim.lsp.buf.format({async = true})
-          augroup end
-          ]])
+          vim.api.nvim_create_augroup("lsp_format_on_save", {
+            clear = true
+          })
+          vim.api.nvim_create_autocmd("BufWritePre", {
+            desc = "LSP format on save",
+            group = "lsp_format_on_save",
+            pattern = "*",
+            callback = function()
+              vim.lsp.buf.format({async = true})
+            end
+          })
         end
         if client.server_capabilities.documentRangeFormattingProvider then
           map('v', '<leader>f', '<cmd>lua vim.lsp.buf.range_formatting()<cr>')
