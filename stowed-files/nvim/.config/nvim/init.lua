@@ -116,6 +116,8 @@ require("lazy").setup({
         }
       }
 
+      local deno_root_pattern = nvim_lsp.util.root_pattern('deno.json', 'deno.jsonc')
+
       local lsp_configs = {
         bashls = default_lsp_opts,
         cssls = default_lsp_opts,
@@ -128,7 +130,8 @@ require("lazy").setup({
           end,
         }),
         denols = vim.tbl_deep_extend('force', default_lsp_opts, {
-          root_dir = nvim_lsp.util.root_pattern('deno.json')
+          root_dir = deno_root_pattern,
+          single_file_support = false,
         }) ,
         dockerls = default_lsp_opts,
         eslint =  vim.tbl_deep_extend('force', default_lsp_opts, {
@@ -149,6 +152,12 @@ require("lazy").setup({
             maxTsServerMemory = 16384
           },
           on_attach = function(client, bufnr)
+            -- Don't run if in a deno project
+            if (deno_root_pattern(vim.fn.getcwd())) then
+              client.stop()
+              return
+            end
+
             -- Never use tsserver formatting, it's not very good
             client.server_capabilities.documentFormattingProvider = false
             lsp_on_attach(client, bufnr)
