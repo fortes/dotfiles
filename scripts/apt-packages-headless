@@ -60,6 +60,7 @@ python3-pylast
 python3-venv
 python3-virtualenv
 rclone
+rename
 ripgrep
 rsync
 shellcheck
