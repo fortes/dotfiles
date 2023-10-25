@@ -610,8 +610,8 @@ augroup filetype_tweaks
     autocmd FileType yaml setlocal formatprg=prettier\ --parser\ yaml
   endif
 
-  if executable('yapf')
-    autocmd FileType python setlocal formatprg=yapf
+  if executable('ruff')
+    autocmd FileType python setlocal formatprg=ruff\ format\ --stdin-filename\ %\ -
   endif
 
   if executable('refmt')

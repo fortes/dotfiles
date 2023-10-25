@@ -9,12 +9,12 @@ import sys
 import time
 
 # Copy from https://listenbrainz.org/profile/
-listenbrainz_auth_token = os.environ.get('LISTENBRAINZ_AUTH_TOKEN')
+listenbrainz_auth_token = os.environ.get("LISTENBRAINZ_AUTH_TOKEN")
 
-librefm_username = os.environ.get('LIBRE_FM_USERNAME')
-librefm_password = os.environ.get('LIBRE_FM_PASSWORD')
+librefm_username = os.environ.get("LIBRE_FM_USERNAME")
+librefm_password = os.environ.get("LIBRE_FM_PASSWORD")
 # Generate once via this script
-librefm_session_key = os.environ.get('LIBRE_FM_SESSION_KEY')
+librefm_session_key = os.environ.get("LIBRE_FM_SESSION_KEY")
 
 if not listenbrainz_auth_token:
     print("Must set $LISTENBRAINZ_AUTH_TOKEN environment variable")
@@ -27,32 +27,33 @@ if not librefm_username or not librefm_password:
 if not librefm_session_key:
     print("Generating a libre.fm session key")
     librefm_network = pylast.LibreFMNetwork(
-        username=librefm_username, password_hash=pylast.md5(librefm_password))
+        username=librefm_username, password_hash=pylast.md5(librefm_password)
+    )
     skg = pylast.SessionKeyGenerator(librefm_network)
     url = skg.get_web_auth_url()
     print("Visit this URL: %s" % url)
-    input('Hit enter when done')
+    input("Hit enter when done")
     session_key = skg.get_web_auth_session_key(url)
-    print("Now save the session key to your ~/.profile.local: %s" %
-          session_key)
+    print("Now save the session key to your ~/.profile.local: %s" % session_key)
     sys.exit(1)
 
-if not os.path.exists('/tmp/cmus-status.txt'):
+if not os.path.exists("/tmp/cmus-status.txt"):
     print("No /tmp/cmus-status.txt file, exiting")
     sys.exit(1)
 
-with open('/tmp/cmus-status.txt') as status_file:
-    [status, title, artist, album, album_artist, track_id,
-     path] = [s.strip() for s in status_file.readlines()]
+with open("/tmp/cmus-status.txt") as status_file:
+    [status, title, artist, album, album_artist, track_id, path] = [
+        s.strip() for s in status_file.readlines()
+    ]
 
 is_new_listen = True
 
-if is_new_listen and os.path.exists('/tmp/previous-track-id.txt'):
-    with open('/tmp/previous-track-id.txt') as previous_file:
+if is_new_listen and os.path.exists("/tmp/previous-track-id.txt"):
+    with open("/tmp/previous-track-id.txt") as previous_file:
         previous_track_id = previous_file.readlines()[0].strip()
         is_new_listen = previous_track_id != track_id
 
-with open('/tmp/previous-track-id.txt', 'w') as previous_file:
+with open("/tmp/previous-track-id.txt", "w") as previous_file:
     previous_file.write(track_id)
 
 
@@ -60,37 +61,36 @@ def listenbrainz_scrobble():
     client = pylistenbrainz.ListenBrainz()
     client.set_auth_token(listenbrainz_auth_token, check_validity=False)
 
-    listen = pylistenbrainz.Listen(track_name=title,
-                                   artist_name=artist,
-                                   recording_mbid=track_id,
-                                   release_name=album,
-                                   listened_at=time.time())
+    listen = pylistenbrainz.Listen(
+        track_name=title,
+        artist_name=artist,
+        recording_mbid=track_id,
+        release_name=album,
+        listened_at=time.time(),
+    )
 
     try:
         if is_new_listen:
             print("ListenBrainz: Submitting %s - %s" % (artist, title))
             response = client.submit_single_listen(listen)
-            if response['status'] == 'ok':
+            if response["status"] == "ok":
                 print("ListenBrainz: Successful!")
             else:
-                print("ListenBrainz: Non-OK status code: %s" %
-                      response['status'])
+                print("ListenBrainz: Non-OK status code: %s" % response["status"])
 
-        if status == 'playing':
+        if status == "playing":
             listen = pylistenbrainz.Listen(
                 track_name=title,
                 artist_name=artist,
                 recording_mbid=track_id,
                 release_name=album,
             )
-            print("ListenBrainz: Submitting playing now: %s - %s" %
-                  (artist, title))
+            print("ListenBrainz: Submitting playing now: %s - %s" % (artist, title))
             response = client.submit_playing_now(listen)
-            if response['status'] == 'ok':
+            if response["status"] == "ok":
                 print("ListenBrainz: Successful!")
             else:
-                print("ListenBrainz: Non-OK status code: %s" %
-                      response['status'])
+                print("ListenBrainz: Non-OK status code: %s" % response["status"])
     except pylistenbrainz.errors.ListenBrainzAPIException as err:
         print("ListenBrainzAPIException: %s" % err.message)
     except pylistenbrainz.errors.InvalidSubmitListensPayloadException as err:
@@ -104,14 +104,17 @@ def librefm_scrobble():
     librefm_network = pylast.LibreFMNetwork(
         username=librefm_username,
         password_hash=pylast.md5(librefm_password),
-        session_key=librefm_session_key)
+        session_key=librefm_session_key,
+    )
     timestamp = time.mktime(datetime.datetime.now().timetuple())
-    librefm_network.scrobble(artist=artist,
-                             title=title,
-                             timestamp=timestamp,
-                             album_artist=album_artist,
-                             mbid=track_id)
-    print('libre.fm: %s - %s scrobbled' % (artist, title))
+    librefm_network.scrobble(
+        artist=artist,
+        title=title,
+        timestamp=timestamp,
+        album_artist=album_artist,
+        mbid=track_id,
+    )
+    print("libre.fm: %s - %s scrobbled" % (artist, title))
 
 
 listenbrainz_scrobble()

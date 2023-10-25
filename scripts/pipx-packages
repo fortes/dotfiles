@@ -2,4 +2,5 @@ beautysh
 epy-reader
 llm
 pyright
+ruff
 vim-vint
