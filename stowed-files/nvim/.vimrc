@@ -599,9 +599,9 @@ augroup filetype_tweaks
 
   " Use prettier to autoformat (gq in Visual mode)
   if executable('prettier')
-    autocmd FileType javascript setlocal formatprg=prettier\ --stdin\ --parser\ flow
-    autocmd FileType typescript,typescript.tsx setlocal formatprg=prettier\ --stdin\ --parser\ typescript
-    autocmd FileType json setlocal formatprg=prettier\ --stdin\ --parser\ json
+    autocmd FileType javascript setlocal formatprg=prettier\ --parser\ flow
+    autocmd FileType typescript,typescript.tsx setlocal formatprg=prettier\ --parser\ typescript
+    autocmd FileType json setlocal formatprg=prettier\ --parser\ json
 
     autocmd FileType css,less setlocal formatprg=prettier\ --parser\ css
     autocmd FileType html setlocal formatprg=prettier\ --parser\ html

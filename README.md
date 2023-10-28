@@ -212,9 +212,12 @@ The Bullseye to Bookworm upgrade requires a few manual steps that I'm too lazy t
 - Mouse wheel speed also sometimes goes to a better default after disconnect/reconnect
 - 1Password can't manage to save authentication, dies trying to talk to keychain via dbus (for some reason, looking for `org.kde.kwalletd5` and ignores gnome keyring)
 - `exa` is now unmaintained, need to either go to [eza](https://github.com/eza-community/eza) or `lsd`
+- `1password` GUI not installing correctly, something wrong w/ bash logic
 
 ## Future Improvements
 
+- [ ] Figure out why gammastep not starting up automatically in some cases, may need to re-write the systemd user entries
+- [ ] Figure out Lutris / Wine / Proton for Linux gaming
 - [ ] [Auto-publish Docker images](https://docs.github.com/en/actions/publishing-packages/publishing-docker-images#publishing-images-to-github-packages)
 - [ ] Better colorschemes, coordinated everywhere
   - [ ] Easier swapping into light mode
