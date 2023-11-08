@@ -54,10 +54,10 @@ fi
 
 if command_exists exa; then
   # Use exa if available
-  alias ls='exa --group-directories-first'
-  alias la='exa --all --group-directories-first'
-  alias ll='exa --header --git --long --group-directories-first'
-  alias ltree='exa --header --git --long --tree --level=2 --group-directories-first'
+  alias ls='exa --group-directories-first --classify'
+  alias la='exa --all --group-directories-first --classify'
+  alias ll='exa --header --git --long --group-directories-first --classify'
+  alias ltree='exa --header --git --long --tree --level=2 --group-directories-first --classify'
 else
   # Map ls to be colorful and reasonable defaults
   alias ls='ls --color=auto -pFhv --quoting-style=shell-escape'
