@@ -44,9 +44,9 @@ isAptPackageInstalled() {
 }
 
 installAptPackagesIfMissing() {
-  echo "  $ARROW Installing $@ (requires sudo)"
-  sudo -E DEBIAN_FRONTEND=noninteractive apt-get -qqfuy install $@ > /dev/null
-  echo "$CMARK $@ installed"
+  echo "  $ARROW Installing $* (requires sudo)"
+  sudo -E DEBIAN_FRONTEND=noninteractive apt-get -qqfuy install "$@" > /dev/null
+  echo "$CMARK $* installed"
 }
 
 export -f installAptPackagesIfMissing
