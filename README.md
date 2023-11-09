@@ -216,6 +216,8 @@ The Bullseye to Bookworm upgrade requires a few manual steps that I'm too lazy t
 
 ## Future Improvements
 
+- [ ] Look into `stevearc/conform.nvim`
+- [ ] Add [Firefox Nightly](https://blog.nightly.mozilla.org/2023/10/30/introducing-mozillas-firefox-nightly-deb-packages-for-debian-based-linux-distributions/)
 - [ ] Figure out why gammastep not starting up automatically in some cases, may need to re-write the systemd user entries
 - [ ] Figure out Lutris / Wine / Proton for Linux gaming
 - [ ] [Auto-publish Docker images](https://docs.github.com/en/actions/publishing-packages/publishing-docker-images#publishing-images-to-github-packages)
