@@ -55,6 +55,10 @@ generate_completions() {
     beet completion > "$HOME/.local/completion.d/beet_completion"
   fi
 
+  if command_exists gh; then
+    gh completion -s bash > "$HOME/.local/completion.d/gh_completion"
+  fi
+
   if command_exists pipx; then
     register-python-argcomplete --shell bash pipx > "$HOME/.local/completion.d/pipx_completion"
   fi
