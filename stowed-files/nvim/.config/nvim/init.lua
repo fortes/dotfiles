@@ -728,7 +728,10 @@ require("lazy").setup({
     'norcalli/nvim-colorizer.lua',
     config = function()
       if vim.o.termguicolors then
-        require('colorizer').setup()
+        require('colorizer').setup({
+          'css';
+          'less';
+        })
       end
     end
   },
