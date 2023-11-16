@@ -27,8 +27,12 @@
   main = "checkout origin/main"
   # Fuzzy reset staged files
   resetm = "!git diff --name-only --cached | fzf -0 -m --preview 'git diff --cached --color=always {-1}' | xargs -r git reset"
+  # Show today's commits
+  today = "!git log --after=yesterday --author=\"$(git config user.name)\" --oneline --no-decorate --no-merges"
   # Undo last commit, but keeping changes
   undo = "reset --soft HEAD^"
+  # Show yesterday's commits
+  yesterday = "!git log --after=\"2 days ago\" --before=yesterday --author=\"$(git config user.name)\" --oneline --no-decorate --no-merges"
 [commit]
   verbose = true
 [core]
