@@ -163,6 +163,7 @@ The Bullseye to Bookworm upgrade requires a few manual steps that I'm too lazy t
   - `winget install Neovim.Neovim`
   - `winget install Plex.PlexAmp`
   - `winget install ShareX.ShareX`
+  - `winget install SourceFoundry.HackFonts`
   - `winget install Valve.Steam` (if gaming)
   - `winget install VideoLAN.VLC`
   - `winget install Zoom.Zoom`
