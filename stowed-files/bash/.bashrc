@@ -36,6 +36,11 @@ if ! infocmp $TERM > /dev/null 2>&1; then
   fi
 fi
 
+# In these modern times, if 256 colors are supported, truecolor probably is too
+if [[ -z "${COLORTERM:-}" ]] && [[ "$TERM" =~ "256color" ]]; then
+  export COLORTERM="truecolor"
+fi
+
 # Bash Options {{{
 # cd without typing cd
 shopt -qs autocd
