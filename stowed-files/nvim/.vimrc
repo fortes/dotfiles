@@ -594,7 +594,7 @@ augroup filetype_tweaks
   endif
 
   if executable('beautysh')
-    autocmd FileType sh setlocal formatprg=beautysh\ -i\ 2\ -f\ -
+    autocmd FileType sh setlocal formatprg=beautysh\ -i\ 2\ -
   endif
 
   " Use prettier to autoformat (gq in Visual mode)
