@@ -472,8 +472,20 @@ require("lazy").setup({
   },
 
   {
+    'piersolenski/telescope-import.nvim',
+    dependencies = 'nvim-telescope/telescope.nvim',
+    config = function()
+      require("telescope").load_extension("import")
+      -- <leader>i to import
+      vim.keymap.set('n', '<leader>i', '<cmd>Telescope import<cr>', {
+        noremap=true, silent=true
+      })
+    end
+  },
+
+  {
     'AckslD/nvim-neoclip.lua',
-    dependencies = {
+    requires = {
       -- Uses telescope for selection
       'nvim-telescope/telescope.nvim',
     },
