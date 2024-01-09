@@ -217,6 +217,11 @@ The Bullseye to Bookworm upgrade requires a few manual steps that I'm too lazy t
 
 ## Future Improvements
 
+- Try switching from docker to podman
+- [ ] Look into `glances` and `btop`
+- [ ] [delta](https://github.com/dandavison/delta) instead of `diff-so-fancy`
+- [ ] [football-cli](https://github.com/ManrajGrover/football-cli)
+- [ ] (caniuse-cli)[https://github.com/sgentle/caniuse-cmd]
 - [ ] Look into `stevearc/conform.nvim`
 - [ ] Add [Firefox Nightly](https://blog.nightly.mozilla.org/2023/10/30/introducing-mozillas-firefox-nightly-deb-packages-for-debian-based-linux-distributions/)
 - [ ] Figure out why gammastep not starting up automatically in some cases, may need to re-write the systemd user entries
@@ -224,6 +229,7 @@ The Bullseye to Bookworm upgrade requires a few manual steps that I'm too lazy t
 - [ ] [Auto-publish Docker images](https://docs.github.com/en/actions/publishing-packages/publishing-docker-images#publishing-images-to-github-packages)
 - [ ] Better colorschemes, coordinated everywhere
   - [ ] Easier swapping into light mode
+  - Check [themer](https://github.com/themerdev/themer) for generation
 - [ ] Setup `xautolock` or similar to automatically lock screen on idle
 - [ ] Figure out rofi / dmenu whatever else would make sense to do more in i3
 - [ ] Check out [`zutty` terminal](https://tomscii.sig7.se/zutty/)
