@@ -10,7 +10,7 @@ esac
 set -o vi
 
 # Make sure we have always loaded ~/.profile, which can get lost
-source $HOME/.profile
+source "$HOME/.profile"
 
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
@@ -18,18 +18,17 @@ source $HOME/.profile
 # Clear C-w binding in order to re-bind in .inputrc
 stty werase undef
 
-# Remember a lot of stuff
 HISTFILE=$HOME/.bash_history
-HISTFILESIZE=5000
-HISTSIZE=2000
-SAVEHIST=$HISTSIZE
+# Never forget
+HISTFILESIZE=-1
+HISTSIZE=-1
 # Don't put duplicate lines into history, ignore commands w/ initial space
 HISTCONTROL=ignoreboth:erasedups
 
 # Make sure the terminal type we're using is supported (tmux-256color doesn't
 # work everywhere yet)
-if ! infocmp $TERM > /dev/null 2>&1; then
-  if [[ "$TERM" = "tmux-256color" ]]; then
+if ! infocmp "${TERM}" > /dev/null 2>&1; then
+  if [[ "${TERM}" = "tmux-256color" ]]; then
     export TERM="screen-256color"
   else
     export TERM="xterm-256color"
@@ -93,7 +92,7 @@ STANDOUT="\[$(tput smso)\]"
 RESET="\[$(tput sgr0)\]"
 
 # Hide normal username
-if [ `whoami` != 'fortes' ]; then
+if [ "$(whoami)" != 'fortes' ]; then
   BASE_PROMPT="$RED\u@"
 else
   BASE_PROMPT=""
@@ -139,9 +138,9 @@ fi
 
 if command_exists dircolors; then
   if [[ -r "$HOME/.dircolors" ]]; then
-    eval $(dircolors -b "$HOME/.dircolors")
+    eval "$(dircolors -b "$HOME/.dircolors")"
   else
-    eval $(dircolors -b)
+    eval "$(dircolors -b)"
   fi
 fi
 
