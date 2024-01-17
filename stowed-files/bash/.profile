@@ -65,46 +65,6 @@ add_to_path "$HOME/.local/bin"
 # Make sure to use system for virsh by default
 export LIBVIRT_DEFAULT_URI="qemu:///system"
 
-fzf_preview_command=""
-if command_exists batcat; then
-  fzf_preview_command="'batcat --color always --style=grid,changes --line-range :300 {}'"
-else
-  fzf_preview_command="'cat {}'"
-fi
-
-# $FZF_DEFAULT_COMMAND is executed with `sh -c`, so need to be careful with
-# POSIX compliance
-if command_exists fdfind; then
-  # Use `fd` when possible for far better performance
-  export FZF_DEFAULT_COMMAND='bash -c "fdfind --type file --follow . \$(git rev-parse --show-cdup 2>/dev/null && echo --hidden)"'
-  export FZF_CTRL_T_COMMAND="fd_with_git --color always"
-  export FZF_ALT_C_COMMAND='fdfind --type directory --hidden --color always'
-fi
-if command_exists exa; then
-  # Show tree structure in preview window
-  export FZF_ALT_C_OPTS="
-    --preview 'exa -T -a {}'
-    "
-fi
-export FZF_DEFAULT_OPTS="
-  --ansi
-  --bind 'ctrl-alt-a:select-all'
-  --bind 'ctrl-alt-d:deselect-all'
-  --extended
-  --inline-info
-  "
-# Alt-C to choose directory file lives in
-export FZF_CTRL_T_OPTS="
-  --bind 'alt-c:execute(echo -n {} | xargs dirname)+abort'
-  --preview ${fzf_preview_command}
-  --preview-window 'right:50%'
-  "
-export FZF_COMPLETION_OPTS='--smart-case'
-
-if command_exists fnm; then
-  eval "$(fnm env)"
-fi
-
 if [ -z "${XDG_CONFIG_HOME:-}" ]; then
   export XDG_CONFIG_HOME="$HOME/.config"
 fi
