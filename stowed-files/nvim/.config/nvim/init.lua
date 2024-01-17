@@ -485,7 +485,7 @@ require("lazy").setup({
 
   {
     'AckslD/nvim-neoclip.lua',
-    requires = {
+    dependencies = {
       -- Uses telescope for selection
       'nvim-telescope/telescope.nvim',
     },
