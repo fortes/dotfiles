@@ -1,5 +1,7 @@
 # vim: ft=gitconfig
 
+[advice]
+  skippedCherryPicks = false
 [alias]
   # Fuzzy add modified files, optionally via patch
   addm = "!git ls-files --deleted --modified --other --exclude-standard | fzf -0 -m --preview 'git diff --color=always {-1}' | xargs -r git add"
@@ -50,6 +52,7 @@
 [interactive]
   diffFilter = "diff-so-fancy-with-fallback --patch"
 [merge]
+  autostash = true
   conflictStyle = diff3
   prompt = false
   tool = nvim
