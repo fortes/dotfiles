@@ -177,12 +177,6 @@ install_fnm() {
   mkdir -p "$HOME/.local/completion.d"
   fnm completions > "$HOME/.local/completion.d/fnm_completion"
   echo "Complete!"
-
-  echo "Installing node LTS ... "
-  fnm install --lts
-
-  echo "Setting node version to LTS"
-  fnm default lts-latest
 }
 
 install_helix() {

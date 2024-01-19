@@ -92,7 +92,13 @@ install_apt_packages() {
 
 install_node_packages() {
   # Pick up `fnm`-provided paths on first run
-  . "$HOME/.profile"
+  . "$HOME/.bashrc"
+
+  echo "Installing node LTS ... "
+  fnm install --lts
+
+  echo "Setting node version to LTS"
+  fnm default lts-latest
 
   echo "Installing global node packages"
   grep -v "^#" "$HOME/dotfiles/scripts/node-packages" | xargs --no-run-if-empty \
