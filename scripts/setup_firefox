@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# Install Firefox
+#
+# Usage: setup_firefox
+
+set -euo pipefail
+IFS=$'\n\t'
+export DEBIAN_FRONTEND=noninteractive
+
+main() {
+  declare -r firefox_sources_list="/etc/apt/sources.list.d/firefox.list"
+  declare -r firefox_key_url="https://packages.mozilla.org/apt/repo-signing-key.gpg"
+  declare -r firefox_key_path="/etc/apt/keyrings/packages.mozilla.org.asc"
+
+  if [ ! -f "$firefox_sources_list" ]; then
+    echo "Adding firefox GPG key (requires sudo)"
+    curl -sS "$firefox_key_url" | sudo tee ${firefox_key_path} > /dev/null
+
+    echo "firefox sources list missing, adding (requires sudo)"
+    echo "deb [signed-by=${firefox_key_path}] https://packages.mozilla.org/apt mozilla main" \
+      | sudo tee "$firefox_sources_list" > /dev/null
+
+    echo "firefox sources added, updating packages"
+    sudo -E apt-get update -qq
+  fi
+
+  echo "Removing firefox-esr package (requires sudo)"
+  sudo -E apt-get remove --quiet --assume-yes firefox-esr
+  echo "Installing firefox package (requires sudo)"
+  sudo -E apt-get install -qq --assume-yes \
+    --fix-broken --no-install-recommends firefox
+}
+
+main
+

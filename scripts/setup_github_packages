@@ -137,7 +137,7 @@ install_agg() {
 install_browsh() {
   echo "Installing browsh dependencies (requires sudo)"
   sudo apt-get install -qq --assume-yes --fix-broken --no-install-recommends \
-    firefox-esr
+    firefox
 
   install_deb 'browsh-org/browsh' 'browsh_.*_linux_amd64.deb'
 }

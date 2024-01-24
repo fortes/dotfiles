@@ -165,10 +165,10 @@ set_default_applications() {
     sudo update-alternatives --set x-terminal-emulator "$(command -v alacritty)"
   fi
 
-  if command_exists firefox-esr && [[ -z $(update-alternatives --query  x-www-browser | grep ^Value | grep firefox) ]]; then
+  if command_exists firefox && [[ -z $(update-alternatives --query  x-www-browser | grep ^Value | grep firefox) ]]; then
     echo "Setting Firefox as default browser (requires sudo)"
-    sudo update-alternatives --set x-www-browser "$(command -v firefox-esr)"
-    xdg-settings set default-web-browser firefox-esr.desktop
+    sudo update-alternatives --set x-www-browser "$(command -v firefox)"
+    xdg-settings set default-web-browser firefox.desktop
   fi
 
   if command_exists yarnpkg && [[ -z $(update-alternatives --query yarn | grep ^Value | grep yarnpkg) ]]; then
@@ -359,6 +359,7 @@ main() {
   install_apt_packages
   "${dotfiles_path}/scripts/setup_1password"
   [[ -z "${IS_DOCKER:-}" ]] && "${dotfiles_path}/scripts/setup_et"
+  [[ -z "${IS_HEADLESS:-}" ]] && "${dotfiles_path}/scripts/setup_firefox"
   "${dotfiles_path}/scripts/setup_github_packages"
 
   # Debian ships with these two by default
