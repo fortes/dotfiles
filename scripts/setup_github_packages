@@ -144,10 +144,6 @@ install_browsh() {
 
 install_bun() {
   install_zip 'oven-sh/bun' 'bun-linux-x64-baseline.zip'
-
-  echo "Generating bun bash completion"
-  mkdir -p "$HOME/.local/completion.d"
-  SHELL=bash bun completions "$HOME/.local/completion.d"
 }
 
 install_ctop() {
@@ -156,10 +152,6 @@ install_ctop() {
 
 install_deno() {
   install_zip 'denoland/deno' 'deno-x86_64-unknown-linux-gnu.zip'
-
-  echo "Generating deno bash completion"
-  mkdir -p "$HOME/.local/completion.d"
-  deno completions bash > "$HOME/.local/completion.d/deno_completion"
 }
 
 install_docker_compose() {
@@ -172,11 +164,6 @@ install_github_cli() {
 
 install_fnm() {
   install_zip 'Schniz/fnm' 'fnm-linux.zip'
-
-  echo -n "Generating completions ... "
-  mkdir -p "$HOME/.local/completion.d"
-  fnm completions > "$HOME/.local/completion.d/fnm_completion"
-  echo "Complete!"
 }
 
 install_helix() {
@@ -256,10 +243,6 @@ install_neovim_stable() {
 
 install_yq() {
   install_bin 'mikefarah/yq' 'yq_linux_amd64'
-
-  echo "Generating yq bash completion"
-  mkdir -p "$HOME/.local/completion.d"
-  yq shell-completion bash > "$HOME/.local/completion.d/yq_completion"
 }
 
 install_zellij() {
