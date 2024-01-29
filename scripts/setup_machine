@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Make your machine usable
 #
-# Usage: setup_machine [--apt-only] [--node-only] [--python-only]
+# Usage: setup_machine [--apt-only]
 
 set -euo pipefail
 IFS=$'\n\t'
@@ -12,7 +12,7 @@ export DEBIAN_FRONTEND=noninteractive
 has_updated=""
 
 usage() {
-  echo "Usage: setup_machine [--apt-only] [--node-only] [--python-only]"
+  echo "Usage: setup_machine [--apt-only]"
 }
 
 # Avoid running multiple times
@@ -70,26 +70,6 @@ install_apt_packages() {
   echo $apt_packages | xargs --no-run-if-empty \
     sudo -E apt-get install -qq --assume-yes --fix-broken --no-install-recommends
   echo "Apt packages installed"
-}
-
-install_python_packages() {
-  declare -r venv_path="$HOME/.local/venv"
-
-  echo "Installing global python packages"
-  grep -v "^#" "$HOME/dotfiles/scripts/pipx-packages" | xargs --no-run-if-empty -L 1 pipx install --force
-  echo "Python packages installed"
-
-  if [[ ! -d "${venv_path}" ]]; then
-    echo "Creating default venv"
-    python3 -m venv "${venv_path}"
-  fi
-
-  # shellcheck source=/dev/null
-  . "${venv_path}/bin/activate"
-
-  echo "Installing venv libraries"
-  grep -v "^#" "$HOME/dotfiles/scripts/python-libraries" | xargs --no-run-if-empty "${venv_path}/bin/python" -m pip install --quiet --upgrade
-  echo "venv libraries installed"
 }
 
 is_package_installed() {
@@ -257,20 +237,12 @@ main() {
   declare -r local_profile_path="$HOME/.profile.local"
 
   declare apt_only=''
-  declare node_only=''
-  declare python_only=''
 
   # Parse arguments
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --apt-only)
         apt_only=1
-        ;;
-      --node-only)
-        node_only=1
-        ;;
-      --python-only)
-        python_only=1
         ;;
       --help)
         usage
@@ -287,12 +259,6 @@ main() {
 
   if [[ -n "${apt_only}" ]]; then
     install_apt_packages
-    exit 0
-  elif [[ -n "${node_only}" ]]; then
-    install_node_packages
-    exit 0
-  elif [[ -n "${python_only}" ]]; then
-    install_python_packages
     exit 0
   fi
 
@@ -325,7 +291,6 @@ main() {
   # Misc system configs
   increase_max_watchers
   pushd "${dotfiles_path}" > /dev/null
-  # shellcheck source=./lock_local_files
   "${dotfiles_path}/scripts/lock_local_files"
   popd > /dev/null
   set_default_applications
@@ -334,11 +299,9 @@ main() {
   setup_locale
 
   # Non-apt package managers
-  # shellcheck source=./install_node_packages
   "${dotfiles_path}/scripts/install_node_packages"
-  install_python_packages
+  "${dotfiles_path}/scripts/install_python_packages"
 
-  # shellcheck source=./generate_completions
   "${dotfiles_path}/scripts/generate_completions"
 
   echo "Setup complete!"

@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# Install python pipx / venv packages
+#
+# Usage: install_python_packages
+
+# Make sure to load `command_exists` helper as well as local paths
+# shellcheck source=../stowed-files/bash/.profile
+. "$HOME/dotfiles/stowed-files/bash/.profile"
+
+install_python_packages() {
+  declare -r venv_path="$HOME/.local/venv"
+
+  if ! command_exists pipx; then
+    >&2 echo "⨯ pipx not installed!"
+    exit 1
+  fi
+
+  echo "Installing global pipx packages …"
+  # `--quiet` added to `pipx` in late 2023, waiting for version bump
+  # in Debian stable
+  grep -v "^#" "$HOME/dotfiles/scripts/pipx-packages" | \
+    xargs --no-run-if-empty -L 1 pipx install --force
+  echo "Pipx packages installed!"
+
+  if [[ ! -d "${venv_path}" ]]; then
+    echo "Creating default venv …"
+    python3 -m venv "${venv_path}"
+    echo "Default venv created!"
+  fi
+
+  # shellcheck source=/dev/null
+  . "${venv_path}/bin/activate"
+
+  echo "Installing venv libraries …"
+  grep -v "^#" "$HOME/dotfiles/scripts/python-libraries" | \
+    xargs --no-run-if-empty \
+      "${venv_path}/bin/python" -m pip install --quiet --upgrade
+  echo "venv libraries installed!"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  install_python_packages "${@}"
+fi
