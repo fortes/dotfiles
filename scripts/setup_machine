@@ -44,44 +44,6 @@ echo_stderr() {
   >&2 echo "${@}"
 }
 
-generate_completions() {
-  declare -r completion_dir="$HOME/.local/completion.d"
-  echo "Generating completions & man pages"
-  mkdir -p "${completion_dir}"
-
-  if command_exists npm; then
-    npm completion > "${completion_dir}/npm_completion"
-  fi
-
-  if command_exists beet; then
-    beet completion > "${completion_dir}/beet_completion"
-  fi
-
-  if command_exists gh; then
-    gh completion -s bash > "${completion_dir}/gh_completion"
-  fi
-
-  if command_exists pipx; then
-    register-python-argcomplete --shell bash pipx > "${completion_dir}/pipx_completion"
-  fi
-
-  if command_exists bun; then
-    SHELL=bash bun completions "${completion_dir}"
-  fi
-
-  if command_exists deno; then
-    deno completions bash > "${completion_dir}/deno_completion"
-  fi
-
-  if command_exists fnm; then
-    fnm completions > "${completion_dir}/fnm_completion"
-  fi
-
-  if command_exists yq; then
-    yq shell-completion bash > "${completion_dir}/yq_completion"
-  fi
-}
-
 increase_max_watchers() {
   declare -r conf_file_path="/etc/sysctl.d/20-increase-max-watchers.conf"
   declare -r max_watches="524288"
@@ -400,7 +362,7 @@ main() {
   install_node_packages
   install_python_packages
 
-  generate_completions
+  "${dotfiles_path}/scripts/generate_completions"
 
   echo "Setup complete!"
 
