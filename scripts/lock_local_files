@@ -3,6 +3,9 @@
 #
 # Usage: lock_local_files [--dry-run]
 
+set -euo pipefail
+IFS=$'\n\t'
+
 lock_local_files() {
   local dry_run=''
 
@@ -25,7 +28,7 @@ lock_local_files() {
     echo "Locking .local files…"
   fi
   if git rev-parse --is-inside-work-tree &> /dev/null; then
-    for local_file in $(git ls-files | grep -e -- '\.local$'); do
+    for local_file in $(git ls-files | grep -e '\.local$'); do
       echo -n "… ${local_file} Checking"
       if ! git locked | grep --quiet --fixed-strings "$local_file"; then
         if [[ -n "${dry_run}" ]]; then

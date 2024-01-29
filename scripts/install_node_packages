@@ -3,6 +3,9 @@
 #
 # Usage: install_node_packages
 
+set -euo pipefail
+IFS=$'\n\t'
+
 # Make sure to load `command_exists` helper as well as local paths
 # shellcheck source=../stowed-files/bash/.profile
 . "$HOME/dotfiles/stowed-files/bash/.profile"
