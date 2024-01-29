@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Install yarn
 #
-# Usage: setup_yarn
+# Usage: install_yarn
 
 set -euo pipefail
 IFS=$'\n\t'

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Install Brave Web Browser
 #
-# Usage: setup_brave
+# Usage: install_brave
 
 set -euo pipefail
 IFS=$'\n\t'

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Setup Eternal Terminal
 #
-# Usage: setup_et
+# Usage: install_et
 
 set -euo pipefail
 IFS=$'\n\t'

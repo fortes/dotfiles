@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Setup Zoom Meetings client
 #
-# Usage: setup_zoom
+# Usage: install_zoom
 
 set -euo pipefail
 IFS=$'\n\t'

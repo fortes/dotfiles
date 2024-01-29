@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Install Signal Desktop Client
 #
-# Usage: setup_signal
+# Usage: install_signal
 
 set -euo pipefail
 IFS=$'\n\t'

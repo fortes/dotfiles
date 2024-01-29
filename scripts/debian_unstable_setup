@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Setup Debian unstable source and install packages
 #
-# Usage: setup_debian_unstable
+# Usage: debian_unstable_setup
 
 set -euo pipefail
 IFS=$'\n\t'

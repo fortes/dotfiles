@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Install Firefox
 #
-# Usage: setup_firefox
+# Usage: install_firefox
 
 set -euo pipefail
 IFS=$'\n\t'

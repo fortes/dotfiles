@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Make your machine usable
 #
-# Usage: setup_google_chrome
+# Usage: install_google_chrome
 
 set -euo pipefail
 IFS=$'\n\t'

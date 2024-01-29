@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Install VSCode
 #
-# Usage: setup_vscode
+# Usage: install_vscode
 
 set -euo pipefail
 IFS=$'\n\t'

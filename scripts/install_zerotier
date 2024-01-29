@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Setup Zerotier
 #
-# Usage: setup_zerotier
+# Usage: install_zerotier
 
 set -euo pipefail
 IFS=$'\n\t'
