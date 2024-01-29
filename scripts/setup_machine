@@ -57,7 +57,9 @@ increase_max_watchers() {
 }
 
 install_apt_packages() {
-  declare apt_packages=$(grep -v "^#" "$dotfiles_path/scripts/apt-packages-headless")
+  declare apt_packages
+  apt_packages=$(grep -v "^#" "$dotfiles_path/scripts/apt-packages-headless")
+
   if [[ -z "${IS_HEADLESS:-}" ]]; then
     apt_packages=$(grep --no-filename -v "^#" "$dotfiles_path/scripts/apt-packages"*)
   fi
@@ -68,22 +70,6 @@ install_apt_packages() {
   echo $apt_packages | xargs --no-run-if-empty \
     sudo -E apt-get install -qq --assume-yes --fix-broken --no-install-recommends
   echo "Apt packages installed"
-}
-
-install_node_packages() {
-  echo "Installing node LTS ... "
-  fnm install --lts
-
-  echo "Setting node version to LTS"
-  fnm default lts-latest
-
-  # Pick up `fnm`-provided paths
-  eval "$(fnm env)"
-
-  echo "Installing global node packages"
-  grep -v "^#" "$HOME/dotfiles/scripts/node-packages" | xargs --no-run-if-empty \
-    npm install -g --fund false
-  echo "Node packages installed"
 }
 
 install_python_packages() {
@@ -98,6 +84,7 @@ install_python_packages() {
     python3 -m venv "${venv_path}"
   fi
 
+  # shellcheck source=/dev/null
   . "${venv_path}/bin/activate"
 
   echo "Installing venv libraries"
@@ -122,23 +109,23 @@ remove_default_dotfile() {
 }
 
 set_default_applications() {
-  if command_exists nvim && [[ -z $(update-alternatives --query editor | grep ^Value | grep nvim) ]]; then
+  if command_exists nvim && ! update-alternatives --query editor | grep ^Value | grep -q nvim; then
     echo "Setting Neovim as default text editor (requires sudo)"
     sudo update-alternatives --install /usr/bin/editor editor "$(command -v nvim)" 60
   fi
 
-  if command_exists alacritty && [[ -z $(update-alternatives --query x-terminal-emulator | grep ^Value | grep alacritty) ]]; then
+  if command_exists alacritty && ! update-alternatives --query x-terminal-emulator | grep ^Value | grep -q alacritty; then
     echo "Setting Alacritty as default terminal (requires sudo)"
     sudo update-alternatives --set x-terminal-emulator "$(command -v alacritty)"
   fi
 
-  if command_exists firefox && [[ -z $(update-alternatives --query  x-www-browser | grep ^Value | grep firefox) ]]; then
+  if command_exists firefox && ! update-alternatives --query  x-www-browser | grep ^Value | grep -q firefox; then
     echo "Setting Firefox as default browser (requires sudo)"
     sudo update-alternatives --set x-www-browser "$(command -v firefox)"
     xdg-settings set default-web-browser firefox.desktop
   fi
 
-  if command_exists yarnpkg && [[ -z $(update-alternatives --query yarn | grep ^Value | grep yarnpkg) ]]; then
+  if command_exists yarnpkg && ! update-alternatives --query yarn | grep ^Value | grep -q yarnpkg; then
     echo "Setting 'yarn' as system alias to 'yarnpkg' (requires sudo)"
     sudo update-alternatives --install /usr/bin/yarn yarn /usr/bin/yarnpkg 10
   fi
@@ -263,7 +250,7 @@ setup_shell() {
 
 main() {
   # Make sure to load `command_exists` helper
-  # shellcheck source=/dev/null
+  # shellcheck source=../stowed-files/bash/.profile
   . "$HOME/dotfiles/stowed-files/bash/.profile"
 
   declare -r dotfiles_path="$HOME/dotfiles"
@@ -338,6 +325,7 @@ main() {
   # Misc system configs
   increase_max_watchers
   pushd "${dotfiles_path}" > /dev/null
+  # shellcheck source=./lock_local_files
   "${dotfiles_path}/scripts/lock_local_files"
   popd > /dev/null
   set_default_applications
@@ -346,9 +334,11 @@ main() {
   setup_locale
 
   # Non-apt package managers
-  install_node_packages
+  # shellcheck source=./install_node_packages
+  "${dotfiles_path}/scripts/install_node_packages"
   install_python_packages
 
+  # shellcheck source=./generate_completions
   "${dotfiles_path}/scripts/generate_completions"
 
   echo "Setup complete!"

@@ -100,7 +100,7 @@ fi
 # Different host colors for different environments
 if [ "$IS_DOCKER" == "1" ]; then
   HOST_COLOR="$GREEN"
-elif [[ ! -z "$SSH_TTY" && ! -z "$ET_VERSION" && -z "$IS_DOCKER" ]]; then
+elif [[ -n "$SSH_TTY" && -n "$ET_VERSION" && -z "$IS_DOCKER" ]]; then
   HOST_COLOR="$RED"
 else
   HOST_COLOR="$CYAN"
@@ -108,11 +108,11 @@ fi
 
 # [[user@]host]:pwd $
 if [[ -z "$SSH_TTY" && -z "$ET_VERSION" && -z "$IS_DOCKER" ]]; then
-  BASE_PROMPT="$BASE_PROMPT$YELLOW\w$RESET"
+  BASE_PROMPT="${BASE_PROMPT}${YELLOW}\w${RESET}"
 else
-  BASE_PROMPT="$BASE_PROMPT$HOST_COLOR\h:$YELLOW\w$RESET"
+  BASE_PROMPT="${BASE_PROMPT}${HOST_COLOR}\h:${YELLOW}\w${RESET}"
 fi
-JOB_COUNT="$BOLD$BLUE[\j]$RESET "
+JOB_COUNT="${BOLD}${BLUE}[\j]${RESET} "
 # Write out history after every command. Add job count if non-zero stopped
 export PROMPT_COMMAND="history -a; HAS_JOBS=\`jobs -sp\` "
 PS1="$BASE_PROMPT ""\${HAS_JOBS:+$JOB_COUNT}"
