@@ -1,0 +1,118 @@
+#!/usr/bin/env bash
+# Work in progress setup for the Mac
+#
+# TODO:
+# - Use `/bin/sh` instead of bash, since will eventually go away
+#   - Or maybe `dash`?
+# - Move over to zsh
+#
+# Usage: setup_mac
+
+set -euo pipefail
+IFS=$'\n\t'
+
+declare -r brew_prefix="/opt/homebrew"
+declare dotfiles_root
+dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+setup_shell() {
+  local homebrew_bash_path="${brew_prefix}/bin/bash"
+
+  # TODO: Should really just move to zsh since Mac will probably ditch bash
+  if [[ -x "${homebrew_bash_path}" ]] && [[ "${SHELL:-}" != "${homebrew_bash_path}" ]]; then
+    if ! grep -q "${homebrew_bash_path}" /etc/shells; then
+      echo "Adding ${homebrew_bash_path} to shell list (requires sudo)"
+      echo "${homebrew_bash_path}" | sudo tee -a /etc/shells > /dev/null
+    fi
+
+    # Only change shell if running interactively, otherwise fails in CI which
+    # can't do the required auth
+    if [[ -t 1 ]] ; then
+      echo "Changing shell to bash ($homebrew_bash_path)"
+      chsh -s "${homebrew_bash_path}"
+    fi
+  fi
+}
+
+install_command_line_tools() {
+  if ! xcode-select -p > /dev/null 2>&1; then
+    echo "Installing command line tools"
+    xcode-select --install
+  fi
+}
+
+install_homebrew() {
+  if [[ ! -x "${brew_prefix}/bin/brew" ]]; then
+    echo "Installing Homebrew"
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+  fi
+
+  if [[ ! -f "$HOME/.profile.brew" ]]; then
+    echo "Exporting brew shellenv"
+    "${brew_prefix}/bin/brew" shellenv > "$HOME/.profile.brew"
+  fi
+
+  # Ensure `brew` in path for rest of script
+  # shellcheck source=/dev/null
+  . "$HOME/.profile.brew"
+}
+
+install_homebrew_packages() {
+  echo "Installing homebrew packages"
+  # Use full path just in case `brew` not in path during initial setup
+  grep -v "^#" "${dotfiles_root}/scripts/brew-packages" | \
+    xargs "${brew_prefix}/bin/brew" install --quiet
+}
+
+main() {
+  if ! uname -s | grep -q Darwin; then
+    >&2 echo "Only works on Mac!"
+    exit 1
+  fi
+
+  # Make sure to load `command_exists` helper
+  # shellcheck source=../stowed-files/bash/.profile
+  . "${dotfiles_root}/stowed-files/bash/.profile"
+
+  local local_profile_path="$HOME/.profile.local"
+
+  if [[ ! -f "$local_profile_path" ]]; then
+    echo "Generating $local_profile_path"
+    "${dotfiles_root}/scripts/create_local_profile" > "$local_profile_path"
+  fi
+
+  # shellcheck source=/dev/null
+  . "$local_profile_path"
+
+  install_command_line_tools
+  install_homebrew
+  install_homebrew_packages
+
+  # Remove default files before stowing, otherwise stow fails
+  "${dotfiles_root}/scripts/remove_default_dotfiles"
+  "${dotfiles_root}/scripts/stow"
+
+  setup_shell
+
+  "${dotfiles_root}/scripts/lock_local_files"
+  "${dotfiles_root}/scripts/set_dotfiles_remote"
+
+  # Non-brew package managers
+  "${dotfiles_root}/scripts/install_node_packages"
+  "${dotfiles_root}/scripts/install_python_packages"
+
+  "${dotfiles_root}/scripts/generate_completions"
+
+  # TODO: Neovim plugin install?
+
+  echo "Setup complete!"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  if [[ "${BASH_VERSINFO:-0}" -ge 4 ]]; then
+    main "${@}"
+  else
+    # Ancient Mac Bash version does not support `@`
+    main
+  fi
+fi

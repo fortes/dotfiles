@@ -1,0 +1,13 @@
+name: MacOS
+on: [push]
+
+jobs:
+  build:
+    runs-on: macos-14
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup machine
+        run: bash ./scripts/setup_mac
+

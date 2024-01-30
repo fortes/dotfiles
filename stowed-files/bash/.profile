@@ -30,11 +30,6 @@ command_exists() {
 }
 export -f command_exists
 
-if [[ -n "${LISTENBRAINZ_AUTH_TOKEN:-}" ]]; then
-  # scrobbling requires `pylistenbrainz`, not available in Debian so need venv
-  source_if_exists "$HOME/.local/venv/bin/activate"
-fi
-
 # Use local NeoVim if we have it
 if [[ -x "$HOME/.local/bin/nvim" ]]; then
   VISUAL="$HOME/.local/bin/nvim"
@@ -47,6 +42,15 @@ fi
 if [[ -n ${VISUAL:-} ]]; then
   EDITOR="$VISUAL"
   export EDITOR VISUAL
+fi
+
+# Homebrew paths, etc
+source_if_exists "$HOME/.profile.brew"
+
+if [[ -n "${LISTENBRAINZ_AUTH_TOKEN:-}" ]]; then
+  # scrobbling requires `pylistenbrainz`, not available in Debian so need venv
+  # Must do this after homebrew path, otherwise brew paths take precedence
+  source_if_exists "$HOME/.local/venv/bin/activate"
 fi
 
 # Locally-installed packages belong in path

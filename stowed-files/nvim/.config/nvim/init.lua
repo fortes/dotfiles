@@ -173,8 +173,6 @@ require("lazy").setup({
               return
             end
 
-            -- Never use tsserver formatting, it's not very good
-            client.server_capabilities.documentFormattingProvider = false
             lsp_on_attach(client, bufnr)
           end,
           root_dir = nvim_lsp.util.find_node_modules_ancestor
@@ -504,16 +502,6 @@ require("lazy").setup({
       vim.keymap.set('n', '<leader>c', require('osc52').copy_operator, {expr=true})
       vim.keymap.set('n', '<leader>cc', '<leader>c_', {remap=true})
       vim.keymap.set('x', '<leader>c', require('osc52').copy_visual)
-    end
-  },
-
-  -- Autoformatting
-  {
-    'prettier/vim-prettier',
-    event = "VeryLazy",
-    config = function()
-      -- Don't use quickfix for syntax errors
-      vim.g['prettier#quickfix_enabled'] = 0
     end
   },
 

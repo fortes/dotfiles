@@ -15,6 +15,11 @@ Graphical sections are Linux-only, and use:
 * foot
 * Firefox
 
+On MacOS, use:
+
+* Alacritty
+* Rectangle
+
 ## Letting me own your machine
 
 ```sh
@@ -204,7 +209,16 @@ The Bullseye to Bookworm upgrade requires a few manual steps that I'm too lazy t
 
 ### Mac
 
-- Not fully functional, see `mac-setup` branch for current status
+Still a work in progress, but kinda works
+
+- May want to install command line tools manually in order to get `git`: `xcode-select --install`
+- Set `terminal.app` profile, send option as meta key
+- `terminal.app` sucks with colors, so once installs happen, switch to Alacritty and pin it in the dock
+- Make sure Rectangle.app starts on login
+
+#### TODO
+
+- [ ] Figure out how to get [M1 CI running](https://github.blog/changelog/2024-01-30-github-actions-introducing-the-new-m1-macos-runner-available-to-open-source/) to check builds
 
 ## Known Issues
 

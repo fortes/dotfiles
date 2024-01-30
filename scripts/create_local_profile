@@ -9,17 +9,19 @@ IFS=$'\n\t'
 
 main() {
   local is_crostini=$([[ -f /etc/apt/sources.list.d/cros.list ]] && printf 1)
+  local is_mac=$([[ ${OSTYPE:-} == 'darwin'* ]] && printf 1)
   local is_docker=$([[ -f /.dockerenv ]] && printf 1)
   local is_wsl=$([[ -d /run/WSL ]] && printf 1)
   # Default to headless in Crostini / Docker / WSL, even though GUI might be
   # possible, can always be overridden
-  local is_headless=$([[ -n "${is_crostini}${is_docker}${is_wsl}" || \
+  local is_headless=$([[ -n "${is_crostini}${is_docker}${is_mac}${is_wsl}" || \
     -z "${WAYLAND_DISPLAY:-}" ]] && printf 1)
 
   cat <<PROFILE_TEMPLATE
 # Generated $(date +%F)
 export IS_CROSTINI="${is_crostini:-}"
 export IS_DOCKER="${is_docker:-}"
+export IS_MAC="${is_mac:-}"
 export IS_WSL="${is_wsl:-}"
 export IS_HEADLESS="${is_headless:-}"
 
@@ -38,4 +40,9 @@ export IS_HEADLESS="${is_headless:-}"
 PROFILE_TEMPLATE
 }
 
-main "${@}"
+if [[ "${BASH_VERSINFO:-0}" -ge 4 ]]; then
+  main "${@}"
+else
+  # Ancient Mac Bash version does not support `@`
+  main
+fi

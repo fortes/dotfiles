@@ -42,40 +42,40 @@ if [[ -z "${COLORTERM:-}" ]] && [[ "$TERM" =~ "256color" ]]; then
 fi
 
 # Bash Options {{{
-# cd without typing cd
-shopt -qs autocd
+# cd without typing cd (unsupported in Mac version)
+shopt -qs autocd 2> /dev/null || true
 # Auto-correct directory typos
 shopt -qs cdspell
 # Check hash before executing
 shopt -qs checkhash
-# Check for stopped jobs before exiting
-shopt -qs checkjobs
+# Check for stopped jobs before exiting (unsupported in Mac version)
+shopt -qs checkjobs 2> /dev/null || true
 # Check window size after each command, and update $LINES and $COLUMNS
-shopt -s checkwinsize
+shopt -qs checkwinsize
 # Save all lines of multiline commands
-shopt -s cmdhist
-# Expand directory names when doing file completion
-shopt -qs direxpand
-# Fix typos for directories in completion
-shopt -qs dirspell
+shopt -qs cmdhist
+# Expand directory names when doing file completion (unsupported in Mac version)
+shopt -qs direxpand 2> /dev/null || true
+# Fix typos for directories in completion (unsupported in Mac version)
+shopt -qs dirspell 2> /dev/null || true
 # Include filenames that begin with '.' in filename expansion
 shopt -qs dotglob
 # Extended pattern matching
 shopt -qs extglob
 # Allow escape sequencing within ${parameter} expansions
 shopt -qs extquote
-# Support ** for expansion
-shopt -qs globstar
+# Support ** for expansion (unsupported in Mac version)
+shopt -qs globstar 2> /dev/null || true
 # Append to history list. Allow editing of history substitution in readline
 shopt -qs histappend histreedit histverify
 # Do hostname completion on words that contain @
 shopt -qs hostcomplete
 # Don't search path for completions when on an empty line
-shopt -s no_empty_cmd_completion
+shopt -qs no_empty_cmd_completion
 # Case insensitive glob matching and case statements
-shopt -s nocaseglob nocasematch
+shopt -qs nocaseglob nocasematch
 # Expand aliases in order to find completions
-shopt -s progcomp_alias
+shopt -qs progcomp_alias
 # }}}
 
 # shellcheck disable=SC2034
@@ -127,7 +127,7 @@ PS1="$BASE_PROMPT ""\${HAS_JOBS:+$JOB_COUNT}"
 git_prompt_location="/etc/bash_completion.d/git-prompt"
 if [ ! -r "${git_prompt_location}" ]; then
   # Homebrew
-  git_prompt_location="/usr/local/etc/bash_completion.d/git-prompt.sh"
+  git_prompt_location="/opt/homebrew/etc/bash_completion.d/git-prompt.sh"
 fi
 
 if [ -r "${git_prompt_location}" ]; then
@@ -215,7 +215,7 @@ export MOZ_ENABLE_WAYLAND=1
 # FZF keybindings (Debian)
 source_if_exists "/usr/share/doc/fzf/examples/key-bindings.bash"
 # FZF keybindings (Homebrew)
-source_if_exists "/usr/local/opt/fzf/shell/key-bindings.bash"
+source_if_exists "/opt/homebrew/opt/fzf/shell/key-bindings.bash"
 
 if command_exists fnm; then
   eval "$(fnm env)"
@@ -226,8 +226,11 @@ export ET_NO_TELEMETRY=1
 
 # Load system bash completion
 source_if_exists "/etc/bash_completion"
-# Load homebrew bash completion
-source_if_exists "/usr/local/etc/bash_completion"
+# Load Homebrew bash completion, see https://docs.brew.sh/Shell-Completion
+source_if_exists "/opt/homebrew/etc/profile.d/bash_completion.sh"
+source_if_exists "/opt/homebrew/etc/bash_completion.d"
+source_if_exists "/opt/homebrew/share/bash-completion/bash_completion"
+
 # Load local bash completion
 source_if_exists "$HOME/.local/completion.d"
 

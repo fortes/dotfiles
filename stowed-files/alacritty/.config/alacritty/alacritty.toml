@@ -1,0 +1,9 @@
+[env]
+# tmux uses `$SHELL` which isn't set by `chsh` on MacOS
+SHELL = "/opt/homebrew/bin/bash"
+[shell]
+# Only used on MacOS, so this path is OK
+program = "/opt/homebrew/bin/bash"
+args = ["--login"]
+[window]
+option_as_alt = "OnlyLeft"
