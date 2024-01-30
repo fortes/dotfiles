@@ -74,14 +74,8 @@ elif uname | grep -qv Darwin; then
   alias ll='ls --color=auto -AlpFhv'
 fi
 
-# Make feh nicer in i3
-if command_exists feh; then
-  alias feh='feh --scale-down'
-fi
-
-# Shortcuts for copying from tmux clipboard to system clipboard
-if command_exists xclip; then
-  alias tcopy='tmux save-buffer - | xclip -i -sel clipboard'
+if command_exists imv-wayland; then
+  alias imv='imv-wayland'
 fi
 
 # Debianisms outside of Debian

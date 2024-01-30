@@ -209,6 +209,9 @@ export FZF_CTRL_T_OPTS="
   "
 export FZF_COMPLETION_OPTS='--smart-case'
 
+# Use wayland for Firefox
+export MOZ_ENABLE_WAYLAND=1
+
 # FZF keybindings (Debian)
 source_if_exists "/usr/share/doc/fzf/examples/key-bindings.bash"
 # FZF keybindings (Homebrew)

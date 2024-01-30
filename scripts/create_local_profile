@@ -14,7 +14,7 @@ main() {
   # Default to headless in Crostini / Docker / WSL, even though GUI might be
   # possible, can always be overridden
   local is_headless=$([[ -n "${is_crostini}${is_docker}${is_wsl}" || \
-    -z "${DISPLAY:-}" ]] && printf 1)
+    -z "${WAYLAND_DISPLAY:-}" ]] && printf 1)
 
   cat <<PROFILE_TEMPLATE
 # Generated $(date +%F)

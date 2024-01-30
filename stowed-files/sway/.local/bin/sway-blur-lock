@@ -1,0 +1,37 @@
+#!/bin/bash
+#
+# Blur and lock the screen
+#
+# Usage:
+# sway-blur-lock
+
+set -euo pipefail
+IFS=$'\n\t'
+
+main() {
+  local image_directory
+  local lock_args=()
+  local outputs
+
+  image_directory="$(mktemp -d /tmp/sway_blur_lock.XXXXXX)"
+
+  if [[ -z ${WAYLAND_DISPLAY} ]]; then
+    echo "Not running under Wayland, aborting"
+    return 1
+  fi
+
+  outputs="$(swaymsg -t get_outputs | \
+    jq -r '.[] | select(.active == true) | .name')"
+
+  for output in ${outputs}; do
+    local image_path="${image_directory}/${output}.png"
+    grim -o "${output}" - | \
+      convert - -scale 10% -scale 1000%  "${image_path}"
+    lock_args+=("--image=${output}:${image_path}")
+  done
+
+  swaylock "${lock_args[@]}"
+}
+
+main "$@"
+
