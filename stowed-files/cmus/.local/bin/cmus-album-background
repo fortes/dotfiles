@@ -10,13 +10,19 @@ tmp_art_path="/tmp/cmus-album-bg-blurred.png"
 previous_folder_path="/tmp/cmus-album-folder-path.txt"
 
 clear_background() {
-  hsetroot -solid "${default_bg}"
+  swaymsg "output * background ${default_bg} solid_color"
   rm -rf "${tmp_art_path}" "${previous_folder_path}"
 }
 
 main() {
-  if ! command_exists cmus-remote || ! command_exists hsetroot || ! command_exists feh; then
-    echo 'Missing requirements, exiting'
+  local album_dirpath
+  local art_path
+  local previous_dirpath
+  local resolution
+  local status
+
+  if [[ -z ${WAYLAND_DISPLAY} ]]; then
+    echo "Not running under Wayland, aborting"
     return 1
   fi
 
@@ -49,14 +55,16 @@ main() {
     return 1
   fi
 
-  local resolution="$(xrandr | grep \* | awk '{print $1}' | head -n 1)"
+  resolution="$(swaymsg -t get_outputs | jq -r '
+    .[] | select(.focused) | "\(.current_mode.width)x\(.current_mode.height)"
+  ')"
   convert "${art_path}" -background "${default_bg}" \
     -scale "${resolution}"\^ -paint 6 \
     -modulate 100,20,100 -fill "${default_bg}" -colorize 20% \
     "${tmp_art_path}"
 
   echo "setting background to ${tmp_art_path}"
-  feh --bg-center "${tmp_art_path}"
+  swaymsg "output '*' background ${tmp_art_path} fill"
 }
 
 main "${@}"

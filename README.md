@@ -5,14 +5,14 @@ This is only public so I can easily share it across machines. There is probably 
 My usage is mostly terminal-based, via Crostini on Chromebook, WSL2 on Windows, and (rarely) MacOS terminal. Making heavy use of:
 
 * Bash / Tmux
-* FZF
+* FZF / pistol / fd / ripgrep
 * Neovim
 * cmus
 
 Graphical sections are Linux-only, and use:
 
-* i3wm & picom & dunst & rofi
-* Alacritty
+* sway / swaync / waybar
+* foot
 * Firefox
 
 ## Letting me own your machine
@@ -215,6 +215,54 @@ The Bullseye to Bookworm upgrade requires a few manual steps that I'm too lazy t
 - `exa` is now unmaintained, need to either go to [eza](https://github.com/eza-community/eza) or `lsd`
 - `1password` GUI not installing correctly, something wrong w/ bash logic
 
+## Sway Migration
+
+Work in progress. The [Sway Wiki](https://github.com/swaywm/sway/wiki/i3-Migration-Guide) has some good links for migration, and there are [useful tools](https://github.com/swaywm/sway/wiki/Useful-add-ons-for-sway) as well
+
+- Chromium: Need to either use command-line flags `--ozone-platform-hint=auto` or go to `chrome://flags` and set `Preferred Ozone platform`
+- Read through [this guide](https://anarc.at/software/desktop/wayland/) a bit more, lots of good detail and using debian and systemd to drive a bunch of stuff
+- Notifications
+  - [x] `sway-notification-center` over dunst, much better
+  - [ ] No need to start automatically, dbus does that
+  - [ ] Figure out volume, etc controls in there. Can substitute for some of the waybar stuff
+      - Looks like this is on newer version than what's in Debian repos, so need to either go to sid early, or just wait
+      - Can also do arbitrary buttons?
+  - [ ] Figure out how to show icons for screenshot, etc
+  - [ ] Make styling a bit more consistent with rest of UX
+- Bar
+  - Figure out bar content, using some combination of `waybar` and the [helpers](https://github.com/swaywm/sway/wiki/Useful-add-ons-for-sway#bar-content-generators)
+  - [ ] Music control
+  - [ ] Better volume display
+  - [ ] Screen recording indicator could be nice
+- [ ] Figure out clipboard, likely `wl-clipboard` (`wayclip` not in repos)
+- [ ] Need to hook up pipewire in tmux as well?
+- [ ] Input / keyboard setup, mostly native in sway?
+- [ ] `swhkd` to consider as hotkey handler, get `sway` out of the business?
+- [ ] Update instructions for setup
+  - get `sway/config.local` out of source control, etc
+- [ ] Figure out how to make wacom tablet work (and update instructions)
+  - [OpenTabletDriver](https://github.com/OpenTabletDriver/OpenTabletDriver) looks promising, but need to test
+- [x] Figure out how to get things using Wayland where necessary
+  - Firefox, Chrome need flags
+  - Signal as well, watch out for needing floating at start
+    - `signal-desktop --enable-features=UseOzonePlatform --ozone-platform=wayland`
+- [x] Need to update screenshot scripts, will likely be `grim` / `slurp` / `grimshot`
+  - Screen recording via `wf-recorder`?
+- [x] Volume keyboard controls not working
+- [x] Need a `rofi` replacement for app launching, window switching, and shutdown, etc commands.
+  - Might consider just using a terminal with `fzf`, but need to figure out the data sources
+  - `wofi` kinda working, need to get terminal apps running (e.g. `htop`)
+  - Window switcher kinda works, need icons
+- [x] `gammastep` seems to work on Wayland, need to figure out all the launching, etc
+  - `gammastep-indicator` broken due to not including `/usr/lib/python3/dist-packages` in `PYTHONPATH`, works if done manually, not sure if something wrong with sway config or what
+  - Need to double-check at night, but should be good?
+- [x] `dunst` seems to support wayland, but need to get launching, etc.
+  - Hm, dbus does this for us, probably fine
+  - `mako-notifier` an option, need to configure in order to get icons
+  - [x] Tray doesn't seem to work? Should have gammastep there?
+      - Tray does work, just nothing in it right now
+- [x] Need to port background drawing handling over, likely using `swaybg` or just native sway
+
 ## Future Improvements
 
 - Try switching from docker to podman
@@ -224,17 +272,16 @@ The Bullseye to Bookworm upgrade requires a few manual steps that I'm too lazy t
 - [ ] (caniuse-cli)[https://github.com/sgentle/caniuse-cmd]
 - [ ] Look into `stevearc/conform.nvim`
 - [ ] Add [Firefox Nightly](https://blog.nightly.mozilla.org/2023/10/30/introducing-mozillas-firefox-nightly-deb-packages-for-debian-based-linux-distributions/)
-- [ ] Figure out why gammastep not starting up automatically in some cases, may need to re-write the systemd user entries
+- [ ] Use [native OSC52 support in Neovim](https://github.com/neovim/neovim/issues/3344) instead of plugin
+- [ ] sixel support in tmux 3.4, but gotta wait until it (hopefully) hits Debian backports
+  - Once sixels are supported, can make a bunch of improvements to scripts here
+  - May want to consider `zellij` which supports sixel? Currently slightly janky though
+- [ ] `wshowkeys` or similar for showing keypresses for screencasts, etc
 - [ ] Figure out Lutris / Wine / Proton for Linux gaming
 - [ ] [Auto-publish Docker images](https://docs.github.com/en/actions/publishing-packages/publishing-docker-images#publishing-images-to-github-packages)
 - [ ] Better colorschemes, coordinated everywhere
-  - [ ] Easier swapping into light mode
   - Check [themer](https://github.com/themerdev/themer) for generation
-- [ ] Setup `xautolock` or similar to automatically lock screen on idle
-- [ ] Figure out rofi / dmenu whatever else would make sense to do more in i3
-- [ ] Check out [`zutty` terminal](https://tomscii.sig7.se/zutty/)
-- [ ] Migrate off of X11 to Wayland: Either use nouveau or wait until Sway has Nvidia support (or get an AMD card)
-  - [ ] `foot` on Wayland seems to be quite good for terminal
+  - [ ] Easier swapping into light mode
 - [ ] Figure out how to get USB-C DP Alt devices to work, might need [displaylink-debian](https://github.com/AdnanHodzic/displaylink-debian) or at the very least `evdi-dkms`
 - [ ] Get [Nvidia Drivers](https://wiki.debian.org/NvidiaGraphicsDrivers) drivers with a reasonable resolution for linux console
   - Install `nvidia-detect` and run to check support

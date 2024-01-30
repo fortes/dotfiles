@@ -1,0 +1,67 @@
+#!/bin/bash
+#
+# Interactive commands for Sway
+# 
+# Usage:
+# sway-system-menu
+
+set -euo pipefail
+IFS=$'\n\t'
+
+get_options() {
+  echo -e "Terminal\\0icon\\x1ffoot"
+  echo -e "Firefox\\0icon\\x1ffirefox-esr"
+  if playerctl status | grep -q Playing; then
+    echo -e "Pause $(playerctl metadata title)\\0icon\\x1fmedia-playback-pause"
+    echo -e "Next\\0icon\\x1fmedia-skip-forward"
+  elif playerctl status | grep -q Paused; then
+    echo -e "Resume $(playerctl metadata title)\\0icon\\x1fmedia-playback-pause"
+    echo -e "Next\\0icon\\x1fmedia-skip-forward"
+  fi
+  echo -e "Lock\\0icon\\x1fsystem-lock-screen"
+  echo -e "Reload Sway\\0icon\\x1fsystem-software-update"
+  echo -e "Exit Sway\\0icon\\x1fsystem-log-out"
+}
+
+main() {
+  local selection
+
+  if [[ -z ${WAYLAND_DISPLAY} ]]; then
+    echo "Not running under Wayland, aborting"
+    return 1
+  fi
+
+  selection=$(get_options | fuzzel --dmenu --prompt "Sway:")
+  case "$selection" in
+    Cancel)
+      echo "Cancelled"
+      ;;
+    Terminal)
+      swaymsg exec foot
+      ;;
+    Firefox)
+      swaymsg exec firefox-esr
+      ;;
+    Lock)
+      swaylock -f -c 000000
+      ;;
+    Resume|Pause)
+      playerctl play-pause
+      ;;
+    Next)
+      playerctl next
+      ;;
+    Reload\ Sway)
+      swaymsg reload
+      ;;
+    Exit\ Sway)
+      swaymsg exit
+      ;;
+    *)
+      echo "Unknown option: ${selection}"
+      return 1
+      ;;
+  esac
+}
+
+main "$@"

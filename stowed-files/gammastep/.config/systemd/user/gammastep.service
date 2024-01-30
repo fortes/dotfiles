@@ -1,0 +1,13 @@
+[Unit]
+Description=Gammastep Indicator
+PartOf=sway-session.target
+
+[Service]
+Type=simple
+# There's some bug with this on Debian right now, so do this temporarily
+Environment=PYTHONPATH=/usr/lib/python3/dist-packages
+ExecStart=/usr/bin/gammastep-indicator
+Restart=always
+
+[Install]
+WantedBy=sway-session.target

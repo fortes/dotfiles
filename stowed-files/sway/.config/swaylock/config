@@ -1,0 +1,7 @@
+color=181818
+daemonize
+ignore-empty-password
+indicator-caps-lock
+indicator-thickness=20
+indicator-radius=100
+show-failed-attempts

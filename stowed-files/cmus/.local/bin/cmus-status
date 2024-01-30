@@ -55,7 +55,7 @@ CMUS_STATUS
     tmux refresh-client -S
   fi
 
-  if [[ -n ${DISPLAY:-} ]]; then
+  if [[ -n ${WAYLAND_DISPLAY:-} ]]; then
     # Run in background since PNG generation can take a while
     cmus-album-background >> /tmp/cmus-album-background.log 2>&1 &
   fi

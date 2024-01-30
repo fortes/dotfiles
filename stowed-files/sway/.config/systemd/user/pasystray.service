@@ -1,0 +1,11 @@
+[Unit]
+Description=PulseAudio system tray
+PartOf=sway-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/pasystray
+Restart=always
+
+[Install]
+WantedBy=sway-session.target
