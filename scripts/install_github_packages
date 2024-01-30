@@ -18,11 +18,45 @@
 # - yq
 # - zellij
 #
-# Usage `install_github_packages`
+# Usage `install_github_packages [package_names...]`
 
 set -euo pipefail
 IFS=$'\n\t'
 export DEBIAN_FRONTEND=noninteractive
+
+AVAILABLE_PACKAGES=(
+  agg
+  browsh
+  bun
+  ctop
+  deno
+  docker-compose
+  fnm
+  # Bookworm tracking recent version already, can use apt
+  # github_cli
+  helix
+  # Bookworm tracking recent version already, can use apt
+  # hugo
+  lazydocker
+  lazygit
+  neovim
+  sad
+  yq
+  zellij
+)
+
+print_usage() {
+  echo "Usage: ${0} [-h|--help] [-s|--sole-package]"
+  echo
+  echo "Install packages directly from GitHub. Available packages:"
+  echo
+  for package in "${AVAILABLE_PACKAGES[@]}"; do
+    echo "- ${package}"
+  done
+  echo
+  echo "Options:"
+  echo "-h|--help: Show this message"
+}
 
 echo_stderr() {
   >&2 echo "${@}"
@@ -249,28 +283,90 @@ install_zellij() {
   install_tarball 'zellij-org/zellij' 'zellij-x86_64-unknown-linux-musl.tar.gz'
 }
 
-main() {
+install_github_packages() {
+  local packages=("$@")
+  if [ "${#packages[@]}" -eq 0 ]; then
+    packages=("${AVAILABLE_PACKAGES[@]}")
+  fi
+
+  while (( "$#" )); do
+    case "${1}" in
+      -h|--help)
+        print_usage
+        exit 0
+        ;;
+    esac
+    shift
+  done
+
+  # shellcheck source=/dev/null
   . "${HOME}/.profile.local"
 
-  install_agg
-  # Requries Firefox, may not be wanted on headless machines
-  [[ -z "${IS_HEADLESS:-}" ]] && install_browsh
-  install_bun
-  install_ctop
-  install_deno
-  install_docker_compose
-  install_fnm
-  # Bookworm tracking recent version already, can use apt
-  # install_github_cli
-  install_helix
-  # Bookworm tracking recent version already, can use apt
-  # install_hugo
-  install_lazydocker
-  install_lazygit
-  install_neovim_stable
-  install_sad
-  install_yq
-  install_zellij
+  echo -n "Installing GitHub packages:"
+  printf " %s" "${packages[@]}"
+  echo
+
+  for package in "${packages[@]}"; do
+    case "${package}" in
+      agg)
+        install_agg
+        ;;
+      browsh)
+        # Requries Firefox, may not be wanted on headless machines
+        [[ -z "${IS_HEADLESS:-}" ]] && install_browsh
+        ;;
+      bun)
+        install_bun
+        ;;
+      ctop)
+        install_ctop
+        ;;
+      deno)
+        install_deno
+        ;;
+      docker-compose)
+        install_docker_compose
+        ;;
+      github-cli)
+        install_github_cli
+        ;;
+      fnm)
+        install_fnm
+        ;;
+      helix)
+        install_helix
+        ;;
+      hugo)
+        install_hugo
+        ;;
+      lazydocker)
+        install_lazydocker
+        ;;
+      lazygit)
+        install_lazygit
+        ;;
+      neovim)
+        install_neovim_stable
+        ;;
+      sad)
+        install_sad
+        ;;
+      yq)
+        install_yq
+        ;;
+      zellij)
+        install_zellij
+        ;;
+      *)
+        echo_stderr "Error: Unrecognized package: ${package}"
+        exit 1
+        ;;
+    esac
+  done
+
+  echo "GitHub packages installed!"
 }
 
-main
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  install_github_packages "${@}"
+fi
