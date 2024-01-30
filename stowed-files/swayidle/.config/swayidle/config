@@ -1,0 +1,10 @@
+# vim: set ft=config
+
+# Turn off the screen after 5 minutes seconds of inactivity
+timeout 300 'swaymsg --quiet "output * dpms off"' resume 'swaymsg --quiet "output * dpms on"'
+
+# lock screen after 10 minutes
+timeout 600 'swaylock' resume 'swaymsg --quiet "output * dpms on"'
+
+# lock screen before suspending
+before-sleep 'swaylock'

@@ -1,0 +1,75 @@
+#!/bin/sh
+#
+# Records the entire screen, run again to stop recording
+# 
+# Usage:
+# wl-record-screen [...wf-recorder args]
+
+TMP_LOG_PATH="/tmp/wf-recorder.log"
+
+on_failure() {
+  log_path="${1:-/tmp/wf-recorder}.log"
+  if [ -n "$1" ]; then
+    mv --force "${TMP_LOG_PATH}" "${log_path}"
+  fi
+
+  notify-send \
+    --urgency critical \
+    --app-name "sway" \
+    "Recording failed!" "See $(echo "$log_path" | sed "s:$HOME:~:g") for details"
+}
+
+main() {
+  coords=''
+  output_dir="${XDG_DOWNLOAD_DIR:-$HOME/Downloads}"
+  pretty_output_dir="$(echo "$output_dir" | sed "s:$HOME:~:g")"
+  out_path=''
+  pid=''
+
+  pid=$(pgrep -x wf-recorder)
+
+  if ! command -v slurp > /dev/null || ! command -v wf-recorder > /dev/null; then
+    echo "slurp/wf-recorder not installed, aborting"
+    exit 1
+  fi
+
+  if [ -n "${pid}" ]; then
+    pkill --signal SIGINT wf-recorder
+    echo "Saved in ${pretty_output_dir}"
+    notify-send \
+      --urgency low \
+      --transient \
+      --expire-time 2500 \
+      --app-name "sway" \
+      --icon camera-video-symbolic \
+      -t 500 "Recording Complete" "Saved in ${pretty_output_dir}"
+    exit 0
+  fi
+
+  if [ -z "${WAYLAND_DISPLAY}" ]; then
+    echo "Not running under Wayland, aborting"
+    exit 1
+  fi
+
+  echo "Starting recording..."
+  if [ "$#" -gt 0 ]; then
+    if ! wf-recorder "$@" > "${TMP_LOG_PATH}" 2>&1; then
+      on_failure
+      exit 1
+    fi
+  else
+    coords="$(slurp -d 2>/dev/null)"
+    if [ -z "${coords}" ]; then
+      echo "Capture cancelled"
+      exit 1
+    fi
+    out_path="${output_dir}/screen-$(date +%Y-%m-%d_%H-%M-%S).mp4"
+
+    if ! wf-recorder --geometry "${coords}" -f "${out_path}" > "${TMP_LOG_PATH}" 2>&1; then
+      on_failure "${out_path}"
+      exit 1
+    fi
+  fi
+}
+
+main "$@"

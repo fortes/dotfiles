@@ -1,0 +1,60 @@
+#!/bin/bash
+#
+# Interactive window switcher for wayland
+#
+# Usage:
+# wl-switch-windows [...wf-recorder args]
+
+IFS=$'\n\t'
+
+function get_windows() {
+  swaymsg -t get_tree | jq -r '
+    recurse(.nodes[]?, .floating_nodes[]?)
+    | select(.type=="con" and .name!=null and .app_id!=null)
+    | "\(.name)\\0icon\\x1f" + (
+        if .app_id == "signal" then "signal-desktop"
+        elif .app_id | startswith("chromium") then "chromium"
+        else .app_id end | ascii_downcase)
+    '
+}
+
+function get_window_id_for_index() {
+  local index="$1"
+  swaymsg -t get_tree | jq -r '[
+    recurse(.nodes[]?, .floating_nodes[]?)
+    | select(.type=="con" and .name!=null and .app_id!=null)
+    | .id
+  ] | .['"${index}"']'
+}
+
+main() {
+  local count
+  local selected_window_id
+  local windows
+
+  if [[ -z ${WAYLAND_DISPLAY} ]]; then
+    echo "Not running under Wayland, aborting"
+    return 1
+  fi
+
+  windows="$(get_windows)"
+
+  count="$(echo "$windows" | wc -l)"
+
+  # Don't want id in the display, so grab index and then re-query to get id
+  selected_window_index=$(echo -ne "$windows" | \
+    fuzzel --dmenu --lines="${count}" --prompt "Switch to:" --index | \
+    cut -d' ' -f1
+  )
+
+  selected_window_id="$(get_window_id_for_index "${selected_window_index}")"
+
+  if [[ -n "${selected_window_id}" ]]; then
+    swaymsg "[con_id=${selected_window_id}]" focus
+  else
+    echo "Cancelled"
+    return 1
+  fi
+}
+
+main "$@"
