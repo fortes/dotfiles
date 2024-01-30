@@ -49,6 +49,9 @@ if [[ -n ${VISUAL:-} ]]; then
   export EDITOR VISUAL
 fi
 
+# Homebrew paths, etc
+source_if_exists "$HOME/.profile.brew"
+
 # Locally-installed packages belong in path
 add_to_path "$HOME/.local/bin"
 

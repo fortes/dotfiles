@@ -1,11 +1,10 @@
 #!/usr/bin/env sh
 
-FD_COMMAND="fd"
-if ! command -v "${FD_COMMAND}" > /dev/null; then
+fd_command="fd"
+if ! command -v "${fd_command}" > /dev/null; then
   # Debian uses `fdfind`
-  FD_COMMAND="fdfind"
+  fd_command="fdfind"
 fi
-export FD_COMMAND
 
 if [ "$#" -eq 0 ]; then
   # Default to matching all files
@@ -14,7 +13,7 @@ fi
 
 if git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
   git_root=$(git rev-parse --show-cdup)
-  "${FD_COMMAND}" --type file --follow --hidden --relative-path "$@" "${git_root:-.}"
+  "${fd_command}" --type file --follow --hidden --relative-path "$@" "${git_root:-.}"
 else
-  "${FD_COMMAND}" --type file --follow --relative-path "$@"
+  "${fd_command}" --type file --follow --relative-path "$@"
 fi
