@@ -66,6 +66,7 @@ ripgrep
 rsync
 shellcheck
 software-properties-common
+speedtest-cli
 ssh
 ssh-import-id
 sshfs
