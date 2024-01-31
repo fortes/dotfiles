@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Make your machine usable
+#
+# Usage: install_google_chrome
+
+set -euo pipefail
+IFS=$'\n\t'
+
+remove_default_dotfile() {
+  declare -r filename=$1
+  if [[ -f "$HOME/$filename" && ! -L "$HOME/$filename" ]]; then
+    echo "Moving default $filename"
+    mv "$HOME/$filename" "$HOME/original$filename"
+  fi
+}
+
+remove_default_dotfiles() {
+  # Debian has these two by default
+  remove_default_dotfile .bashrc
+  remove_default_dotfile .profile
+
+  # MacOS has this one by default
+  remove_default_dotfile .bash_profile
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  remove_default_dotfiles "${@}"
+fi

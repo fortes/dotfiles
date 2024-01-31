@@ -6,6 +6,9 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+declare dotfiles_root
+dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
 # Make sure not to get stuck on any prompts
 export DEBIAN_FRONTEND=noninteractive
 
@@ -27,6 +30,7 @@ apt_update_once() {
 check_prerequisites() {
   if ! command_exists apt-get; then
     echo_stderr "Only works on Debian-like systems"
+    exit 1
   fi
 
   if ! command_exists lsb_release || ! command_exists add-apt-repository; then
@@ -58,10 +62,10 @@ increase_max_watchers() {
 
 install_apt_packages() {
   declare apt_packages
-  apt_packages=$(grep -v "^#" "$dotfiles_path/scripts/apt-packages-headless")
+  apt_packages=$(grep -v "^#" "${dotfiles_root}/scripts/apt-packages-headless")
 
   if [[ -z "${IS_HEADLESS:-}" ]]; then
-    apt_packages=$(grep --no-filename -v "^#" "$dotfiles_path/scripts/apt-packages"*)
+    apt_packages=$(grep --no-filename -v "^#" "${dotfiles_root}/scripts/apt-packages"*)
   fi
 
   apt_update_once
@@ -77,14 +81,6 @@ is_package_installed() {
     return 0
   else
     return 1
-  fi
-}
-
-remove_default_dotfile() {
-  declare -r filename=$1
-  if [[ -f "$HOME/$filename" && ! -L "$HOME/$filename" ]]; then
-    echo "Moving default $filename"
-    mv "$HOME/$filename" "$HOME/original$filename"
   fi
 }
 
@@ -113,7 +109,7 @@ set_default_applications() {
 
 set_dotfiles_remote() {
   (
-    cd "$HOME/dotfiles"
+    cd "${dotfiles_root}"
     if git remote get-url "$(git remote)" | grep -q https; then
       echo "Setting dotfiles git remote"
       git remote set-url origin git@github.com:fortes/dotfiles.git
@@ -231,9 +227,8 @@ setup_shell() {
 main() {
   # Make sure to load `command_exists` helper
   # shellcheck source=../stowed-files/bash/.profile
-  . "$HOME/dotfiles/stowed-files/bash/.profile"
+  . "${dotfiles_root}/stowed-files/bash/.profile"
 
-  declare -r dotfiles_path="$HOME/dotfiles"
   declare -r local_profile_path="$HOME/.profile.local"
 
   declare apt_only=''
@@ -268,7 +263,7 @@ main() {
 
   if [[ ! -f "${local_profile_path}" ]]; then
     echo "Generating ${local_profile_path}"
-    "${dotfiles_path}/scripts/create_local_profile" > "${local_profile_path}"
+    "${dotfiles_root}/scripts/create_local_profile" > "${local_profile_path}"
   fi
 
   # shellcheck source=/dev/null
@@ -277,21 +272,19 @@ main() {
   setup_nonfree
   setup_backports
   install_apt_packages
-  "${dotfiles_path}/scripts/install_1password"
-  [[ -z "${IS_DOCKER:-}" ]] && "${dotfiles_path}/scripts/install_et"
-  [[ -z "${IS_HEADLESS:-}" ]] && "${dotfiles_path}/scripts/install_firefox"
-  "${dotfiles_path}/scripts/install_github_packages"
+  "${dotfiles_root}/scripts/install_1password"
+  [[ -z "${IS_DOCKER:-}" ]] && "${dotfiles_root}/scripts/install_et"
+  [[ -z "${IS_HEADLESS:-}" ]] && "${dotfiles_root}/scripts/install_firefox"
+  "${dotfiles_root}/scripts/install_github_packages"
 
-  # Debian ships with these two by default
-  remove_default_dotfile .bashrc
-  remove_default_dotfile .profile
-
-  "${dotfiles_path}/scripts/stow"
+  # Remove default files before stowing, otherwise stow fails
+  "${dotfiles_root}/scripts/remove_default_dotfiles"
+  "${dotfiles_root}/scripts/stow"
 
   # Misc system configs
   increase_max_watchers
-  pushd "${dotfiles_path}" > /dev/null
-  "${dotfiles_path}/scripts/lock_local_files"
+  pushd "${dotfiles_root}" > /dev/null
+  "${dotfiles_root}/scripts/lock_local_files"
   popd > /dev/null
   set_default_applications
   [[ -z "${IS_DOCKER:-}" ]] && setup_docker
@@ -299,10 +292,10 @@ main() {
   setup_locale
 
   # Non-apt package managers
-  "${dotfiles_path}/scripts/install_node_packages"
-  "${dotfiles_path}/scripts/install_python_packages"
+  "${dotfiles_root}/scripts/install_node_packages"
+  "${dotfiles_root}/scripts/install_python_packages"
 
-  "${dotfiles_path}/scripts/generate_completions"
+  "${dotfiles_root}/scripts/generate_completions"
 
   echo "Setup complete!"
 
@@ -311,4 +304,6 @@ main() {
   # - chrome / steam / wine / others that require custom stuff
 }
 
-main "${@}"
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  main "${@}"
+fi

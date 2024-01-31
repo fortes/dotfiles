@@ -3,14 +3,20 @@
 #
 # Usage: generate_completions
 
+declare dotfiles_root
+dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
 # Pick up `command_exists`
 # shellcheck source=../stowed-files/bash/.profile
-source "${HOME}/dotfiles/stowed-files/bash/.profile"
+source "${dotfiles_root}/stowed-files/bash/.profile"
 
 generate_completions() {
   declare -r completion_dir="$HOME/.local/completion.d"
-  echo -n "… Generating completions & man pages"
+  declare -r man_dir_path="$HOME/.local/share/man/man1"
   mkdir -p "${completion_dir}"
+  mkdir -p "${man_dir_path}"
+
+  echo -n "… Generating completions & man pages"
 
   if command_exists npm; then
     npm completion > "${completion_dir}/npm_completion"
@@ -22,6 +28,11 @@ generate_completions() {
 
   if command_exists gh; then
     gh completion -s bash > "${completion_dir}/gh_completion"
+  fi
+
+  if command_exists hugo; then
+    hugo completion bash > "${completion_dir}/hugo_completion"
+    hugo gen man --dir "${man_dir_path}" > /dev/null
   fi
 
   if command_exists pipx; then

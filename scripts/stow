@@ -7,10 +7,12 @@ set -euo pipefail
 IFS=$'\n\t'
 
 main() {
-  local dotfiles_path="$HOME/dotfiles"
+  local dotfiles_root
+  dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+  local stowed_files_path="${dotfiles_root}/stowed-files"
 
-  stow --dir="$dotfiles_path/stowed-files/" --target="$HOME" \
-    $(ls "$dotfiles_path/stowed-files") $@
+  stow --dir="${stowed_files_path}/" --target="$HOME" \
+    $(ls "${stowed_files_path}") $@
 }
 
 main "${@}"

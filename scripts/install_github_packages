@@ -14,6 +14,7 @@
 # - lazydocker
 # - lazygit
 # - neovim (latest)
+# - pistol
 # - sad
 # - yq
 # - zellij
@@ -39,6 +40,7 @@ AVAILABLE_PACKAGES=(
   # hugo
   lazydocker
   lazygit
+  pistol
   neovim
   sad
   yq
@@ -213,17 +215,6 @@ install_helix() {
 
 install_hugo() {
   install_deb 'gohugoio/hugo' 'hugo_extended_.*_linux-amd64.deb'
-
-  echo "Generating hugo bash completion & man pages"
-  mkdir -p "$HOME/.local/completion.d"
-  hugo completion bash > "$HOME/.local/completion.d/hugo_completion"
-  pushd "$(mktemp -d)" > /dev/null
-  hugo gen man
-  local man_dir_path="$HOME/.local/share/man/man1"
-  mkdir -p "${man_dir_path}"
-  mv man/* "${man_dir_path}"
-  popd > /dev/null
-  rm -rf "${man_dir_path}"
 }
 
 install_lazydocker() {
@@ -273,6 +264,10 @@ install_neovim_stable() {
   sudo update-alternatives --install /usr/bin/view view "${vim_path}" 110
   sudo update-alternatives --install /usr/bin/vim vim "${vim_path}" 110
   sudo update-alternatives --install /usr/bin/vimdiff vimdiff "${vim_path}" 110
+}
+
+install_pistol() {
+  install_bin 'doronbehar/pistol' 'pistol-static-linux-x86_64'
 }
 
 install_yq() {
@@ -347,6 +342,9 @@ install_github_packages() {
         ;;
       neovim)
         install_neovim_stable
+        ;;
+      pistol)
+        install_pistol
         ;;
       sad)
         install_sad

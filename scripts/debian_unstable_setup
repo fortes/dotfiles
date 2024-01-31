@@ -7,6 +7,9 @@ set -euo pipefail
 IFS=$'\n\t'
 export DEBIAN_FRONTEND=noninteractive
 
+declare dotfiles_root
+dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
 main() {
   declare -r unstable_sources_list="/etc/apt/sources.list.d/debian-unstable.list"
 
@@ -23,7 +26,7 @@ main() {
   fi
 
   echo "Installing unstable packages (requires sudo)"
-  grep -v "^#" "$HOME/dotfiles/scripts/apt-packages-unstable" | \
+  grep -v "^#" "${dotfiles_root}/scripts/apt-packages-unstable" | \
     xargs --no-run-if-empty \
     sudo -E apt-get install -qq --target-release unstable --assume-yes \
     --fix-broken --no-install-recommends

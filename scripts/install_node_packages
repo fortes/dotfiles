@@ -6,9 +6,12 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+declare dotfiles_root
+dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
 # Make sure to load `command_exists` helper as well as local paths
 # shellcheck source=../stowed-files/bash/.profile
-. "$HOME/dotfiles/stowed-files/bash/.profile"
+. "${dotfiles_root}/stowed-files/bash/.profile"
 
 install_node_packages() {
   if ! command_exists fnm; then
@@ -26,7 +29,7 @@ install_node_packages() {
   eval "$(fnm env)"
 
   echo "Installing global node packages …"
-  grep -v "^#" "${HOME}/dotfiles/scripts/node-packages" | \
+  grep -v "^#" "${dotfiles_root}/scripts/node-packages" | \
     xargs --no-run-if-empty npm install -g --fund false
 
   echo "Node packages installed!"

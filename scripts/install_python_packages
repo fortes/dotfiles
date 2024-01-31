@@ -6,9 +6,12 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+declare dotfiles_root
+dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
 # Make sure to load `command_exists` helper as well as local paths
 # shellcheck source=../stowed-files/bash/.profile
-. "$HOME/dotfiles/stowed-files/bash/.profile"
+. "${dotfiles_root}/stowed-files/bash/.profile"
 
 install_python_packages() {
   declare -r venv_path="$HOME/.local/venv"
@@ -21,7 +24,7 @@ install_python_packages() {
   echo "Installing global pipx packages …"
   # `--quiet` added to `pipx` in late 2023, waiting for version bump
   # in Debian stable
-  grep -v "^#" "$HOME/dotfiles/scripts/pipx-packages" | \
+  grep -v "^#" "${dotfiles_root}/scripts/pipx-packages" | \
     xargs --no-run-if-empty -L 1 pipx install --force
   echo "Pipx packages installed!"
 
@@ -35,7 +38,7 @@ install_python_packages() {
   . "${venv_path}/bin/activate"
 
   echo "Installing venv libraries …"
-  grep -v "^#" "$HOME/dotfiles/scripts/python-libraries" | \
+  grep -v "^#" "${dotfiles_root}/scripts/python-libraries" | \
     xargs --no-run-if-empty \
       "${venv_path}/bin/python" -m pip install --quiet --upgrade
   echo "venv libraries installed!"

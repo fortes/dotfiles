@@ -12,6 +12,7 @@ bat
 beets
 build-essential
 ca-certificates
+chafa
 cifs-utils
 curl
 dnsutils
