@@ -3,10 +3,15 @@
 # Submits listens to ListenBrainz & Libre.fm
 import datetime
 import os
-import pylast
-import pylistenbrainz
 import sys
 import time
+
+try:
+  import pylast
+  import pylistenbrainz
+except ImportError:
+  print("Must install pylast and pylistenbrainz!")
+  sys.exit(1)
 
 # Copy from https://listenbrainz.org/profile/
 listenbrainz_auth_token = os.environ.get("LISTENBRAINZ_AUTH_TOKEN")
@@ -50,8 +55,12 @@ is_new_listen = True
 
 if is_new_listen and os.path.exists("/tmp/previous-track-id.txt"):
     with open("/tmp/previous-track-id.txt") as previous_file:
-        previous_track_id = previous_file.readlines()[0].strip()
-        is_new_listen = previous_track_id != track_id
+        previous_track_lines = previous_file.readlines()
+        if len(previous_track_lines) == 0:
+            is_new_listen = True
+        else:
+          previous_track_id = previous_track_lines[0].strip()
+          is_new_listen = previous_track_id != track_id
 
 with open("/tmp/previous-track-id.txt", "w") as previous_file:
     previous_file.write(track_id)
