@@ -163,11 +163,18 @@ if ! command_exists "${FD_COMMAND}"; then
 fi
 export FD_COMMAND
 
+BAT_COMMAND="bat"
+if ! command_exists "${BAT_COMMAND}"; then
+  # Debian uses `fdfind`
+  BAT_COMMAND="batcat"
+fi
+export BAT_COMMAND
+
 fzf_preview_command=""
 if command_exists pistol; then
   fzf_preview_command="'pistol {}'"
-elif command_exists batcat; then
-  fzf_preview_command="'batcat --color always --style=grid,changes --line-range :300 {}'"
+elif command_exists "${BAT_COMMAND}"; then
+  fzf_preview_command="'${BAT_COMMAND} --color always --style=grid,changes --line-range :300 {}'"
 else
   fzf_preview_command="'cat {}'"
 fi

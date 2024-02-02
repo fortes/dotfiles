@@ -16,7 +16,7 @@ main() {
       fzf --ansi \
         --color 'hl:-1:underline,hl+:-1:underline:reverse' \
         --delimiter ':' \
-        --preview "batcat --color=always {1} --highlight-line {2}" \
+        --preview "${BAT_COMMAND} --color=always {1} --highlight-line {2}" \
         --preview-window='+{2}+3/3,~3'
     )
 
@@ -28,4 +28,4 @@ main() {
     fi
 }
 
-main "${@}"
+main "${@:-}"
