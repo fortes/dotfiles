@@ -12,9 +12,11 @@ export -f add_to_path
 source_if_exists() {
   for file in $@; do
     if [[ -f "${file}" ]]; then
+      # shellcheck source=/dev/null
       . "${file}"
     elif [[ -d "${file}" ]]; then
       for f in $(find "${file}" -type f); do
+        # shellcheck source=/dev/null
         . "${f}"
       done
     fi

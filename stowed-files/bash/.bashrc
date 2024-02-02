@@ -132,6 +132,7 @@ if [ -r "${git_prompt_location}" ]; then
   export GIT_PS1_SHOWUNTRACKEDFILES=1
   # Suppress prompt when within an ignored dir
   export GIT_PS1_HIDE_IF_PWD_IGNORED=1
+  # shellcheck source=/dev/null
   source "${git_prompt_location}"
   export PROMPT_COMMAND="$PROMPT_COMMAND; __git_ps1 \"$BASE_PROMPT\" \" \${HAS_JOBS:+$JOB_COUNT }\" \" %s$RESET\""
 fi
@@ -155,13 +156,14 @@ else
   fzf_preview_command="'cat {}'"
 fi
 
-# $FZF_DEFAULT_COMMAND is executed with `sh -c`, so need to be careful with
-# POSIX compliance
-if command_exists fdfind; then
+if command_exists "${fd_command}"; then
   # Use `fd` when possible for far better performance
-  export FZF_DEFAULT_COMMAND='bash -c "fdfind --type file --follow . \$(git rev-parse --show-cdup 2>/dev/null && echo --hidden)"'
-  export FZF_CTRL_T_COMMAND="fd_with_git --color always"
-  export FZF_ALT_C_COMMAND='fdfind --type directory --hidden --color always'
+  #
+  # $FZF_DEFAULT_COMMAND is executed with `sh -c`, so need to be careful with
+  # POSIX compliance
+  export FZF_DEFAULT_COMMAND="bash -c 'source ~/.profile && fd_with_git'"
+  export FZF_CTRL_T_COMMAND="fd_with_git"
+  export FZF_ALT_C_COMMAND="${fd_command} --type directory --hidden --color always"
 fi
 if command_exists exa; then
   # Show tree structure in preview window
