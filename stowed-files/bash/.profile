@@ -2,21 +2,23 @@
 
 # Add path if not present
 add_to_path() {
-  if echo ":$PATH:" | grep -vq ":$@:"; then
-    export PATH="$@:$PATH"
+  if echo ":$PATH:" | grep -vq ":$*:"; then
+    export PATH="$*:$PATH"
   fi
 }
 export -f add_to_path
 
 # Source file only if it exists
 source_if_exists() {
-  for file in $@; do
+  for file in "$@"; do
     if [[ -f "${file}" ]]; then
+      # shellcheck source=/dev/null
       . "${file}"
     elif [[ -d "${file}" ]]; then
-      for f in $(find "${file}" -type f); do
+      while IFS= read -r -d $'\0' f; do
+        # shellcheck source=/dev/null
         . "${f}"
-      done
+      done < <(find "${file}" -type f -print0)
     fi
   done
 }
@@ -27,18 +29,6 @@ command_exists() {
   command -v "$1" &> /dev/null
 }
 export -f command_exists
-
-is_inside_git_repo() {
-  git rev-parse --is-inside-work-tree &> /dev/null
-}
-export -f is_inside_git_repo
-
-fd_with_git() {
-  # Show hidden files only when in a git repository
-  fdfind --type file --follow \
-    $(is_inside_git_repo && echo . "$(git rev-parse --show-cdup)" --hidden) $@
-}
-export -f fd_with_git
 
 if [[ -n "${LISTENBRAINZ_AUTH_TOKEN:-}" ]]; then
   # scrobbling requires `pylistenbrainz`, not available in Debian so need venv

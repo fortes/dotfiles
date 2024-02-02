@@ -10,6 +10,7 @@ esac
 set -o vi
 
 # Make sure we have always loaded ~/.profile, which can get lost
+# shellcheck source=/dev/null
 source "$HOME/.profile"
 
 # make less more friendly for non-text input files, see lesspipe(1)
@@ -77,17 +78,23 @@ shopt -s nocaseglob nocasematch
 shopt -s progcomp_alias
 # }}}
 
+# shellcheck disable=SC2034
 BLACK="\[$(tput setaf 0)\]"
 RED="\[$(tput setaf 1)\]"
 GREEN="\[$(tput setaf 2)\]"
 YELLOW="\[$(tput setaf 3)\]"
 BLUE="\[$(tput setaf 4)\]"
+# shellcheck disable=SC2034
 MAGENTA="\[$(tput setaf 5)\]"
 CYAN="\[$(tput setaf 6)\]"
+# shellcheck disable=SC2034
 WHITE="\[$(tput setaf 7)\]"
 BOLD="\[$(tput bold)\]"
+# shellcheck disable=SC2034
 DIM="\[$(tput dim)\]"
+# shellcheck disable=SC2034
 UNDERLINE="\[$(tput smul)\]"
+# shellcheck disable=SC2034
 STANDOUT="\[$(tput smso)\]"
 RESET="\[$(tput sgr0)\]"
 
@@ -132,6 +139,7 @@ if [ -r "${git_prompt_location}" ]; then
   export GIT_PS1_SHOWUNTRACKEDFILES=1
   # Suppress prompt when within an ignored dir
   export GIT_PS1_HIDE_IF_PWD_IGNORED=1
+  # shellcheck source=/dev/null
   source "${git_prompt_location}"
   export PROMPT_COMMAND="$PROMPT_COMMAND; __git_ps1 \"$BASE_PROMPT\" \" \${HAS_JOBS:+$JOB_COUNT }\" \" %s$RESET\""
 fi
@@ -148,6 +156,13 @@ if command_exists zoxide; then
   eval "$(zoxide init bash --hook pwd)"
 fi
 
+FD_COMMAND="fd"
+if ! command_exists "${FD_COMMAND}"; then
+  # Debian uses `fdfind`
+  FD_COMMAND="fdfind"
+fi
+export FD_COMMAND
+
 fzf_preview_command=""
 if command_exists batcat; then
   fzf_preview_command="'batcat --color always --style=grid,changes --line-range :300 {}'"
@@ -155,13 +170,14 @@ else
   fzf_preview_command="'cat {}'"
 fi
 
-# $FZF_DEFAULT_COMMAND is executed with `sh -c`, so need to be careful with
-# POSIX compliance
-if command_exists fdfind; then
+if command_exists "${FD_COMMAND}"; then
   # Use `fd` when possible for far better performance
-  export FZF_DEFAULT_COMMAND='bash -c "fdfind --type file --follow . \$(git rev-parse --show-cdup 2>/dev/null && echo --hidden)"'
-  export FZF_CTRL_T_COMMAND="fd_with_git --color always"
-  export FZF_ALT_C_COMMAND='fdfind --type directory --hidden --color always'
+  #
+  # $FZF_DEFAULT_COMMAND is executed with `sh -c`, so need to be careful with
+  # POSIX compliance
+  export FZF_DEFAULT_COMMAND="fd_with_git"
+  export FZF_CTRL_T_COMMAND="fd_with_git"
+  export FZF_ALT_C_COMMAND="${FD_COMMAND} --type directory --hidden --color always"
 fi
 if command_exists exa; then
   # Show tree structure in preview window
