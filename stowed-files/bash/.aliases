@@ -52,13 +52,22 @@ if [[ -x ~/.local/bin/docker-compose ]]; then
   alias docker-compose="sudo ~/.local/bin/docker-compose"
 fi
 
-if command_exists exa; then
+# exa deprecated, eza the fork
+if command_exists eza; then
+  # Use eza if available
+  alias ls='eza --group-directories-first --classify'
+  alias la='eza --all --group-directories-first --classify'
+  alias ll='eza --header --git --long --group-directories-first --classify'
+  alias ltree='eza --header --git --long --tree --level=2 --group-directories-first --classify'
+  alias exa='eza'
+elif command_exists exa; then
   # Use exa if available
   alias ls='exa --group-directories-first --classify'
   alias la='exa --all --group-directories-first --classify'
   alias ll='exa --header --git --long --group-directories-first --classify'
   alias ltree='exa --header --git --long --tree --level=2 --group-directories-first --classify'
-else
+  alias eza='exa'
+elif uname | grep -qv Darwin; then
   # Map ls to be colorful and reasonable defaults
   alias ls='ls --color=auto -pFhv --quoting-style=shell-escape'
   alias la='ls --color=auto -ApFhv'
