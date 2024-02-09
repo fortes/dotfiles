@@ -164,7 +164,9 @@ fi
 export FD_COMMAND
 
 fzf_preview_command=""
-if command_exists batcat; then
+if command_exists pistol; then
+  fzf_preview_command="'pistol {}'"
+elif command_exists batcat; then
   fzf_preview_command="'batcat --color always --style=grid,changes --line-range :300 {}'"
 else
   fzf_preview_command="'cat {}'"
