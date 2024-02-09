@@ -5,7 +5,11 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-main() {
+# Make sure to load `command_exists` helper
+# shellcheck source=/dev/null
+. ~/.profile
+
+playerctl_status() {
   local play_status
 
   play_status=$(playerctl status -p cmus 2>&1 || echo)
@@ -29,4 +33,34 @@ main() {
   fi
 }
 
-main "${@}"
+cmus_status() {
+  local cmus_status
+  cmus_status=$(cmus-remote -Q 2>&1 || echo)
+  if echo "${cmus_status}" | grep -qi "not running"; then
+    return
+  fi
+
+  local artist
+  local title
+  local album
+
+  artist=$(echo "${cmus_status}" | grep -i '^tag artist ' | cut -d ' ' -f 3-)
+  title=$(echo "${cmus_status}" | grep -i '^tag title ' | cut -d ' ' -f 3-)
+  album=$(echo "${cmus_status}" | grep -i '^tag album ' | cut -d ' ' -f 3-)
+  albumArtist=$(echo "${cmus_status}" | grep -i '^tag albumartist ' | cut -d ' ' -f 3-)
+
+  if echo "${cmus_status}" | grep -qi "status playing"; then
+    echo "${artist} ▸ ${title}  "
+  else
+    echo "${albumArtist} ♪ ${album}  "
+  fi
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  # playerctl not available on MacOS
+  if command_exists playerctl; then
+    playerctl_status "${@}"
+  elif command_exists cmus-remote; then
+    cmus_status "${@}"
+  fi
+fi

@@ -21,19 +21,20 @@ main() {
   fi
 
   if [[ ! -f /tmp/cmus-status.txt ]]; then
-    echo "No cmus status file found"
+    echo "No cmus status file found, removing background"
+    clear_background
     return
   fi
 
-  local status="$(sed -n 1p /tmp/cmus-status.txt)"
+  status="$(sed -n 1p /tmp/cmus-status.txt)"
   if [[ "${status}" == "stopped" ]]; then
     echo 'cmus stopped, removing background'
     clear_background
     return
   fi
 
-  local album_dirpath="$(sed -n 7p /tmp/cmus-status.txt | xargs -0 dirname)"
-  local previous_dirpath="$(cat "${previous_folder_path}" 2>/dev/null || true)"
+  album_dirpath="$(sed -n 7p /tmp/cmus-status.txt | xargs -0 dirname)"
+  previous_dirpath="$(cat "${previous_folder_path}" 2>/dev/null || true)"
   echo "${album_dirpath}" > /tmp/cmus-album-folder-path.txt
 
   if [[ "${album_dirpath}" == "${previous_dirpath}" ]]; then
@@ -41,11 +42,11 @@ main() {
     return
   fi
 
-  local art_path=$(ls "${album_dirpath}"/folder.* 2> /dev/null | head -n 1)
-  if [[ $? != 0 ]] || [[ -z "${art_path}" ]]; then
+  art_path=$(find "${album_dirpath}" -type f -name "folder.*" 2> /dev/null | head -n 1)
+  if [[ ! -f "${art_path}" ]]; then
     echo "album art file not found in ${album_dirpath}, exiting"
     clear_background
-    return
+    return 1
   fi
 
   local resolution="$(xrandr | grep \* | awk '{print $1}' | head -n 1)"

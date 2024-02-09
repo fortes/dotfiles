@@ -6,12 +6,12 @@ set -o nounset
 set -o pipefail
 
 # shellcheck disable=SC2016
-BEET_FORMAT_STRING='$mb_albumid $albumartist - [$original_year] $album%aunique{albumartist album original_year, albumtype albumdisambig label year catalognum}'
+BEET_FORMAT_STRING='$mb_albumid $albumartist - [$original_year] $album%aunique{albumartist album original_year, albumtype albumdisambig label year catalognum} ($genre)'
 
 main() {
   cmus_status=$(cmus-remote -Q)
   album_ids=$(beet ls -f"$BEET_FORMAT_STRING" -a "$@" added- albumartist+ | \
-    fzf --multi -1 -0 --with-nth 2.. | awk '{print $1}')
+    fzf --height 40% --layout=reverse --multi -1 -0 --with-nth 2.. | awk '{print $1}')
 
   if [ -z "$album_ids" ]; then
     echo "No albums found"
@@ -48,7 +48,7 @@ main() {
 
 if cmus-remote -Q > /dev/null 2>&1; then
   if [[ -z "$*" ]]; then
-    main "added:-1w.."
+    main "added:-2w.."
   else
     main "$@"
   fi

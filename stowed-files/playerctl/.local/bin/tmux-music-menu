@@ -5,13 +5,21 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-main() {
+# Make sure to load `command_exists` helper
+# shellcheck source=/dev/null
+. ~/.profile
+
+playerctl_menu() {
   local play_status
   local title
   local artist
   local album
 
-  play_status=$(playerctl status 2>&1 || echo)
+  local previous_command
+  local toggle_command
+  local next_command
+
+  play_status=$(playerctl -p cmus status 2>&1 || echo)
   if echo "${play_status}" | grep -qiE '(no players found|stopped)'; then
     tmux display-message "Not playing music"
     return
@@ -22,12 +30,68 @@ main() {
   title=$(playerctl metadata xesam:title)
   genre=$(playerctl metadata xesam:genre)
 
+  previous_command="music-control previous"
+  toggle_command="music-control toggle"
+  next_command="music-control next"
+
   if echo "${play_status}" | grep -qi "playing"; then
     verb="Pause"
   else
     verb="Play"
   fi
 
+  artist="${artist}" \
+    album="${album}" \
+    title="${title}" \
+    genre="${genre}" \
+    previous_command="${previous_command}" \
+    toggle_command="${toggle_command}" \
+    next_command="${next_command}" \
+    display_menu
+}
+
+cmus_menu() {
+  local play_status
+  local title
+  local artist
+  local album
+
+  local previous_command
+  local toggle_command
+  local next_command
+
+  cmus_status=$(cmus-remote -Q 2>&1 || echo)
+  if echo "${cmus_status}" | grep -qi "not running"; then
+    tmux display-message "Not playing music"
+    return
+  fi
+
+  artist=$(echo "${cmus_status}" | grep -i '^tag artist ' | cut -d ' ' -f 3-)
+  title=$(echo "${cmus_status}" | grep -i '^tag title ' | cut -d ' ' -f 3-)
+  album=$(echo "${cmus_status}" | grep -i '^tag album ' | cut -d ' ' -f 3-)
+  genre=$(echo "${cmus_status}" | grep -i '^tag genre ' | cut -d ' ' -f 3-)
+
+  previous_command="cmus-remote --prev"
+  toggle_command="cmus-remote --pause"
+  next_command="cmus-remote --next"
+
+  if echo "${cmus_status}" | grep -qi "^status playing"; then
+    verb="Pause"
+  else
+    verb="Play"
+  fi
+
+  artist="${artist}" \
+    album="${album}" \
+    title="${title}" \
+    genre="${genre}" \
+    previous_command="${previous_command}" \
+    toggle_command="${toggle_command}" \
+    next_command="${next_command}" \
+    display_menu
+}
+
+display_menu() {
   tmux display-menu -T "#[fg=cyan]cmus" -x R -y S \
     "" \
     "-Title    #[nodim align=right]${title:0:60}" "" "" \
@@ -35,12 +99,18 @@ main() {
     "-Album    #[nodim align=right]${album:0:60}" "" "" \
     "-Genre    #[nodim align=right]${genre:0:60}" "" "" \
     "" \
-    "Previous" "z" "run-shell -b 'playerctl previous'" \
-    "${verb}" "c" "run-shell -b 'playerctl play-pause'" \
-    "Next" "b" "run-shell -b 'playerctl next'" \
+    "Previous" "z" "run-shell -b '${previous_command}'" \
+    "${verb}" "c" "run-shell -b '${toggle_command}'" \
+    "Next" "b" "run-shell -b '${next_command}'" \
     "" \
     "Close" "q" ""
-  }
+}
 
-main "${@}"
-
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  # playerctl not available on MacOS
+  if command_exists playerctl; then
+    playerctl_menu "${@}"
+  elif command_exists cmus-remote; then
+    cmus_menu "${@}"
+  fi
+fi
