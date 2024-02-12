@@ -7,6 +7,8 @@
 # - ctop
 # - deno
 # - docker-compose
+# - fnm
+# - fx
 # - github cli
 # - fnm
 # - helix
@@ -33,6 +35,7 @@ AVAILABLE_PACKAGES=(
   deno
   docker-compose
   fnm
+  fx
   # Bookworm tracking recent version already, can use apt
   # github_cli
   helix
@@ -202,6 +205,10 @@ install_fnm() {
   install_zip 'Schniz/fnm' 'fnm-linux.zip'
 }
 
+install_fx() {
+  install_bin 'antonmedv/fx' 'fx_linux_amd64'
+}
+
 install_helix() {
   local url
   url="$(get_latest_release_url 'helix-editor/helix' 'x86_64.AppImage')"
@@ -327,6 +334,9 @@ install_github_packages() {
         ;;
       fnm)
         install_fnm
+        ;;
+      fx)
+        install_fx
         ;;
       helix)
         install_helix
