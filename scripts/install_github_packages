@@ -6,6 +6,7 @@
 # - bun
 # - ctop
 # - deno
+# - difftastic
 # - docker-compose
 # - fnm
 # - fx
@@ -33,6 +34,7 @@ AVAILABLE_PACKAGES=(
   bun
   ctop
   deno
+  difftastic
   docker-compose
   fnm
   fx
@@ -123,8 +125,10 @@ install_deb() {
 install_tarball() {
   local repo="${1}"
   local match="${2}"
-  local name
-  name="$(basename "${repo}")"
+  local name="${3:-}"
+  if [[ -z "${name}" ]]; then
+    name="$(basename "${repo}")"
+  fi
 
   local url
   url="$(get_latest_release_url "${repo}" "${match}")"
@@ -191,6 +195,10 @@ install_ctop() {
 
 install_deno() {
   install_zip 'denoland/deno' 'deno-x86_64-unknown-linux-gnu.zip'
+}
+
+install_difftastic() {
+  install_tarball 'wilfred/difftastic' 'difft-x86_64-unknown-linux-gnu.tar.gz' 'difft'
 }
 
 install_docker_compose() {
@@ -325,6 +333,9 @@ install_github_packages() {
         ;;
       deno)
         install_deno
+        ;;
+      difftastic)
+        install_difftastic
         ;;
       docker-compose)
         install_docker_compose
