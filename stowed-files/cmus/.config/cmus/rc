@@ -38,4 +38,4 @@ set format_treewin=  %l [%y]
 set format_treewin_artist=%a
 
 # Handy filters
-fset this_year=originaldate=2023
+fset this_year=originaldate=2024
