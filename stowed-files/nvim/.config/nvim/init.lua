@@ -59,11 +59,15 @@ require("lazy").setup({
           -- <C-]> automapped via `tagfunc`
         end
         if client.server_capabilities.referencesProvider then
+          -- `gr` soon to be in default keymaps
+          -- https://github.com/neovim/neovim/pull/28500
           map('n', 'gr', '<cmd>lua vim.lsp.buf.references()<cr>')
           map('n', 'gR', '<cmd>Telescope lsp_references<cr>')
         end
         if client.server_capabilities.renameProvider then
-          map('n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<cr>')
+          -- `crn` soon to be in default keymaps
+          -- https://github.com/neovim/neovim/pull/28500
+          map('n', 'crn', '<cmd>lua vim.lsp.buf.rename()<cr>')
         end
         if client.server_capabilities.hoverProvider then
           map('n', 'gh', '<cmd>lua vim.lsp.buf.hover()<cr>')
@@ -76,9 +80,15 @@ require("lazy").setup({
         end
         if client.server_capabilities.signatureHelpProvider then
           map('n', 'g?', '<cmd>lua vim.lsp.buf.signature_help()<cr>')
+          -- `<C-S>` soon to be in default keymaps
+          -- https://github.com/neovim/neovim/pull/28500
+          map('i', '<C-s>', '<cmd>lua vim.lsp.buf.signature_help()<cr>')
         end
         if client.server_capabilities.codeActionProvider then
-          map('n', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<cr>')
+          -- `crr` soon to be in default keymaps
+          -- https://github.com/neovim/neovim/pull/28500
+          map('n', 'crr', '<cmd>lua vim.lsp.buf.code_action()<cr>')
+          map('v', 'crr', '<cmd>lua vim.lsp.buf.code_action()<cr>')
         end
         if client.server_capabilities.documentFormattingProvider then
           map('n', '<leader>f', '<cmd>lua vim.lsp.buf.format({async = false})<cr>')
