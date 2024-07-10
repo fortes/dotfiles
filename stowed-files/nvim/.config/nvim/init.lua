@@ -317,18 +317,6 @@ require("lazy").setup({
     },
   },
 
-  -- Enable spellchecking in buffers that use Treesitter
-  {
-    'lewis6991/spellsitter.nvim',
-    dependencies = {
-      'nvim-treesitter/nvim-treesitter'
-    },
-    config = function()
-      -- Can also be a list of filetypes
-      require('spellsitter').setup({enable = true})
-    end
-  },
-
   -- Indentation guides
   {
     'lukas-reineke/indent-blankline.nvim',
