@@ -107,7 +107,7 @@ require("lazy").setup({
           })
         end
         if client.server_capabilities.documentRangeFormattingProvider then
-          map('v', '<leader>f', '<cmd>lua vim.lsp.buf.range_formatting()<cr>')
+          map('v', '<leader>f', '<cmd>lua vim.lsp.buf.format({async = false})<cr>')
         end
         if client.server_capabilities.documentSymbolProvider then
           map('n', '<leader>ds', '<cmd>Telescope lsp_document_symbols<cr>')
