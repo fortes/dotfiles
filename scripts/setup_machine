@@ -97,7 +97,7 @@ set_default_applications() {
 
   if command_exists firefox && ! update-alternatives --query  x-www-browser | grep ^Value | grep -q firefox; then
     echo "Setting Firefox as default browser (requires sudo)"
-    sudo update-alternatives --set x-www-browser "$(command -v firefox)"
+    sudo update-alternatives --install /usr/bin/x-www-browser x-www-browser "$(command -v firefox)" 60
     xdg-settings set default-web-browser firefox.desktop
   fi
 
