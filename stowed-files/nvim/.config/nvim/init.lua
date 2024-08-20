@@ -189,7 +189,6 @@ require("lazy").setup({
     end
   },
 
-
   -- Show LSP progress in lower right
   {
     'j-hui/fidget.nvim',

@@ -599,15 +599,29 @@ augroup filetype_tweaks
 
   " Use prettier to autoformat (gq in Visual mode)
   if executable('prettier')
-    autocmd FileType javascript setlocal formatprg=prettier\ --parser\ flow
-    autocmd FileType typescript,typescript.tsx setlocal formatprg=prettier\ --parser\ typescript
+    autocmd FileType javascript setlocal formatprg=prettier
+
+    autocmd FileType typescript,typescript.tsx
+      \ setlocal formatprg=prettier\ --parser\ typescript
+
     autocmd FileType json setlocal formatprg=prettier\ --parser\ json
 
     autocmd FileType css,less setlocal formatprg=prettier\ --parser\ css
+
     autocmd FileType html setlocal formatprg=prettier\ --parser\ html
 
     autocmd FileType markdown setlocal formatprg=prettier\ --parser\ markdown
+
     autocmd FileType yaml setlocal formatprg=prettier\ --parser\ yaml
+
+    " Use `formatprg` for `formatexpr` wherever we use `prettier`
+    autocmd FileType javascript setlocal formatexpr=
+    autocmd FileType typescript,typescript.tsx setlocal formatexpr=
+    autocmd FileType json setlocal formatexpr=
+    autocmd FileType css,less setlocal formatexpr=
+    autocmd FileType html setlocal formatexpr=
+    autocmd FileType markdown setlocal formatexpr=
+    autocmd FileType yaml setlocal formatexpr=
   endif
 
   if executable('ruff')
