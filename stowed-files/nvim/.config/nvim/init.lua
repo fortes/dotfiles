@@ -564,6 +564,9 @@ require("lazy").setup({
           map('n', '<leader>hS', ':Gitsigns undo_stage_hunk<CR>')
           -- <leader>hP Preview current hunk
           map('n', '<leader>hP', ':Gitsigns preview_hunk<CR>')
+          -- <leader>hr Restore current hunk
+          map('n', '<leader>hr', ':Gitsigns reset_hunk<CR>')
+          map('v', '<leader>hr', ':Gitsigns reset_hunk<CR>')
 
           -- Toggle options
           -- <leader>gB show blame for current line
