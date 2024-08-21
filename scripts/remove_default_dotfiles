@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Make your machine usable
+# Remove the default OS-provided dotfiles so stow can use their location
 #
-# Usage: install_google_chrome
+# Usage: remote_default_dotfiles
 
 set -euo pipefail
 IFS=$'\n\t'

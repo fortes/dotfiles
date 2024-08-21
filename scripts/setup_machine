@@ -107,16 +107,6 @@ set_default_applications() {
   fi
 }
 
-set_dotfiles_remote() {
-  (
-    cd "${dotfiles_root}"
-    if git remote get-url "$(git remote)" | grep -q https; then
-      echo "Setting dotfiles git remote"
-      git remote set-url origin git@github.com:fortes/dotfiles.git
-    fi
-  )
-}
-
 setup_backports() {
   declare -r codename="$(lsb_release -cs | tail -n 1)"
 
@@ -259,7 +249,7 @@ main() {
 
   check_prerequisites
   setup_shell
-  set_dotfiles_remote
+  "${dotfiles_root}/scripts/set_dotfiles_remote"
 
   if [[ ! -f "${local_profile_path}" ]]; then
     echo "Generating ${local_profile_path}"

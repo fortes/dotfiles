@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# Make your machine usable
+#
+# Usage: set_dotfiles_remote
+
+set -euo pipefail
+IFS=$'\n\t'
+
+declare dotfiles_root
+dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+set_dotfiles_remote() {
+  (
+    cd "${dotfiles_root}"
+    if git remote get-url "$(git remote)" | grep -q https; then
+      echo "Setting dotfiles git remote"
+      git remote set-url origin git@github.com:fortes/dotfiles.git
+    fi
+  )
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  set_dotfiles_remote "${@}"
+fi
