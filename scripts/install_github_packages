@@ -141,7 +141,7 @@ install_tarball() {
   pushd "${download_dir}" > /dev/null
   wget --quiet -O "${name}.tar.gz" "${url}"
   echo -n "Expanding ${name}.tar.gz ... "
-  tar xzvf "${name}.tar.gz"
+  tar xzvf "${name}.tar.gz"> /dev/null
   mv "${name}" "${install_location}/${name}"
   chmod 755 "${install_location}/${name}"
   popd > /dev/null
