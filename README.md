@@ -50,8 +50,10 @@ Once you've run setup, you'll still have to do the following manual steps:
    Alternatively, try using the command line `op` to get the keys:
 
    ```sh
-   op item get SSH_KEY_ITEM_ID --fields "private key" > ~/.ssh/xxx &&
+   op item get SSH_KEY_ITEM_ID --fields "private key" --reveal > ~/.ssh/xxx &&
    op item get SSH_KEY_ITEM_ID --fields "public key" > ~/.ssh/xxx.pub
+   # Private key has quotes around it, so need to remove them before this next step
+   ssh-keygen -p -f ~/.ssh/xxx
    chmod 400 ~/.ssh/xxx*
    ```
 
@@ -97,7 +99,7 @@ TODO: Automate these steps.
   - Enable in private mode
   - Enable cloud storage mode. Should do the following, but doesn't always work:
     - Enable annoyances filters
-    - Add [Bypass paywalls clean filter](https://gitlab.com/magnolia1234/bypass-paywalls-clean-filters/-/raw/main/bpc-paywall-filter.txt)
+    - Add [Bypass paywalls clean filter](https://gitflic.ru/project/magnolia1234/bypass-paywalls-clean-filters)
 
 ### Debian
 
@@ -138,9 +140,16 @@ The Bullseye to Bookworm upgrade requires a few manual steps that I'm too lazy t
 
 ### Chromebook
 
-- Setup Phone Smart Lock & PIN unlock
-- Enable Linux, run `setup_machine`
-- Share `Downloads` folder with Linux
+- Do setup via phone, should copy over everything
+- Set local device password and PIN for quicker local login
+- Extensions, settings, and play store apps should automatically sync
+  - Night light might need to be manually set up?
+- Chrome Extension Setup
+  - 1Password: Login to account
+  - uBlock Origin: Need to enable cloud sync and copy over settings
+- Enable Linux, choose a larger disk size (20GB fine?). Double check which debian version it is via `lsb_release -a` (should be `bookworm`)
+- Run `setup_machine`
+- Share `Downloads` folder with Linux, then symlink via `ln -s /mnt/chromeos/MyFiles/Downloads ~/downloads`
 
 ### Windows
 
