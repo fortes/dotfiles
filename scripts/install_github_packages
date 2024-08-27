@@ -19,6 +19,7 @@
 # - neovim (latest)
 # - pistol
 # - sad
+# - wezterm
 # - yq
 # - zellij
 #
@@ -48,6 +49,7 @@ AVAILABLE_PACKAGES=(
   pistol
   neovim
   sad
+  wezterm
   yq
   zellij
 )
@@ -116,7 +118,7 @@ install_deb() {
   download_dir="$(mktemp --directory "${name}"XXX)"
   pushd "${download_dir}" > /dev/null
   wget --quiet -O "${name}.deb" "${url}"
-  echo -n "Installing ${repo} (requires sudo) ... "
+  echo "Installing ${repo} (requires sudo) ... "
   sudo dpkg -i "${name}.deb"
   popd > /dev/null
   rm -rf "${download_dir}"
@@ -285,6 +287,10 @@ install_pistol() {
   install_bin 'doronbehar/pistol' 'pistol-static-linux-x86_64'
 }
 
+install_wezterm() {
+  install_deb 'wez/wezterm' 'wezterm-.*.Debian12.deb'
+}
+
 install_yq() {
   install_bin 'mikefarah/yq' 'yq_linux_amd64'
 }
@@ -369,6 +375,9 @@ install_github_packages() {
         ;;
       sad)
         install_sad
+        ;;
+      wezterm)
+        install_wezterm
         ;;
       yq)
         install_yq

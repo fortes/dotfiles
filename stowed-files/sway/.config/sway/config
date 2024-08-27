@@ -210,7 +210,7 @@ bindsym $mod+Shift+n exec swaync-client -t
 
 # App-specific tweaks
 for_window [app_id="pavucontrol"] floating enable
-for_window [app_id="(?i)foot|(alacr|k)itty"] border pixel 0
+for_window [app_id="(?i)foot|(alacr|k)itty|(wez|ml)term"] border pixel 0
 for_window [app_id="(?i)firefox"] border pixel 0
 for_window [app_id="(?i)signal"] border pixel 0
 for_window [app_id="(?i)chromium"] border pixel 0
