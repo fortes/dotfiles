@@ -29,6 +29,7 @@ export IS_HEADLESS="${is_headless:-}"
 # export ENABLE_GITHUB_COPILOT=1
 
 # Used for 'llm' command
+# export ANTHROPIC_API_KEY="xxxxxx"
 # export OPENAI_API_KEY="xxxxxx"
 
 # Add machine-specific items below
