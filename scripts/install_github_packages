@@ -377,7 +377,7 @@ install_github_packages() {
         install_sad
         ;;
       wezterm)
-        install_wezterm
+        [[ -z "${IS_HEADLESS:-}" ]] && install_wezterm
         ;;
       yq)
         install_yq
