@@ -73,7 +73,8 @@ sshfs
 stow
 sudo
 tig
-tmux
+# Pick up tmux 3.4 which has sixel support
+tmux/bookworm-backports
 trash-cli
 unzip
 vifm
