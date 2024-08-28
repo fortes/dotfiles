@@ -168,6 +168,13 @@ set signcolumn=auto:1-3
 " Open new split panes to right and bottom, which feels more natural
 set splitbelow
 set splitright
+" Keep text in the middle of the screen when splitting
+set splitkeep=screen
+
+" Status line always visible at the bottom of the screen
+if has('nvim-0.7')
+  set laststatus=3
+endif
 
 " Reasonable tab completion
 set wildmode=full

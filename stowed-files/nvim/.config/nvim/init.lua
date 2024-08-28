@@ -337,22 +337,6 @@ require("lazy").setup({
     }
   },
 
-  -- Generate code annotations, e.g. JSDoc
-  {
-    'danymat/neogen',
-    dependencies = {
-      'nvim-treesitter/nvim-treesitter'
-    },
-    config = function()
-      require('neogen').setup {
-        enabled = true
-      }
-
-      local opts = {noremap = true, silent = true}
-      vim.api.nvim_set_keymap("n", "<Leader>nf", ":lua require('neogen').generate()<cr>", opts)
-    end
-  },
-
   -- Split or Join blocks of code
   {
     'Wansmer/treesj',
@@ -546,6 +530,10 @@ require("lazy").setup({
           end
 
           -- Toggle staging
+          -- <leader>hs next hunk
+          map('n', '<leader>hn', ':Gitsigns prev_hunk<CR>')
+          -- <leader>hs previous hunk
+          map('n', '<leader>hp', ':Gitsigns next_hunk<CR>')
           -- <leader>hs Stage current hunk
           map('n', '<leader>hs', ':Gitsigns stage_hunk<CR>')
           -- <leader>hS Unstage current hunk
@@ -709,6 +697,12 @@ require("lazy").setup({
     end,
     -- Since only using for syntax for now, don't do full setup
     -- build = ':GoUpdateBinaries'
+  },
+
+  -- Better UX for built-in vim UI like input and select
+  {
+    'stevearc/dressing.nvim',
+    opts = {},
   },
 
   -- Show colors in actual color
