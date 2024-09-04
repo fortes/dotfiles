@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+# Swap color scheme between light and dark in `tmux`
+#
+# Usage: toggle-color-scheme [light|dark]
+set -euo pipefail
+
+main() {
+  local new_theme
+  new_theme="${1:-}"
+
+  if [[ -z "${new_theme}" ]]; then
+    if [[ "$(tmux show-environment -g COLOR_THEME | cut -d= -f2-)" == "light" ]]; then
+      new_theme="dark"
+    else
+      new_theme="light"
+    fi
+  elif  [[ "${new_theme}" != "light" && "${new_theme}" != "dark" ]]; then
+    echo "Error: Invalid theme. Use 'light' or 'dark'." >&2
+    exit 1
+  fi
+
+  echo -n "Setting color scheme to ${new_theme}..."
+
+  # Colorscheme scripts have unbound variables
+  set +u
+  if [[ "${new_theme}" == "light" ]]; then
+    # shellcheck source=../../../../scripts/base16-default-light.sh
+    . ~/dotfiles/scripts/base16-default-light.sh
+  else
+    # shellcheck source=../../../../scripts/base16-default-dark.sh
+    . ~/dotfiles/scripts/base16-default-dark.sh
+  fi
+  set -u
+
+  update_tmux_colors "${new_theme}"
+  update_cmus_colors "${new_theme}"
+  update_neovim_colors "${new_theme}"
+
+  echo "done!"
+}
+
+# Check if cmus is running and update its colors if so
+update_cmus_colors() {
+  local new_theme
+  new_theme="${1:-}"
+
+  if pgrep -x cmus > /dev/null; then
+    if [[ "${new_theme}" == "light" ]]; then
+      cmus-remote -C "colorscheme xterm-white"
+    else
+      cmus-remote -C "colorscheme spotify"
+    fi
+  fi
+}
+
+# Check if neovim is running and update its colors if so
+update_neovim_colors() {
+  local new_theme
+  local neovim_socket_dir
+
+  new_theme="${1:-}"
+  neovim_socket_dir="$(dirname "$(nvim --headless -c 'echo v:servername' +qa 2>&1)")"
+
+  if [[ "${neovim_socket_dir}" != "${XDG_RUNTIME_DIR:-}" ]]; then
+    # Mac has a directory per process it seems
+    neovim_socket_dir="$(dirname "${neovim_socket_dir}")"
+  fi
+
+  if [[ ! -d "${neovim_socket_dir}" ]]; then
+    return
+  fi
+
+  # Change colorscheme of all neovim instances
+  while IFS= read -r socket; do
+    if [[ "${new_theme}" == "light" ]]; then
+      nvim --server "${socket}" --remote-send "<Esc>:colorscheme dayfox<cr>"
+    else
+      nvim --server "${socket}" --remote-send "<Esc>:colorscheme carbonfox<cr>"
+    fi
+  done < <(find "${neovim_socket_dir}" -type s -name "nvim*" 2>/dev/null)
+}
+
+update_tmux_colors() {
+  local new_theme
+  new_theme="${1:-}"
+
+  # Check if tmux is running first
+  if ! tmux ls > /dev/null 2>&1; then
+    return
+  fi
+
+  tmux set-environment -g COLOR_THEME "${new_theme}" && \
+    tmux set-environment COLOR_THEME "${new_theme}" && \
+    tmux source-file ~/.config/tmux/tmux.conf && \
+    tmux refresh-client -S
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  main "${@:-}"
+fi

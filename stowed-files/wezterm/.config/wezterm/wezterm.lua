@@ -39,7 +39,7 @@ config.keys = {
           [[\
 . ~/.profile && . ~/.bashrc && \
   echo -n "[$(date "+%Y-%m-%d %H:%M:%S")] " >> /tmp/wezterm-toggle.log && \
-  ~/dotfiles/stowed-files/wezterm/.local/bin/toggle-color-scheme >> /tmp/wezterm-toggle.log 2>&1
+  ~/dotfiles/stowed-files/bash/.local/bin/toggle-color-scheme >> /tmp/wezterm-toggle.log 2>&1
           ]]
         }
       },
