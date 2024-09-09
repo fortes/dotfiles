@@ -138,7 +138,7 @@ require("lazy").setup({
         cssls = default_lsp_opts,
         cssmodules_ls =  vim.tbl_deep_extend('force', default_lsp_opts, {
           on_attach = function(client, bufnr)
-            -- Don't use `definitionProvider` since it conflicts with tsserver
+            -- Don't use `definitionProvider` since it conflicts with ts_ls
             client.server_capabilities.definitionProvider = false
 
             lsp_on_attach(client, bufnr)
@@ -160,7 +160,7 @@ require("lazy").setup({
         html = default_lsp_opts,
         jsonls = default_lsp_opts,
         pyright = default_lsp_opts,
-        tsserver = vim.tbl_deep_extend('force', default_lsp_opts, {
+        ts_ls = vim.tbl_deep_extend('force', default_lsp_opts, {
           -- Increase memory limit to 16GB, might need to adjust on weaker
           -- machines
           init_options = {
