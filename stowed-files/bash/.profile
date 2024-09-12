@@ -79,6 +79,7 @@ if [ -z "${SSH_AUTH_SOCK:-}" ] && command_exists keychain; then
   eval "$(keychain --eval --noask --agents ssh --quiet)"
 
   SSH_SOCKET_LOCATION="$HOME/.ssh/ssh_auth_sock"
+  mkdir -p "$(dirname "${SSH_SOCKET_LOCATION}")"
   if [ ! -S "${SSH_SOCKET_LOCATION}" ] && [ -S "${SSH_AUTH_SOCK}" ]; then
     ln -sf "${SSH_AUTH_SOCK}" "${SSH_SOCKET_LOCATION}"
   fi
