@@ -28,6 +28,9 @@ set -euo pipefail
 IFS=$'\n\t'
 export DEBIAN_FRONTEND=noninteractive
 
+declare dotfiles_root
+dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
 AVAILABLE_PACKAGES=(
   agg
   browsh
@@ -299,6 +302,15 @@ install_zellij() {
 }
 
 install_github_packages() {
+  # Make sure to load `command_exists` helper
+  # shellcheck source=../stowed-files/bash/.profile
+  . "${dotfiles_root}/stowed-files/bash/.profile"
+
+  if ! command_exists apt-get; then
+    echo_stderr "Only works on Debian-like systems"
+    exit 1
+  fi
+
   local packages=("$@")
   if [ "${#packages[@]}" -eq 0 ]; then
     packages=("${AVAILABLE_PACKAGES[@]}")
