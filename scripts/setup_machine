@@ -229,7 +229,7 @@ main() {
       --apt-only)
         apt_only=1
         ;;
-      --help)
+      --help|-h)
         usage
         exit 0
         ;;

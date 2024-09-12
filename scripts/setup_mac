@@ -15,6 +15,10 @@ declare -r brew_prefix="/opt/homebrew"
 declare dotfiles_root
 dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
+usage() {
+  echo "Usage: setup_mac [--brew-only]"
+}
+
 setup_shell() {
   local homebrew_bash_path="${brew_prefix}/bin/bash"
 
@@ -73,6 +77,31 @@ main() {
   # Make sure to load `command_exists` helper
   # shellcheck source=../stowed-files/bash/.profile
   . "${dotfiles_root}/stowed-files/bash/.profile"
+
+  declare brew_only=''
+  # Parse arguments
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --homebrew-only|--brew-only)
+        brew_only=1
+        ;;
+      --help|-h)
+        usage
+        exit 0
+        ;;
+      *)
+        >&2 echo "Unknown argument: $1"
+        usage
+        exit 1
+        ;;
+    esac
+    shift
+  done
+
+  if [[ -n "${brew_only}" ]]; then
+    install_homebrew_packages
+    exit 0
+  fi
 
   local local_profile_path="$HOME/.profile.local"
 
