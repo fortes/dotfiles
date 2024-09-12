@@ -262,7 +262,8 @@ main() {
   setup_nonfree
   setup_backports
   install_apt_packages
-  "${dotfiles_root}/scripts/install_1password"
+  # Don't install 1Password GUI for now, it's not working properly
+  IS_HEADLESS=1 "${dotfiles_root}/scripts/install_1password"
   [[ -z "${IS_DOCKER:-}" ]] && "${dotfiles_root}/scripts/install_et"
   [[ -z "${IS_HEADLESS:-}" ]] && "${dotfiles_root}/scripts/install_firefox"
   "${dotfiles_root}/scripts/install_github_packages"
