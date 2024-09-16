@@ -1,6 +1,9 @@
 # Global .gitignore
 .gitconfig.local
 
+# Aider
+.aider*
+
 # Directory-local overrides
 .nvimrc
 
