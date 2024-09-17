@@ -7,6 +7,15 @@ set -euo pipefail
 IFS=$'\n\t'
 export DEBIAN_FRONTEND=noninteractive
 
+# List out extensions via `code --list-extensions`
+EXTENSIONS=(
+  eamodio.gitlens
+  esbenp.prettier-vscode
+  github.copilot
+  github.copilot-chat
+  vscodevim.vim
+)
+
 main() {
   declare -r vscode_sources_list="/etc/apt/sources.list.d/vscode.list"
   declare -r vscode_key_url="https://packages.microsoft.com/keys/microsoft.asc"
@@ -25,9 +34,20 @@ main() {
     sudo -E apt-get update -qq
   fi
 
-  echo "Installing code package (requires sudo)"
-  sudo -E apt-get install -qq --assume-yes \
-    --fix-broken --no-install-recommends code
+  if ! command -v code &> /dev/null; then
+    echo "Installing code package (requires sudo)"
+    sudo -E apt-get install -qq --assume-yes \
+      --fix-broken --no-install-recommends code
+  else
+    echo "VSCode already installed, skipping"
+  fi
+
+  echo "Installing extensions"
+  for extension in "${EXTENSIONS[@]}"; do
+    echo "Installing extension: ${extension}"
+    code --install-extension ${extension}
+  done  
 }
 
 main
+
