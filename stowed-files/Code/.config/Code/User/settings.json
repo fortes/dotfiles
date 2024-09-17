@@ -1,0 +1,7 @@
+{
+    "github.copilot.enable": {
+        "markdown": true
+    },
+    "files.autoSave": "afterDelay"
+}
+
