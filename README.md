@@ -228,6 +228,10 @@ Still a work in progress, but kinda works
 #### TODO
 
 - [ ] Figure out how to get [M1 CI running](https://github.blog/changelog/2024-01-30-github-actions-introducing-the-new-m1-macos-runner-available-to-open-source/) to check builds
+- [ ] Automate cleaning up old symlinked files via stow, for now can hack via
+   ```sh
+   find -L ~/.config -type l [-delete]
+   ```
 
 ## Known Issues
 
