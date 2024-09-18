@@ -66,11 +66,12 @@
 [pager]
   difftool = true
 [pull]
+  autostash = true
   rebase = true
 [push]
-  default = current
   # Automatically set upstream when pushing (basically `-u` by default)
   autoSetupRemote = true
+  default = current
 [rebase]
   autosquash = 1
 [status]
@@ -80,7 +81,7 @@
   # Local modifications / auth
   path = ~/.gitconfig.local
 [filter "lfs"]
-	clean = git-lfs clean -- %f
-	smudge = git-lfs smudge -- %f
-	process = git-lfs filter-process
-	required = true
+  clean = git-lfs clean -- %f
+  smudge = git-lfs smudge -- %f
+  process = git-lfs filter-process
+  required = true
