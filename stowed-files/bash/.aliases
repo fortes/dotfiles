@@ -72,6 +72,11 @@ if command_exists bat; then
   alias batcat='bat'
 fi
 
+if command_exists code; then
+  # Override Mac's default storage dir to match Linux
+  alias code='code --user-data-dir="${XDG_CONFIG_HOME}/Code"'
+fi
+
 # Load local file if present
 if [ -f ~/.aliases.local ]; then
   . ~/.aliases.local

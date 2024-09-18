@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+# Install VSCode
+#
+# Usage: install_vscode_extensions
+
+set -euo pipefail
+IFS=$'\n\t'
+
+# List out extensions via `code --list-extensions`
+EXTENSIONS=(
+  clinyong.vscode-css-modules
+  dbaeumer.vscode-eslint
+  denoland.vscode-deno
+  eamodio.gitlens
+  editorconfig.editorconfig
+  esbenp.prettier-vscode
+  github.copilot
+  github.copilot-chat
+  github.vscode-github-actions
+  mrmlnc.vscode-less
+  ms-azuretools.vscode-docker
+  ms-python.debugpy
+  ms-python.pylint
+  ms-python.python
+  ms-python.vscode-pylance
+  ms-vscode-remote.remote-containers
+  ms-vscode-remote.remote-ssh
+  ms-vscode-remote.remote-ssh-edit
+  ms-vscode.remote-explorer
+  redhat.vscode-yaml
+  streetsidesoftware.code-spell-checker
+  vscodevim.vim
+  wayou.vscode-todo-highlight
+)
+
+main() {
+  if ! command -v code &> /dev/null; then
+    echo "Must have VSCode installed" 1>&2
+    exit 1
+  fi
+
+  # TODO: On Mac, need to do `--user-data-dir ~/.config/Code` when launching
+
+  echo "Installing extensions"
+  for extension in "${EXTENSIONS[@]}"; do
+    echo "Installing extension: ${extension}"
+    code --install-extension "${extension}"
+  done
+}
+
+main

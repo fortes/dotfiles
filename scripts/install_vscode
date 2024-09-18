@@ -7,26 +7,8 @@ set -euo pipefail
 IFS=$'\n\t'
 export DEBIAN_FRONTEND=noninteractive
 
-# List out extensions via `code --list-extensions`
-EXTENSIONS=(
-  dbaeumer.vscode-eslint
-  denoland.vscode-deno
-  eamodio.gitlens
-  esbenp.prettier-vscode
-  github.copilot
-  github.copilot-chat
-  github.vscode-github-actions
-  ms-azuretools.vscode-docker
-  ms-python.debugpy
-  ms-python.python
-  ms-python.vscode-pylance
-  ms-vscode-remote.remote-containers
-  ms-vscode-remote.remote-ssh
-  ms-vscode-remote.remote-ssh-edit
-  ms-vscode.remote-explorer
-  streetsidesoftware.code-spell-checker
-  vscodevim.vim
-)
+declare dotfiles_root
+dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 main() {
   declare -r vscode_sources_list="/etc/apt/sources.list.d/vscode.list"
@@ -54,13 +36,7 @@ main() {
     echo "VSCode already installed, skipping"
   fi
 
-  # TODO: On Mac, need to do `--user-data-dir ~/.config/Code` when launching
-
-  echo "Installing extensions"
-  for extension in "${EXTENSIONS[@]}"; do
-    echo "Installing extension: ${extension}"
-    code --install-extension "${extension}"
-  done
+  exec "${dotfiles_root}/scripts/install_vscode_extensions"
 }
 
 main

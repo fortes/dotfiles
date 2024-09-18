@@ -7,7 +7,15 @@
   },
   "terminal.integrated.sendKeybindingsToShell": true,
   "terminal.integrated.defaultProfile.linux": "tmux",
+  "terminal.integrated.defaultProfile.osx": "tmux",
   "terminal.integrated.profiles.linux": {
+    "tmux": {
+      "path": "tmux",
+      "icon": "terminal-tmux",
+      "args": ["new-session", "-A", "-s", "vscode-${workspaceFolderBasename}"]
+    }
+  },
+  "terminal.integrated.profiles.osx": {
     "tmux": {
       "path": "tmux",
       "icon": "terminal-tmux",
@@ -23,5 +31,7 @@
       "commands": ["workbench.action.quickOpen"]
     }
   ],
-  "workbench.preferredLightColorTheme": "Visual Studio Dark"
+  "workbench.preferredLightColorTheme": "Visual Studio Dark",
+  "editor.formatOnSave": true,
+  "editor.formatOnSaveMode": "modificationsIfAvailable"
 }

@@ -123,12 +123,16 @@ main() {
 
   setup_shell
 
+  # Disable press and hold in VSCode
+  defaults write com.microsoft.VSCode ApplePressAndHoldEnabled -bool false
+
   "${dotfiles_root}/scripts/lock_local_files"
   "${dotfiles_root}/scripts/set_dotfiles_remote"
 
   # Non-brew package managers
   "${dotfiles_root}/scripts/install_node_packages"
   "${dotfiles_root}/scripts/install_python_packages"
+  "${dotfiles_root}/scripts/install_vscode_extensions"
 
   "${dotfiles_root}/scripts/generate_completions"
 
