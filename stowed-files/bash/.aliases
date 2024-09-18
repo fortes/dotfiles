@@ -33,23 +33,9 @@ if command_exists npm; then
   alias npath='export PATH=$(npm bin):$PATH'
 fi
 
-if command_exists docker; then
-  # Always use docker with sudo
-  alias docker="sudo docker"
-fi
-
-if command_exists lazydocker; then
-  alias lazydocker="sudo ~/.local/bin/lazydocker"
-fi
-
 if command_exists ctop; then
   # Doesn't work well in tmux https://github.com/bcicen/ctop/issues/263
   alias ctop='TERM="${TERM/#tmux/screen}" sudo ~/.local/bin/ctop'
-fi
-
-if [[ -x ~/.local/bin/docker-compose ]]; then
-  # Use local install
-  alias docker-compose="sudo ~/.local/bin/docker-compose"
 fi
 
 # exa deprecated, eza the fork
