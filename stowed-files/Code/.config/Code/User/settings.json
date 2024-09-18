@@ -1,7 +1,27 @@
 {
-    "github.copilot.enable": {
-        "markdown": true
-    },
-    "files.autoSave": "afterDelay"
+  "editor.inlineSuggest.enabled": true,
+  "editor.accessibilitySupport": "off",
+  "files.autoSave": "afterDelay",
+  "github.copilot.enable": {
+    "markdown": true
+  },
+  "terminal.integrated.sendKeybindingsToShell": true,
+  "terminal.integrated.defaultProfile.linux": "tmux",
+  "terminal.integrated.profiles.linux": {
+    "tmux": {
+      "path": "tmux",
+      "icon": "terminal-tmux",
+      "args": ["new-session", "-A", "-s", "vscode-${workspaceFolderBasename}"]
+    }
+  },
+  "typescript.tsserver.maxTsServerMemory": 32000,
+  "window.autoDetectColorScheme": true,
+  "vim.showMarksInGutter": true,
+  "vim.normalModeKeyBindingsNonRecursive": [
+    {
+      "before": ["<C-p>"],
+      "commands": ["workbench.action.quickOpen"]
+    }
+  ],
+  "workbench.preferredLightColorTheme": "Visual Studio Dark"
 }
-
