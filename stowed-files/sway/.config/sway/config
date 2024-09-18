@@ -214,6 +214,7 @@ for_window [app_id="(?i)foot|(alacr|k)itty|(wez|ml)term"] border pixel 0
 for_window [app_id="(?i)firefox"] border pixel 0
 for_window [app_id="(?i)signal"] border pixel 0
 for_window [app_id="(?i)chromium"] border pixel 0
+for_window [app_id="(?i)code-url-handler"] border pixel 0
 
 # Workaround for crash on start if signal isnt floating on launch
 # run with args `--enable-features=UseOzonePlatform --ozone-platform=wayland`
