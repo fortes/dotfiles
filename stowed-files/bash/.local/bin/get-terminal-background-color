@@ -1,0 +1,37 @@
+#!/bin/bash
+#
+# Get the background color of the terminal
+# Requires a terminal that supports the OSC 11 escape sequence
+# Output examples:
+#
+# - rgb:1111/1111/1111
+#
+# Usage: get-terminal-background-color
+
+main() {
+  # Open a new file descriptor for the terminal
+  exec 3<> /dev/tty
+
+  # Disable terminal echoing
+  stty -echo <&3
+
+  # Send the escape sequence to query the background color
+  printf '\e]11;?\a' >&3
+
+  # Read the response from the terminal
+  IFS=$'\a' read -d $'\a' -r -u 3 response
+
+  # Re-enable terminal echoing
+  stty echo <&3
+
+  # Close the file descriptor
+  exec 3<&-
+
+  # Remove everything up to and including '<ESC>]11;'
+  color=${response#*$'\e]11;'}
+
+  # Remove any trailing characters after the color value
+  echo "${color%%$'\a'*}"
+}
+
+main
