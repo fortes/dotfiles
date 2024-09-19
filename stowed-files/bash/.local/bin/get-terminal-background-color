@@ -11,6 +11,12 @@
 set -euo pipefail
 
 main() {
+  if [[ ${TERM} == "linux" ]]; then
+    # Escape codes not supported in Linux console, just return black for now
+    echo "rgb:0000/0000/0000"
+    return
+  fi
+
   # Open a new file descriptor for the terminal
   exec 3<> /dev/tty
 
