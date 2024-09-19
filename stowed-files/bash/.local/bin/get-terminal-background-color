@@ -8,6 +8,8 @@
 #
 # Usage: get-terminal-background-color
 
+set -euo pipefail
+
 main() {
   # Open a new file descriptor for the terminal
   exec 3<> /dev/tty

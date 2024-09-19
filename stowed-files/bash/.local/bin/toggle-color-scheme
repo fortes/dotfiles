@@ -4,12 +4,18 @@
 # Usage: toggle-color-scheme [light|dark]
 set -euo pipefail
 
+declare dir_path
+dir_path="$(dirname "${BASH_SOURCE[0]}")"
+
 main() {
   local new_theme
   new_theme="${1:-}"
 
   if [[ -z "${new_theme}" ]]; then
-    if [[ "$(tmux show-environment -g COLOR_THEME | cut -d= -f2-)" == "light" ]]; then
+    local current_theme
+    current_theme="$(get_current_color_theme)"
+
+    if [[ "${current_theme}" == "light" ]]; then
       new_theme="dark"
     else
       new_theme="light"
@@ -37,6 +43,33 @@ main() {
   update_neovim_colors "${new_theme}"
 
   echo "done!"
+}
+
+get_current_color_theme() {
+  if tmux has-session > /dev/null 2>&1; then
+    local tmux_value
+    tmux_value="$(tmux show-environment -g COLOR_THEME 2>/dev/null || true)"
+    if [[ -n "${tmux_value}" ]]; then
+      echo "${tmux_value}" | cut -d= -f2-
+      return
+    fi
+  fi
+
+  if [[ -n "${COLOR_THEME:-}" ]]; then
+    echo "${COLOR_THEME}"
+    return;
+  fi
+
+  # Get terminal background color and extract red channel
+  red_bg_value=$("${dir_path}/get-terminal-background-color" | cut -d: -f2)
+
+  # Look at the first digit of the red value, and assume anything more than
+  # half is light, and anything less is dark
+  if [[ "${red_bg_value:0:1}" =~ [8-9A-Fa-f] ]]; then
+    echo "light"
+  else
+    echo "dark"
+  fi
 }
 
 # Check if cmus is running and update its colors if so
@@ -73,9 +106,9 @@ update_neovim_colors() {
   # Change colorscheme of all neovim instances
   while IFS= read -r socket; do
     if [[ "${new_theme}" == "light" ]]; then
-      nvim --server "${socket}" --remote-send "<Esc>:colorscheme dayfox<cr>"
+      nvim --server "${socket}" --remote-send "<Esc>:set background=light|colorscheme dayfox<cr>"
     else
-      nvim --server "${socket}" --remote-send "<Esc>:colorscheme carbonfox<cr>"
+      nvim --server "${socket}" --remote-send "<Esc>:set background=dark|colorscheme carbonfox<cr>"
     fi
   done < <(find "${neovim_socket_dir}" -type s -name "nvim*" 2>/dev/null)
 }
@@ -85,7 +118,7 @@ update_tmux_colors() {
   new_theme="${1:-}"
 
   # Check if tmux is running first
-  if ! tmux ls > /dev/null 2>&1; then
+  if ! tmux has-session > /dev/null 2>&1; then
     return
   fi
 
