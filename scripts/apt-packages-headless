@@ -1,3 +1,4 @@
+# vim:ft=sh
 apt-file
 apt-transport-https
 apt-utils
@@ -31,7 +32,8 @@ git-lfs
 gnupg
 gron
 htop
-hugo
+# Debian version ancient, get from `install_github_packages`
+# hugo
 iftop
 imagemagick
 info

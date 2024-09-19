@@ -44,8 +44,7 @@ AVAILABLE_PACKAGES=(
   # Bookworm tracking recent version already, can use apt
   # github_cli
   helix
-  # Bookworm tracking recent version already, can use apt
-  # hugo
+  hugo
   lazydocker
   lazygit
   pistol
