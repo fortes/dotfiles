@@ -28,9 +28,28 @@ require("lazy").setup({
         -- Override default, which disables markdown
         markdown = true,
         -- Disable in places where it doesn't make sense
-        TelescopePrompt = false
+        TelescopePrompt = false,
+        DressingInput = false,
+        codecompanion = false,
       }
     end
+  },
+
+  -- AI coding assistant
+  {
+    "olimorris/codecompanion.nvim",
+    cond = function()
+      return os.getenv('ANTHROPIC_API_KEY') ~= '' or os.getenv('OPENAI_API_KEY') ~= ''
+    end,
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-treesitter/nvim-treesitter",
+      -- Optional: For working with files with slash commands
+      "nvim-telescope/telescope.nvim",
+      -- Improves the default Neovim UI
+      "stevearc/dressing.nvim",
+    },
+    config = true
   },
 
   -- Language Server for all sorts of goodness
