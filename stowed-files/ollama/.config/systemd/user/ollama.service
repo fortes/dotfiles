@@ -1,0 +1,12 @@
+[Unit]
+Description=Ollama Service
+After=network-online.target
+
+[Service]
+ExecStart=/home/fortes/.local/bin/ollama serve
+Restart=always
+RestartSec=3
+Environment="PATH=/home/fortes/.local/bin:${PATH}"
+
+[Install]
+WantedBy=default.target

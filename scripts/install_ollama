@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# Install Ollama
+#
+# Usage: install_ollama
+
+set -euo pipefail
+IFS=$'\n\t'
+export DEBIAN_FRONTEND=noninteractive
+
+main() {
+  local install_location="$HOME/.local/bin/ollama"
+  local download_dir
+  download_dir="$(mktemp -d -t ollama-XXXX)"
+
+  if [[ ! -x "${install_location}" ]]; then
+    echo "Installing Ollama..."
+    pushd "${download_dir}" > /dev/null
+    wget --quiet -O "ollama-linux-amd64.tgz" \
+      "https://ollama.com/download/ollama-linux-amd64.tgz"
+    tar -C "$HOME/.local" -xzf "ollama-linux-amd64.tgz" > /dev/null
+    popd > /dev/null
+  fi
+
+  echo "Ollama installed, starting service"
+  systemctl --user start ollama
+
+  # Still need to download models, e.g. `ollama run llama3`
+  #
+  # Can also hook up via `llm` by first `llm install llm-ollama`
+}
+
+main
+
+
