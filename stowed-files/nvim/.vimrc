@@ -383,6 +383,49 @@ set gdefault
 set ignorecase
 set smartcase
 
+function! s:Cmarks() abort
+  let items = []
+
+  " Global marks:
+  let marklist = getmarklist()
+  " Local marks:
+  let marklist += getmarklist(bufnr())
+
+  for mark in marklist
+    let name = mark.mark[1]
+    if name !~ '[a-zA-Z]'
+      continue
+    endif
+
+    if has_key(mark, 'file')
+      let filename = fnamemodify(mark.file, ':p')
+    else
+      let filename = expand('%:p')
+    endif
+
+    if !filereadable(filename)
+      " A mark could have been saved in a temporary file
+      continue
+    endif
+
+    let [buffer, line, col, _] = mark.pos
+    let text = readfile(filename)[line - 1]
+
+    call add(items, {
+          \ 'filename': filename,
+          \ 'buffer':   buffer,
+          \ 'text':     name..' | '..text,
+          \ 'lnum':     line,
+          \ 'col':      col || 1,
+          \ })
+  endfor
+
+  call setqflist([], 'r', {'title': 'Marks', 'items': items})
+  copen
+endfunction
+" Show marks in quickfix list
+command! Cmarks call s:Cmarks()
+
 " */# in visual mode searches for selected text, similar to normal mode
 vnoremap * :<C-u>call <SID>VisualSetSearch('/')<cr>/<C-R>=@/<cr><cr>
 vnoremap # :<C-u>call <SID>VisualSetSearch('#')<cr>/<C-R>=@/<cr><cr>
