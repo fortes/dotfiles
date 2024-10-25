@@ -734,6 +734,20 @@ endif
 
 if has('spell')
   set spelllang=en_us,pt_pt
+
+  let s:spell_file = fnamemodify($MYVIMRC, ':h').'/spell/pt.utf-8.spl'
+  let s:spell_url = 'http://ftp.vim.org/vim/runtime/spell/pt.utf-8.spl'
+
+  " Download Portuguese dictionary if not present
+  if !filereadable(s:spell_file)
+    echo "Portuguese spell file not found. Downloading..."
+    if executable('curl')
+      execute '!curl -fLo ' . s:spell_file . ' ' . s:spell_url
+    elseif executable('wget')
+      execute '!wget -O ' . s:spell_file . ' ' . s:spell_url
+    endif
+  endif
+
   " Re-generate spelling files if modified
   for d in glob(fnamemodify($MYVIMRC, ':h').'/spell/*.add', 1, 1)
     if getftime(d) > getftime(d.'.spl')
