@@ -12,12 +12,12 @@ My usage is mostly terminal-based, via Crostini on Chromebook, WSL2 on Windows, 
 Graphical sections are Linux-only, and use:
 
 * sway / swaync / waybar
-* foot
+* WezTerm
 * Firefox
 
 On MacOS, use:
 
-* Alacritty
+* WezTerm
 * Rectangle
 
 ## Letting me own your machine
@@ -112,11 +112,10 @@ TODO: Automate these steps.
 - Depending on the machine, you may need `pavucontrol` in order to unmute your audio output via GUI.
   \*\* Alternatively, find the name of the desired output via `pacmd list-sinks` then run `pacmd set-default-sink $SINK_NAME` and make sure to unmute via `pacmd set-sink-mute [name] 0`
 - If running multiple monitors, need to configure Wacom tablet to only use a specific monitor:
-  ```sh
-  xsetwacom --list | grep stylus # get id, e.g. "21"
-  xrandr --listactivemonitors # get id, e.g. DP-2
-
-  xsetwacom --set "21" MapToOutput DP-2
+  ```
+  input "type:tablet_tool" {
+    map_to_output DP-1 
+  }
   ```
 - For High DPI displays, create a `~/.Xresources.local` file with the proper `Xft.dpi` (see `.Xresources` for example)
 - To mount SMB shares on boot, add something like the following to `/etc/fstab`:

@@ -33,5 +33,6 @@
   ],
   "workbench.preferredLightColorTheme": "Visual Studio Dark",
   "editor.formatOnSave": true,
-  "editor.formatOnSaveMode": "modificationsIfAvailable"
+  "editor.formatOnSaveMode": "modificationsIfAvailable",
+  "github.copilot.preferredAccount": "fortes-codaio"
 }
