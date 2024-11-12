@@ -5,6 +5,7 @@
 # - browsh
 # - bun
 # - ctop
+# - delta
 # - deno
 # - difftastic
 # - docker-compose
@@ -36,6 +37,7 @@ AVAILABLE_PACKAGES=(
   browsh
   bun
   ctop
+  delta
   deno
   difftastic
   docker-compose
@@ -196,6 +198,10 @@ install_ctop() {
   install_bin 'bcicen/ctop' 'ctop-.*-linux-amd64'
 }
 
+install_delta() {
+  install_deb 'dandavison/delta' 'git-delta_.*_amd64.deb'
+}
+
 install_deno() {
   install_zip 'denoland/deno' 'deno-x86_64-unknown-linux-gnu.zip'
 }
@@ -346,6 +352,9 @@ install_github_packages() {
         ;;
       ctop)
         install_ctop
+        ;;
+      delta)
+        install_delta
         ;;
       deno)
         install_deno

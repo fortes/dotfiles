@@ -1,7 +1,0 @@
-#! /usr/bin/env bash
-
-if command -v diff-so-fancy > /dev/null 2>&1; then
-  exec diff-so-fancy "$@"
-else
-  exec less -RFX
-fi

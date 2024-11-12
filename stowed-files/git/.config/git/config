@@ -39,7 +39,7 @@
   verbose = true
 [core]
   excludesfile = ~/.config/git/ignore.global
-  pager = "diff-so-fancy-with-fallback | less --tabs=2 -RFX"
+  pager = delta
   whitespace = space-before-tab,tab-in-indent,blank-at-eof,trailing-space,tabwidth=2
 [diff]
   algorithm = minimal
@@ -55,10 +55,10 @@
 [init]
   defaultBranch = main
 [interactive]
-  diffFilter = "diff-so-fancy-with-fallback --patch"
+  diffFilter = "delta --color-only"
 [merge]
   autostash = true
-  conflictStyle = diff3
+  conflictStyle = zdiff3
   prompt = false
   tool = nvim
 [mergetool "nvim"]
@@ -77,11 +77,13 @@
 [status]
   # Show files within an untracked directory
   showUntrackedFiles = all
-[include]
-  # Local modifications / auth
-  path = ~/.gitconfig.local
 [filter "lfs"]
   clean = git-lfs clean -- %f
   smudge = git-lfs smudge -- %f
   process = git-lfs filter-process
   required = true
+[delta]
+  navigate = true    # use n and N to move between diff sections
+[include]
+  # Local modifications / auth
+  path = ~/.gitconfig.local
