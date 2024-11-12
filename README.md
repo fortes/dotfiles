@@ -308,6 +308,8 @@ Work in progress. The [Sway Wiki](https://github.com/swaywm/sway/wiki/i3-Migrati
 - [ ] Better colorschemes, coordinated everywhere
   - Check [themer](https://github.com/themerdev/themer) for generation
   - [ ] Easier swapping into light mode
+  - [ ] `dircolors` can be better and used elsewhere: https://github.com/seebi/dircolors-solarized
+  - [ ] [RootLoops](https://rootloops.sh/) for generation
 - [ ] Figure out how to get USB-C DP Alt devices to work, might need [displaylink-debian](https://github.com/AdnanHodzic/displaylink-debian) or at the very least `evdi-dkms`
 - [ ] Get [Nvidia Drivers](https://wiki.debian.org/NvidiaGraphicsDrivers) drivers with a reasonable resolution for linux console
   - Install `nvidia-detect` and run to check support
