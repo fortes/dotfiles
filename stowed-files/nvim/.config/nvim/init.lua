@@ -333,29 +333,6 @@ require("lazy").setup({
     },
   },
 
-  -- Indentation guides
-  {
-    'lukas-reineke/indent-blankline.nvim',
-    -- Required for scope
-    dependencies = {
-      'nvim-treesitter/nvim-treesitter'
-    },
-    main = "ibl",
-    opts = {
-      exclude = {
-        filetypes = {
-          'help',
-          'markdown',
-          'packer',
-          'txt'
-        },
-        buftypes = {
-          'terminal'
-        },
-      },
-    }
-  },
-
   -- Split or Join blocks of code
   {
     'Wansmer/treesj',

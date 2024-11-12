@@ -326,9 +326,11 @@ set formatoptions+=n
 " Show special indicators
 set list
 " Highlight trailing spaces
-set listchars=trail:·,tab:»·
+set listchars=trail:·,tab:→-,nbsp:␣
 " Show wrap indicators
 set listchars+=extends:»,precedes:«
+" Indent guides
+set listchars+=multispace:\ ·,leadmultispace:\┊\ ,
 " Show non-breaking spaces
 set listchars+=nbsp:%
 
