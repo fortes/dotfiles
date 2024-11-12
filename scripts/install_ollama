@@ -8,11 +8,20 @@ IFS=$'\n\t'
 export DEBIAN_FRONTEND=noninteractive
 
 main() {
+  local force
   local install_location="$HOME/.local/bin/ollama"
   local download_dir
   download_dir="$(mktemp -d -t ollama-XXXX)"
 
-  if [[ ! -x "${install_location}" ]]; then
+  while [[ "$#" -gt 0 ]]; do
+      case $1 in
+          -f|--force) force=true;;
+          *) echo "Unknown parameter passed: $1"; exit 1;;
+      esac
+      shift
+  done
+
+  if [[ ${force:-} || ! -x "${install_location}" ]]; then
     echo "Installing Ollama..."
     pushd "${download_dir}" > /dev/null
     wget --quiet -O "ollama-linux-amd64.tgz" \
@@ -29,6 +38,6 @@ main() {
   # Can also hook up via `llm` by first `llm install llm-ollama`
 }
 
-main
+main "$@"
 
 
