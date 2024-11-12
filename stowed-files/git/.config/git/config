@@ -43,6 +43,7 @@
   whitespace = space-before-tab,tab-in-indent,blank-at-eof,trailing-space,tabwidth=2
 [diff]
   algorithm = minimal
+  colorMoved = default
   tool = difftastic
 [difftool]
   prompt = false
@@ -83,7 +84,10 @@
   process = git-lfs filter-process
   required = true
 [delta]
-  navigate = true    # use n and N to move between diff sections
+  # use DELTA_FEATURES=+side-by-side env var for side-by-side diffs
+  line-numbers = true
+  navigate = true # use n and N to move between diff sections
+  tabs = 2
 [include]
   # Local modifications / auth
   path = ~/.gitconfig.local
