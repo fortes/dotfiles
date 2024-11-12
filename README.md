@@ -73,6 +73,13 @@ Once you've run setup, you'll still have to do the following manual steps:
      email = xyz@abc.com
    ```
 
+   If you need to tweak any config based upon the directory path, do something like
+
+   ```
+   [includeIf "gitdir:~/src/company/"]
+     path = ~/.config/git/company.gitconfig
+   ```
+
 ## Ignoring changes to a file
 
 ```sh
