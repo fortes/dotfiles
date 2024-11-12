@@ -724,6 +724,33 @@ require("lazy").setup({
     opts = {},
   },
 
+  -- Quickfix improvements
+  -- Shows some context of match in preview window (toggle with `p` / toggle
+  -- auto-preview with `P`)
+  -- <tab>/<s-tab> to toggle sign on item, `zn` or `zN` (inverse) to filter
+  -- z<tab> to clear all signs in quickfix
+  -- <C-x> to open in horizontal split, <C-v> for vertical
+  -- `<`/`>` to move through quickfix history (basically `colder`/`cnewer`)
+  {
+    'kevinhwang91/nvim-bqf',
+    config = function()
+      require('bqf').setup({
+        auto_enable = true,
+        preview = {
+          auto_preview = true,
+          win_height = 12,
+          win_vheight = 12,
+          delay_syntax = 80,
+          border_chars = {'┃', '┃', '━', '━', '┏', '┓', '┗', '┛', '█'},
+        },
+        func_map = {
+          -- Disable default fzf mapping, since we use telescope
+          fzffilter = '',
+        },
+      })
+    end
+  },
+
   -- Show colors in actual color
   {
     'norcalli/nvim-colorizer.lua',
