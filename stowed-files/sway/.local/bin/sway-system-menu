@@ -9,7 +9,7 @@ set -euo pipefail
 IFS=$'\n\t'
 
 get_options() {
-  echo -e "Terminal\\0icon\\x1ffoot"
+  echo -e "Terminal\\0icon\\x1forg.wezfurlong.wezterm"
   echo -e "Firefox\\0icon\\x1ffirefox-esr"
   if playerctl status | grep -q Playing; then
     echo -e "Pause $(playerctl metadata title)\\0icon\\x1fmedia-playback-pause"
@@ -37,7 +37,7 @@ main() {
       echo "Cancelled"
       ;;
     Terminal)
-      swaymsg exec foot
+      swaymsg exec wezterm
       ;;
     Firefox)
       swaymsg exec firefox-esr

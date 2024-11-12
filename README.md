@@ -300,8 +300,6 @@ Work in progress. The [Sway Wiki](https://github.com/swaywm/sway/wiki/i3-Migrati
 
 - Try switching from docker to podman
 - [ ] Look into `glances` and `btop`
-- [ ] [delta](https://github.com/dandavison/delta) instead of `diff-so-fancy`
-- [ ] [football-cli](https://github.com/ManrajGrover/football-cli)
 - [ ] (caniuse-cli)[https://github.com/sgentle/caniuse-cmd]
 - [ ] Look into `stevearc/conform.nvim`
 - [ ] Add [Firefox Nightly](https://blog.nightly.mozilla.org/2023/10/30/introducing-mozillas-firefox-nightly-deb-packages-for-debian-based-linux-distributions/)
