@@ -2,7 +2,6 @@
 # Install some specific packages directly from GitHub. Specifically:
 #
 # - agg (asciinema gif generator)
-# - browsh
 # - bun
 # - ctop
 # - delta
@@ -34,7 +33,6 @@ dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 AVAILABLE_PACKAGES=(
   agg
-  browsh
   bun
   ctop
   delta
@@ -180,14 +178,6 @@ install_zip() {
 
 install_agg() {
   install_bin 'asciinema/agg' 'agg-x86_64-unknown-linux-musl'
-}
-
-install_browsh() {
-  echo "Installing browsh dependencies (requires sudo)"
-  sudo apt-get install -qq --assume-yes --fix-broken --no-install-recommends \
-    firefox
-
-  install_deb 'browsh-org/browsh' 'browsh_.*_linux_amd64.deb'
 }
 
 install_bun() {
@@ -342,10 +332,6 @@ install_github_packages() {
     case "${package}" in
       agg)
         install_agg
-        ;;
-      browsh)
-        # Requries Firefox, may not be wanted on headless machines
-        [[ -z "${IS_HEADLESS:-}" ]] && install_browsh
         ;;
       bun)
         install_bun
