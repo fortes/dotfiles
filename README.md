@@ -238,6 +238,7 @@ Still a work in progress, but kinda works
    ```sh
    find -L ~/.config -type l [-delete]
    ```
+- [ ] Figure out what [Windows 11 tweaks & usability improvements](https://kittenlabs.de/blog/2024/08/20/windows-11-tweaks-usability-improvements/) to copy
 
 ## Known Issues
 
