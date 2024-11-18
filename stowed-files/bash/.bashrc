@@ -165,7 +165,7 @@ export FD_COMMAND
 
 BAT_COMMAND="bat"
 if ! command_exists "${BAT_COMMAND}"; then
-  # Debian uses `fdfind`
+  # Debian uses `batcat`
   BAT_COMMAND="batcat"
 fi
 export BAT_COMMAND
@@ -191,7 +191,7 @@ fi
 if command_exists exa; then
   # Show tree structure in preview window
   export FZF_ALT_C_OPTS="
-    --preview 'exa -T -a {}'
+    --preview 'exa --tree --all {}'
     "
 fi
 export FZF_DEFAULT_OPTS="
