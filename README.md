@@ -321,3 +321,5 @@ Work in progress. The [Sway Wiki](https://github.com/swaywm/sway/wiki/i3-Migrati
   - Install `nvidia-detect` and run to check support
   - Install `nvidia-driver`
   - Get better resolution when booted into console by adding `GRUB_GFXMODE=auto` in `/etc/default/grub`, then run `sudo update-grub`
+- [ ] Learn from [Wayland Apps in Wireguard Docker Containers](https://www.procustodibus.com/blog/2024/10/wayland-wireguard-containers/) and see if anything worth copying
+- [ ] [Dotfile managers](https://dotfiles.github.io/utilities/) might have something better than GNU `stow`
