@@ -230,6 +230,7 @@ Still a work in progress, but kinda works
 - Set `terminal.app` profile, send option as meta key
 - `terminal.app` sucks with colors, so once installs happen, switch to Alacritty and pin it in the dock
 - Make sure Rectangle.app starts on login
+- Need to figure out how to [use Hammerspoon](https://github.com/Hammerspoon/Spoons/blob/master/Source/MusicAppMediaFix.spoon/init.lua) to have media keys control cmus, instead of launching iTunes (gross)
 
 #### TODO
 
