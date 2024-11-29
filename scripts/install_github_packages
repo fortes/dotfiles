@@ -15,6 +15,7 @@
 # - hugo
 # - lazydocker
 # - lazygit
+# - ncspot
 # - neovim (latest)
 # - pistol
 # - sad
@@ -47,6 +48,7 @@ AVAILABLE_PACKAGES=(
   hugo
   lazydocker
   lazygit
+  ncspot
   pistol
   neovim
   sad
@@ -239,6 +241,10 @@ install_lazygit() {
   install_tarball 'jesseduffield/lazygit' 'lazygit_.*_Linux_x86_64.tar.gz'
 }
 
+install_ncspot() {
+  install_tarball 'hrkfdn/ncspot' 'ncspot-v.*-linux-x86_64.tar.gz'
+}
+
 install_sad() {
   install_deb 'ms-jpq/sad' 'x86_64-unknown-linux-gnu.deb'
 }
@@ -371,6 +377,9 @@ install_github_packages() {
         ;;
       lazygit)
         install_lazygit
+        ;;
+      ncspot)
+        install_ncspot
         ;;
       neovim)
         install_neovim_stable
