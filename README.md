@@ -301,6 +301,7 @@ Work in progress. The [Sway Wiki](https://github.com/swaywm/sway/wiki/i3-Migrati
 ## Future Improvements
 
 - Try switching from docker to podman
+- [ ] Test out [psst](https://github.com/jpochyla/psst) for Spotify
 - [ ] Look into `glances` and `btop`
 - [ ] Check out [`yazi`](https://github.com/sxyazi/yazi) over `vifm`
 - [ ] (caniuse-cli)[https://github.com/sgentle/caniuse-cmd]
