@@ -12,7 +12,7 @@ local config = wezterm.config_builder();
 
 config.hide_tab_bar_if_only_one_tab = true
 
-config.color_scheme = 'Builtin Dark'
+config.color_scheme = 'Default Dark (base16)'
 
 config.window_padding = {
   left = 4,
@@ -24,10 +24,10 @@ config.window_padding = {
 -- Toggle colorscheme with Ctrl+Shift+L
 wezterm.on('toggle-color-scheme', function(window, pane)
   local overrides = window:get_config_overrides() or {}
-  if overrides.color_scheme == 'Builtin Dark' then
-    overrides.color_scheme = 'Builtin Light'
+  if overrides.color_scheme == 'Default Dark (base 16)' then
+    overrides.color_scheme = 'Default Light (base 16)'
   else
-    overrides.color_scheme = 'Builtin Dark'
+    overrides.color_scheme = 'Default Dark (base 16)'
   end
   window:set_config_overrides(overrides)
 end)
