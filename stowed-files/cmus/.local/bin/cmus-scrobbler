@@ -1,6 +1,17 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.11"
+# dependencies = [
+#   "pylast",
+#   "pylistenbrainz",
+# ]
+# ///
 #
 # Submits listens to ListenBrainz & Libre.fm
+#
+# NOTE: The `uv run` will fail when offline, but that's OK since submission
+# requires internet access anyway. Eventually, if some kind of offline record is
+# added, that might matter, but for now it's fine.
 import datetime
 import os
 import sys
@@ -53,7 +64,7 @@ with open("/tmp/cmus-status.txt") as status_file:
 
 is_new_listen = True
 
-if is_new_listen and os.path.exists("/tmp/previous-track-id.txt"):
+if os.path.exists("/tmp/previous-track-id.txt"):
     with open("/tmp/previous-track-id.txt") as previous_file:
         previous_track_lines = previous_file.readlines()
         if len(previous_track_lines) == 0:
@@ -62,9 +73,12 @@ if is_new_listen and os.path.exists("/tmp/previous-track-id.txt"):
           previous_track_id = previous_track_lines[0].strip()
           is_new_listen = previous_track_id != track_id
 
+if not is_new_listen:
+    print("Not a new listen, skipping scrobble")
+    sys.exit(0)
+
 with open("/tmp/previous-track-id.txt", "w") as previous_file:
     previous_file.write(track_id)
-
 
 def listenbrainz_scrobble():
     client = pylistenbrainz.ListenBrainz()
@@ -79,13 +93,12 @@ def listenbrainz_scrobble():
     )
 
     try:
-        if is_new_listen:
-            print("ListenBrainz: Submitting %s - %s" % (artist, title))
-            response = client.submit_single_listen(listen)
-            if response["status"] == "ok":
-                print("ListenBrainz: Successful!")
-            else:
-                print("ListenBrainz: Non-OK status code: %s" % response["status"])
+        print("ListenBrainz: Submitting %s - %s" % (artist, title))
+        response = client.submit_single_listen(listen)
+        if response["status"] == "ok":
+            print("ListenBrainz: Successful!")
+        else:
+            print("ListenBrainz: Non-OK status code: %s" % response["status"])
 
         if status == "playing":
             listen = pylistenbrainz.Listen(
@@ -107,9 +120,6 @@ def listenbrainz_scrobble():
 
 
 def librefm_scrobble():
-    if not is_new_listen:
-        return
-
     librefm_network = pylast.LibreFMNetwork(
         username=librefm_username,
         password_hash=pylast.md5(librefm_password),

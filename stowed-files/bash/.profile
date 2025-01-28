@@ -47,12 +47,6 @@ fi
 # Homebrew paths, etc
 source_if_exists "$HOME/.profile.brew"
 
-if [[ -n "${LISTENBRAINZ_AUTH_TOKEN:-}" ]]; then
-  # scrobbling requires `pylistenbrainz`, not available in Debian so need venv
-  # Must do this after homebrew path, otherwise brew paths take precedence
-  source_if_exists "$HOME/.local/venv/bin/activate"
-fi
-
 # Locally-installed packages belong in path
 add_to_path "$HOME/.local/bin"
 
