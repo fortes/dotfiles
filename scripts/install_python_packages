@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Install python pipx / venv packages
+# Install python packages via `uv`
 #
 # Usage: install_python_packages
 
@@ -21,12 +21,15 @@ install_python_packages() {
     exit 1
   fi
 
-  echo "Installing global pipx packages …"
-  # `--quiet` added to `pipx` in late 2023, waiting for version bump
-  # in Debian stable
-  grep -v "^#" "${dotfiles_root}/scripts/pipx-packages" | \
-    xargs --no-run-if-empty -L 1 pipx install --force
-  echo "Pipx packages installed!"
+  if ! command_exists uv; then
+    >&2 echo "⨯ uv not installed, installing"
+    pipx install --force uv
+  fi
+
+  echo "Installing global uvx packages …"
+  grep -v "^#" "${dotfiles_root}/scripts/uvx-packages" | \
+    xargs --no-run-if-empty -L 1 uv tool install --quiet
+  echo "uvx packages installed!"
 
   if [[ ! -d "${venv_path}" ]]; then
     echo "Creating default venv …"

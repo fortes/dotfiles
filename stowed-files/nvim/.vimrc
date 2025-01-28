@@ -99,8 +99,10 @@ set timeoutlen=600
 set ttimeout
 set ttimeoutlen=200
 
-" Always use python3 from env that has `neovim` package
-let g:python3_host_prog = '~/.local/venv/bin/python3'
+if isdirectory(expand('~/.local/venv'))
+  " Always use python3 from env that has `neovim` package
+  let g:python3_host_prog = '~/.local/venv/bin/python3'
+endif
 " }}}
 
 " UI {{{

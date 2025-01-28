@@ -1,0 +1,11 @@
+# vim:ft=sh
+aider-chat
+argcomplete
+beautysh
+# Requires additional dependencies due to plugins
+beets --with requests --with pylast
+epy-reader
+llm
+pyright
+ruff
+vim-vint

@@ -140,7 +140,7 @@ TODO: Automate these steps.
 The Bullseye to Bookworm upgrade requires a few manual steps that I'm too lazy to automate:
 
 - Must call `apt-key delete` on keys for `et`, `signal`, etc repos that were added via the now deprecated `apt-key`. Find the key id by taking the last eight digits of the hex displayed (no space). E.g. `apt-key del 57F6FB06` for Signal. Need to then delete the relevant fiels in `/etc/apt/sources.list.d` as well
-- `pip` user packages no longer work, everything got moved to `pipx`/`venv` and there may be some strays left in `~/.local/bin` that need to be manually removed
+- `pip` user packages no longer work, everything got moved to `uvx`/`pipx`/`venv` and there may be some strays left in `~/.local/bin` that need to be manually removed
   - `pip freeze --user | xargs pip uninstall` should work here
 - Remove `/etc/apt/sources.list.d/bullseye-backports.list` and let the script add the new one
 
@@ -231,6 +231,26 @@ Still a work in progress, but kinda works
 - `terminal.app` sucks with colors, so once installs happen, switch to Alacritty and pin it in the dock
 - Make sure Rectangle.app starts on login
 - Need to figure out how to [use Hammerspoon](https://github.com/Hammerspoon/Spoons/blob/master/Source/MusicAppMediaFix.spoon/init.lua) to have media keys control cmus, instead of launching iTunes (gross)
+
+### Docker
+
+Need to first build the thing
+
+```sh
+docker build -t dotfiles .
+```
+
+Then run it like so to do work via your home directory
+
+```sh
+docker run -it --rm --name dotfiles dotfiles
+```
+
+To share files, use `-v /path/to/host:/path/to/container`, for example if sharing the `~/src` folder:
+
+```sh
+docker run -it --rm --name dotfiles -v ~/src:/home/fortes/src dotfiles
+```
 
 #### TODO
 

@@ -6,7 +6,7 @@
 declare dotfiles_root
 dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-# Pick up `command_exists`
+# Pick up `command_exists` and correct paths
 # shellcheck source=../stowed-files/bash/.profile
 source "${dotfiles_root}/stowed-files/bash/.profile"
 
@@ -18,25 +18,8 @@ generate_completions() {
 
   echo -n "… Generating completions & man pages"
 
-  if command_exists npm; then
-    npm completion > "${completion_dir}/npm_completion"
-  fi
-
   if command_exists beet; then
     beet completion > "${completion_dir}/beet_completion"
-  fi
-
-  if command_exists gh; then
-    gh completion -s bash > "${completion_dir}/gh_completion"
-  fi
-
-  if command_exists hugo; then
-    hugo completion bash > "${completion_dir}/hugo_completion"
-    hugo gen man --dir "${man_dir_path}" > /dev/null
-  fi
-
-  if command_exists pipx; then
-    register-python-argcomplete --shell bash pipx > "${completion_dir}/pipx_completion"
   fi
 
   if command_exists bun; then
@@ -53,6 +36,27 @@ generate_completions() {
 
   if command_exists fnm; then
     fnm completions > "${completion_dir}/fnm_completion"
+  fi
+
+  if command_exists gh; then
+    gh completion -s bash > "${completion_dir}/gh_completion"
+  fi
+
+  if command_exists hugo; then
+    hugo completion bash > "${completion_dir}/hugo_completion"
+    hugo gen man --dir "${man_dir_path}" > /dev/null
+  fi
+
+  if command_exists npm; then
+    npm completion > "${completion_dir}/npm_completion"
+  fi
+
+  if command_exists pipx; then
+    register-python-argcomplete --shell bash pipx > "${completion_dir}/pipx_completion"
+  fi
+
+  if command_exists uv; then
+    uv generate-shell-completion bash > "${completion_dir}/uv_completion"
   fi
 
   if command_exists wezterm; then
