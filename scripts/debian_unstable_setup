@@ -28,8 +28,8 @@ main() {
   echo "Installing unstable packages (requires sudo)"
   grep -v "^#" "${dotfiles_root}/scripts/apt-packages-unstable" | \
     xargs --no-run-if-empty \
-    sudo -E apt-get install -qq --target-release unstable --assume-yes \
-    --fix-broken --no-install-recommends
+    sudo -E apt-get install -qq -o=Dpkg::Use-Pty=0 --assume-yes \
+    --fix-broken --no-install-recommends --target-release unstable 
 }
 
 main

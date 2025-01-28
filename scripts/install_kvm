@@ -15,7 +15,7 @@ main() {
     packages="${packages} virt-manager"
   fi
 
-  sudo -E apt-get install -qq --assume-yes \
+  sudo -E apt-get install -qq -o=Dpkg::Use-Pty=0 --assume-yes \
     --fix-broken --no-install-recommends \
     ${packages}
 

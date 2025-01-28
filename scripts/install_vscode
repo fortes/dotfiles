@@ -30,7 +30,7 @@ main() {
 
   if ! command -v code &> /dev/null; then
     echo "Installing code package (requires sudo)"
-    sudo -E apt-get install -qq --assume-yes \
+    sudo -E apt-get install -qq -o=Dpkg::Use-Pty=0 --assume-yes \
       --fix-broken --no-install-recommends code
   else
     echo "VSCode already installed, skipping"
