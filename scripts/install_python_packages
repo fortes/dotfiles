@@ -28,7 +28,7 @@ install_python_packages() {
 
   echo "Installing global uvx packages …"
   grep -v "^#" "${dotfiles_root}/scripts/uvx-packages" | \
-    xargs --no-run-if-empty -L 1 uv tool install --quiet
+    xargs --no-run-if-empty -L 1 uv tool install --quiet --force --refresh
   echo "uvx packages installed!"
 
   if [[ ! -d "${venv_path}" ]]; then
