@@ -71,6 +71,9 @@ fi
 if command_exists bat; then
   alias batcat='bat'
 fi
+if command_exists eza; then
+  alias exa='eza'
+fi
 
 if command_exists code; then
   # Override Mac's default storage dir to match Linux
@@ -79,5 +82,6 @@ fi
 
 # Load local file if present
 if [ -f ~/.aliases.local ]; then
+  # shellcheck source=/dev/null
   . ~/.aliases.local
 fi

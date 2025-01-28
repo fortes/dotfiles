@@ -1,13 +1,11 @@
 # vim: ft=sh
 
-# If not running interactively, don't do anything
+# If not running interactively, don't do anything here. Anything
+# needed in non-interactive shells goes in `.profile`
 case $- in
     *i*) ;;
       *) return;;
 esac
-
-# Glorious editor
-set -o vi
 
 # Make sure we have always loaded ~/.profile, which can get lost
 # shellcheck source=/dev/null
@@ -15,9 +13,6 @@ source "$HOME/.profile"
 
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
-
-# Clear C-w binding in order to re-bind in .inputrc
-stty werase undef
 
 HISTFILE=$HOME/.bash_history
 # Never forget
@@ -156,19 +151,26 @@ if command_exists zoxide; then
   eval "$(zoxide init bash --hook pwd)"
 fi
 
-FD_COMMAND="fd"
-if ! command_exists "${FD_COMMAND}"; then
-  # Debian uses `fdfind`
-  FD_COMMAND="fdfind"
-fi
-export FD_COMMAND
-
 BAT_COMMAND="bat"
 if ! command_exists "${BAT_COMMAND}"; then
   # Debian uses `batcat`
   BAT_COMMAND="batcat"
 fi
 export BAT_COMMAND
+
+EZA_COMMAND="eza"
+if ! command_exists "${EZA_COMMAND}"; then
+  # Debian uses `exa` until `eza` is available
+  EZA_COMMAND="exa"
+fi
+export EZA_COMMAND
+
+FD_COMMAND="fd"
+if ! command_exists "${FD_COMMAND}"; then
+  # Debian uses `fdfind`
+  FD_COMMAND="fdfind"
+fi
+export FD_COMMAND
 
 fzf_preview_command=""
 if command_exists pistol; then
@@ -188,12 +190,14 @@ if command_exists "${FD_COMMAND}"; then
   export FZF_CTRL_T_COMMAND="fd_with_git"
   export FZF_ALT_C_COMMAND="${FD_COMMAND} --type directory --hidden --color always"
 fi
-if command_exists exa; then
+
+if command_exists "${EZA_COMMAND}"; then
   # Show tree structure in preview window
   export FZF_ALT_C_OPTS="
-    --preview 'exa --tree --all {}'
+    --preview '${EZA_COMMAND} --tree --all {}'
     "
 fi
+
 export FZF_DEFAULT_OPTS="
   --ansi
   --bind 'ctrl-alt-a:select-all'
@@ -209,9 +213,6 @@ export FZF_CTRL_T_OPTS="
   "
 export FZF_COMPLETION_OPTS='--smart-case'
 
-# Use wayland for Firefox
-export MOZ_ENABLE_WAYLAND=1
-
 # FZF keybindings (Debian)
 source_if_exists "/usr/share/doc/fzf/examples/key-bindings.bash"
 # FZF keybindings (Homebrew)
@@ -220,9 +221,6 @@ source_if_exists "/opt/homebrew/opt/fzf/shell/key-bindings.bash"
 if command_exists fnm; then
   eval "$(fnm env)"
 fi
-
-# Opt-out of Eternal Terminal telemetry
-export ET_NO_TELEMETRY=1
 
 # Load system bash completion
 source_if_exists "/etc/bash_completion"
