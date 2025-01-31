@@ -250,12 +250,13 @@ install_sad() {
 }
 
 install_neovim_stable() {
+  local url
   local vim_path="$HOME/.local/bin/nvim"
 
   echo -n "Installing neovim stable ... "
   mkdir -p "$(dirname "${vim_path}")"
-  wget "https://github.com/neovim/neovim/releases/download/stable/nvim.appimage" \
-    --quiet --output-document "$vim_path"
+  url="$(get_latest_release_url "neovim/neovim" "nvim-linux-x86_64.appimage")"
+  wget "${url}" --quiet --output-document "$vim_path"
   chmod +x "$vim_path"
   echo "neovim stable installed"
 
