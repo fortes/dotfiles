@@ -164,13 +164,13 @@ The Bullseye to Bookworm upgrade requires a few manual steps that I'm too lazy t
 - Uninstall Teams, and other pre-installed unwanted things
 - Enable BitLocker
 - Adjust taskbar settings
+- Adjust settings for Snipping tool, make sure to save to `Downloads` folder
 - Disable browser tabs from being in Alt-Tab list (Settings -> System -> Multitasking)
 - Turn on clipboard history by hitting Windows-V
 - Set Windows Terminal as default terminal application
 - Enable Hyper-V (required for WSL)
   - Search for `hyper-v` in start menu, will show up in obscure UI for settings
 - Enable [Windows Sandbox](https://learn.microsoft.com/en-us/windows/security/threat-protection/windows-sandbox/windows-sandbox-overview)
-- Install `Windows Subsystem for Linux` via MS Store (doesn't seem to work in `winget`)
 - Accept MS Store terms for `winget`, running `winget list` should prompt
 - Get WinGet via MS Store via `App Installer`
   - `winget install AgileBits.1Password`
@@ -180,14 +180,12 @@ The Bullseye to Bookworm upgrade requires a few manual steps that I'm too lazy t
   - `winget install Microsoft.PowerToys`
   - `winget install Microsoft.VisualStudioCode`
   - `winget install Mozilla.Firefox`
-  - `winget install Neovim.Neovim`
   - `winget install Plex.PlexAmp`
-  - `winget install ShareX.ShareX`
-  - `winget install SourceFoundry.HackFonts`
-  - `winget install Valve.Steam` (if gaming)
   - `winget install VideoLAN.VLC`
   - `winget install Zoom.Zoom`
-- Install Battle.net (Optional, if gaming)
+- If gaming, also install:
+  - `winget install Blizzard.BattleNet`
+  - `winget install Valve.Steam`
 - WSL
   - [Optional] Allocate more memory for WSL VM by creating/adding to `%UserProfile%\.wslconfig`:
     ```
@@ -199,15 +197,17 @@ The Bullseye to Bookworm upgrade requires a few manual steps that I'm too lazy t
     [boot]
     systemd=true
     ```
-  - `winget install Debian.Debian`
+  - Install `Windows Subsystem for Linux` via running `wsl --install Debian` in an admin terminal)
   - `sudo apt update && sudo apt dist-upgrade`
-  - Run `~/dotfiles/setup_machine`
+  - Clone this repo and run `~/dotfiles/setup_machine`
   - Set Debian as default terminal
   - To mount network shares, do something like this in `/etc/fstab` (`drvfs` special for WSL):
     ```
     \\machine-name\share	/mnt/machine-share	drvfs	defaults,ro,noatime,uid=1000,gid=1000,umask=022	0	0
     ```
 - 1Password
+  - Sign into account
+- Firefox
   - Sign into account
 - VS Code
   - Sign in via GitHub to sync
@@ -217,8 +217,6 @@ The Bullseye to Bookworm upgrade requires a few manual steps that I'm too lazy t
     - SSH
     - WSL
     - vim
-- ShareX
-  - Configure output location to be `Downloads`
 - Steam & Battle.net
   - Sign in and install games locally
 
