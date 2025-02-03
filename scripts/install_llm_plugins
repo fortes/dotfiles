@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# Install plugins for `llm`
+#
+# Usage: install_llm_plugins
+
+set -euo pipefail
+IFS=$'\n\t'
+
+PLUGINS=(
+  llm-anthropic
+  llm-gemini
+  llm-ollama
+)
+
+install_llm_plugins() {
+  if ! command_exists llm; then
+    >&2 echo "⨯ llm not installed!"
+    exit 1
+  fi
+
+  echo "Installing llm plugins …"
+  for plugin in "${PLUGINS[@]}"; do
+    llm install "${plugin}"
+  done
+  echo "llm plugins installed!"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  install_llm_plugins "${@}"
+fi
