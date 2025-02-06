@@ -18,9 +18,9 @@ install_llm_plugins() {
     exit 1
   fi
 
-  echo "Installing llm plugins …"
+  echo "Installing / Updating llm plugins …"
   for plugin in "${PLUGINS[@]}"; do
-    llm install "${plugin}"
+    llm install -U "${plugin}"
   done
   echo "llm plugins installed!"
 }
