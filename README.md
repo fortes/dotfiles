@@ -160,7 +160,7 @@ The Bullseye to Bookworm upgrade requires a few manual steps that I'm too lazy t
 ### Windows
 
 - Run all Windows Updates
-- Install drivers, update BIOS, etc
+- Install machine-specific drivers, update BIOS, etc
 - Uninstall Teams, and other pre-installed unwanted things
 - Enable BitLocker
 - Adjust taskbar settings
@@ -168,18 +168,19 @@ The Bullseye to Bookworm upgrade requires a few manual steps that I'm too lazy t
 - Disable browser tabs from being in Alt-Tab list (Settings -> System -> Multitasking)
 - Turn on clipboard history by hitting Windows-V
 - Set Windows Terminal as default terminal application
-- Enable Hyper-V (required for WSL)
+- Enable Hyper-V (required for WSL, useful for VMs)
   - Search for `hyper-v` in start menu, will show up in obscure UI for settings
 - Enable [Windows Sandbox](https://learn.microsoft.com/en-us/windows/security/threat-protection/windows-sandbox/windows-sandbox-overview)
 - Accept MS Store terms for `winget`, running `winget list` should prompt
 - Get WinGet via MS Store via `App Installer`
   - `winget install AgileBits.1Password`
+  - `winget install Mozilla.Firefox`
+  - `winget install OpenWhisperSystems.Signal`
+- Depending on machine setup, the following might be of use as well
   - `winget install Google.Chrome.Dev`
   - `winget install Microsoft.MouseandKeyboardCenter`
-  - `winget install Microsoft.PowerShell`
   - `winget install Microsoft.PowerToys`
   - `winget install Microsoft.VisualStudioCode`
-  - `winget install Mozilla.Firefox`
   - `winget install Plex.PlexAmp`
   - `winget install VideoLAN.VLC`
   - `winget install Zoom.Zoom`
@@ -197,11 +198,11 @@ The Bullseye to Bookworm upgrade requires a few manual steps that I'm too lazy t
     [boot]
     systemd=true
     ```
-  - Install `Windows Subsystem for Linux` via running `wsl --install Debian` in an admin terminal)
-  - `sudo apt update && sudo apt dist-upgrade`
+  - Install `Windows Subsystem for Linux` via running `wsl --install Debian` (in an admin terminal)
+  - Enter the WSL2 container and run `sudo apt update && sudo apt dist-upgrade`
   - Clone this repo and run `~/dotfiles/setup_machine`
-  - Set Debian as default terminal
-  - To mount network shares, do something like this in `/etc/fstab` (`drvfs` special for WSL):
+  - [Optional] Set Debian as the default terminal
+  - To auto-mount network shares, do something like this in `/etc/fstab` (`drvfs` special for WSL):
     ```
     \\machine-name\share	/mnt/machine-share	drvfs	defaults,ro,noatime,uid=1000,gid=1000,umask=022	0	0
     ```
@@ -252,6 +253,7 @@ docker run -it --rm --name dotfiles -v ~/src:/home/fortes/src dotfiles
 
 #### TODO
 
+- [ ] Move `ncspot` to install from Flatpak or Snap since it doesn't work on bookworm due to glibc version
 - [ ] Figure out how to get [M1 CI running](https://github.blog/changelog/2024-01-30-github-actions-introducing-the-new-m1-macos-runner-available-to-open-source/) to check builds
 - [ ] Automate cleaning up old symlinked files via stow, for now can hack via
    ```sh
