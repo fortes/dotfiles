@@ -97,6 +97,11 @@ git update-index --no-skip-worktree ./symlinks/npmrc
 TODO: Automate these steps.
 
 - (Optional) Enable GitHub copilot via `~/.profile.local`, then run `:Copilot setup` in NeoVim to authenticate
+- May also want to consider adding something like
+  ```sh
+  export NODE_OPTIONS='--max_old_space_size=16384'
+  ```
+  to `~/.profile.local` to let things like eslint have more memory
 - Install `kindlegen` [from Amazon](https://www.amazon.com/gp/feature.html?ie=UTF8&docId=1000765211) (TODO: See if possible to script this)
 
 ### Firefox / Chrome

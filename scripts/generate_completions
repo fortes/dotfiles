@@ -47,6 +47,7 @@ generate_completions() {
     hugo gen man --dir "${man_dir_path}" > /dev/null
   fi
 
+  # TODO: This fails to find node in some cases
   if command_exists npm; then
     npm completion > "${completion_dir}/npm_completion"
   fi

@@ -8,13 +8,19 @@ set -euo pipefail
 IFS=$'\n\t'
 
 main() {
-  local is_crostini=$([[ -f /etc/apt/sources.list.d/cros.list ]] && printf 1)
-  local is_mac=$([[ ${OSTYPE:-} == 'darwin'* ]] && printf 1)
-  local is_docker=$([[ -f /.dockerenv ]] && printf 1)
-  local is_wsl=$([[ -d /run/WSL ]] && printf 1)
+  local is_crostini
+  local is_mac
+  local is_docker
+  local is_wsl
+  local is_headless
+
+  is_crostini=$([[ -f /etc/apt/sources.list.d/cros.list ]] && printf 1)
+  is_mac=$([[ ${OSTYPE:-} == 'darwin'* ]] && printf 1)
+  is_docker=$([[ -f /.dockerenv ]] && printf 1)
+  is_wsl=$([[ -d /run/WSL ]] && printf 1)
   # Default to headless in Crostini / Docker / WSL, even though GUI might be
   # possible, can always be overridden
-  local is_headless=$([[ -n "${is_crostini}${is_docker}${is_mac}${is_wsl}" || \
+  is_headless=$([[ -n "${is_crostini}${is_docker}${is_mac}${is_wsl}" || \
     -z "${WAYLAND_DISPLAY:-}" ]] && printf 1)
 
   cat <<PROFILE_TEMPLATE
@@ -32,11 +38,16 @@ export IS_HEADLESS="${is_headless:-}"
 # export ANTHROPIC_API_KEY="xxxxxx"
 # export OPENAI_API_KEY="xxxxxx"
 
-# Add machine-specific items below
+# Typescript language server can OOM on large codebases
+# export MAX_TS_SERVER_MEMORY=32768
+
+# For scrobbing via cmus
 # export LISTENBRAINZ_AUTH_TOKEN="xxxxxx"
 # export LIBRE_FM_USERNAME="fortes"
 # export LIBRE_FM_PASSWORD="xxxxxx"
 # export LIBRE_FM_SESSION_KEY="xxxxxx"
+
+# Add machine-specific items below
 # export BEETSDIR=/data/media/music/beets
 PROFILE_TEMPLATE
 }
