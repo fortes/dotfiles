@@ -80,6 +80,8 @@ Once you've run setup, you'll still have to do the following manual steps:
      path = ~/.config/git/company.gitconfig
    ```
 
+6. Log into GitHub Copilot / Claude Code
+
 ## Ignoring changes to a file
 
 ```sh

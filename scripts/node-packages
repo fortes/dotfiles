@@ -1,3 +1,4 @@
+@anthropic-ai/claude-code
 bash-language-server
 cssmodules-language-server
 dockerfile-language-server-nodejs
