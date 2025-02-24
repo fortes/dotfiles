@@ -14,6 +14,7 @@ main() {
   local is_wsl
   local is_headless
 
+  set +e
   is_crostini=$([[ -f /etc/apt/sources.list.d/cros.list ]] && printf 1)
   is_mac=$([[ ${OSTYPE:-} == 'darwin'* ]] && printf 1)
   is_docker=$([[ -f /.dockerenv ]] && printf 1)
@@ -22,6 +23,7 @@ main() {
   # possible, can always be overridden
   is_headless=$([[ -n "${is_crostini}${is_docker}${is_mac}${is_wsl}" || \
     -z "${WAYLAND_DISPLAY:-}" ]] && printf 1)
+  set -e
 
   cat <<PROFILE_TEMPLATE
 # Generated $(date +%F)
