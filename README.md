@@ -171,6 +171,7 @@ The Bullseye to Bookworm upgrade requires a few manual steps that I'm too lazy t
 - Adjust taskbar settings
 - Adjust settings for Snipping tool, make sure to save to `Downloads` folder
 - Disable browser tabs from being in Alt-Tab list (Settings -> System -> Multitasking)
+- Disable "When I snap a window, suggest what I can snap next to it" in System -> Multitasking
 - Turn on clipboard history by hitting Windows-V
 - Set Windows Terminal as default terminal application
 - Enable Hyper-V (required for WSL, useful for VMs)
@@ -230,11 +231,22 @@ The Bullseye to Bookworm upgrade requires a few manual steps that I'm too lazy t
 
 Still a work in progress, but kinda works
 
-- May want to install command line tools manually in order to get `git`: `xcode-select --install`
+- Set up TouchID, Apple account if required
+- Remove all the junk from the dock
+- Enable *Night Shift* and set to *Sunset to Sunrise*
+- Turn off Natural Scrolling
+- Increase keyboard repeat rate to max, delay to min
+- Change Globe key to Control dictation
+- Disable iCloud syncing of all but Find My Mac & Safari
 - Set `terminal.app` profile, send option as meta key
-- `terminal.app` sucks with colors, so once installs happen, switch to Alacritty and pin it in the dock
-- Make sure Rectangle.app starts on login
-- Need to figure out how to [use Hammerspoon](https://github.com/Hammerspoon/Spoons/blob/master/Source/MusicAppMediaFix.spoon/init.lua) to have media keys control cmus, instead of launching iTunes (gross)
+- May want to install command line tools manually in order to get `git`: `xcode-select --install`
+- Run `setup_mac`
+
+##### After Setup
+
+- `terminal.app` sucks with colors, so once installs happen, switch to WezTerm and pin it in the dock
+- Make sure `Rectangle.app` starts on login
+- Install the 1Password extension in Safari (others should sync automatically)
 
 ### Docker
 
@@ -258,6 +270,7 @@ docker run -it --rm --name dotfiles -v ~/src:/home/fortes/src dotfiles
 
 #### TODO
 
+- [ ] Get remote VSCode settings synced up as well, currently in `~/.vscode-server/data/Machine`
 - [ ] Move `ncspot` to install from Flatpak or Snap since it doesn't work on bookworm due to glibc version
 - [ ] Figure out how to get [M1 CI running](https://github.blog/changelog/2024-01-30-github-actions-introducing-the-new-m1-macos-runner-available-to-open-source/) to check builds
 - [ ] Automate cleaning up old symlinked files via stow, for now can hack via
@@ -325,6 +338,7 @@ Work in progress. The [Sway Wiki](https://github.com/swaywm/sway/wiki/i3-Migrati
 
 ## Future Improvements
 
+- [ ] Figure out how to [use Hammerspoon](https://github.com/Hammerspoon/Spoons/blob/master/Source/MusicAppMediaFix.spoon/init.lua) to have media keys control cmus, instead of launching iTunes (gross)
 - Try switching from docker to podman
 - [ ] Test out [psst](https://github.com/jpochyla/psst) for Spotify
 - [ ] Look into `glances` and `btop`
