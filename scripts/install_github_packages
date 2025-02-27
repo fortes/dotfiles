@@ -19,6 +19,7 @@
 # - neovim (latest)
 # - pistol
 # - sad
+# - superfile
 # - wezterm
 # - yq
 # - zellij
@@ -52,6 +53,7 @@ AVAILABLE_PACKAGES=(
   pistol
   neovim
   sad
+  superfile
   wezterm
   yq
   zellij
@@ -146,7 +148,8 @@ install_tarball() {
   pushd "${download_dir}" > /dev/null
   wget --quiet -O "${name}.tar.gz" "${url}"
   echo -n "Expanding ${name}.tar.gz ... "
-  tar xzvf "${name}.tar.gz"> /dev/null
+  # Make sure to flatten directories like `dist`
+  tar xzvf "${name}.tar.gz" --strip-components=3 > /dev/null
   mv "${name}" "${install_location}/${name}"
   chmod 755 "${install_location}/${name}"
   popd > /dev/null
@@ -247,6 +250,10 @@ install_ncspot() {
 
 install_sad() {
   install_deb 'ms-jpq/sad' 'x86_64-unknown-linux-gnu.deb'
+}
+
+install_superfile() {
+  install_tarball 'yorukot/superfile' 'superfile-linux-v.*-amd64.tar.gz' 'spf'
 }
 
 install_neovim_stable() {
@@ -390,6 +397,9 @@ install_github_packages() {
         ;;
       sad)
         install_sad
+        ;;
+      superfile)
+        install_superfile
         ;;
       wezterm)
         [[ -z "${IS_HEADLESS:-}" ]] && install_wezterm

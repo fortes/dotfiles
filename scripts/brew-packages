@@ -42,6 +42,7 @@ sad
 shellcheck
 speedtest-cli
 stow
+superfile
 tmux
 vifm
 visual-studio-code
