@@ -23,7 +23,8 @@ exiv2
 fd-find
 ffmpeg
 fuse3
-fzf
+# Debian version ancient, get from `install_github_packages`
+# fzf
 gh
 git
 git-crypt

@@ -10,6 +10,7 @@
 # - docker-compose
 # - fnm
 # - fx
+# - fzf (because Bookworm is very old)
 # - github cli
 # - helix
 # - hugo
@@ -43,6 +44,7 @@ AVAILABLE_PACKAGES=(
   docker-compose
   fnm
   fx
+  fzf
   # Bookworm tracking recent version already, can use apt
   # github_cli
   helix
@@ -233,6 +235,10 @@ install_fx() {
   install_bin 'antonmedv/fx' 'fx_linux_amd64'
 }
 
+install_fzf() {
+  install_tarball 'junegunn/fzf' 'fzf-.*-linux_amd64.tar.gz'
+}
+
 install_helix() {
   local url
   url="$(get_latest_release_url 'helix-editor/helix' 'x86_64.AppImage')"
@@ -385,6 +391,9 @@ install_github_packages() {
         ;;
       fx)
         install_fx
+        ;;
+      fzf)
+        install_fzf
         ;;
       helix)
         install_helix
