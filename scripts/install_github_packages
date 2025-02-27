@@ -148,9 +148,21 @@ install_tarball() {
   pushd "${download_dir}" > /dev/null
   wget --quiet -O "${name}.tar.gz" "${url}"
   echo -n "Expanding ${name}.tar.gz ... "
-  # Make sure to flatten directories like `dist`
-  tar xzvf "${name}.tar.gz" --strip-components=3 > /dev/null
-  mv "${name}" "${install_location}/${name}"
+  tar xzvf "${name}.tar.gz" > /dev/null
+  if [[ -f "${name}" ]]; then
+    mv "${name}" "${install_location}/${name}"
+  else
+    local file_path
+    # File wasn't in the root of the tarball, find matching name to move
+    file_path="$(find . -type f -name "${name}")"
+    if [[ -n "${file_path}" ]]; then
+      mv "${file_path}" "${install_location}/${name}"
+    else
+      echo_stderr "Error: Could not find ${name} in ${download_dir}"
+      find "${download_dir}" -type f
+      exit 2
+    fi
+  fi
   chmod 755 "${install_location}/${name}"
   popd > /dev/null
   rm -rf "${download_dir}"
