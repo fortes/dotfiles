@@ -17,6 +17,7 @@ eza
 fd
 firefox
 fnm
+font-jetbrains-mono
 fzf
 git
 git-crypt
@@ -46,6 +47,7 @@ superfile
 tmux
 vifm
 visual-studio-code
+wezterm
 wget
 yt-dlp
 zoxide

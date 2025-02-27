@@ -176,6 +176,8 @@ The Bullseye to Bookworm upgrade requires a few manual steps that I'm too lazy t
 - Disable "When I snap a window, suggest what I can snap next to it" in System -> Multitasking
 - Turn on clipboard history by hitting Windows-V
 - Set Windows Terminal as default terminal application
+  - Download [JetBrains Mono](https://www.jetbrains.com/lp/mono/) and set it as the default font in Windows Terminal
+  - Choose reasonable default colors for Windows Terminal
 - Enable Hyper-V (required for WSL, useful for VMs)
   - Search for `hyper-v` in start menu, will show up in obscure UI for settings
 - Enable [Windows Sandbox](https://learn.microsoft.com/en-us/windows/security/threat-protection/windows-sandbox/windows-sandbox-overview)
