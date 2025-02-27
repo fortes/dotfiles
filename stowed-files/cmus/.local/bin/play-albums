@@ -6,12 +6,25 @@ set -o nounset
 set -o pipefail
 
 # shellcheck disable=SC2016
-BEET_FORMAT_STRING='$mb_albumid $albumartist - [$original_year] $album%aunique{albumartist album original_year, albumtype albumdisambig label year catalognum} ($genre)'
+BEET_FORMAT_STRING='$mb_albumid|$original_year|%left{$albumartist,40}|%left{$album%aunique{albumtype albumdisambig label year catalognum},40}|$genre'
+BEET_HEADER_STRING='ID|Year|Artist|Album|Genre'
+
+FZF_ARGS=(
+  --header-lines 1
+  --height 80%
+  --layout=reverse
+  --multi
+  -0
+  --with-nth 2..
+  --accept-nth 1
+)
 
 main() {
-  cmus_status=$(cmus-remote -Q)
-  album_ids=$(beet ls -f"$BEET_FORMAT_STRING" -a "$@" added- albumartist+ | \
-    fzf --height 40% --layout=reverse --multi -1 -0 --with-nth 2.. | awk '{print $1}')
+  cmus_status=$(cmus-remote --raw status)
+  album_results="$(echo "${BEET_HEADER_STRING}"; beet ls -f"$BEET_FORMAT_STRING" -a "$@" added- albumartist+)"
+  album_ids=$(echo "${album_results}" | \
+    column -t -s '|' | \
+    fzf "${FZF_ARGS[@]}")
 
   if [ -z "$album_ids" ]; then
     echo "No albums found"
@@ -29,8 +42,9 @@ main() {
   num_albums=$(wc -l <<< "$album_ids")
   echo "Playing $num_albums albums"
 
-  # Pause
-  cmus-remote -C 'view queue'
+  # Switch to queue view
+  cmus-remote --raw 'view queue'
+
   # TODO: Add --args in order to add `-c` for clearing, then make parameterized
   # shellcheck disable=SC2086
   beet play -y $query year- album- track+
@@ -40,13 +54,13 @@ main() {
 
   if grep -qE "^status (paused|playing)" <<< "$cmus_status"; then
     # cmus was already playing
-    cmus-remote -p && cmus-remote -n
+    cmus-remote --play && cmus-remote --next
   else
-    cmus-remote -p
+    cmus-remote --play
   fi
 }
 
-if cmus-remote -Q > /dev/null 2>&1; then
+if cmus-remote --raw status > /dev/null 2>&1; then
   if [[ -z "$*" ]]; then
     main "added:-2w.."
   else
