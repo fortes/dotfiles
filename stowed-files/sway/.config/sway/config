@@ -202,8 +202,8 @@ bindsym XF86AudioNext exec music-control next
 bindsym Print exec "grimshot --notify copy active"
 # Mod-Shift-S for area, same as Windows snipping tool
 bindsym $mod+Shift+s exec grimshot --notify copy area
-# Shift-PrintScreen to video capture area, same as ShareX on Windows
-bindsym Shift+Print exec wl-record-screen
+# Mod-Shift-R for recording area, same as Windows snipping tool
+bindsym $mod+Shift+r exec wl-record-screen
 
 # Notification panel with Mod-Shift-N
 bindsym $mod+Shift+n exec swaync-client -t
