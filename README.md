@@ -82,6 +82,19 @@ Once you've run setup, you'll still have to do the following manual steps:
 
 6. Log into GitHub Copilot / Claude Code
 
+   ```sh
+   # GitHub CLI client
+   gh auth login
+   # May also need to update the Copilot extensions
+   gh extension upgrade gh-copilot
+
+   # Launch Claude Code, which will take you through the flow
+   claude
+
+   # Copilot Vim extension by doing `:Copilot setup`
+   # Make sure `ENABLE_GITHUB_COPILOT` variable is set in `~/.profile.local`
+   ```
+
 ## Ignoring changes to a file
 
 ```sh
