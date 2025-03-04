@@ -9,5 +9,5 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Setup machine
-        run: bash ./scripts/setup_mac
+        run: bash ./script/setup_mac
 

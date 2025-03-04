@@ -30,11 +30,11 @@ main() {
   # Colorscheme scripts have unbound variables
   set +u
   if [[ "${new_theme}" == "light" ]]; then
-    # shellcheck source=../../../../scripts/base16-default-light.sh
-    . ~/dotfiles/scripts/base16-default-light.sh
+    # shellcheck source=../../../../script/base16-default-light.sh
+    . ~/dotfiles/script/base16-default-light.sh
   else
-    # shellcheck source=../../../../scripts/base16-default-dark.sh
-    . ~/dotfiles/scripts/base16-default-dark.sh
+    # shellcheck source=../../../../script/base16-default-dark.sh
+    . ~/dotfiles/script/base16-default-dark.sh
   fi
   set -u
 
