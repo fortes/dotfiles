@@ -27,7 +27,7 @@ install_python_packages() {
   fi
 
   echo "Installing global uvx packages …"
-  grep -v "^#" "${dotfiles_root}/scripts/uvx-packages" | \
+  grep -v "^#" "${dotfiles_root}/script/uvx-packages" | \
     xargs --no-run-if-empty -L 1 uv tool install --quiet --force --refresh
   echo "uvx packages installed!"
 
@@ -41,7 +41,7 @@ install_python_packages() {
   . "${venv_path}/bin/activate"
 
   echo "Installing venv libraries …"
-  grep -v "^#" "${dotfiles_root}/scripts/python-libraries" | \
+  grep -v "^#" "${dotfiles_root}/script/python-libraries" | \
     xargs --no-run-if-empty \
       "${venv_path}/bin/python" -m pip install --quiet --upgrade
   echo "venv libraries installed!"

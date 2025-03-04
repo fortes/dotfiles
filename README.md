@@ -24,7 +24,7 @@ On MacOS, use:
 
 ```sh
 git clone https://github.com/fortes/dotfiles.git --branch debian-bookworm
-./dotfiles/scripts/setup_machine
+./dotfiles/script/setup
 ```
 
 ## Setup
@@ -119,10 +119,10 @@ TODO: Automate these steps.
 
 - Run browser setup above
 - Can install some optional apps via scripts:
-  - `dotfiles/scripts/setup_kvm`
-  - `dotfiles/scripts/setup_signal`
-  - `dotfiles/scripts/setup_zerotier`
-  - `dotfiles/scripts/setup_zoom`
+  - `dotfiles/script/setup_kvm`
+  - `dotfiles/script/setup_signal`
+  - `dotfiles/script/setup_zerotier`
+  - `dotfiles/script/setup_zoom`
 - Depending on the machine, you may need `pavucontrol` in order to unmute your audio output via GUI.
   \*\* Alternatively, find the name of the desired output via `pacmd list-sinks` then run `pacmd set-default-sink $SINK_NAME` and make sure to unmute via `pacmd set-sink-mute [name] 0`
 - If running multiple monitors, need to configure Wacom tablet to only use a specific monitor:

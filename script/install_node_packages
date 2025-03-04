@@ -29,7 +29,7 @@ install_node_packages() {
   eval "$(fnm env)"
 
   echo "Installing global node packages …"
-  grep -v "^#" "${dotfiles_root}/scripts/node-packages" | \
+  grep -v "^#" "${dotfiles_root}/script/node-packages" | \
     xargs --no-run-if-empty npm install -g --fund false
 
   echo "Node packages installed!"

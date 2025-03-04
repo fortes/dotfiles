@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Bootstrap an environment, be it Linux or Mac
+
+# Get script directory
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+if uname -s | grep -q Darwin; then
+  exec "${script_dir}/setup_mac" "$@"
+elif command -v apt > /dev/null 2>&1; then
+  exec "${script_dir}/setup_linux" "$@"
+else
+  >&2 echo 'Unsupported OS'
+  exit 1
+fi

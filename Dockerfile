@@ -32,7 +32,7 @@ WORKDIR /home/$USER_NAME
 
 ADD --chown=$USER_NAME:$USER_NAME . /home/$USER_NAME/dotfiles
 
-RUN ./dotfiles/scripts/setup_machine
+RUN ./dotfiles/script/setup
 
 SHELL ["/bin/bash", "-c"]
 CMD ["/bin/bash"]

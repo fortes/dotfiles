@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Make your machine usable
 #
-# Usage: setup_machine [--apt-only]
+# Usage: setup_linux [--apt-only]
 
 set -euo pipefail
 IFS=$'\n\t'
@@ -64,10 +64,10 @@ increase_max_watchers() {
 
 install_apt_packages() {
   declare apt_packages
-  apt_packages=$(grep -v "^#" "${dotfiles_root}/scripts/apt-packages-headless")
+  apt_packages=$(grep -v "^#" "${dotfiles_root}/script/apt-packages-headless")
 
   if [[ -z "${IS_HEADLESS:-}" ]]; then
-    apt_packages=$(grep --no-filename -v "^#" "${dotfiles_root}/scripts/apt-packages"*)
+    apt_packages=$(grep --no-filename -v "^#" "${dotfiles_root}/script/apt-packages"*)
   fi
 
   apt_update_once
@@ -253,11 +253,11 @@ main() {
 
   check_prerequisites
   setup_shell
-  "${dotfiles_root}/scripts/set_dotfiles_remote"
+  "${dotfiles_root}/script/set_dotfiles_remote"
 
   if [[ ! -f "${local_profile_path}" ]]; then
     echo "Generating ${local_profile_path}"
-    "${dotfiles_root}/scripts/create_local_profile" > "${local_profile_path}"
+    "${dotfiles_root}/script/create_local_profile" > "${local_profile_path}"
   fi
 
   # shellcheck source=/dev/null
@@ -267,19 +267,19 @@ main() {
   setup_backports
   install_apt_packages
   # Don't install 1Password GUI for now, it's not working properly
-  IS_HEADLESS=1 "${dotfiles_root}/scripts/install_1password"
-  [[ -z "${IS_DOCKER:-}" ]] && "${dotfiles_root}/scripts/install_et"
-  [[ -z "${IS_HEADLESS:-}" ]] && "${dotfiles_root}/scripts/install_firefox"
-  "${dotfiles_root}/scripts/install_github_packages"
+  IS_HEADLESS=1 "${dotfiles_root}/script/install_1password"
+  [[ -z "${IS_DOCKER:-}" ]] && "${dotfiles_root}/script/install_et"
+  [[ -z "${IS_HEADLESS:-}" ]] && "${dotfiles_root}/script/install_firefox"
+  "${dotfiles_root}/script/install_github_packages"
 
   # Remove default files before stowing, otherwise stow fails
-  "${dotfiles_root}/scripts/remove_default_dotfiles"
-  "${dotfiles_root}/scripts/stow"
+  "${dotfiles_root}/script/remove_default_dotfiles"
+  "${dotfiles_root}/script/stow"
 
   # Misc system configs
   increase_max_watchers
   pushd "${dotfiles_root}" > /dev/null
-  "${dotfiles_root}/scripts/lock_local_files"
+  "${dotfiles_root}/script/lock_local_files"
   popd > /dev/null
   set_default_applications
   [[ -z "${IS_DOCKER:-}" ]] && setup_docker
@@ -287,10 +287,10 @@ main() {
   setup_locale
 
   # Non-apt package managers
-  "${dotfiles_root}/scripts/install_node_packages"
-  "${dotfiles_root}/scripts/install_python_packages"
+  "${dotfiles_root}/script/install_node_packages"
+  "${dotfiles_root}/script/install_python_packages"
 
-  "${dotfiles_root}/scripts/generate_completions"
+  "${dotfiles_root}/script/generate_completions"
 
   echo "Setup complete!"
 
