@@ -19,6 +19,7 @@
 # - ncspot
 # - neovim (latest)
 # - pistol
+# - psst
 # - sad
 # - superfile
 # - wezterm
@@ -53,6 +54,7 @@ AVAILABLE_PACKAGES=(
   lazygit
   ncspot
   pistol
+  psst
   neovim
   sad
   superfile
@@ -188,7 +190,8 @@ install_zip() {
   pushd "${download_dir}" > /dev/null
   wget --quiet -O "${name}.zip" "${url}"
   echo -n "Unzipping ${name}.zip ... "
-  unzip -q -o -j -d "${install_location}" "${name}.zip"
+  unzip -q -o -j -d . "${name}.zip"
+  mv "${name}" "${install_location}/${name}"
   chmod 755 "${install_location}/${name}"
   popd > /dev/null
   rm -rf "${download_dir}"
@@ -316,6 +319,23 @@ install_pistol() {
   install_bin 'doronbehar/pistol' 'pistol-static-linux-x86_64'
 }
 
+install_psst() {
+  # One-off due to being a .deb which is in a .zip
+  local name="psst"
+  local repo="jpochyla/psst"
+  local url="https://nightly.link/jpochyla/psst/workflows/build/main/psst-deb-amd64.zip"
+
+  download_dir="$(mktemp --directory "${name}"XXX)"
+  pushd "${download_dir}" > /dev/null
+  wget --quiet -O "${name}.zip" "${url}"
+  echo -n "Unzipping ${name}.zip ... "
+  unzip -q -o -j -d . "${name}.zip"
+  echo "Installing ${repo} (requires sudo) ... "
+  sudo dpkg -i psst*.deb
+  popd > /dev/null
+  rm -rf "${download_dir}"
+}
+
 install_wezterm() {
   install_deb 'wez/wezterm' 'wezterm-.*.Debian12.deb'
 }
@@ -415,6 +435,9 @@ install_github_packages() {
         ;;
       pistol)
         install_pistol
+        ;;
+      psst)
+        [[ -z "${IS_HEADLESS:-}" ]] && install_psst
         ;;
       sad)
         install_sad

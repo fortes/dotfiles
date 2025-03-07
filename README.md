@@ -97,6 +97,8 @@ Once you've run setup, you'll still have to do the following manual steps:
    # Make sure `ENABLE_GITHUB_COPILOT` variable is set in `~/.profile.local`
    ```
 
+7. Log into Spotify via `ncspot` and `psst`
+
 ## Ignoring changes to a file
 
 ```sh
