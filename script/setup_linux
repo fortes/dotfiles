@@ -285,6 +285,7 @@ main() {
   [[ -z "${IS_DOCKER:-}" ]] && setup_docker
   setup_keyboard
   setup_locale
+  [[ -n "${IS_CROSTINI:-}" ]] && "${dotfiles_root}/script/set_chromebook_browser"
 
   # Non-apt package managers
   "${dotfiles_root}/script/install_node_packages"

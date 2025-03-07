@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Sets the default browser on Chromebooks such that it opens the native Chrome,
+# and not whatever linux browser is in crostini (e.g. Firefox)
+
+set -euo pipefail
+IFS=$'\n\t'
+
+main() {
+  if [[ -f /etc/apt/sources.list.d/cros.list ]]; then
+    echo "Setting default browser to Chromebook's native browser"
+    sudo update-alternatives --set x-www-browser /usr/bin/garcon-url-handler
+    unset BROWSER && xdg-settings set default-web-browser garcon_host_browser.desktop
+  else
+    >&2 echo "Not a Chromebook"
+    exit 1
+  fi
+}
+
+main "${@}"
