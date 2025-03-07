@@ -295,7 +295,7 @@ set complete+=kspell
 
 " Show menu when only one match, don't insert until match selected,
 " and don't autoselect a match
-set completeopt=longest,menuone,noinsert,noselect
+set completeopt=longest,menuone,noinsert,noselect,popup
 
 " Make sure there's a default dictionary for completion
 if filereadable('/usr/share/dict/words')

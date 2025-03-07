@@ -19,9 +19,9 @@ vim.opt.rtp:prepend(lazypath)
 require("lazy").setup({
   -- GitHub Co-Pilot is paid, so only load if #ENABLE_GITHUB_COPILOT is set
   {
-    'github/copilot.vim',
+    "github/copilot.vim",
     cond = function()
-      return os.getenv('ENABLE_GITHUB_COPILOT') == '1'
+      return os.getenv("ENABLE_GITHUB_COPILOT") == "1"
     end,
     config = function()
       vim.g.copilot_filetypes = {
@@ -33,6 +33,35 @@ require("lazy").setup({
         codecompanion = false,
       }
     end
+  },
+
+  -- GitHub Copilot chat, which isn't in copilot.vim yet
+  --
+  -- :CopilotChatOpen to open chat
+  -- :CopilotChatModels to view/select models
+  -- :CopilotChatAgents to view/select agents
+  -- :CopilotChatPrompts for predefined prompts like Explain/Review/Tests
+  --
+  -- <C-s> in insert mode to submit chat (<CR> in normal mode)
+  -- <C-y> to accept nearest diff
+  -- gh for help
+  {
+    {
+      "CopilotC-Nvim/CopilotChat.nvim",
+      cond = function()
+        return os.getenv("ENABLE_GITHUB_COPILOT") == "1"
+      end,
+      dependencies = {
+        { "github/copilot.vim" },
+        -- for curl, log and async functions
+        { "nvim-lua/plenary.nvim" },
+      },
+      -- Note: Only on MacOS or Linux
+      build = "make tiktoken",
+      opts = {
+        -- See Configuration section for options
+      },
+    },
   },
 
   -- AI coding assistant

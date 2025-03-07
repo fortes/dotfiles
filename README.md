@@ -85,6 +85,8 @@ Once you've run setup, you'll still have to do the following manual steps:
    ```sh
    # GitHub CLI client
    gh auth login
+   # Install the Copilot extension
+   gh extension install github/gh-copilot
    # May also need to update the Copilot extensions
    gh extension upgrade gh-copilot
 
@@ -355,6 +357,7 @@ Work in progress. The [Sway Wiki](https://github.com/swaywm/sway/wiki/i3-Migrati
 
 ## Future Improvements
 
+- [ ] Get things working in GitHub codespaces, which seems to use Ubuntu 20.04.06 LTS underneath. Currently fails silently trying to install backports sources. [Troubleshooting instructions](https://docs.github.com/en/codespaces/troubleshooting/troubleshooting-personalization-for-codespaces#troubleshooting-dotfiles) can be helpful
 - [ ] Figure out how to [use Hammerspoon](https://github.com/Hammerspoon/Spoons/blob/master/Source/MusicAppMediaFix.spoon/init.lua) to have media keys control cmus, instead of launching iTunes (gross)
 - Try switching from docker to podman
 - [ ] Test out [psst](https://github.com/jpochyla/psst) for Spotify
