@@ -262,6 +262,14 @@ Still a work in progress, but kinda works
 - Set `terminal.app` profile, send option as meta key
 - May want to install command line tools manually in order to get `git`: `xcode-select --install`
 - Run `setup_mac`
+- Make sure keys repeat properly in VSCode: `defaults write com.microsoft.VSCode ApplePressAndHoldEnabled -bool false`
+  - For other apps that have this issue, do the following:
+    ```sh
+    # Get the app id
+    osascript -e 'id of app "Cursor"'
+    # Outputs something like `com.todesktop.xxxxx`
+    defaults write -g com.todesktop.xxxxx ApplePressAndHoldEnabled -bool false
+    ```
 
 ##### After Setup
 
