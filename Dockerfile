@@ -30,7 +30,7 @@ RUN addgroup --gid $GROUP_ID $USER_NAME && \
 USER $USER_NAME
 WORKDIR /home/$USER_NAME
 
-ADD --chown=$USER_NAME:$USER_NAME . /home/$USER_NAME/dotfiles
+COPY --chown=$USER_NAME:$USER_NAME . /home/$USER_NAME/dotfiles
 
 RUN ./dotfiles/script/setup
 
