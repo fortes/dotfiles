@@ -737,6 +737,7 @@ require("lazy").setup({
   -- z<tab> to clear all signs in quickfix
   -- <C-x> to open in horizontal split, <C-v> for vertical
   -- `<`/`>` to move through quickfix history (basically `colder`/`cnewer`)
+  -- Check out stevearc/quicker.nvim at some point
   {
     'kevinhwang91/nvim-bqf',
     config = function()
