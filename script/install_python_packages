@@ -13,6 +13,25 @@ dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # shellcheck source=../stowed-files/bash/.profile
 . "${dotfiles_root}/stowed-files/bash/.profile"
 
+UVX_PACKAGES=(
+  # Must force python version due to dependency conflict
+  "aider-chat --python python3.12"
+  argcomplete
+  beautysh
+  # Requires additional dependencies due to plugins
+  "beets --with requests --with pylast"
+  epy-reader
+  files-to-prompt
+  llm
+  pyright
+  ruff
+  vim-vint
+)
+
+VENV_LIBRARIES=(
+  neovim
+)
+
 install_python_packages() {
   declare -r venv_path="$HOME/.local/venv"
 
@@ -27,8 +46,10 @@ install_python_packages() {
   fi
 
   echo "Installing global uvx packages …"
-  grep -v "^#" "${dotfiles_root}/script/uvx-packages" | \
-    xargs --no-run-if-empty -L 1 uv tool install --quiet --force --refresh
+  for package in "${UVX_PACKAGES[@]}"; do
+    # Need to use eval here since we allow additional arguments
+    eval "uv tool install --quiet --force --refresh ${package}"
+  done
   echo "uvx packages installed!"
 
   if [[ ! -d "${venv_path}" ]]; then
@@ -41,9 +62,7 @@ install_python_packages() {
   . "${venv_path}/bin/activate"
 
   echo "Installing venv libraries …"
-  grep -v "^#" "${dotfiles_root}/script/python-libraries" | \
-    xargs --no-run-if-empty \
-      "${venv_path}/bin/python" -m pip install --quiet --upgrade
+  "${venv_path}/bin/python" -m pip install --quiet --upgrade "${VENV_LIBRARIES[@]}"
   echo "venv libraries installed!"
 }
 
