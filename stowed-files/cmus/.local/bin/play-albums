@@ -112,6 +112,9 @@ play-albums() {
   local tmp_m3u_file
   tmp_m3u_file="$(mktemp).m3u"
 
+  # Make sure to clean up the temp file on exit
+  trap 'rm -f -- "${tmp_m3u_file}"' EXIT
+
   # Technically, can use `beet play` if the local and remote paths match,
   # but for now keep a single codepath
   #
