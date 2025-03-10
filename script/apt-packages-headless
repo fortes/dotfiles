@@ -22,6 +22,7 @@ exa
 exiv2
 fd-find
 ffmpeg
+flatpak
 fuse3
 # Debian version ancient, get from `install_github_packages`
 # fzf

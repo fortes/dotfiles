@@ -46,12 +46,13 @@ AVAILABLE_PACKAGES=(
   fx
   fzf
   # Bookworm tracking recent version already, can use apt
-  # github_cli
+  # github-cli
   helix
   hugo
   lazydocker
   lazygit
-  ncspot
+  # Use via flatpak due to conflict in glibc
+  # ncspot
   pistol
   neovim
   sad
