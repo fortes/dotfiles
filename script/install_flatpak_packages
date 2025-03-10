@@ -34,7 +34,7 @@ install_flatpak_packages() {
   fi
 
   echo "Installing Flatpak packages from ${packages_file} ..."
-  grep -v "^#" "${packages_file}" | while read -r package; do
+  while IFS= read -r package; do
     [ -z "${package}" ] && continue
     echo -n "Installing ${package} ... "
     flatpak install --or-update --user --assumeyes --noninteractive \
@@ -47,7 +47,7 @@ install_flatpak_packages() {
     fi
 
     echo "done."
-  done
+  done < <(grep -v "^#" "${packages_file}")
   echo "Flatpak packages installed!"
 }
 
