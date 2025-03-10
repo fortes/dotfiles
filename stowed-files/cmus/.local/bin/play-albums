@@ -1,9 +1,26 @@
 #!/usr/bin/env bash
+# Helper to query beets for albums, select via FZF, then play in cmus.
+# Also handles rewriting remote paths to local paths.
+#
+# Set the local path by editing this script, or (preferrably) via the
+# `LOCAL_ALBUM_DIR` env variable
+#
+# Usage:
+#
+#   # Choose from albums in a given year
+#   play-albums year:2025 genre:rock
+#
+#   # Append to play queue instead of clearing
+#   play-albums beth gibbons --append
+
 [[ "$TRACE" ]] && set -o xtrace
 
 set -o errexit
 set -o nounset
 set -o pipefail
+
+BEETS_ALBUM_DIR="/data/media/music/albums/"
+LOCAL_ALBUM_DIR="${LOCAL_ALBUM_DIR:-${BEETS_ALBUM_DIR}}"
 
 # shellcheck disable=SC2016
 BEET_FORMAT_STRING='$mb_albumid|$original_year|%left{$albumartist,40}|%left{$album,40}|$genre'
@@ -19,12 +36,26 @@ FZF_ARGS=(
   --accept-nth 1
 )
 
-main() {
+play-albums() {
   local album_ids
   local append=false
   local beet_album_query
   local beet_query_args=()
   local beet_query_results
+  local column_name_arg
+
+  if ! cmus-remote --raw status > /dev/null 2>&1; then
+    echo "cmus not running"
+    exit 1
+  fi
+
+  if [[ ! -d "${LOCAL_ALBUM_DIR}" ]]; then
+    echo "Local album directory not found: ${LOCAL_ALBUM_DIR}"
+    exit 1
+  fi
+
+  # Make sure `LOCAL_ALBUM_DIR` ends with a trailing slash
+  LOCAL_ALBUM_DIR="$(realpath "${LOCAL_ALBUM_DIR}")/"
 
    # Parse arguments
   while [[ $# -gt 0 ]]; do
@@ -46,10 +77,22 @@ main() {
 
   # Purposefuly want to use unquoted here
   # shellcheck disable=SC2086
-  beet_query_results=$(beet ls -a -f"${BEET_FORMAT_STRING}" "${beet_query_args[@]}" added- albumartist+ original_year-)
+  beet_query_results=$(beet ls --album --format="${BEET_FORMAT_STRING}" \
+    added- albumartist+ original_year- \
+    "${beet_query_args[@]}" \
+  )
 
+  if uname -s | grep -vq Darwin; then
+    # Not supported on BSD `column`
+    column_name_arg="--table-columns ${COLUMN_NAMES}"
+  else
+    # Prepend row with column names
+    beet_query_results=$(echo "${COLUMN_NAMES}" | tr ',' '|'; echo "${beet_query_results}")
+  fi
+
+  # shellcheck disable=SC2086
   album_ids=$(echo "${beet_query_results}" | \
-    column -t -s '|' --table-columns "${COLUMN_NAMES}" | \
+    column -t -s '|' ${column_name_arg:-} | \
     fzf "${FZF_ARGS[@]}")
 
   if [ -z "$album_ids" ]; then
@@ -65,34 +108,45 @@ main() {
   # Remove initial ', ' using parameter substitution
   beet_album_query=${beet_album_query#, }
 
+  # Generate a list of paths to the matched albums
+  local tmp_m3u_file
+  tmp_m3u_file="$(mktemp).m3u"
+
+  # Make sure to clean up the temp file on exit
+  trap 'rm -f -- "${tmp_m3u_file}"' EXIT
+
+  # Technically, can use `beet play` if the local and remote paths match,
+  # but for now keep a single codepath
+  #
+  # Purposefuly want to use unquoted here for the query
+  # shellcheck disable=SC2086
+  beet ls --path original_year- album- track+ ${beet_album_query} \
+    | sed -e "s|${BEETS_ALBUM_DIR}|${LOCAL_ALBUM_DIR}|" > "${tmp_m3u_file}"
+
   if ! ${append}; then
     cmus-remote --clear --queue
+    cmus-remote --stop
   fi
 
-  # Purposefuly want to use unquoted here
-  # shellcheck disable=SC2086
-  beet play -y ${beet_album_query} original_year- album- track+
+  # Output number of albums being played
+  local album_count
+  album_count=$(echo "${album_ids}" | wc -l)
+  echo "Playing ${album_count} albums"
+
+  # Switch to queue view
+  cmus-remote --raw 'view queue'
+  cmus-remote --queue "${tmp_m3u_file}"
 
   # Wait a beat in order to make sure cmus has queued the album
   sleep 2
 
-  # Switch to queue view
-  cmus-remote --raw 'view queue'
-
   # If the queue was cleared, advance to the next track to start new albums
   if ! ${append}; then
-    if cmus-remote --raw status | grep -qE "^status (paused|playing)"; then
-      # cmus was already playing
-      cmus-remote --play && cmus-remote --next
-    else
-      cmus-remote --play
-    fi
+    cmus-remote --play
+    cmus-remote --next
   fi
 }
 
-if cmus-remote --raw status > /dev/null 2>&1; then
-  main "$@"
-else
-  echo "cmus not running"
-  exit 1
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  play-albums "$@"
 fi
