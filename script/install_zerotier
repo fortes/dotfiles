@@ -7,7 +7,7 @@ set -euo pipefail
 IFS=$'\n\t'
 export DEBIAN_FRONTEND=noninteractive
 
-main() {
+install_zerotier() {
   declare -r zerotier_sources_list="/etc/apt/sources.list.d/zerotier.list"
   declare -r zerotier_key_url="https://raw.githubusercontent.com/zerotier/ZeroTierOne/master/doc/contact%40zerotier.com.gpg"
   declare -r zerotier_key_path="/etc/apt/keyrings/zerotier.asc"
@@ -32,4 +32,6 @@ main() {
   echo 'Join network via `sudo zerotier-cli join xxxxxxxxx`'
 }
 
-main
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  install_zerotier
+fi

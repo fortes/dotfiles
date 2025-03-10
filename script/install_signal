@@ -7,7 +7,7 @@ set -euo pipefail
 IFS=$'\n\t'
 export DEBIAN_FRONTEND=noninteractive
 
-main() {
+install_signal() {
   declare -r signal_sources_list="/etc/apt/sources.list.d/signal-xenial.list"
   declare -r signal_key_url="https://updates.signal.org/desktop/apt/keys.asc"
   declare -r signal_key_path="/etc/apt/keyrings/signal-xenial.asc"
@@ -30,5 +30,7 @@ main() {
     --fix-broken --no-install-recommends signal-desktop desktop-file-utils
 }
 
-main
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  install_signal
+fi
 

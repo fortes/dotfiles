@@ -33,7 +33,7 @@ EXTENSIONS=(
   wayou.vscode-todo-highlight
 )
 
-main() {
+install_vscode_extensions() {
   if ! command -v code &> /dev/null; then
     echo "Must have VSCode installed" 1>&2
     exit 1
@@ -48,4 +48,6 @@ main() {
   done
 }
 
-main
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  install_vscode_extensions
+fi

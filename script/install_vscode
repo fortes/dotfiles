@@ -10,7 +10,7 @@ export DEBIAN_FRONTEND=noninteractive
 declare dotfiles_root
 dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-main() {
+install_vscdoe() {
   declare -r vscode_sources_list="/etc/apt/sources.list.d/vscode.list"
   declare -r vscode_key_url="https://packages.microsoft.com/keys/microsoft.asc"
   declare -r vscode_key_path="/etc/apt/keyrings/microsoft.asc"
@@ -39,5 +39,7 @@ main() {
   exec "${dotfiles_root}/script/install_vscode_extensions"
 }
 
-main
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  install_vscdoe
+fi
 

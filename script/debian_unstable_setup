@@ -10,7 +10,9 @@ export DEBIAN_FRONTEND=noninteractive
 declare dotfiles_root
 dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-main() {
+UNSTABLE_PACKAGES=()
+
+debian_unstable_setup() {
   declare -r unstable_sources_list="/etc/apt/sources.list.d/debian-unstable.list"
 
   if [ ! -f "$unstable_sources_list" ]; then
@@ -26,10 +28,11 @@ main() {
   fi
 
   echo "Installing unstable packages (requires sudo)"
-  grep -v "^#" "${dotfiles_root}/script/apt-packages-unstable" | \
-    xargs --no-run-if-empty \
-    sudo -E apt-get install -qq -o=Dpkg::Use-Pty=0 --assume-yes \
-    --fix-broken --no-install-recommends --target-release unstable 
+  sudo -E apt-get install -qq -o=Dpkg::Use-Pty=0 --assume-yes \
+    --fix-broken --no-install-recommends --target-release unstable \
+    "${UNSTABLE_PACKAGES[@]}"
 }
 
-main
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  debian_unstable_setup
+fi

@@ -7,7 +7,7 @@ set -euo pipefail
 IFS=$'\n\t'
 export DEBIAN_FRONTEND=noninteractive
 
-main() {
+install_zoom() {
   declare -r zoom_deb_url="https://zoom.us/client/latest/zoom_amd64.deb"
   declare -r zoom_deb_temp_path="/tmp/zoom_amd64.deb"
 
@@ -22,4 +22,6 @@ main() {
   rm -rf "${zoom_deb_temp_path}"
 }
 
-main
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  install_zoom
+fi
