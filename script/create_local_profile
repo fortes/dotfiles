@@ -51,6 +51,7 @@ export IS_HEADLESS="${is_headless:-}"
 
 # Add machine-specific items below
 # export BEETSDIR=/data/media/music/beets
+# export LOCAL_ALBUM_DIR="$HOME/music"
 PROFILE_TEMPLATE
 }
 
