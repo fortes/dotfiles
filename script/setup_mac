@@ -40,7 +40,6 @@ BREW_PACKAGES=(
   git-crypt
   git-extras
   git-lfs
-  gocryptfs
   gron
   helix
   htop
