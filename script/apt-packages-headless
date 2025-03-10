@@ -32,6 +32,7 @@ git-crypt
 git-extras
 git-lfs
 gnupg
+gocryptfs
 gron
 htop
 # Debian version ancient, get from `install_github_packages`
