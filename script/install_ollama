@@ -7,7 +7,7 @@ set -euo pipefail
 IFS=$'\n\t'
 export DEBIAN_FRONTEND=noninteractive
 
-main() {
+install_ollama() {
   local force
   local install_location="$HOME/.local/bin/ollama"
   local download_dir
@@ -38,6 +38,6 @@ main() {
   # Can also hook up via `llm` by first `llm install llm-ollama`
 }
 
-main "$@"
-
-
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  install_ollama "$@"
+fi

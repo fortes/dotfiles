@@ -32,6 +32,8 @@ WORKDIR /home/$USER_NAME
 
 COPY --chown=$USER_NAME:$USER_NAME . /home/$USER_NAME/dotfiles
 
+ENV IS_DOCKER=1
+
 RUN ./dotfiles/script/setup
 
 SHELL ["/bin/bash", "-c"]

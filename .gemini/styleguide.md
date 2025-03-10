@@ -16,3 +16,4 @@ This repository contains the dotfiles for my personal development environment. I
 * Configuration files are stored in the `stowed-files` directory, then symlinked via the GNU Stow utility.
 
 * Bash scripts should all follow the "Strict Mode" pattern to ensure that they are safe and reliable
+  * Should also use long form options for readability

@@ -12,6 +12,10 @@ dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # Load command_exists helper and local paths
 . "${dotfiles_root}/stowed-files/bash/.profile"
 
+FLATPAK_PACKAGES=(
+  io.github.hrkfdn.ncspot
+)
+
 install_flatpak_packages() {
   if ! command_exists flatpak; then
     >&2 echo "⨯ flatpak not installed!"
@@ -34,7 +38,7 @@ install_flatpak_packages() {
   fi
 
   echo "Installing Flatpak packages from ${packages_file} ..."
-  while IFS= read -r package; do
+  for package in "${FLATPAK_PACKAGES[@]}"; do
     [ -z "${package}" ] && continue
     echo -n "Installing ${package} ... "
     flatpak install --or-update --user --assumeyes --noninteractive \
@@ -50,7 +54,7 @@ install_flatpak_packages() {
     fi
 
     echo "done."
-  done < <(grep -v "^#" "${packages_file}")
+  done
   echo "Flatpak packages installed!"
 }
 

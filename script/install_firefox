@@ -7,7 +7,7 @@ set -euo pipefail
 IFS=$'\n\t'
 export DEBIAN_FRONTEND=noninteractive
 
-main() {
+install_firefox() {
   declare -r firefox_sources_list="/etc/apt/sources.list.d/firefox.list"
   declare -r firefox_key_url="https://packages.mozilla.org/apt/repo-signing-key.gpg"
   declare -r firefox_key_path="/etc/apt/keyrings/packages.mozilla.org.asc"
@@ -31,5 +31,7 @@ main() {
     --fix-broken --no-install-recommends firefox
 }
 
-main
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  install_firefox "${@}"
+fi
 

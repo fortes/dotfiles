@@ -9,6 +9,26 @@ IFS=$'\n\t'
 declare dotfiles_root
 dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
+PACKAGES=(
+  @anthropic-ai/claude-code
+  bash-language-server
+  cssmodules-language-server
+  dockerfile-language-server-nodejs
+  eslint
+  fkill-cli
+  neovim
+  npm
+  npm-check-updates
+  prettier
+  rome
+  tsx
+  typescript
+  typescript-language-server
+  vim-language-server
+  vscode-langservers-extracted
+  yaml-language-server
+)
+
 # Make sure to load `command_exists` helper as well as local paths
 # shellcheck source=../stowed-files/bash/.profile
 . "${dotfiles_root}/stowed-files/bash/.profile"
@@ -29,9 +49,7 @@ install_node_packages() {
   eval "$(fnm env)"
 
   echo "Installing global node packages …"
-  grep -v "^#" "${dotfiles_root}/script/node-packages" | \
-    xargs --no-run-if-empty npm install -g --fund false
-
+  npm install --global --fund false "${PACKAGES[@]}"
   echo "Node packages installed!"
 }
 
