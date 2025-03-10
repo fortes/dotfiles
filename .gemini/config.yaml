@@ -1,0 +1,11 @@
+# Disable poems, etc
+have_fun: false
+code_review:
+  # Enable acting on PRs
+  disable: false
+  comment_severity_threshold: LOW
+  max_review_comments: -1
+  pull_request_opened:
+    help: false
+    summary: false
+    code_review: true
