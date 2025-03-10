@@ -41,7 +41,10 @@ install_flatpak_packages() {
       flathub "${package}"
 
     local friendly_name="${package##*.}"
-    if grep -vq "^alias ${friendly_name}=" "${HOME}/.aliases.local"; then
+    if [[ ! -f "${HOME}/.aliases.local" ]]; then
+      touch "${HOME}/.aliases.local"
+    fi
+    if ! grep -q "^alias ${friendly_name}=" "${HOME}/.aliases.local"; then
       echo -n "Adding alias for ${friendly_name} ..."
       echo "alias ${friendly_name}='flatpak run ${package}'" >> "${HOME}/.aliases.local"
     fi
