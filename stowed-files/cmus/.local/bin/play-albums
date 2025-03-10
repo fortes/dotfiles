@@ -113,7 +113,8 @@ play-albums() {
   tmp_m3u_file="$(mktemp).m3u"
 
   # Make sure to clean up the temp file on exit
-  trap 'rm -f -- "${tmp_m3u_file}"' EXIT
+  # shellcheck disable=SC2064
+  trap "rm -f \"${tmp_m3u_file:-}\"" EXIT
 
   # Technically, can use `beet play` if the local and remote paths match,
   # but for now keep a single codepath
@@ -129,9 +130,14 @@ play-albums() {
   fi
 
   # Output number of albums being played
-  local album_count
-  album_count=$(echo "${album_ids}" | wc -l)
-  echo "Playing ${album_count} albums"
+  local song_count
+  song_count=$(wc -l < "${tmp_m3u_file}")
+
+  if ${append}; then
+    printf "Adding %d songs\n" "${song_count}"
+  else
+    printf "Playing %d songs\n" "${song_count}"
+  fi
 
   # Switch to queue view
   cmus-remote --raw 'view queue'
