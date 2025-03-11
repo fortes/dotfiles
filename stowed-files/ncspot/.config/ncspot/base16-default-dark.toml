@@ -1,0 +1,19 @@
+# Base16 Default Dark - ncspot color config
+# Chris Kempson (http://chriskempson.com)
+
+[theme]
+background = "#181818"
+primary = "#d8d8d8"
+secondary = "#282828"
+title = "#e8e8e8"
+playing = "#e8e8e8"
+playing_bg = "#181818"
+highlight = "#d8d8d8"
+highlight_bg = "#383838"
+error = "#d8d8d8"
+error_bg = "#f8f8f8"
+statusbar = "#181818"
+statusbar_progress = "#e8e8e8"
+statusbar_bg = "#e8e8e8"
+cmdline = "#d8d8d8"
+cmdline_bg = "#181818"
