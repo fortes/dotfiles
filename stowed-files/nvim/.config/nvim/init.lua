@@ -31,6 +31,7 @@ require("lazy").setup({
         TelescopePrompt = false,
         DressingInput = false,
         codecompanion = false,
+        ["copilot-chat"] = false,
       }
     end
   },
