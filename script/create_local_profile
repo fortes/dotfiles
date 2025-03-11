@@ -36,9 +36,10 @@ export IS_HEADLESS="${is_headless:-}"
 # Enable if GitHub account has Copilot access
 # export ENABLE_GITHUB_COPILOT=1
 
-# Used for 'llm' command
+# Used for 'llm' and 'aider'
 # export ANTHROPIC_API_KEY="xxxxxx"
 # export OPENAI_API_KEY="xxxxxx"
+# export OPENROUTER_API_KEY="xxxxxx"
 
 # Typescript language server can OOM on large codebases
 # export MAX_TS_SERVER_MEMORY=32768

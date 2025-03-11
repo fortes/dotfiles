@@ -99,6 +99,8 @@ Once you've run setup, you'll still have to do the following manual steps:
 
 7. Log into Spotify via `ncspot` and `psst`
 
+8. Add keys for `llm` via `llm keys set xxx` (or copy over from another machine from `~/.config/io.datasette.llm`)
+
 ## Ignoring changes to a file
 
 ```sh

@@ -10,6 +10,7 @@ PLUGINS=(
   llm-anthropic
   llm-gemini
   llm-ollama
+  llm-openrouter
 )
 
 install_llm_plugins() {
