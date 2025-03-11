@@ -80,6 +80,12 @@ if command_exists code; then
   alias code='code --user-data-dir="${XDG_CONFIG_HOME}/Code"'
 fi
 
+# Flatpak aliases
+if command_exists flatpak; then
+  # Make sure to use config from `~/.config`, not `~/.var/app/xxx`
+  alias ncspot='flatpak run io.github.hrkfdn.ncspot --config "${XDG_CONFIG_HOME}/ncspot/config.toml"'
+fi
+
 # Load local file if present
 if [ -f ~/.aliases.local ]; then
   # shellcheck source=/dev/null
