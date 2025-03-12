@@ -11,8 +11,33 @@ main() {
   dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
   local stowed_files_path="${dotfiles_root}/stowed-files"
 
+  # Purposefully allow word splitting on $@ to pass through flags
+  # shellcheck disable=SC2046,SC2068
   stow --dir="${stowed_files_path}/" --target="$HOME" \
-    $(ls "${stowed_files_path}") $@
+    $(ls "${stowed_files_path}") ${@}
+
+  # Special case for firefox user.js
+  if [[ -d "${HOME}/.mozilla/firefox" ]]; then
+    local profile_dirs
+    profile_dirs="$(ls -d "${HOME}/.mozilla/firefox/"*.default*)"
+
+    # There's a `.stow-local-ignore` file to ignore `user.js` during
+    # the previous operation. We rename it temporarily in order to
+    # do the profile stowing, then restore it
+    mv "${stowed_files_path}/mozilla/.stow-local-ignore" \
+      "${dotfiles_root}/mozilla-stow-local-ignore.bak"
+
+    for profile_dir in ${profile_dirs}; do
+      # Purposefully allow word splitting on $@ to pass through flags
+      # shellcheck disable=SC2046,SC2068
+      stow --dir="${stowed_files_path}" --target="${profile_dir}" \
+        --override=user.js mozilla ${@}
+    done
+
+    # Restore ignore file
+    mv "${dotfiles_root}/mozilla-stow-local-ignore.bak" \
+      "${stowed_files_path}/mozilla/.stow-local-ignore"
+  fi
 }
 
 main "${@}"

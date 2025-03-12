@@ -301,6 +301,8 @@ docker run -it --rm --name dotfiles -v ~/src:/home/fortes/src dotfiles
 
 #### TODO
 
+- [ ] Move from `docker` to `podman`
+- [ ] Get `devcontainer` setup for this repo
 - [ ] Get remote VSCode settings synced up as well, currently in `~/.vscode-server/data/Machine`
 - [ ] Move `ncspot` to install from Flatpak or Snap since it doesn't work on bookworm due to glibc version
 - [ ] Figure out how to get [M1 CI running](https://github.blog/changelog/2024-01-30-github-actions-introducing-the-new-m1-macos-runner-available-to-open-source/) to check builds
