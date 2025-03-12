@@ -68,7 +68,8 @@ HEADLESS_PACKAGES=(
   ncal
   ncdu
   ncurses-term
-  neovim
+  # Installed via `install_github_packages`
+  # neovim
   pipx
   progress
   python3
