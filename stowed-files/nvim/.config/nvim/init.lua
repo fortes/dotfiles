@@ -139,25 +139,6 @@ require("lazy").setup({
           map('n', 'crr', '<cmd>lua vim.lsp.buf.code_action()<cr>')
           map('v', 'crr', '<cmd>lua vim.lsp.buf.code_action()<cr>')
         end
-        if client.server_capabilities.documentFormattingProvider then
-          map('n', '<leader>f', '<cmd>lua vim.lsp.buf.format({async = false})<cr>')
-
-          -- Format on save, where supported
-          vim.api.nvim_create_augroup("lsp_format_on_save", {
-            clear = true
-          })
-          vim.api.nvim_create_autocmd("BufWritePre", {
-            desc = "LSP format on save",
-            group = "lsp_format_on_save",
-            pattern = "*",
-            callback = function()
-              vim.lsp.buf.format({async = true})
-            end
-          })
-        end
-        if client.server_capabilities.documentRangeFormattingProvider then
-          map('v', '<leader>f', '<cmd>lua vim.lsp.buf.format({async = false})<cr>')
-        end
         if client.server_capabilities.documentSymbolProvider then
           map('n', '<leader>ds', '<cmd>Telescope lsp_document_symbols<cr>')
         else
@@ -489,6 +470,47 @@ require("lazy").setup({
       ':lua require("telescope").extensions.neoclip.default()<cr>',
       {noremap=true, silent=true})
     end
+  },
+
+  -- Formatting, use <leader>f to format buffer / selection
+  {
+    'stevearc/conform.nvim',
+    cmd = { "ConformInfo" },
+    event = { "BufWritePre" },
+    keys = {
+      {
+        "<leader>f",
+        function()
+          require("conform").format({ async = true })
+        end,
+        mode = "",
+        desc = "Format buffer",
+      },
+    },
+    init = function()
+      vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
+    end,
+    opts = {
+      default_format_opts = {
+        lsp_format = "fallback",
+      },
+      format_on_save = {
+        -- Options will be passed to conform.format()
+        async = true,
+        timeout_ms = 500,
+      },
+      formatters_by_ft = {
+        bash = {'beautysh'},
+        css = {'prettier'},
+        html = {'prettier'},
+        javascript = {'prettier'},
+        json = {'prettier'},
+        markdown = {'prettier'},
+        python = {'ruff'},
+        typescript = {'prettier'},
+        yaml = {'prettier'},
+      },
+    },
   },
 
   -- Highlight ranges in timeline

@@ -328,7 +328,6 @@ Work in progress. The [Sway Wiki](https://github.com/swaywm/sway/wiki/i3-Migrati
 - Chromium: Need to either use command-line flags `--ozone-platform-hint=auto` or go to `chrome://flags` and set `Preferred Ozone platform`
 - Read through [this guide](https://anarc.at/software/desktop/wayland/) a bit more, lots of good detail and using debian and systemd to drive a bunch of stuff
 - Notifications
-  - [x] `sway-notification-center` over dunst, much better
   - [ ] No need to start automatically, dbus does that
   - [ ] Figure out volume, etc controls in there. Can substitute for some of the waybar stuff
       - Looks like this is on newer version than what's in Debian repos, so need to either go to sid early, or just wait
@@ -348,26 +347,6 @@ Work in progress. The [Sway Wiki](https://github.com/swaywm/sway/wiki/i3-Migrati
   - get `sway/config.local` out of source control, etc
 - [ ] Figure out how to make wacom tablet work (and update instructions)
   - [OpenTabletDriver](https://github.com/OpenTabletDriver/OpenTabletDriver) looks promising, but need to test
-- [x] Figure out how to get things using Wayland where necessary
-  - Firefox, Chrome need flags
-  - Signal as well, watch out for needing floating at start
-    - `signal-desktop --enable-features=UseOzonePlatform --ozone-platform=wayland`
-- [x] Need to update screenshot scripts, will likely be `grim` / `slurp` / `grimshot`
-  - Screen recording via `wf-recorder`?
-- [x] Volume keyboard controls not working
-- [x] Need a `rofi` replacement for app launching, window switching, and shutdown, etc commands.
-  - Might consider just using a terminal with `fzf`, but need to figure out the data sources
-  - `wofi` kinda working, need to get terminal apps running (e.g. `htop`)
-  - Window switcher kinda works, need icons
-- [x] `gammastep` seems to work on Wayland, need to figure out all the launching, etc
-  - `gammastep-indicator` broken due to not including `/usr/lib/python3/dist-packages` in `PYTHONPATH`, works if done manually, not sure if something wrong with sway config or what
-  - Need to double-check at night, but should be good?
-- [x] `dunst` seems to support wayland, but need to get launching, etc.
-  - Hm, dbus does this for us, probably fine
-  - `mako-notifier` an option, need to configure in order to get icons
-  - [x] Tray doesn't seem to work? Should have gammastep there?
-      - Tray does work, just nothing in it right now
-- [x] Need to port background drawing handling over, likely using `swaybg` or just native sway
 
 ## Future Improvements
 
@@ -379,11 +358,6 @@ Work in progress. The [Sway Wiki](https://github.com/swaywm/sway/wiki/i3-Migrati
 - [ ] Check out [`yazi`](https://github.com/sxyazi/yazi) over `vifm`
 - [ ] (caniuse-cli)[https://github.com/sgentle/caniuse-cmd]
 - [ ] Look into `stevearc/conform.nvim`
-- [ ] Add [Firefox Nightly](https://blog.nightly.mozilla.org/2023/10/30/introducing-mozillas-firefox-nightly-deb-packages-for-debian-based-linux-distributions/)
-- [ ] Use [native OSC52 support in Neovim](https://github.com/neovim/neovim/issues/3344) instead of plugin
-- [ ] sixel support in tmux 3.4, but gotta wait until it (hopefully) hits Debian backports
-  - Once sixels are supported, can make a bunch of improvements to scripts here
-  - May want to consider `zellij` which supports sixel? Currently slightly janky though
 - [ ] `wshowkeys` or similar for showing keypresses for screencasts, etc
 - [ ] Figure out Lutris / Wine / Proton for Linux gaming
 - [ ] [Auto-publish Docker images](https://docs.github.com/en/actions/publishing-packages/publishing-docker-images#publishing-images-to-github-packages)

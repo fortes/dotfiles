@@ -675,10 +675,6 @@ augroup filetype_tweaks
     autocmd FileType python setlocal formatprg=ruff\ format\ --stdin-filename\ %\ -
   endif
 
-  if executable('refmt')
-    autocmd FileType reason setlocal formatprg=refmt
-  endif
-
   " Find .js files when using `gf` (useful with require)
   autocmd FileType javascript setlocal suffixesadd=.js,.json,index.js
   autocmd FileType typescript setlocal suffixesadd=.ts,.tsx,.js,.jsx,.json,index.js,index.ts
