@@ -308,12 +308,15 @@ install_neovim_stable() {
     echo "Must manually launch Neovim to install plugins"
   fi
 
-  echo "Setting neovim as default editor (requires sudo)"
-  sudo update-alternatives --install /usr/bin/ex ex "${vim_path}" 110
-  sudo update-alternatives --install /usr/bin/vi vi "${vim_path}" 110
-  sudo update-alternatives --install /usr/bin/view view "${vim_path}" 110
-  sudo update-alternatives --install /usr/bin/vim vim "${vim_path}" 110
-  sudo update-alternatives --install /usr/bin/vimdiff vimdiff "${vim_path}" 110
+  # Assume if it's already set for `vim`, then it's set for the others
+  if update-alternatives --list vim | head -n1 | grep -qv "${vim_path}"; then
+    echo "Setting neovim as default editor (requires sudo)"
+    sudo update-alternatives --install /usr/bin/ex ex "${vim_path}" 110
+    sudo update-alternatives --install /usr/bin/vi vi "${vim_path}" 110
+    sudo update-alternatives --install /usr/bin/view view "${vim_path}" 110
+    sudo update-alternatives --install /usr/bin/vim vim "${vim_path}" 110
+    sudo update-alternatives --install /usr/bin/vimdiff vimdiff "${vim_path}" 110
+  fi
 }
 
 install_pistol() {
