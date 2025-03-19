@@ -244,14 +244,7 @@ install_fzf() {
 }
 
 install_helix() {
-  local url
-  url="$(get_latest_release_url 'helix-editor/helix' 'x86_64.AppImage')"
-  local install_location="$HOME/.local/bin"
-  mkdir -p "${install_location}"
-  echo -n "Downloading helix ... "
-  wget --quiet -O "${install_location}/hx" "${url}"
-  chmod 755 "${install_location}/hx"
-  echo "helix installed"
+  install_bin 'helix-editor/helix' 'x86_64.AppImage' 'hx'
 }
 
 install_hugo() {
