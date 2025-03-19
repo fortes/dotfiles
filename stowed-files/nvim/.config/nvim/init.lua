@@ -489,28 +489,39 @@ require("lazy").setup({
     },
     init = function()
       vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
+
+      -- Use `deno` for formatting when in a deno project, prettier otherwise
+      local deno_or_prettier = function(bufnr)
+        -- Let `deno` LSP format when in a deno project, fall back to prettier
+        if vim.fs.root(bufnr, { 'deno.json', 'deno.jsonc' }) ~= nil then
+          return { 'deno_fmt', lsp_format = 'prefer' }
+        end
+        return { 'prettier' }
+      end
+
+      require("conform").setup({
+        default_format_opts = {
+          lsp_format = "fallback",
+        },
+        format_after_save = {
+          -- Options will be passed to conform.format()
+          async = true,
+          timeout_ms = 500,
+        },
+        formatters_by_ft = {
+          bash = {'beautysh'},
+          css = {'prettier'},
+          html = {'prettier'},
+          javascript = deno_or_prettier,
+          json = deno_or_prettier,
+          jsonc = deno_or_prettier,
+          markdown = deno_or_prettier,
+          python = {'ruff'},
+          typescript = deno_or_prettier,
+          yaml = {'prettier'},
+        },
+      })
     end,
-    opts = {
-      default_format_opts = {
-        lsp_format = "fallback",
-      },
-      format_on_save = {
-        -- Options will be passed to conform.format()
-        async = true,
-        timeout_ms = 500,
-      },
-      formatters_by_ft = {
-        bash = {'beautysh'},
-        css = {'prettier'},
-        html = {'prettier'},
-        javascript = {'prettier'},
-        json = {'prettier'},
-        markdown = {'prettier'},
-        python = {'ruff'},
-        typescript = {'prettier'},
-        yaml = {'prettier'},
-      },
-    },
   },
 
   -- Highlight ranges in timeline
