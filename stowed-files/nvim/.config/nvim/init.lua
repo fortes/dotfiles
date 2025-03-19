@@ -17,12 +17,16 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 -- Helper for keymaps
-local function map(mode, lhs, rhs, bufnr)
+local function map(mode, lhs, rhs, opts_or_bufnr)
   local opts = {
-    buffer = bufnr,
     noremap = true,
     silent = true
   }
+  if (type(opts_or_bufnr) == 'number') then
+    opts.buffer = opts_or_bufnr
+  elseif (type(opts_or_bufnr) == 'table') then
+    opts = vim.tbl_extend('force', opts, opts_or_bufnr)
+  end
   vim.keymap.set(mode, lhs, rhs, opts)
 end
 
@@ -183,7 +187,9 @@ require("lazy").setup({
         eslint = vim.tbl_deep_extend('force', default_lsp_opts, {
           on_attach = function(client, bufnr)
             -- <leader>x to autofix via eslint
-            map('n', '<leader>x', '<cmd>EslintFixAll<cr>')
+            map('n', '<leader>x', '<cmd>EslintFixAll<cr>', {
+              desc = "Fix all ESLint issues"
+            })
             lsp_on_attach(client, bufnr)
           end,
           root_dir = nvim_lsp.util.root_pattern('.git')
@@ -402,7 +408,9 @@ require("lazy").setup({
       })
 
       -- Key mappings: <space>m - toggle
-      map('n', '<leader>m', require('treesj').toggle)
+      map('n', '<leader>m', require('treesj').toggle, {
+        desc = 'Toggle node join',
+      })
     end,
   },
 
@@ -482,16 +490,31 @@ require("lazy").setup({
         local builtin = require('telescope.builtin')
 
         -- Key mappings
-        map('n', '<leader>t', '<cmd>Telescope<cr>')
-        map('n', 'z=', builtin.spell_suggest)
-        map('n', '<c-p>', project_files)
-        map('n', '<m-p>', builtin.oldfiles)
-        map('n', '<m-b>', builtin.buffers)
-        map('n', '<m-m>', builtin.marks)
+        map('n', '<leader>t', '<cmd>Telescope<cr>', {
+          desc = "Telescope pickers",
+        })
+        map('n', 'z=', builtin.spell_suggest, { desc = "Spelling suggestions" })
+        map('n', '<c-p>', project_files, { desc = "Project files" })
+        map('n', '<m-p>', builtin.oldfiles, { desc = "Old files" })
+        map('n', '<m-b>', builtin.buffers, { desc = "Buffers" })
+        map('n', '<m-m>', builtin.marks, { desc = "Marks" })
         -- Replace lgrep bindings from ~/.vimrc with live grepping and selection
-        map('n', 'Q', '<cmd>lua require("telescope.builtin").live_grep{default_text=vim.fn.expand("<cword>")}<cr>')
-        map('v', 'Q',
-          ':<C-u>norm! gv"sy<cr>:lua require("telescope.builtin").live_grep{default_text=vim.fn.getreg("s")}<cr>')
+        map(
+          'n',
+          'Q',
+          '<cmd>lua require("telescope.builtin").live_grep{' ..
+          'default_text=vim.fn.expand("<cword>")' ..
+          '}<cr>',
+          { desc = "Live grep current word" }
+        )
+        map(
+          'v',
+          'Q',
+          ':<C-u>norm! gv"sy<cr>:lua require("telescope.builtin").live_grep{' ..
+          'default_text=vim.fn.getreg("s")' ..
+          '}<cr>',
+          { desc = "Live grep selection" }
+        )
       end
     },
     {
@@ -509,7 +532,12 @@ require("lazy").setup({
     config = function()
       require('neoclip').setup({})
 
-      map('n', '<leader>cl', ':lua require("telescope").extensions.neoclip.default()<cr>')
+      map(
+        'n',
+        '<leader>cl',
+        ':lua require("telescope").extensions.neoclip.default()<cr>',
+        { desc = 'Clipboard history' }
+      )
     end
   },
 
@@ -609,31 +637,67 @@ require("lazy").setup({
         current_line_blame = true,
         on_attach = function(bufnr)
           -- Toggle staging
-          -- <leader>hs next hunk
-          map('n', '<leader>hn', ':Gitsigns prev_hunk<CR>', bufnr)
-          -- <leader>hs previous hunk
-          map('n', '<leader>hp', ':Gitsigns next_hunk<CR>', bufnr)
+          -- <leader>hn previous hunk
+          map('n', '<leader>hn', ':Gitsigns prev_hunk<CR>', {
+            buffer = bufnr,
+            desc = "Previous hunk"
+          })
+          -- <leader>hp next hunk
+          map('n', '<leader>hp', ':Gitsigns next_hunk<CR>', {
+            buffer = bufnr,
+            desc = "Next hunk"
+          })
           -- <leader>hs Stage current hunk
-          map('n', '<leader>hs', ':Gitsigns stage_hunk<CR>', bufnr)
+          map('n', '<leader>hs', ':Gitsigns stage_hunk<CR>', {
+            buffer = bufnr,
+            desc = "Stage hunk"
+          })
           -- <leader>hS Unstage current hunk
-          map('n', '<leader>hS', ':Gitsigns undo_stage_hunk<CR>', bufnr)
+          map('n', '<leader>hS', ':Gitsigns undo_stage_hunk<CR>', {
+            buffer = bufnr,
+            desc = "Unstage hunk"
+          })
           -- <leader>hP Preview current hunk
-          map('n', '<leader>hP', ':Gitsigns preview_hunk<CR>', bufnr)
+          map('n', '<leader>hP', ':Gitsigns preview_hunk<CR>', {
+            buffer = bufnr,
+            desc = "Preview hunk"
+          })
           -- <leader>hr Restore current hunk
-          map('n', '<leader>hr', ':Gitsigns reset_hunk<CR>', bufnr)
-          map('v', '<leader>hr', ':Gitsigns reset_hunk<CR>', bufnr)
+          map('n', '<leader>hr', ':Gitsigns reset_hunk<CR>', {
+            buffer = bufnr,
+            desc = "Reset hunk"
+          })
+          map('v', '<leader>hr', ':Gitsigns reset_hunk<CR>', {
+            buffer = bufnr,
+            desc = "Reset hunk"
+          })
 
           -- Toggle options
           -- <leader>gB show blame for current line
-          map('n', '<leader>gB', ':Gitsigns blame_line<CR>', bufnr)
+          map('n', '<leader>gB', ':Gitsigns blame_line<CR>', {
+            buffer = bufnr,
+            desc = "Show blame for current line"
+          })
           -- <leader>gbl toggle current line blame
-          map('n', '<leader>gbl', ':Gitsigns toggle_current_line_blame<CR>', bufnr)
+          map('n', '<leader>gbl', ':Gitsigns toggle_current_line_blame<CR>', {
+            buffer = bufnr,
+            desc = "Toggle current line blame display"
+          })
           -- <leader>gd toggle deleted
-          map('n', '<leader>gd', ':Gitsigns toggle_deleted<CR>', bufnr)
+          map('n', '<leader>gd', ':Gitsigns toggle_deleted<CR>', {
+            buffer = bufnr,
+            desc = "Toggle deleted markers"
+          })
           -- <leader>gs toggle signs
-          map('n', '<leader>gs', ':Gitsigns toggle_signs<CR>', bufnr)
+          map('n', '<leader>gs', ':Gitsigns toggle_signs<CR>', {
+            buffer = bufnr,
+            desc = "Toggle git signs"
+          })
           -- <leader>gw toggle word diff
-          map('n', '<leader>gw', ':Gitsigns toggle_word_diff<CR>', bufnr)
+          map('n', '<leader>gw', ':Gitsigns toggle_word_diff<CR>', {
+            buffer = bufnr,
+            desc = "Toggle word diff"
+          })
         end
       })
     end,
@@ -683,13 +747,26 @@ require("lazy").setup({
 
       -- Override `:Explore` and friends
       vim.g['loaded_netrwPlugin'] = 1
-      vim.cmd([[
-        command! -nargs=? -complete=dir Explore Dirvish <args>
-        command! -nargs=? -complete=dir Sexplore belowright split | silent Dirvish <args>
-        command! -nargs=? -complete=dir Vexplore leftabove vsplit | silent Dirvish <args>
-        command! -nargs=? -complete=dir Lexplore topleft vsplit | silent Dirvish <args>
-        command! -nargs=? -complete=dir Texplore tabnew | silent Dirvish <args>
-      ]])
+      vim.api.nvim_create_user_command('Explore', 'Dirvish <args>', {
+        nargs = '?',
+        complete = 'dir'
+      })
+      vim.api.nvim_create_user_command('Sexplore', 'belowright split | silent Dirvish <args>', {
+        nargs = '?',
+        complete = 'dir'
+      })
+      vim.api.nvim_create_user_command('Vexplore', 'leftabove vsplit | silent Dirvish <args>', {
+        nargs = '?',
+        complete = 'dir'
+      })
+      vim.api.nvim_create_user_command('Lexplore', 'topleft vsplit | silent Dirvish <args>', {
+        nargs = '?',
+        complete = 'dir'
+      })
+      vim.api.nvim_create_user_command('Texplore', 'tabnew | silent Dirvish <args>', {
+        nargs = '?',
+        complete = 'dir'
+      })
     end
   },
 
@@ -831,9 +908,9 @@ require("lazy").setup({
     config = function()
       if vim.o.termguicolors then
         if os.getenv('COLOR_THEME') == 'light' then
-          vim.cmd('silent! colorscheme dayfox')
+          vim.cmd.colorscheme('dayfox')
         else
-          vim.cmd('silent! colorscheme carbonfox')
+          vim.cmd.colorscheme('carbonfox')
         end
       end
     end
@@ -841,9 +918,7 @@ require("lazy").setup({
 })
 
 -- Load local config, if present
-vim.cmd([[
-  if filereadable(expand('~/.nvimrc.local'))
-    source ~/.nvimrc.local
-    endif
-  ]]
-)
+local local_config_path = vim.fn.expand('~/.nvimrc.local')
+if vim.fn.filereadable(local_config_path) == 1 then
+  vim.cmd('source ' .. local_config_path)
+end
