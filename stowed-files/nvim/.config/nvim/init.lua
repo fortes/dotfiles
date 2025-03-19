@@ -402,9 +402,7 @@ require("lazy").setup({
       })
 
       -- Key mappings: <space>m - toggle
-      vim.keymap.set('n', '<leader>m', function()
-        require('treesj').toggle()
-      end, { noremap = true, silent = true })
+      map('n', '<leader>m', require('treesj').toggle)
     end,
   },
 
@@ -492,7 +490,8 @@ require("lazy").setup({
         map('n', '<m-m>', builtin.marks)
         -- Replace lgrep bindings from ~/.vimrc with live grepping and selection
         map('n', 'Q', '<cmd>lua require("telescope.builtin").live_grep{default_text=vim.fn.expand("<cword>")}<cr>')
-        map('v', 'Q', ':<C-u>norm! gv"sy<cr>:lua require("telescope.builtin").live_grep{default_text=vim.fn.getreg("s")}<cr>')
+        map('v', 'Q',
+          ':<C-u>norm! gv"sy<cr>:lua require("telescope.builtin").live_grep{default_text=vim.fn.getreg("s")}<cr>')
       end
     },
     {
@@ -510,9 +509,7 @@ require("lazy").setup({
     config = function()
       require('neoclip').setup({})
 
-      vim.keymap.set('n', '<leader>cl',
-        ':lua require("telescope").extensions.neoclip.default()<cr>',
-        { noremap = true, silent = true })
+      map('n', '<leader>cl', ':lua require("telescope").extensions.neoclip.default()<cr>')
     end
   },
 
