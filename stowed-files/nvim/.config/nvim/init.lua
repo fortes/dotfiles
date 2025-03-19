@@ -194,8 +194,17 @@ require("lazy").setup({
           settings = {
             Lua = {
               diagnostics = {
+                -- Recognize the vim global
                 globals = { 'vim' }
-              }
+              },
+              workspace = {
+                -- Add Neovim runtime files
+                library = vim.api.nvim_get_runtime_file("", true),
+              },
+              -- Do not send telemetry data
+              telemetry = {
+                enable = false,
+              },
             }
           }
         }),
