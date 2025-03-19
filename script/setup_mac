@@ -46,6 +46,7 @@ BREW_PACKAGES=(
   hugo
   jq
   keychain
+  lua-language-server
   moreutils
   mpv
   ncdu

@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# When installed via Homebrew
+if [[ -x /opt/homebrew/bin/lua-language-server ]]; then
+  exec /opt/homebrew/bin/lua-language-server "$@"
+fi
+
+# Linux tarball
+if [[ -d "$HOME/.local/share/lua-language-server" ]]; then
+  exec "$HOME/.local/share/lua-language-server/bin/lua-language-server" "$@"
+fi
+
+>&2 echo "lua-language-server: command not found"
+exit 1
