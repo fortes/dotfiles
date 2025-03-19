@@ -16,6 +16,16 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
+-- Helper for keymaps
+local function map(mode, lhs, rhs, bufnr)
+  local opts = {
+    buffer=bufnr,
+    noremap=true,
+    silent=true
+  }
+  vim.keymap.set(mode, lhs, rhs, opts)
+end
+
 require("lazy").setup({
   -- GitHub Co-Pilot is paid, so only load if #ENABLE_GITHUB_COPILOT is set
   {
@@ -92,66 +102,57 @@ require("lazy").setup({
     config = function()
       local nvim_lsp = require('lspconfig')
 
-      local function map(...)
-        opts = {
-          buffer=bufnr,
-          noremap=true,
-          silent=true
-        }
-        vim.keymap.set(...)
-      end
-
       -- Only map keys after language server has attached to buffer
       local lsp_on_attach = function(client, bufnr)
         if client.server_capabilities.definitionProvider then
-          map('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>')
+          map('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>', bufnr)
           -- <C-]> automapped via `tagfunc`
         end
         if client.server_capabilities.referencesProvider then
           -- `gr` soon to be in default keymaps
           -- https://github.com/neovim/neovim/pull/28500
-          map('n', 'gr', '<cmd>lua vim.lsp.buf.references()<cr>')
-          map('n', 'gR', '<cmd>Telescope lsp_references<cr>')
+          map('n', 'gr', '<cmd>lua vim.lsp.buf.references()<cr>', bufnr)
+          map('n', 'gR', '<cmd>Telescope lsp_references<cr>', bufnr)
         end
         if client.server_capabilities.renameProvider then
           -- `crn` soon to be in default keymaps
           -- https://github.com/neovim/neovim/pull/28500
-          map('n', 'crn', '<cmd>lua vim.lsp.buf.rename()<cr>')
+          map('n', 'crn', '<cmd>lua vim.lsp.buf.rename()<cr>', bufnr)
         end
         if client.server_capabilities.hoverProvider then
-          map('n', 'gh', '<cmd>lua vim.lsp.buf.hover()<cr>')
+          map('n', 'gh', '<cmd>lua vim.lsp.buf.hover()<cr>', bufnr)
         end
         if client.server_capabilities.implementationProvider then
-          map('n', 'gI', '<cmd>lua vim.lsp.buf.implementation()<cr>')
+          map('n', 'gI', '<cmd>lua vim.lsp.buf.implementation()<cr>', bufnr)
         end
         if client.server_capabilities.typeDefinitionProvider then
-          map('n', 'gD', '<cmd>lua vim.lsp.buf.type_definition()<cr>')
+          map('n', 'gD', '<cmd>lua vim.lsp.buf.type_definition()<cr>', bufnr)
         end
         if client.server_capabilities.signatureHelpProvider then
-          map('n', 'g?', '<cmd>lua vim.lsp.buf.signature_help()<cr>')
+          map('n', 'g?', '<cmd>lua vim.lsp.buf.signature_help()<cr>', bufnr)
           -- `<C-S>` soon to be in default keymaps
           -- https://github.com/neovim/neovim/pull/28500
-          map('i', '<C-s>', '<cmd>lua vim.lsp.buf.signature_help()<cr>')
+          map('i', '<C-s>', '<cmd>lua vim.lsp.buf.signature_help()<cr>', bufnr)
         end
         if client.server_capabilities.codeActionProvider then
           -- `crr` soon to be in default keymaps
           -- https://github.com/neovim/neovim/pull/28500
-          map('n', 'crr', '<cmd>lua vim.lsp.buf.code_action()<cr>')
-          map('v', 'crr', '<cmd>lua vim.lsp.buf.code_action()<cr>')
+          map('n', 'crr', '<cmd>lua vim.lsp.buf.code_action()<cr>', bufnr)
+          map('v', 'crr', '<cmd>lua vim.lsp.buf.code_action()<cr>', bufnr)
         end
         if client.server_capabilities.documentSymbolProvider then
-          map('n', '<leader>ds', '<cmd>Telescope lsp_document_symbols<cr>')
+          map('n', '<leader>ds', '<cmd>Telescope lsp_document_symbols<cr>', bufnr)
         else
-          map('n', '<leader>ds', '<cmd>Telescope treesitter<cr>')
+          map('n', '<leader>ds', '<cmd>Telescope treesitter<cr>', bufnr)
         end
         if client.server_capabilities.workspaceSymbolProvider then
-          map('n', '<leader>ws', '<cmd>Telescope lsp_dynamic_workspace_symbols<cr>')
+          map('n', '<leader>ws', '<cmd>Telescope lsp_dynamic_workspace_symbols<cr>', bufnr)
         end
 
-        map('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<cr>')
-        map('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<cr>')
-        map('n', '<leader>e', '<cmd>lua vim.diagnostic.open_float()<cr>')
-        map('n', '<leader>q', '<cmd>lua vim.diagnostic.setloclist()<cr>')
+        map('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<cr>', bufnr)
+        map('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<cr>', bufnr)
+        map('n', '<leader>e', '<cmd>lua vim.diagnostic.open_float()<cr>', bufnr)
+        map('n', '<leader>q', '<cmd>lua vim.diagnostic.setloclist()<cr>', bufnr)
       end
 
       local default_lsp_opts = {
@@ -189,7 +190,15 @@ require("lazy").setup({
         }),
         html = default_lsp_opts,
         jsonls = default_lsp_opts,
-        lua_ls = default_lsp_opts,
+        lua_ls = vim.tbl_deep_extend('force', default_lsp_opts, {
+          settings = {
+            Lua = {
+              diagnostics = {
+                globals = { 'vim' }
+              }
+            }
+          }
+        }),
         pyright = default_lsp_opts,
         ts_ls = vim.tbl_deep_extend('force', default_lsp_opts, {
           -- Increase memory limit to 16GB, might need to adjust on weaker
@@ -370,7 +379,6 @@ require("lazy").setup({
 
         -- Notify about possible problems or not
         notify = true,
-        langs = langs,
         -- Use `dot` for repeat action
         dot_repeat = true,
       })
@@ -568,43 +576,32 @@ require("lazy").setup({
         signcolumn = true,
         current_line_blame = true,
         on_attach = function(bufnr)
-          local gs = package.loaded.gitsigns
-
-          local function map(...)
-            opts = {
-              buffer=bufnr,
-              noremap=true,
-              silent=true
-            }
-            vim.keymap.set(...)
-          end
-
           -- Toggle staging
           -- <leader>hs next hunk
-          map('n', '<leader>hn', ':Gitsigns prev_hunk<CR>')
+          map('n', '<leader>hn', ':Gitsigns prev_hunk<CR>', bufnr)
           -- <leader>hs previous hunk
-          map('n', '<leader>hp', ':Gitsigns next_hunk<CR>')
+          map('n', '<leader>hp', ':Gitsigns next_hunk<CR>', bufnr)
           -- <leader>hs Stage current hunk
-          map('n', '<leader>hs', ':Gitsigns stage_hunk<CR>')
+          map('n', '<leader>hs', ':Gitsigns stage_hunk<CR>', bufnr)
           -- <leader>hS Unstage current hunk
-          map('n', '<leader>hS', ':Gitsigns undo_stage_hunk<CR>')
+          map('n', '<leader>hS', ':Gitsigns undo_stage_hunk<CR>', bufnr)
           -- <leader>hP Preview current hunk
-          map('n', '<leader>hP', ':Gitsigns preview_hunk<CR>')
+          map('n', '<leader>hP', ':Gitsigns preview_hunk<CR>', bufnr)
           -- <leader>hr Restore current hunk
-          map('n', '<leader>hr', ':Gitsigns reset_hunk<CR>')
-          map('v', '<leader>hr', ':Gitsigns reset_hunk<CR>')
+          map('n', '<leader>hr', ':Gitsigns reset_hunk<CR>', bufnr)
+          map('v', '<leader>hr', ':Gitsigns reset_hunk<CR>', bufnr)
 
           -- Toggle options
           -- <leader>gB show blame for current line
-          map('n', '<leader>gB', ':Gitsigns blame_line<CR>')
+          map('n', '<leader>gB', ':Gitsigns blame_line<CR>', bufnr)
           -- <leader>gbl toggle current line blame
-          map('n', '<leader>gbl', ':Gitsigns toggle_current_line_blame<CR>')
+          map('n', '<leader>gbl', ':Gitsigns toggle_current_line_blame<CR>', bufnr)
           -- <leader>gd toggle deleted
-          map('n', '<leader>gd', ':Gitsigns toggle_deleted<CR>')
+          map('n', '<leader>gd', ':Gitsigns toggle_deleted<CR>', bufnr)
           -- <leader>gs toggle signs
-          map('n', '<leader>gs', ':Gitsigns toggle_signs<CR>')
+          map('n', '<leader>gs', ':Gitsigns toggle_signs<CR>', bufnr)
           -- <leader>gw toggle word diff
-          map('n', '<leader>gw', ':Gitsigns toggle_word_diff<CR>')
+          map('n', '<leader>gw', ':Gitsigns toggle_word_diff<CR>', bufnr)
         end
       })
     end,
