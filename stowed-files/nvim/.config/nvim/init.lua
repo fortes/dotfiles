@@ -19,9 +19,9 @@ vim.opt.rtp:prepend(lazypath)
 -- Helper for keymaps
 local function map(mode, lhs, rhs, bufnr)
   local opts = {
-    buffer=bufnr,
-    noremap=true,
-    silent=true
+    buffer = bufnr,
+    noremap = true,
+    silent = true
   }
   vim.keymap.set(mode, lhs, rhs, opts)
 end
@@ -167,7 +167,7 @@ require("lazy").setup({
       local lsp_configs = {
         bashls = default_lsp_opts,
         cssls = default_lsp_opts,
-        cssmodules_ls =  vim.tbl_deep_extend('force', default_lsp_opts, {
+        cssmodules_ls = vim.tbl_deep_extend('force', default_lsp_opts, {
           on_attach = function(client, bufnr)
             -- Don't use `definitionProvider` since it conflicts with ts_ls
             client.server_capabilities.definitionProvider = false
@@ -178,9 +178,9 @@ require("lazy").setup({
         denols = vim.tbl_deep_extend('force', default_lsp_opts, {
           root_dir = deno_root_pattern,
           single_file_support = false,
-        }) ,
+        }),
         dockerls = default_lsp_opts,
-        eslint =  vim.tbl_deep_extend('force', default_lsp_opts, {
+        eslint = vim.tbl_deep_extend('force', default_lsp_opts, {
           on_attach = function(client, bufnr)
             -- <leader>x to autofix via eslint
             map('n', '<leader>x', '<cmd>EslintFixAll<cr>')
@@ -266,7 +266,7 @@ require("lazy").setup({
           enable = true
         },
         -- Enable `=` for indentation based on treesitter (experimental)
-        indent = {enable = true},
+        indent = { enable = true },
       }
 
       vim.wo.foldmethod = 'expr'
@@ -340,7 +340,7 @@ require("lazy").setup({
     config = function()
       require('nvim-treesitter.configs').setup {
         refactor = {
-          highlight_definitions = {enable = true},
+          highlight_definitions = { enable = true },
         },
       }
     end
@@ -386,7 +386,7 @@ require("lazy").setup({
       -- Key mappings: <space>m - toggle
       vim.keymap.set('n', '<leader>m', function()
         require('treesj').toggle()
-      end, {noremap=true, silent=true})
+      end, { noremap = true, silent = true })
     end,
   },
 
@@ -435,18 +435,20 @@ require("lazy").setup({
 
         -- Fallback to file search if not in git repo
         function _G.project_files()
-          local ok = pcall(require"telescope.builtin".git_files, {
+          local ok = pcall(require "telescope.builtin".git_files, {
             use_git_root = true,
             show_untracked = true
           })
-          if not ok then require"telescope.builtin".find_files({
-            hidden = true
-          }) end
+          if not ok then
+            require "telescope.builtin".find_files({
+              hidden = true
+            })
+          end
         end
 
         local opts = {
-          noremap=true,
-          silent=true
+          noremap = true,
+          silent = true
         }
 
         -- Key mappings
@@ -455,8 +457,8 @@ require("lazy").setup({
         vim.keymap.set('n', '<c-p>', ':lua project_files()<cr>', opts)
         vim.keymap.set('n', '<m-p>', [[<cmd>Telescope oldfiles<cr>]], opts)
         vim.keymap.set('n', '<m-b>',
-        [[<cmd>Telescope buffers show_all_buffers=true<cr>]],
-        opts)
+          [[<cmd>Telescope buffers show_all_buffers=true<cr>]],
+          opts)
         vim.keymap.set('n', 'Q', [[<cmd>Telescope live_grep<cr>]], opts)
       end
     },
@@ -476,8 +478,8 @@ require("lazy").setup({
       require('neoclip').setup({})
 
       vim.keymap.set('n', '<leader>cl',
-      ':lua require("telescope").extensions.neoclip.default()<cr>',
-      {noremap=true, silent=true})
+        ':lua require("telescope").extensions.neoclip.default()<cr>',
+        { noremap = true, silent = true })
     end
   },
 
@@ -518,16 +520,16 @@ require("lazy").setup({
           timeout_ms = 500,
         },
         formatters_by_ft = {
-          bash = {'beautysh'},
-          css = {'prettier'},
-          html = {'prettier'},
+          bash = { 'beautysh' },
+          css = { 'prettier' },
+          html = { 'prettier' },
           javascript = deno_or_prettier,
           json = deno_or_prettier,
           jsonc = deno_or_prettier,
           markdown = deno_or_prettier,
-          python = {'ruff'},
+          python = { 'ruff' },
           typescript = deno_or_prettier,
-          yaml = {'prettier'},
+          yaml = { 'prettier' },
         },
       })
     end,
@@ -658,7 +660,6 @@ require("lazy").setup({
         command! -nargs=? -complete=dir Lexplore topleft vsplit | silent Dirvish <args>
         command! -nargs=? -complete=dir Texplore tabnew | silent Dirvish <args>
       ]])
-
     end
   },
 
@@ -770,7 +771,7 @@ require("lazy").setup({
           win_height = 12,
           win_vheight = 12,
           delay_syntax = 80,
-          border_chars = {'┃', '┃', '━', '━', '┏', '┓', '┗', '┛', '█'},
+          border_chars = { '┃', '┃', '━', '━', '┏', '┓', '┗', '┛', '█' },
         },
         func_map = {
           -- Disable default fzf mapping, since we use telescope
@@ -786,8 +787,8 @@ require("lazy").setup({
     config = function()
       if vim.o.termguicolors then
         require('colorizer').setup({
-          'css';
-          'less';
+          'css',
+          'less',
         })
       end
     end
