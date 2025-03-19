@@ -43,6 +43,8 @@ export IS_HEADLESS="${is_headless:-}"
 
 # Typescript language server can OOM on large codebases
 # export MAX_TS_SERVER_MEMORY=32768
+# Same, but for eslint and others
+# export NODE_OPTIONS='--max_old_space_size=16384'
 
 # For scrobbing via cmus
 # export LISTENBRAINZ_AUTH_TOKEN="xxxxxx"

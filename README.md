@@ -4,21 +4,21 @@ This is only public so I can easily share it across machines. There is probably 
 
 My usage is mostly terminal-based, via Crostini on Chromebook, WSL2 on Windows, and (rarely) MacOS terminal. Making heavy use of:
 
-* Bash / Tmux
-* FZF / pistol / fd / ripgrep
-* Neovim
-* cmus
+- Bash / Tmux
+- FZF / pistol / fd / ripgrep
+- Neovim
+- cmus
 
 Graphical sections are Linux-only, and use:
 
-* sway / swaync / waybar
-* WezTerm
-* Firefox
+- sway / swaync / waybar
+- WezTerm
+- Firefox
 
 On MacOS, use:
 
-* WezTerm
-* Rectangle
+- WezTerm
+- Rectangle
 
 ## Letting me own your machine
 
@@ -27,9 +27,9 @@ git clone https://github.com/fortes/dotfiles.git --branch debian-bookworm
 ./dotfiles/script/setup
 ```
 
-## Setup
+## Post-Setup
 
-Once you've run setup, you'll still have to do the following manual steps:
+Once you've run setup, you'll still have to do the following universal manual steps (see platform-specific sections for more):
 
 1. Generate this machine's SSH keys:
 
@@ -113,26 +113,19 @@ To make changes in the future:
 git update-index --no-skip-worktree ./symlinks/npmrc
 ```
 
-## Additional Settings
-
-TODO: Automate these steps.
-
-- (Optional) Enable GitHub copilot via `~/.profile.local`, then run `:Copilot setup` in NeoVim to authenticate
-- May also want to consider adding something like
-  ```sh
-  export NODE_OPTIONS='--max_old_space_size=16384'
-  ```
-  to `~/.profile.local` to let things like eslint have more memory
-- Install `kindlegen` [from Amazon](https://www.amazon.com/gp/feature.html?ie=UTF8&docId=1000765211) (TODO: See if possible to script this)
-
-### Firefox / Chrome
+### Firefox
 
 - Log into sync accounts, extensions should automatically install
-- Configure uBlock
+- Run `dotfiles/script/stow` manually to make sure to link `user.js` for Firefox now that a profile has been created
+- Configure uBlock Origin
   - Enable in private mode
-  - Enable cloud storage mode. Should do the following, but doesn't always work:
+  - Enable cloud storage mode. Should do the following for you, but doesn't always work:
     - Enable annoyances filters
     - Add [Bypass paywalls clean filter](https://gitflic.ru/project/magnolia1234/bypass-paywalls-clean-filters)
+
+### Chrome
+
+- Log into sync accounts, extensions should automatically install
 
 ### Debian
 
@@ -147,7 +140,7 @@ TODO: Automate these steps.
 - If running multiple monitors, need to configure Wacom tablet to only use a specific monitor:
   ```
   input "type:tablet_tool" {
-    map_to_output DP-1 
+    map_to_output DP-1
   }
   ```
 - For High DPI displays, create a `~/.Xresources.local` file with the proper `Xft.dpi` (see `.Xresources` for example)
@@ -156,19 +149,6 @@ TODO: Automate these steps.
   ```
   //machine-name/share /media/share cifs nofail,user=,password=,ro	0	0
   ```
-
-#### Docker
-
-- Must start Neovim in order to install plugin manager
-
-#### Bookworm Upgrade
-
-The Bullseye to Bookworm upgrade requires a few manual steps that I'm too lazy to automate:
-
-- Must call `apt-key delete` on keys for `et`, `signal`, etc repos that were added via the now deprecated `apt-key`. Find the key id by taking the last eight digits of the hex displayed (no space). E.g. `apt-key del 57F6FB06` for Signal. Need to then delete the relevant fiels in `/etc/apt/sources.list.d` as well
-- `pip` user packages no longer work, everything got moved to `uvx`/`pipx`/`venv` and there may be some strays left in `~/.local/bin` that need to be manually removed
-  - `pip freeze --user | xargs pip uninstall` should work here
-- Remove `/etc/apt/sources.list.d/bullseye-backports.list` and let the script add the new one
 
 ### Chromebook
 
@@ -256,7 +236,7 @@ Still a work in progress, but kinda works
 
 - Set up TouchID, Apple account if required
 - Remove all the junk from the dock
-- Enable *Night Shift* and set to *Sunset to Sunrise*
+- Enable _Night Shift_ and set to _Sunset to Sunrise_
 - Turn off Natural Scrolling
 - Increase keyboard repeat rate to max, delay to min
 - Change Globe key to Control dictation
@@ -272,10 +252,7 @@ Still a work in progress, but kinda works
     # Outputs something like `com.todesktop.xxxxx`
     defaults write -g com.todesktop.xxxxx ApplePressAndHoldEnabled -bool false
     ```
-
-##### After Setup
-
-- `terminal.app` sucks with colors, so once installs happen, switch to WezTerm and pin it in the dock
+- `terminal.app` sucks with colors, switch to WezTerm and pin it in the dock
 - Make sure `Rectangle.app` starts on login
 - Install the 1Password extension in Safari (others should sync automatically)
 
@@ -299,65 +276,31 @@ To share files, use `-v /path/to/host:/path/to/container`, for example if sharin
 docker run -it --rm --name dotfiles -v ~/src:/home/fortes/src dotfiles
 ```
 
-#### TODO
-
-- [ ] Move from `docker` to `podman`
-- [ ] Get `devcontainer` setup for this repo
-- [ ] Get remote VSCode settings synced up as well, currently in `~/.vscode-server/data/Machine`
-- [ ] Move `ncspot` to install from Flatpak or Snap since it doesn't work on bookworm due to glibc version
-- [ ] Figure out how to get [M1 CI running](https://github.blog/changelog/2024-01-30-github-actions-introducing-the-new-m1-macos-runner-available-to-open-source/) to check builds
-- [ ] Automate cleaning up old symlinked files via stow, for now can hack via
-   ```sh
-   find -L ~/.config -type l [-delete]
-   ```
-- [ ] Figure out what [Windows 11 tweaks & usability improvements](https://kittenlabs.de/blog/2024/08/20/windows-11-tweaks-usability-improvements/) to copy
+Also need to manually start neovim to install plugins
 
 ## Known Issues
 
-- Debian bookworm does a `debian.sources` file instead of `sources.list`, need to adjust `setup_machine`
+### Linux
+
 - Media keys on Microsoft Ergonomic Keyboard sometimes aren't detected, disconnect/reconnect USB may be enough to fix?
 - Mouse wheel speed also sometimes goes to a better default after disconnect/reconnect
 - 1Password can't manage to save authentication, dies trying to talk to keychain via dbus (for some reason, looking for `org.kde.kwalletd5` and ignores gnome keyring)
-- `exa` is now unmaintained, need to either go to [eza](https://github.com/eza-community/eza) or `lsd`
 - `1password` GUI not installing correctly, something wrong w/ bash logic
 
-## Sway Migration
+## TODO/Future Improvements
 
-Work in progress. The [Sway Wiki](https://github.com/swaywm/sway/wiki/i3-Migration-Guide) has some good links for migration, and there are [useful tools](https://github.com/swaywm/sway/wiki/Useful-add-ons-for-sway) as well
-
-- Chromium: Need to either use command-line flags `--ozone-platform-hint=auto` or go to `chrome://flags` and set `Preferred Ozone platform`
-- Read through [this guide](https://anarc.at/software/desktop/wayland/) a bit more, lots of good detail and using debian and systemd to drive a bunch of stuff
-- Notifications
-  - [ ] No need to start automatically, dbus does that
-  - [ ] Figure out volume, etc controls in there. Can substitute for some of the waybar stuff
-      - Looks like this is on newer version than what's in Debian repos, so need to either go to sid early, or just wait
-      - Can also do arbitrary buttons?
-  - [ ] Figure out how to show icons for screenshot, etc
-  - [ ] Make styling a bit more consistent with rest of UX
-- Bar
-  - Figure out bar content, using some combination of `waybar` and the [helpers](https://github.com/swaywm/sway/wiki/Useful-add-ons-for-sway#bar-content-generators)
-  - [ ] Music control
-  - [ ] Better volume display
-  - [ ] Screen recording indicator could be nice
-- [ ] Figure out clipboard, likely `wl-clipboard` (`wayclip` not in repos)
-- [ ] Need to hook up pipewire in tmux as well?
-- [ ] Input / keyboard setup, mostly native in sway?
-- [ ] `swhkd` to consider as hotkey handler, get `sway` out of the business?
-- [ ] Update instructions for setup
-  - get `sway/config.local` out of source control, etc
-- [ ] Figure out how to make wacom tablet work (and update instructions)
-  - [OpenTabletDriver](https://github.com/OpenTabletDriver/OpenTabletDriver) looks promising, but need to test
-
-## Future Improvements
-
+- [ ] Look into publishing a docker container via GitHub actions
+- [ ] `exa` is now unmaintained, need to either go to [eza](https://github.com/eza-community/eza) or `lsd`
+- [ ] Move from `docker` to `podman`
+- [ ] Get `devcontainer` setup for this repo
+- [ ] Get remote VSCode settings synced up as well, currently in `~/.vscode-server/data/Machine`
+- [ ] Figure out how to get [M1 CI running](https://github.blog/changelog/2024-01-30-github-actions-introducing-the-new-m1-macos-runner-available-to-open-source/) to check builds
+- [ ] Figure out what [Windows 11 tweaks & usability improvements](https://kittenlabs.de/blog/2024/08/20/windows-11-tweaks-usability-improvements/) to copy
 - [ ] Get things working in GitHub codespaces, which seems to use Ubuntu 20.04.06 LTS underneath. Currently fails silently trying to install backports sources. [Troubleshooting instructions](https://docs.github.com/en/codespaces/troubleshooting/troubleshooting-personalization-for-codespaces#troubleshooting-dotfiles) can be helpful
 - [ ] Figure out how to [use Hammerspoon](https://github.com/Hammerspoon/Spoons/blob/master/Source/MusicAppMediaFix.spoon/init.lua) to have media keys control cmus, instead of launching iTunes (gross)
 - Try switching from docker to podman
-- [ ] Test out [psst](https://github.com/jpochyla/psst) for Spotify
 - [ ] Look into `glances` and `btop`
 - [ ] Check out [`yazi`](https://github.com/sxyazi/yazi) over `vifm`
-- [ ] (caniuse-cli)[https://github.com/sgentle/caniuse-cmd]
-- [ ] Look into `stevearc/conform.nvim`
 - [ ] `wshowkeys` or similar for showing keypresses for screencasts, etc
 - [ ] Figure out Lutris / Wine / Proton for Linux gaming
 - [ ] [Auto-publish Docker images](https://docs.github.com/en/actions/publishing-packages/publishing-docker-images#publishing-images-to-github-packages)

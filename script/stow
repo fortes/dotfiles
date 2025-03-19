@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 # Call stow with correct paths for dotfiles
 #
+# Should be able to run with `-R` to delete stale files, otherwise can do
+# `find -L ~/.config -type l [-delete]` to find/remove stale links
+#
 # Usage: stow [-nv]
 
 set -euo pipefail
