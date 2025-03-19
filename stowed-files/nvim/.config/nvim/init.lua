@@ -4,7 +4,7 @@ vim.cmd('source ~/.vimrc')
 
 -- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not vim.loop.fs_stat(lazypath) then
+if not vim.uv.fs_stat(lazypath) then
   vim.fn.system({
     "git",
     "clone",
@@ -199,7 +199,10 @@ require("lazy").setup({
               },
               workspace = {
                 -- Add Neovim runtime files
-                library = vim.api.nvim_get_runtime_file("", true),
+                library = {
+                  vim.env.VIMRUNTIME,
+                  "${3rd}/luv/library"
+                },
               },
               -- Do not send telemetry data
               telemetry = {
@@ -224,7 +227,7 @@ require("lazy").setup({
 
             lsp_on_attach(client, bufnr)
           end,
-          root_dir = nvim_lsp.util.find_node_modules_ancestor
+          root_dir = nvim_lsp.util.root_pattern('node_modules'),
         }),
         vimls = default_lsp_opts,
         yamlls = default_lsp_opts
@@ -253,11 +256,10 @@ require("lazy").setup({
   {
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
-    cond = function()
-      return vim.fn.has('nvim-0.6') == 1
-    end,
     config = function()
+      ---@diagnostic disable-next-line: missing-fields
       require('nvim-treesitter.configs').setup {
+        auto_install = true,
         ensure_installed = {
           'bash',
           'css',
@@ -274,12 +276,16 @@ require("lazy").setup({
         highlight = {
           enable = true
         },
+        ignore_install = {},
         -- Enable `=` for indentation based on treesitter (experimental)
-        indent = { enable = true },
+        indent = {
+          enable = true
+        },
+        sync_install = false,
       }
 
       vim.wo.foldmethod = 'expr'
-      vim.wo.foldexpr = 'nvim_treesitter#foldexpr()'
+      vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
     end
   },
 
@@ -290,6 +296,7 @@ require("lazy").setup({
       'nvim-treesitter/nvim-treesitter'
     },
     config = function()
+      ---@diagnostic disable-next-line: missing-fields
       require('nvim-treesitter.configs').setup {
         autotag = {
           enable = true
@@ -323,6 +330,7 @@ require("lazy").setup({
       'nvim-treesitter/nvim-treesitter'
     },
     config = function()
+      ---@diagnostic disable-next-line: missing-fields
       require('nvim-treesitter.configs').setup {
         endwise = {
           enable = true
@@ -347,6 +355,7 @@ require("lazy").setup({
       'nvim-treesitter/nvim-treesitter'
     },
     config = function()
+      ---@diagnostic disable-next-line: missing-fields
       require('nvim-treesitter.configs').setup {
         refactor = {
           highlight_definitions = { enable = true },
@@ -416,9 +425,21 @@ require("lazy").setup({
       end,
       config = function()
         local telescope = require('telescope')
+        local actions = require('telescope.actions')
+        local action_layout = require('telescope.actions.layout')
 
         telescope.setup {
           defaults = {
+            -- Show all mappings via <C-/>
+            mappings = {
+              i = {
+                ["<Esc>"] = actions.close,
+                ["<M-p>"] = action_layout.toggle_preview,
+              },
+              n = {
+                ["<M-p>"] = action_layout.toggle_preview,
+              },
+            },
             vimgrep_arguments = {
               "rg",
               "--color=never",
@@ -437,13 +458,18 @@ require("lazy").setup({
               override_file_sorter = true,
               case_mode = 'smart_case'
             }
+          },
+          pickers = {
+            git_files = {
+              show_untracked = true,
+            },
           }
         }
 
         telescope.load_extension('fzf')
 
         -- Fallback to file search if not in git repo
-        function _G.project_files()
+        local project_files = function()
           local ok = pcall(require "telescope.builtin".git_files, {
             use_git_root = true,
             show_untracked = true
@@ -455,20 +481,18 @@ require("lazy").setup({
           end
         end
 
-        local opts = {
-          noremap = true,
-          silent = true
-        }
+        local builtin = require('telescope.builtin')
 
         -- Key mappings
-        vim.keymap.set('n', '<leader>t', '<cmd>Telescope<cr>', opts)
-        vim.keymap.set('n', 'z=', '<cmd>Telescope spell_suggest<cr>', opts)
-        vim.keymap.set('n', '<c-p>', ':lua project_files()<cr>', opts)
-        vim.keymap.set('n', '<m-p>', [[<cmd>Telescope oldfiles<cr>]], opts)
-        vim.keymap.set('n', '<m-b>',
-          [[<cmd>Telescope buffers show_all_buffers=true<cr>]],
-          opts)
-        vim.keymap.set('n', 'Q', [[<cmd>Telescope live_grep<cr>]], opts)
+        map('n', '<leader>t', '<cmd>Telescope<cr>')
+        map('n', 'z=', builtin.spell_suggest)
+        map('n', '<c-p>', project_files)
+        map('n', '<m-p>', builtin.oldfiles)
+        map('n', '<m-b>', builtin.buffers)
+        map('n', '<m-m>', builtin.marks)
+        -- Replace lgrep bindings from ~/.vimrc with live grepping and selection
+        map('n', 'Q', '<cmd>lua require("telescope.builtin").live_grep{default_text=vim.fn.expand("<cword>")}<cr>')
+        map('v', 'Q', ':<C-u>norm! gv"sy<cr>:lua require("telescope.builtin").live_grep{default_text=vim.fn.getreg("s")}<cr>')
       end
     },
     {

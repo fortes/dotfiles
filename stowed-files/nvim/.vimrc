@@ -475,11 +475,14 @@ if has('eval')
 
   " K searches for word under cursor in root of project (remove default binding)
   nnoremap K :GitRootCD<cr>:silent! lgrep! "<C-R><C-W>"<cr>
+  " No Ex-mode, start project search instead, using word under the cursor
+  nnoremap Q :GitRootCD<cr>:lgrep! <C-R><C-W>
   " Grep for visual selection, just like in normal mode. Note that this clears /
   " uses the `s` register
   vnoremap K :<C-u>norm! gv"sy<cr>:GitRootCD<cr>:silent! lgrep! "<C-R>s"<cr>
-  " Never use Ex-mode, map to project search command instead
-  nnoremap Q :GitRootCD<cr>:lgrep!<SPACE>
+  " Grep for visual selection, just like in normal mode. Note that this clears /
+  " uses the `s` register
+  vnoremap Q :<C-u>norm! gv"sy<cr>:GitRootCD<cr>:silent! lgrep! <C-R>s
 endif
 
 " Automatically open quickfix/location list after grep/make
@@ -494,16 +497,22 @@ augroup END
 if executable('rg')
   " Use smart case, match whole words, use literal string, and output in
   " vim-friendly format
-  set grepprg=rg\ --vimgrep\ -F
+  set grepprg=rg\ --vimgrep
 else
   " Mimic rg settings (literal, recursive, ignore common directories)
-  set grepprg=grep\ -FIinrw\ --exclude-dir=.git\ --exclude-dir=node_modules
+  set grepprg=grep\ --with-filename\ --fixed-strings\
+    \ --binary-files=without-match\ --ignore-case\ --line-number\ --recursive\
+    \ --exclude-dir=socket\ --exclude-dir=.git\ --exclude-dir=node_modules\
+    \ $*\ /dev/null
+  set grepformat=%f:%l:%m
 
-  " Unlike ag, grep needs to have a file path after the search command. Add that
+  " Unlike rg, grep needs to have a file path after the search command. Add that
   " in for the K bindings (default to current directory)
   nnoremap K :GitRootCD<cr>:lgrep! "<C-R><C-W>" .<cr>
   vnoremap K :<C-u>norm! gv"sy<cr>:GitRootCD<cr>:lgrep! "<C-R>s" .<cr>
-  nnoremap Q :GitRootCD<cr>:lgrep!<SPACE><SPACE>.<LEFT><LEFT>
+  " Pre-fill path
+  nnoremap Q :GitRootCD<cr>:lgrep! <C-R><C-W> .<left><left>
+  vnoremap Q :<C-u>norm! gv"sy<cr>:GitRootCD<cr>:lgrep! <C-R>s .<left><left>
 endif
 " }}}
 

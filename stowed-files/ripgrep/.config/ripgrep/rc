@@ -1,2 +1,16 @@
---follow
+# Avoid super long lines in the terminal, show a preview
+--max-columns=160
+--max-columns-preview
+
+# Search hidden fiels / dirs by default
+--hidden
+
+# Exclude these directories from results
+--glob=!.git/*
+--glob=!node_modules/*
+
+# (Mostly) case insensitive
 --smart-case
+
+# Follow symlinks
+--follow
