@@ -541,7 +541,7 @@ require("lazy").setup({
     end
   },
 
-  -- Formatting, use <leader>f to format buffer / selection
+  -- Formatting, use <leader>f to format buffer / `gq` for selection
   {
     'stevearc/conform.nvim',
     cmd = { "ConformInfo" },
