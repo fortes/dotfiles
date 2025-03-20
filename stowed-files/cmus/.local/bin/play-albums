@@ -124,6 +124,15 @@ play-albums() {
   beet ls --path original_year- album- track+ ${beet_album_query} \
     | sed -e "s|${BEETS_ALBUM_DIR}|${LOCAL_ALBUM_DIR}|" > "${tmp_m3u_file}"
 
+  # Check if those files are available in local directory, catches the case
+  # where trying to play off a remote share that is not mounted
+  while IFS= read -r song_path; do
+    if [[ ! -f "${song_path}" ]]; then
+      >&2 echo "Song not found in local dir: ${song_path#"${LOCAL_ALBUM_DIR}"}, aborting"
+      exit 1
+    fi
+  done < "${tmp_m3u_file}"
+
   if ! ${append}; then
     cmus-remote --clear --queue
     cmus-remote --stop
