@@ -43,7 +43,7 @@ user_pref('sidebar.main.tools', ['aichat', 'bookmarks', 'syncedtabs']);
 user_pref('sidebar.position_start', false);
 user_pref('sidebar.revamp', true);
 user_pref('sidebar.verticalTabs', true);
-user_pref('sidebar.visibility', true);
+user_pref('sidebar.visibility', 'always-show');
 
 // Disable search suggestions in search bar
 user_user_pref("browser.urlbar.quicksuggest.sponsored", false);
