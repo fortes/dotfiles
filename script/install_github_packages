@@ -26,6 +26,7 @@
 # - wezterm
 # - yq
 # - zellij
+# - zoxide (Bookworm version is very old)
 #
 # Usage `install_github_packages [package_names...]`
 
@@ -64,6 +65,7 @@ AVAILABLE_PACKAGES=(
   wezterm
   yq
   zellij
+  zoxide
 )
 
 print_usage() {
@@ -370,6 +372,10 @@ install_zellij() {
   install_tarball 'zellij-org/zellij' 'zellij-x86_64-unknown-linux-musl.tar.gz'
 }
 
+install_zoxide() {
+  install_deb 'ajeetdsouza/zoxide' 'zoxide_.*_amd64.deb'
+}
+
 install_github_packages() {
   # Make sure to load `command_exists` helper
   # shellcheck source=../stowed-files/bash/.profile
@@ -478,6 +484,9 @@ install_github_packages() {
         ;;
       zellij)
         install_zellij
+        ;;
+      zoxide)
+        install_zoxide
         ;;
       *)
         echo_stderr "Error: Unrecognized package: ${package}"

@@ -104,7 +104,8 @@ HEADLESS_PACKAGES=(
   yank
   yq
   yt-dlp/bookworm-backports
-  zoxide
+  # Debian version ancient, get from `install_github_packages`
+  # zoxide
 )
 
 GUI_PACKAGES=(
