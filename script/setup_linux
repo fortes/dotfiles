@@ -13,6 +13,8 @@ dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 export DEBIAN_FRONTEND=noninteractive
 
 HEADLESS_PACKAGES=(
+  # For yazi
+  7zip
   apt-file
   apt-transport-https
   apt-utils
@@ -36,6 +38,8 @@ HEADLESS_PACKAGES=(
   exiv2
   fd-find
   ffmpeg
+  # Required for `yazi`
+  file
   fuse3
   # Debian version ancient, get from `install_github_packages`
   # fzf
@@ -153,7 +157,7 @@ GUI_PACKAGES=(
   waybar
   wev
   wf-recorder
-  # Wanted by `grimshot`, but useful for scripts
+  # Wanted by `grimshot`, but useful for scripts / yazi
   wl-clipboard
   xwayland
 )

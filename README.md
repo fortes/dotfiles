@@ -300,7 +300,6 @@ Also need to manually start neovim to install plugins
 - [ ] Figure out how to [use Hammerspoon](https://github.com/Hammerspoon/Spoons/blob/master/Source/MusicAppMediaFix.spoon/init.lua) to have media keys control cmus, instead of launching iTunes (gross)
 - Try switching from docker to podman
 - [ ] Look into `glances` and `btop`
-- [ ] Check out [`yazi`](https://github.com/sxyazi/yazi) over `vifm`
 - [ ] `wshowkeys` or similar for showing keypresses for screencasts, etc
 - [ ] Figure out Lutris / Wine / Proton for Linux gaming
 - [ ] [Auto-publish Docker images](https://docs.github.com/en/actions/publishing-packages/publishing-docker-images#publishing-images-to-github-packages)

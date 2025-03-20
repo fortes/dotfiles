@@ -22,8 +22,8 @@
 # - pistol
 # - psst
 # - sad
-# - superfile
 # - wezterm
+# - yazi
 # - yq
 # - zellij
 # - zoxide (Bookworm version is very old)
@@ -61,8 +61,8 @@ AVAILABLE_PACKAGES=(
   psst
   neovim
   sad
-  superfile
   wezterm
+  yazi
   yq
   zellij
   zoxide
@@ -294,10 +294,6 @@ install_sad() {
   install_deb 'ms-jpq/sad' 'x86_64-unknown-linux-gnu.deb'
 }
 
-install_superfile() {
-  install_tarball 'yorukot/superfile' 'superfile-linux-v.*-amd64.tar.gz' 'spf'
-}
-
 install_neovim_stable() {
   local url
   local vim_path="$HOME/.local/bin/nvim"
@@ -362,6 +358,30 @@ install_psst() {
 
 install_wezterm() {
   install_deb 'wez/wezterm' 'wezterm-.*.Debian12.deb'
+}
+
+install_yazi() {
+  local url
+  # musl version because Bookworm is old and yazi requires a newer glibc (2.39)
+  url="$(get_latest_release_url "sxyazi/yazi" "yazi-x86_64-unknown-linux-musl.zip")"
+
+  local bin_location="$HOME/.local/bin"
+  local completion_location="/home/fortes/.local/completion.d/"
+
+  local download_dir
+  download_dir="$(mktemp --directory yaziXXX)"
+
+  pushd "${download_dir}" > /dev/null
+  wget --quiet -O yazi.zip "${url}"
+  echo -n "Unzipping yazi.zip ... "
+  unzip -q -o -j -d . yazi.zip
+
+  mv -t "${bin_location}" {ya,yazi} 
+  chmod 755 "${bin_location}"/{ya,yazi}
+  mv -t "${completion_location}" yazi.bash
+  popd > /dev/null
+  rm -rf "${download_dir}"
+  echo "yazi installed"
 }
 
 install_yq() {
@@ -473,11 +493,11 @@ install_github_packages() {
       sad)
         install_sad
         ;;
-      superfile)
-        install_superfile
-        ;;
       wezterm)
         [[ -z "${IS_HEADLESS:-}" ]] && install_wezterm
+        ;;
+      yazi)
+        install_yazi
         ;;
       yq)
         install_yq

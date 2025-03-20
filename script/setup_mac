@@ -32,9 +32,13 @@ BREW_PACKAGES=(
   MisterTea/et/et
   eza
   fd
+  # For yazi
+  ffmpeg
   firefox
   fnm
   font-jetbrains-mono
+  # For yazi
+  font-symbols-only-nerd-font
   fzf
   git
   git-crypt
@@ -44,6 +48,8 @@ BREW_PACKAGES=(
   helix
   htop
   hugo
+  # For yazi
+  imagemagick
   jq
   keychain
   lua-language-server
@@ -59,15 +65,17 @@ BREW_PACKAGES=(
   rectangle
   ripgrep
   sad
+  # For yazi
+  sevenzip
   shellcheck
   speedtest-cli
   stow
-  superfile
   tmux
   vifm
   visual-studio-code
   wezterm
   wget
+  yazi
   yt-dlp
   zoxide
 )

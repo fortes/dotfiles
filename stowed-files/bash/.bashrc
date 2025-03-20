@@ -147,6 +147,24 @@ if command_exists dircolors; then
   fi
 fi
 
+if command_exists yazi && ! declare -F y > /dev/null; then
+  # Change directory with yazi by hitting `q` after navigating to the directory,
+  # use `Q` to quit without changing directory
+  function y() {
+    local tmp
+    tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+    yazi "${@}" --cwd-file="${tmp}"
+    if cwd="$(command cat -- "${tmp}")" && [ -n "${cwd}" ] && [ "${cwd}" != "${PWD}" ]; then
+      # Assume yazi is returning a valid directory
+      # shellcheck disable=SC2164
+      builtin cd -- "${cwd}"
+    fi
+    rm -f -- "${tmp}"
+  }
+
+  export -f y
+fi
+
 if command_exists zoxide; then
   eval "$(zoxide init bash --hook pwd)"
 fi
