@@ -14,12 +14,12 @@ install_et() {
 
   if [ ! -f "${et_sources_list}" ]; then
     echo "Adding Eternal Terminal GPG key (requires sudo)"
-    curl -sSL "${et_key_url}" | \
-      sudo tee "$et_key_path" > /dev/null
+    curl -sSL "${et_key_url}" |
+      sudo tee "$et_key_path" >/dev/null
 
     echo "Eternal Terminal sources list missing, adding (requires sudo)"
-    echo "deb [signed-by=${et_key_path}] https://github.com/MisterTea/debian-et/raw/master/debian-source/ bookworm main" \
-      | sudo tee "${et_sources_list}" > /dev/null
+    echo "deb [signed-by=${et_key_path}] https://github.com/MisterTea/debian-et/raw/master/debian-source/ bookworm main" |
+      sudo tee "${et_sources_list}" >/dev/null
 
     echo "Eternal Terminal sources added, updating packages"
     sudo -E apt-get update -qq

@@ -14,12 +14,12 @@ install_zerotier() {
 
   if [ ! -f "$zerotier_sources_list" ]; then
     echo "Adding Zerotier GPG key (requires sudo)"
-    curl -sS "$zerotier_key_url" | \
-      sudo tee "$zerotier_key_path" > /dev/null
+    curl -sS "$zerotier_key_url" |
+      sudo tee "$zerotier_key_path" >/dev/null
 
     echo "Zerotier sources list missing, adding (requires sudo)"
-    echo "deb [signed-by=${zerotier_key_path}] http://download.zerotier.com/debian/bookworm bookworm main" \
-      | sudo tee "$zerotier_sources_list" > /dev/null
+    echo "deb [signed-by=${zerotier_key_path}] http://download.zerotier.com/debian/bookworm bookworm main" |
+      sudo tee "$zerotier_sources_list" >/dev/null
 
     echo "Zerotier sources added, updating packages"
     sudo -E apt-get update -qq

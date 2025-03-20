@@ -91,12 +91,12 @@ setup_shell() {
   if [[ -x "${homebrew_bash_path}" ]] && [[ "${SHELL:-}" != "${homebrew_bash_path}" ]]; then
     if ! grep -q "${homebrew_bash_path}" /etc/shells; then
       echo "Adding ${homebrew_bash_path} to shell list (requires sudo)"
-      echo "${homebrew_bash_path}" | sudo tee -a /etc/shells > /dev/null
+      echo "${homebrew_bash_path}" | sudo tee -a /etc/shells >/dev/null
     fi
 
     # Only change shell if running interactively, otherwise fails in CI which
     # can't do the required auth
-    if [[ -t 1 ]] ; then
+    if [[ -t 1 ]]; then
       echo "Changing shell to bash ($homebrew_bash_path)"
       chsh -s "${homebrew_bash_path}"
     fi
@@ -104,7 +104,7 @@ setup_shell() {
 }
 
 install_command_line_tools() {
-  if ! xcode-select -p > /dev/null 2>&1; then
+  if ! xcode-select -p >/dev/null 2>&1; then
     echo "Installing command line tools"
     xcode-select --install
   fi
@@ -118,7 +118,7 @@ install_homebrew() {
 
   if [[ ! -f "$HOME/.profile.brew" ]]; then
     echo "Exporting brew shellenv"
-    "${brew_prefix}/bin/brew" shellenv > "$HOME/.profile.brew"
+    "${brew_prefix}/bin/brew" shellenv >"$HOME/.profile.brew"
   fi
 
   # Ensure `brew` in path for rest of script
@@ -146,18 +146,18 @@ main() {
   # Parse arguments
   while [[ $# -gt 0 ]]; do
     case "$1" in
-      --homebrew-only|--brew-only)
-        brew_only=1
-        ;;
-      --help|-h)
-        usage
-        exit 0
-        ;;
-      *)
-        >&2 echo "Unknown argument: $1"
-        usage
-        exit 1
-        ;;
+    --homebrew-only | --brew-only)
+      brew_only=1
+      ;;
+    --help | -h)
+      usage
+      exit 0
+      ;;
+    *)
+      >&2 echo "Unknown argument: $1"
+      usage
+      exit 1
+      ;;
     esac
     shift
   done
@@ -171,7 +171,7 @@ main() {
 
   if [[ ! -f "$local_profile_path" ]]; then
     echo "Generating $local_profile_path"
-    "${dotfiles_root}/script/create_local_profile" > "$local_profile_path"
+    "${dotfiles_root}/script/create_local_profile" >"$local_profile_path"
   fi
 
   # shellcheck source=/dev/null

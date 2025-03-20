@@ -14,12 +14,12 @@ install_lutris() {
 
   if [ ! -f "$lutris_sources_list" ]; then
     echo "Adding Lutris GPG key (requires sudo)"
-    curl -sS ${lutris_key_url} | \
+    curl -sS ${lutris_key_url} |
       sudo -E gpg --dearmor --output ${lutris_key_path}
 
     echo "Lutris sources list missing, adding (requires sudo)"
-    echo "deb [signed-by=${lutris_key_path}] https://download.opensuse.org/repositories/home:/strycore/Debian_12/ ./" \
-      | sudo tee "$lutris_sources_list" > /dev/null
+    echo "deb [signed-by=${lutris_key_path}] https://download.opensuse.org/repositories/home:/strycore/Debian_12/ ./" |
+      sudo tee "$lutris_sources_list" >/dev/null
 
     echo "Lutris sources added, updating packages"
     sudo -E apt-get update -qq

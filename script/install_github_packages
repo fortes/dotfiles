@@ -22,6 +22,7 @@
 # - pistol
 # - psst
 # - sad
+# - shfmt
 # - wezterm
 # - yazi
 # - yq
@@ -61,6 +62,7 @@ AVAILABLE_PACKAGES=(
   psst
   neovim
   sad
+  shfmt
   wezterm
   yazi
   yq
@@ -96,7 +98,7 @@ get_latest_release_url() {
     echo_stderr "Error: Could not find url for ${repo} matching ${match}"
     exit 2
   fi
-  echo "${urls}"| head -n 1
+  echo "${urls}" | head -n 1
 }
 
 install_bin() {
@@ -130,11 +132,11 @@ install_deb() {
   url="$(get_latest_release_url "${repo}" "${match}")"
 
   download_dir="$(mktemp --directory "${name}"XXX)"
-  pushd "${download_dir}" > /dev/null
+  pushd "${download_dir}" >/dev/null
   wget --quiet -O "${name}.deb" "${url}"
   echo "Installing ${repo} (requires sudo) ... "
   sudo dpkg -i "${name}.deb"
-  popd > /dev/null
+  popd >/dev/null
   rm -rf "${download_dir}"
 }
 
@@ -154,10 +156,10 @@ install_tarball() {
   local download_dir
   download_dir="$(mktemp --directory "${name}"XXX)"
 
-  pushd "${download_dir}" > /dev/null
+  pushd "${download_dir}" >/dev/null
   wget --quiet -O "${name}.tar.gz" "${url}"
   echo -n "Expanding ${name}.tar.gz ... "
-  tar xzvf "${name}.tar.gz" > /dev/null
+  tar xzvf "${name}.tar.gz" >/dev/null
   if [[ -f "${name}" ]]; then
     mv "${name}" "${install_location}/${name}"
   else
@@ -173,7 +175,7 @@ install_tarball() {
     fi
   fi
   chmod 755 "${install_location}/${name}"
-  popd > /dev/null
+  popd >/dev/null
   rm -rf "${download_dir}"
   echo "${name} installed"
 }
@@ -192,13 +194,13 @@ install_zip() {
   local download_dir
   download_dir="$(mktemp --directory "${name}"XXX)"
 
-  pushd "${download_dir}" > /dev/null
+  pushd "${download_dir}" >/dev/null
   wget --quiet -O "${name}.zip" "${url}"
   echo -n "Unzipping ${name}.zip ... "
   unzip -q -o -j -d . "${name}.zip"
   mv "${name}" "${install_location}/${name}"
   chmod 755 "${install_location}/${name}"
-  popd > /dev/null
+  popd >/dev/null
   rm -rf "${download_dir}"
   echo "${name} installed"
 }
@@ -274,14 +276,14 @@ install_lua_language_server() {
   local download_dir
   download_dir="$(mktemp --directory "${name}"XXX)"
 
-  pushd "${download_dir}" > /dev/null
+  pushd "${download_dir}" >/dev/null
   wget --quiet -O "${name}.tar.gz" "${url}"
   echo -n "Expanding ${name}.tar.gz ... "
-  tar xzvf "${name}.tar.gz" -C "${install_location}" > /dev/null
+  tar xzvf "${name}.tar.gz" -C "${install_location}" >/dev/null
 
   # Binary is symlinked via stow
 
-  popd > /dev/null
+  popd >/dev/null
   rm -rf "${download_dir}"
   echo "${name} installed"
 }
@@ -312,7 +314,7 @@ install_neovim_stable() {
     (
       cd "${vim_appimage_dir_path}"
       mv "${vim_path}" .
-      "${vim_appimage_dir_path}/nvim" --appimage-extract > /dev/null
+      "${vim_appimage_dir_path}/nvim" --appimage-extract >/dev/null
       ln -s "${vim_appimage_dir_path}/squashfs-root/AppRun" "${vim_path}"
     )
   fi
@@ -346,14 +348,18 @@ install_psst() {
   local url="https://nightly.link/jpochyla/psst/workflows/build/main/psst-deb-amd64.zip"
 
   download_dir="$(mktemp --directory "${name}"XXX)"
-  pushd "${download_dir}" > /dev/null
+  pushd "${download_dir}" >/dev/null
   wget --quiet -O "${name}.zip" "${url}"
   echo -n "Unzipping ${name}.zip ... "
   unzip -q -o -j -d . "${name}.zip"
   echo "Installing ${repo} (requires sudo) ... "
   sudo dpkg -i psst*.deb
-  popd > /dev/null
+  popd >/dev/null
   rm -rf "${download_dir}"
+}
+
+install_shfmt() {
+  install_bin 'mvdan/sh' 'shfmt_v.*_linux_amd64' 'shfmt'
 }
 
 install_wezterm() {
@@ -371,15 +377,15 @@ install_yazi() {
   local download_dir
   download_dir="$(mktemp --directory yaziXXX)"
 
-  pushd "${download_dir}" > /dev/null
+  pushd "${download_dir}" >/dev/null
   wget --quiet -O yazi.zip "${url}"
   echo -n "Unzipping yazi.zip ... "
   unzip -q -o -j -d . yazi.zip
 
-  mv -t "${bin_location}" {ya,yazi} 
+  mv -t "${bin_location}" {ya,yazi}
   chmod 755 "${bin_location}"/{ya,yazi}
   mv -t "${completion_location}" yazi.bash
-  popd > /dev/null
+  popd >/dev/null
   rm -rf "${download_dir}"
   echo "yazi installed"
 }
@@ -411,12 +417,12 @@ install_github_packages() {
     packages=("${AVAILABLE_PACKAGES[@]}")
   fi
 
-  while (( "$#" )); do
+  while (("$#")); do
     case "${1}" in
-      -h|--help)
-        print_usage
-        exit 0
-        ;;
+    -h | --help)
+      print_usage
+      exit 0
+      ;;
     esac
     shift
   done
@@ -430,88 +436,91 @@ install_github_packages() {
 
   for package in "${packages[@]}"; do
     case "${package}" in
-      agg)
-        install_agg
-        ;;
-      bun)
-        install_bun
-        ;;
-      ctop)
-        install_ctop
-        ;;
-      delta)
-        install_delta
-        ;;
-      deno)
-        install_deno
-        ;;
-      difftastic)
-        install_difftastic
-        ;;
-      docker-compose)
-        install_docker_compose
-        ;;
-      github-cli)
-        install_github_cli
-        ;;
-      fnm)
-        install_fnm
-        ;;
-      fx)
-        install_fx
-        ;;
-      fzf)
-        install_fzf
-        ;;
-      helix)
-        install_helix
-        ;;
-      hugo)
-        install_hugo
-        ;;
-      lazydocker)
-        install_lazydocker
-        ;;
-      lazygit)
-        install_lazygit
-        ;;
-      luals)
-        install_lua_language_server
-        ;;
-      ncspot)
-        install_ncspot
-        ;;
-      neovim)
-        install_neovim_stable
-        ;;
-      pistol)
-        install_pistol
-        ;;
-      psst)
-        [[ -z "${IS_HEADLESS:-}" ]] && install_psst
-        ;;
-      sad)
-        install_sad
-        ;;
-      wezterm)
-        [[ -z "${IS_HEADLESS:-}" ]] && install_wezterm
-        ;;
-      yazi)
-        install_yazi
-        ;;
-      yq)
-        install_yq
-        ;;
-      zellij)
-        install_zellij
-        ;;
-      zoxide)
-        install_zoxide
-        ;;
-      *)
-        echo_stderr "Error: Unrecognized package: ${package}"
-        exit 1
-        ;;
+    agg)
+      install_agg
+      ;;
+    bun)
+      install_bun
+      ;;
+    ctop)
+      install_ctop
+      ;;
+    delta)
+      install_delta
+      ;;
+    deno)
+      install_deno
+      ;;
+    difftastic)
+      install_difftastic
+      ;;
+    docker-compose)
+      install_docker_compose
+      ;;
+    github-cli)
+      install_github_cli
+      ;;
+    fnm)
+      install_fnm
+      ;;
+    fx)
+      install_fx
+      ;;
+    fzf)
+      install_fzf
+      ;;
+    helix)
+      install_helix
+      ;;
+    hugo)
+      install_hugo
+      ;;
+    lazydocker)
+      install_lazydocker
+      ;;
+    lazygit)
+      install_lazygit
+      ;;
+    luals)
+      install_lua_language_server
+      ;;
+    ncspot)
+      install_ncspot
+      ;;
+    neovim)
+      install_neovim_stable
+      ;;
+    pistol)
+      install_pistol
+      ;;
+    psst)
+      [[ -z "${IS_HEADLESS:-}" ]] && install_psst
+      ;;
+    sad)
+      install_sad
+      ;;
+    shfmt)
+      install_shfmt
+      ;;
+    wezterm)
+      [[ -z "${IS_HEADLESS:-}" ]] && install_wezterm
+      ;;
+    yazi)
+      install_yazi
+      ;;
+    yq)
+      install_yq
+      ;;
+    zellij)
+      install_zellij
+      ;;
+    zoxide)
+      install_zoxide
+      ;;
+    *)
+      echo_stderr "Error: Unrecognized package: ${package}"
+      exit 1
+      ;;
     esac
   done
 

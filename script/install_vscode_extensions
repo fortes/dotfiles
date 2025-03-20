@@ -34,7 +34,7 @@ EXTENSIONS=(
 )
 
 install_vscode_extensions() {
-  if ! command -v code &> /dev/null; then
+  if ! command -v code &>/dev/null; then
     echo "Must have VSCode installed" 1>&2
     exit 1
   fi

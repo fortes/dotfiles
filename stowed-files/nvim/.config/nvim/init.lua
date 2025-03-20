@@ -578,7 +578,7 @@ require("lazy").setup({
           timeout_ms = 500,
         },
         formatters_by_ft = {
-          bash = { 'beautysh' },
+          bash = { 'shfmt' },
           css = { 'prettier' },
           html = { 'prettier' },
           javascript = deno_or_prettier,

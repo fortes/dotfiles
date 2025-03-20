@@ -14,12 +14,12 @@ install_yarn() {
 
   if [ ! -f "$yarn_sources_list" ]; then
     echo "Adding Yarn GPG key (requires sudo)"
-    curl -sS "$yarn_key_url" | \
-      sudo tee "$yarn_key_path" > /dev/null
+    curl -sS "$yarn_key_url" |
+      sudo tee "$yarn_key_path" >/dev/null
 
     echo "Yarn sources list missing, adding (requires sudo)"
-    echo "deb [arch=amd64 signed-by=${yarn_key_path}] https://dl.yarnpkg.com/debian stable main" \
-      | sudo tee "$yarn_sources_list"
+    echo "deb [arch=amd64 signed-by=${yarn_key_path}] https://dl.yarnpkg.com/debian stable main" |
+      sudo tee "$yarn_sources_list"
 
     echo "Yarn sources added, updating packages"
     sudo -E apt-get update -qq

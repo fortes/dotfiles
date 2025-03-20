@@ -21,7 +21,7 @@ main() {
   is_wsl=$([[ -d /run/WSL ]] && printf 1)
   # Default to headless in Crostini / Docker / WSL, even though GUI might be
   # possible, can always be overridden
-  is_headless=$([[ -n "${is_crostini}${is_docker}${is_mac}${is_wsl}" || \
+  is_headless=$([[ -n "${is_crostini}${is_docker}${is_mac}${is_wsl}" ||
     -z "${WAYLAND_DISPLAY:-}" ]] && printf 1)
   set -e
 

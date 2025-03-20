@@ -9,16 +9,16 @@ IFS=$'\n\t'
 lock_local_files() {
   local dry_run=''
 
-  while (( "$#" )); do
+  while (("$#")); do
     case "$1" in
-      --dry-run)
-        dry_run=1
-        shift
-        ;;
-      *)
-        >&2 echo "⨯ Unknown argument: $1"
-        exit 1
-        ;;
+    --dry-run)
+      dry_run=1
+      shift
+      ;;
+    *)
+      >&2 echo "⨯ Unknown argument: $1"
+      exit 1
+      ;;
     esac
   done
 
@@ -27,7 +27,7 @@ lock_local_files() {
   else
     echo "Locking .local files…"
   fi
-  if git rev-parse --is-inside-work-tree &> /dev/null; then
+  if git rev-parse --is-inside-work-tree &>/dev/null; then
     for local_file in $(git ls-files | grep -e '\.local$'); do
       echo -n "… ${local_file} Checking"
       if ! git locked | grep --quiet --fixed-strings "$local_file"; then

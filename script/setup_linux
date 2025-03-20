@@ -204,10 +204,10 @@ increase_max_watchers() {
   declare -r conf_file_path="/etc/sysctl.d/20-increase-max-watchers.conf"
   declare -r max_watches="524288"
 
-  if [ ! -f  "$conf_file_path" ]; then
+  if [ ! -f "$conf_file_path" ]; then
     echo "Increasing max watchers (requires sudo)"
-    echo "fs.inotify.max_user_watches=$max_watches" | \
-      sudo tee &> /dev/null -a "$conf_file_path" && sudo sysctl -p
+    echo "fs.inotify.max_user_watches=$max_watches" |
+      sudo tee -a "$conf_file_path" &>/dev/null && sudo sysctl -p
     echo "Max watchers set to $max_watches"
   fi
 }
@@ -253,7 +253,7 @@ set_default_applications() {
     sudo update-alternatives --set x-terminal-emulator "$(command -v alacritty)"
   fi
 
-  if command_exists firefox && ! update-alternatives --query  x-www-browser | grep ^Value | grep -q firefox; then
+  if command_exists firefox && ! update-alternatives --query x-www-browser | grep ^Value | grep -q firefox; then
     echo "Setting Firefox as default browser (requires sudo)"
     sudo update-alternatives --install /usr/bin/x-www-browser x-www-browser "$(command -v firefox)" 60
     xdg-settings set default-web-browser firefox.desktop
@@ -269,7 +269,7 @@ setup_backports() {
   declare -r codename="$(lsb_release -cs | tail -n 1)"
 
   # WSL comes with backports pre-enabled
-  if grep -q "${codename}-backports" /etc/apt/sources.list{,.d/*} 2> /dev/null; then
+  if grep -q "${codename}-backports" /etc/apt/sources.list{,.d/*} 2>/dev/null; then
     echo "Backports already in sources.list"
     return
   fi
@@ -277,8 +277,8 @@ setup_backports() {
   declare -r sources_path="/etc/apt/sources.list.d/backports.list"
 
   echo "${codename}-backports not in sources.list, adding (requires sudo)"
-  echo "deb http://ftp.debian.org/debian ${codename}-backports main contrib non-free non-free-firmware" | \
-    sudo tee &> /dev/null "$sources_path"
+  echo "deb http://ftp.debian.org/debian ${codename}-backports main contrib non-free non-free-firmware" |
+    sudo tee "$sources_path" &>/dev/null
 
   # New source requires forced updates
   has_updated=""
@@ -334,9 +334,9 @@ setup_locale() {
     # Uncomment from `locale.gen` file
     sudo sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
     echo "Setting locale to ${locale}"
-    sudo sudo -E dpkg-reconfigure --frontend=noninteractive locales && \
+    sudo sudo -E dpkg-reconfigure --frontend=noninteractive locales &&
       sudo -E update-locale LANG=${locale}
-    sudo debconf-set-selections -c <<< "locales locales/default_environment_locale select ${locale}"
+    sudo debconf-set-selections -c <<<"locales locales/default_environment_locale select ${locale}"
   fi
 }
 
@@ -354,9 +354,9 @@ setup_nonfree() {
   elif ! grep -q non-free /etc/apt/sources.list; then
     # Assume contrib and non-free always travel together
     echo "Adding contrib & non-free to sources (requires sudo)"
-    sudo -E add-apt-repository --no-update --yes contrib > /dev/null
-    sudo -E add-apt-repository --no-update --yes non-free > /dev/null
-    sudo -E add-apt-repository --no-update --yes non-free-firmware > /dev/null
+    sudo -E add-apt-repository --no-update --yes contrib >/dev/null
+    sudo -E add-apt-repository --no-update --yes non-free >/dev/null
+    sudo -E add-apt-repository --no-update --yes non-free-firmware >/dev/null
 
     # New source requires forced updates
     has_updated=""
@@ -385,18 +385,18 @@ main() {
   # Parse arguments
   while [[ $# -gt 0 ]]; do
     case "$1" in
-      --apt-only)
-        apt_only=1
-        ;;
-      --help|-h)
-        usage
-        exit 0
-        ;;
-      *)
-        echo_stderr "Unknown argument: $1"
-        usage
-        exit 1
-        ;;
+    --apt-only)
+      apt_only=1
+      ;;
+    --help | -h)
+      usage
+      exit 0
+      ;;
+    *)
+      echo_stderr "Unknown argument: $1"
+      usage
+      exit 1
+      ;;
     esac
     shift
   done
@@ -412,7 +412,7 @@ main() {
 
   if [[ ! -f "${local_profile_path}" ]]; then
     echo "Generating ${local_profile_path}"
-    "${dotfiles_root}/script/create_local_profile" > "${local_profile_path}"
+    "${dotfiles_root}/script/create_local_profile" >"${local_profile_path}"
   fi
 
   # shellcheck source=/dev/null
@@ -434,9 +434,9 @@ main() {
 
   # Misc system configs
   increase_max_watchers
-  pushd "${dotfiles_root}" > /dev/null
+  pushd "${dotfiles_root}" >/dev/null
   "${dotfiles_root}/script/lock_local_files"
-  popd > /dev/null
+  popd >/dev/null
   set_default_applications
   [[ -z "${IS_DOCKER:-}" ]] && setup_docker
   setup_keyboard

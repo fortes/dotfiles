@@ -649,8 +649,8 @@ augroup filetype_tweaks
     autocmd FileType vim setlocal makeprg=vint\ --enable-neovim\ \-s\ %
   endif
 
-  if executable('beautysh')
-    autocmd FileType sh setlocal formatprg=beautysh\ -i\ 2\ -
+  if executable('shfmt')
+    autocmd FileType sh setlocal formatprg=shfmt\ --indent\ 2
   endif
 
   " Use prettier to autoformat (gq in Visual mode)

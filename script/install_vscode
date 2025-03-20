@@ -17,18 +17,18 @@ install_vscdoe() {
 
   if [ ! -f "$vscode_sources_list" ]; then
     echo "Adding Microsoft GPG key (requires sudo)"
-    curl -sS "$vscode_key_url" | \
-      sudo tee "$vscode_key_path" > /dev/null
+    curl -sS "$vscode_key_url" |
+      sudo tee "$vscode_key_path" >/dev/null
 
     echo "Microsoft VSCode sources list missing, adding (requires sudo)"
-    echo "deb [arch=amd64 signed-by=${vscode_key_path}] https://packages.microsoft.com/repos/vscode stable main" \
-      | sudo tee "$vscode_sources_list"
+    echo "deb [arch=amd64 signed-by=${vscode_key_path}] https://packages.microsoft.com/repos/vscode stable main" |
+      sudo tee "$vscode_sources_list"
 
     echo "Microsoft VSCode sources added, updating packages"
     sudo -E apt-get update -qq
   fi
 
-  if ! command -v code &> /dev/null; then
+  if ! command -v code &>/dev/null; then
     echo "Installing code package (requires sudo)"
     sudo -E apt-get install -qq -o=Dpkg::Use-Pty=0 --assume-yes \
       --fix-broken --no-install-recommends code
@@ -42,4 +42,3 @@ install_vscdoe() {
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   install_vscdoe
 fi
-

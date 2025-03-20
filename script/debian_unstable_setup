@@ -17,11 +17,11 @@ debian_unstable_setup() {
 
   if [ ! -f "$unstable_sources_list" ]; then
     echo "Debian unstable sources list missing, adding (requires sudo)"
-    echo "deb http://deb.debian.org/debian/ unstable main" \
-      | sudo tee "$unstable_sources_list"
+    echo "deb http://deb.debian.org/debian/ unstable main" |
+      sudo tee "$unstable_sources_list"
     echo "Decreasing priority of unstable packages"
-    printf 'Package: *\nPin: release a=unstable\nPin-Priority: 90\n' \
-      | sudo tee /etc/apt/preferences.d/limit-unstable
+    printf 'Package: *\nPin: release a=unstable\nPin-Priority: 90\n' |
+      sudo tee /etc/apt/preferences.d/limit-unstable
 
     echo "Unstable sources added, updating packages"
     sudo -E apt-get update -qq
