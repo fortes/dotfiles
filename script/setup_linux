@@ -440,6 +440,8 @@ main() {
   # Non-apt package managers
   "${dotfiles_root}/script/install_node_packages"
   "${dotfiles_root}/script/install_python_packages"
+  "${dotfiles_root}/script/install_llm_plugins"
+  "${dotfiles_root}/script/install_yazi_plugins"
 
   "${dotfiles_root}/script/generate_completions"
 

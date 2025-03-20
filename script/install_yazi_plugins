@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# Install plugins for `yazi`
+#
+# Usage: install_yazi_plugins
+
+set -euo pipefail
+IFS=$'\n\t'
+
+PLUGINS=(
+  yazi-rs/plugins:git
+)
+
+install_yazi_plugins() {
+  if ! command_exists ya; then
+    >&2 echo "⨯ yazi not installed!"
+    exit 1
+  fi
+
+  echo "Installing / Updating yazi plugins …"
+  for plugin in "${PLUGINS[@]}"; do
+    ya pack -a "${plugin}"
+  done
+  echo "yazi plugins installed!"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  install_yazi_plugins "${@}"
+fi
+
