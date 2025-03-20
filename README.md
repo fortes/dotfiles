@@ -217,6 +217,7 @@ git update-index --no-skip-worktree ./symlinks/npmrc
     ```
 - 1Password
   - Sign into account
+  - Disable global keyboard shortcuts
 - Firefox
   - Sign into account
 - VS Code
