@@ -130,6 +130,7 @@ GUI_PACKAGES=(
   fuzzel
   gammastep
   gnome-keyring
+  grimshot
   hsetroot
   imv
   libnotify-bin
@@ -152,6 +153,8 @@ GUI_PACKAGES=(
   waybar
   wev
   wf-recorder
+  # Wanted by `grimshot`, but useful for scripts
+  wl-clipboard
   xwayland
 )
 
