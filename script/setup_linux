@@ -253,12 +253,6 @@ set_default_applications() {
     sudo update-alternatives --set x-terminal-emulator "$(command -v alacritty)"
   fi
 
-  if command_exists firefox && ! update-alternatives --query x-www-browser | grep ^Value | grep -q firefox; then
-    echo "Setting Firefox as default browser (requires sudo)"
-    sudo update-alternatives --install /usr/bin/x-www-browser x-www-browser "$(command -v firefox)" 60
-    xdg-settings set default-web-browser firefox.desktop
-  fi
-
   if command_exists yarnpkg && ! update-alternatives --query yarn | grep ^Value | grep -q yarnpkg; then
     echo "Setting 'yarn' as system alias to 'yarnpkg' (requires sudo)"
     sudo update-alternatives --install /usr/bin/yarn yarn /usr/bin/yarnpkg 10
@@ -441,7 +435,7 @@ main() {
   [[ -z "${IS_DOCKER:-}" ]] && setup_docker
   setup_keyboard
   setup_locale
-  [[ -n "${IS_CROSTINI:-}" ]] && "${dotfiles_root}/script/set_chromebook_browser"
+  [[ -z "${IS_DOCKER:-}" ]] && "${dotfiles_root}/script/set_default_browser"
 
   # Non-apt package managers
   "${dotfiles_root}/script/install_node_packages"
