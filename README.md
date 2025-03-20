@@ -162,8 +162,8 @@ git update-index --no-skip-worktree ./symlinks/npmrc
 - Enable Linux, choose a larger disk size (20GB fine?). Double check which debian version it is via `lsb_release -a` (should be `bookworm`)
 - Run `setup_machine`
 - Share `Downloads` folder with Linux, then symlink via `ln -s /mnt/chromeos/MyFiles/Downloads ~/downloads`
-- Change terminal font by going to [chrome-untrusted://terminal/html/nassh_preferences_editor.html](chrome-untrusted://terminal/html/nassh_preferences_editor.html)
-  - Add `'DejaVu Sans Mono Nerd` to the beginning of "Text Font Family"
+- Change terminal font by going to `chrome-untrusted://terminal/html/nassh_preferences_editor.html`
+  - Add `'DejaVu Sans Mono Nerd'` to the beginning of "Text Font Family"
   - Add the following to custom CSS:
     ```css
     @font-face {
@@ -291,6 +291,10 @@ docker run -it --rm --name dotfiles -v ~/src:/home/fortes/src dotfiles
 Also need to manually start neovim to install plugins
 
 ## Known Issues
+
+### Mac
+
+- Firefox and VSCode casks get ornery and no longer update via brew
 
 ### Linux
 
