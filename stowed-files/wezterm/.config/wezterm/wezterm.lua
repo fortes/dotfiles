@@ -14,7 +14,7 @@ config.hide_tab_bar_if_only_one_tab = true
 
 config.color_scheme = 'Default Dark (base16)'
 
-config.font = wezterm.font("JetBrains Mono", {weight="Light"})
+config.font = wezterm.font("JetBrains Mono", { weight = "Light" })
 
 config.window_padding = {
   left = 0,
@@ -36,9 +36,9 @@ end)
 
 config.keys = {
   {
-    key="L",
-    mods="CTRL|SHIFT",
-    action= wezterm.action.Multiple {
+    key = "L",
+    mods = "CTRL|SHIFT",
+    action = wezterm.action.Multiple {
       wezterm.action.EmitEvent "toggle-color-scheme",
       -- Spawn shell to run `toggle-color-scheme`
       wezterm.action.SpawnCommandInNewTab {
