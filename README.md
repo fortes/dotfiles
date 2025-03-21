@@ -305,6 +305,7 @@ Also need to manually start neovim to install plugins
 
 ## TODO/Future Improvements
 
+- [ ] Set up [network share](https://www.reddit.com/r/Crostini/wiki/howto/addnetworkshares/) in Crostini
 - [ ] Look into publishing a docker container via GitHub actions
 - [ ] `exa` is now unmaintained, need to either go to [eza](https://github.com/eza-community/eza) or `lsd`
 - [ ] Move from `docker` to `podman`
