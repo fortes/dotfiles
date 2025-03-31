@@ -17,9 +17,9 @@ if !has('nvim')
   " vint: +ProhibitSetNoCompatible
   set complete-=i
   set cscopeverbose
-  " nvim also sets `msgsep`, but that doesn't exist in vim 8.2 on Mac
   set display=lastline
   set encoding=utf-8
+  set fillchars="vert:│,fold:·,foldsep:│"
   set formatoptions=tcq
   if v:version >= 704
     set formatoptions+=j
@@ -28,23 +28,35 @@ if !has('nvim')
   set hidden
   set history=10000
   set hlsearch
+  set include=.
   set incsearch
   set nojoinspaces
+  set jumpoptions=clean
   if has('langmap') && (v:version > 704 || v:version == 704 && has('patch502'))
     set langnoremap
   endif
   set laststatus=2
+  set mouse=nvi
+  set mousemodel=popup_setpos
   set nrformats=bin,hex
+  set path=".,,"
   set ruler
   set sessionoptions-=options
+  set sessionoptions+=unix,slash
+  set shortmess-=S
+  set shortmess+=CF
   set showcmd
   set sidescroll=1
   set smarttab
   set nostartofline
+  set switchbuf=uselast
   set tabpagemax=50
   set tags="./tags;,tags"
+  set ttimeout
+  set ttimeoutlen=50
   set ttyfast
-  set viewoptions=folds,cursor,curdir,unix,slash
+  set viewoptions+=unix,slash
+  set viewoptions-=options
   set wildmenu
   " nvim also sets `pum`, which doesn't exist in vim 8.2 on Mac
   set wildoptions=tagfile
@@ -53,6 +65,11 @@ if !has('nvim')
   nnoremap <C-L> <Cmd>nohlsearch<Bar>diffupdate<CR><C-L>
   inoremap <C-U> <C-G>u<C-U>
   inoremap <C-W> <C-G>u<C-W>
+
+  " Enable syntax highlighting by default
+  if has('syntax')
+    syntax enable
+  endif
 endif
 " }}}
 
@@ -363,11 +380,6 @@ if !exists('g:colors_name')
   silent! colorscheme desert
 endif
 
-" Enable syntax highlighting by default
-if has('syntax')
-  syntax enable
-endif
-
 if has('termguicolors')
   " Mac doesn't ship with tmux terminfo
   if $COLORTERM == 'truecolor' || $TERM =~ '^\(xterm\|tmux\)-256'
@@ -452,7 +464,6 @@ if has('eval')
     endif
   endfunction
 
-  " Change to git root of current file (if in a repo)
   function! FindGitRootCD()
     let root = systemlist('git -C ' . expand('%:p:h') . ' rev-parse --show-toplevel')[0]
     if v:shell_error
@@ -462,27 +473,35 @@ if has('eval')
     endif
   endfunction
 
+  function! GetSearchPath()
+    let result = FindGitRootCD()
+    if type(result) == type({})
+      let repo_root = result['dir']
+      if getcwd() == repo_root
+        return '.'
+      else
+        return fnamemodify(repo_root, ':~:.')
+      endif
+    else
+      return '.'
+    endif
+  endfunction
+
+  " Change to git root of current file (if in a repo)
   function! GitRootCD()
     let result = FindGitRootCD()
     if type(result) == type({})
       execute 'tcd' fnameescape(result['dir'])
-      echo 'Now in '.result['dir']
+      echo 'Now in '.fnamemodify(result['dir'], ':~:.')
     else
       echo 'Not in git repo!'
     endif
   endfunction
   command! GitRootCD :call GitRootCD()
 
-  " K searches for word under cursor in root of project (remove default binding)
-  nnoremap K :GitRootCD<cr>:silent! lgrep! "<C-R><C-W>"<cr>
   " No Ex-mode, start project search instead, using word under the cursor
-  nnoremap Q :GitRootCD<cr>:lgrep! <C-R><C-W>
-  " Grep for visual selection, just like in normal mode. Note that this clears /
-  " uses the `s` register
-  vnoremap K :<C-u>norm! gv"sy<cr>:GitRootCD<cr>:silent! lgrep! "<C-R>s"<cr>
-  " Grep for visual selection, just like in normal mode. Note that this clears /
-  " uses the `s` register
-  vnoremap Q :<C-u>norm! gv"sy<cr>:GitRootCD<cr>:silent! lgrep! <C-R>s
+  nnoremap Q :lgrep! "<C-R><C-W>" <C-R>=GetSearchPath()<CR>
+  vnoremap Q :<C-u>norm! gv"sy<cr>:lgrep! "<C-R>s" <C-R>=GetSearchPath()<CR>
 endif
 
 " Automatically open quickfix/location list after grep/make
@@ -505,14 +524,6 @@ else
     \ --exclude-dir=socket\ --exclude-dir=.git\ --exclude-dir=node_modules\
     \ $*\ /dev/null
   set grepformat=%f:%l:%m
-
-  " Unlike rg, grep needs to have a file path after the search command. Add that
-  " in for the K bindings (default to current directory)
-  nnoremap K :GitRootCD<cr>:lgrep! "<C-R><C-W>" .<cr>
-  vnoremap K :<C-u>norm! gv"sy<cr>:GitRootCD<cr>:lgrep! "<C-R>s" .<cr>
-  " Pre-fill path
-  nnoremap Q :GitRootCD<cr>:lgrep! <C-R><C-W> .<left><left>
-  vnoremap Q :<C-u>norm! gv"sy<cr>:GitRootCD<cr>:lgrep! <C-R>s .<left><left>
 endif
 " }}}
 
@@ -717,38 +728,16 @@ if has('syntax')
 endif
 " }}}
 
-" Netrw config {{{
-" Netrw requires `eval`, not present in `vim.tiny`
-if has('eval')
-  " Disable annoying banner
-  let g:netrw_banner=0
-
-  " Open in same window
-  let g:netrw_browse_split=0
-
-  " Open splits to the right
-  let g:netrw_altv=1
-
-  " Tree view
-  let g:netrw_liststyle=3
-
-  " Sensible limit to the width of the file explorer
-  let g:netrw_winsize = 25
-
-  " Hide files in .gitignore
-  let g:netrw_list_hide=netrw_gitignore#Hide()
-  let g:netrw_list_hide.=',\(^\|\s\s\)\zs\.\S\+'
-endif
-" }}}
-
 if has('spell')
   set spelllang=en_us,pt_pt
 
-  let s:spell_file = fnamemodify($MYVIMRC, ':h').'/spell/pt.utf-8.spl'
+  let s:spell_dir = fnamemodify($MYVIMRC, ':h').'/spell'
+  let s:spell_file = (s:spell_dir).'/pt.utf-8.spl'
   let s:spell_url = 'https://ftp.nluug.nl/vim/runtime/spell/pt.utf-8.spl'
 
-  " Download Portuguese dictionary if not present
-  if !filereadable(s:spell_file)
+  " Download Portuguese dictionary if not present, but only if the directory
+  " is already present, else we might be using a temporary config file anyway
+  if isdirectory(s:spell_dir) && !filereadable(s:spell_file)
     echo "Portuguese spell file not found. Downloading..."
     if executable('curl')
       execute '!curl -fLo ' . s:spell_file . ' ' . s:spell_url

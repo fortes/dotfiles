@@ -107,54 +107,19 @@ require("lazy").setup({
       local nvim_lsp = require('lspconfig')
 
       -- Only map keys after language server has attached to buffer
+      -- Quite a few are now default as of v0.11
+      -- `grn` to rename symbol
+      -- `grr` to find references
+      -- `gri` to find implementation
+      -- `g0` for document symbol
+      -- `gra` for code actions
+      -- `<C-S>` for signature help
       local lsp_on_attach = function(client, bufnr)
-        if client.server_capabilities.definitionProvider then
-          map('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>', bufnr)
-          -- <C-]> automapped via `tagfunc`
-        end
         if client.server_capabilities.referencesProvider then
-          -- `gr` soon to be in default keymaps
-          -- https://github.com/neovim/neovim/pull/28500
-          map('n', 'gr', '<cmd>lua vim.lsp.buf.references()<cr>', bufnr)
-          map('n', 'gR', '<cmd>Telescope lsp_references<cr>', bufnr)
-        end
-        if client.server_capabilities.renameProvider then
-          -- `crn` soon to be in default keymaps
-          -- https://github.com/neovim/neovim/pull/28500
-          map('n', 'crn', '<cmd>lua vim.lsp.buf.rename()<cr>', bufnr)
-        end
-        if client.server_capabilities.hoverProvider then
-          map('n', 'gh', '<cmd>lua vim.lsp.buf.hover()<cr>', bufnr)
-        end
-        if client.server_capabilities.implementationProvider then
-          map('n', 'gI', '<cmd>lua vim.lsp.buf.implementation()<cr>', bufnr)
-        end
-        if client.server_capabilities.typeDefinitionProvider then
-          map('n', 'gD', '<cmd>lua vim.lsp.buf.type_definition()<cr>', bufnr)
-        end
-        if client.server_capabilities.signatureHelpProvider then
-          map('n', 'g?', '<cmd>lua vim.lsp.buf.signature_help()<cr>', bufnr)
-          -- `<C-S>` soon to be in default keymaps
-          -- https://github.com/neovim/neovim/pull/28500
-          map('i', '<C-s>', '<cmd>lua vim.lsp.buf.signature_help()<cr>', bufnr)
-        end
-        if client.server_capabilities.codeActionProvider then
-          -- `crr` soon to be in default keymaps
-          -- https://github.com/neovim/neovim/pull/28500
-          map('n', 'crr', '<cmd>lua vim.lsp.buf.code_action()<cr>', bufnr)
-          map('v', 'crr', '<cmd>lua vim.lsp.buf.code_action()<cr>', bufnr)
-        end
-        if client.server_capabilities.documentSymbolProvider then
-          map('n', '<leader>ds', '<cmd>Telescope lsp_document_symbols<cr>', bufnr)
-        else
-          map('n', '<leader>ds', '<cmd>Telescope treesitter<cr>', bufnr)
-        end
-        if client.server_capabilities.workspaceSymbolProvider then
-          map('n', '<leader>ws', '<cmd>Telescope lsp_dynamic_workspace_symbols<cr>', bufnr)
+          -- grr default in Neovim 0.11, use upper case to use Telescope
+          map('n', 'gRR', '<cmd>Telescope lsp_references<cr>', bufnr)
         end
 
-        map('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<cr>', bufnr)
-        map('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<cr>', bufnr)
         map('n', '<leader>e', '<cmd>lua vim.diagnostic.open_float()<cr>', bufnr)
         map('n', '<leader>q', '<cmd>lua vim.diagnostic.setloclist()<cr>', bufnr)
       end
@@ -248,8 +213,6 @@ require("lazy").setup({
   -- Show LSP progress in lower right
   {
     'j-hui/fidget.nvim',
-    -- Re-write in progress, stay on stable
-    tag = 'legacy',
     dependencies = {
       'neovim/nvim-lspconfig'
     },
@@ -269,6 +232,7 @@ require("lazy").setup({
         ensure_installed = {
           'bash',
           'css',
+          'gotmpl',
           'html',
           'javascript',
           'json',
@@ -304,12 +268,10 @@ require("lazy").setup({
     config = function()
       ---@diagnostic disable-next-line: missing-fields
       require('nvim-treesitter.configs').setup {
-        autotag = {
-          enable = true
-        },
         textobjects = {
           select = {
             enable = true,
+            -- Automatically jump forward to textobj, similar to targets.vim
             lookahead = true,
             keymaps = {
               ["af"] = "@function.outer",
@@ -327,6 +289,13 @@ require("lazy").setup({
     dependencies = {
       'nvim-treesitter/nvim-treesitter'
     },
+    config = function()
+      require('nvim-ts-autotag').setup({
+        opts = {
+          enable_close_on_slash = true,
+        }
+      })
+    end
   },
 
   -- Use Treesitter to add `end` in Lua, Bash, etc
@@ -335,14 +304,6 @@ require("lazy").setup({
     dependencies = {
       'nvim-treesitter/nvim-treesitter'
     },
-    config = function()
-      ---@diagnostic disable-next-line: missing-fields
-      require('nvim-treesitter.configs').setup {
-        endwise = {
-          enable = true
-        }
-      }
-    end,
   },
 
   -- Use Treesitter for rainbow delimiters
@@ -426,9 +387,6 @@ require("lazy").setup({
         -- Use telescope for `vim.ui.select`
         'nvim-telescope/telescope-ui-select.nvim'
       },
-      cond = function()
-        return vim.fn.has('nvim-0.6') == 1
-      end,
       config = function()
         local telescope = require('telescope')
         local actions = require('telescope.actions')
@@ -466,13 +424,23 @@ require("lazy").setup({
             }
           },
           pickers = {
+            find_files = {
+              hidden = true,
+            },
             git_files = {
               show_untracked = true,
+            },
+            live_grep = {
+              additional_args = function(opts)
+                return { "--hidden" }
+              end,
+              hidden = true,
             },
           }
         }
 
         telescope.load_extension('fzf')
+        telescope.load_extension('ui-select')
 
         -- Fallback to file search if not in git repo
         local project_files = function()
@@ -545,7 +513,7 @@ require("lazy").setup({
   {
     'stevearc/conform.nvim',
     cmd = { "ConformInfo" },
-    event = { "BufWritePre" },
+    event = "BufWritePre",
     keys = {
       {
         "<leader>f",
@@ -596,30 +564,29 @@ require("lazy").setup({
   -- Highlight ranges in timeline
   {
     'winston0410/range-highlight.nvim',
-    dependencies = {
-      'winston0410/cmd-parser.nvim',
-    },
-    cond = function()
-      return vim.fn.has('nvim-0.5') == 1
-    end,
-    config = function()
-      require('range-highlight').setup({})
-    end
+    event = "CmdlineEnter",
+    opts = {},
   },
 
   -- Display available key bindings, marks, registers, etc
   {
     'folke/which-key.nvim',
     event = "VeryLazy",
-    config = function()
-      require("which-key").setup()
-    end
+    keys = {
+      {
+        "<leader>?",
+        function()
+          require("which-key").show({ global = false })
+        end,
+        desc = "Buffer Local Keymaps (which-key)",
+      },
+    },
   },
 
   -- Preview line number via `:XXX` before moving
   {
     'nacro90/numb.nvim',
-    event = "VeryLazy",
+    event = "CmdlineEnter",
     config = function()
       require('numb').setup()
     end
@@ -629,26 +596,45 @@ require("lazy").setup({
   -- `[c` / `]c` to jump between hunks
   -- <leader>hs to stage hunk
   -- <leader>hp to preview hunk
+  -- <leader>hi to preview hunk (inline)
   {
     'lewis6991/gitsigns.nvim',
     config = function()
       require('gitsigns').setup({
-        signcolumn = true,
         current_line_blame = true,
         on_attach = function(bufnr)
-          -- Toggle staging
-          -- <leader>hn previous hunk
-          map('n', '<leader>hn', ':Gitsigns prev_hunk<CR>', {
-            buffer = bufnr,
-            desc = "Previous hunk"
-          })
-          -- <leader>hp next hunk
-          map('n', '<leader>hp', ':Gitsigns next_hunk<CR>', {
+          local gitsigns = require('gitsigns')
+
+          -- [c previous hunk
+          map('n', ']c', function()
+            if vim.wo.diff then
+              vim.cmd.normal({ ']c', bang = true })
+            else
+              gitsigns.nav_hunk('next')
+            end
+          end, {
             buffer = bufnr,
             desc = "Next hunk"
           })
+          -- ]c next hunk
+          map('n', '[c', function()
+            if vim.wo.diff then
+              vim.cmd.normal({ '[c', bang = true })
+            else
+              gitsigns.nav_hunk('prev')
+            end
+          end, {
+            buffer = bufnr,
+            desc = "Previous hunk"
+          })
           -- <leader>hs Stage current hunk
           map('n', '<leader>hs', ':Gitsigns stage_hunk<CR>', {
+            buffer = bufnr,
+            desc = "Stage hunk"
+          })
+          map('v', '<leader>hs', function()
+            gitsigns.stage_hunk({ vim.fn.line('.'), vim.fn.line('v') })
+          end, {
             buffer = bufnr,
             desc = "Stage hunk"
           })
@@ -657,8 +643,13 @@ require("lazy").setup({
             buffer = bufnr,
             desc = "Unstage hunk"
           })
-          -- <leader>hP Preview current hunk
-          map('n', '<leader>hP', ':Gitsigns preview_hunk<CR>', {
+          -- <leader>hp Preview current hunk
+          map('n', '<leader>hp', ':Gitsigns preview_hunk<CR>', {
+            buffer = bufnr,
+            desc = "Preview hunk"
+          })
+          -- <leader>hP Preview current hunk inline
+          map('n', '<leader>hi', ':Gitsigns preview_hunk_inline<CR>', {
             buffer = bufnr,
             desc = "Preview hunk"
           })
@@ -667,7 +658,9 @@ require("lazy").setup({
             buffer = bufnr,
             desc = "Reset hunk"
           })
-          map('v', '<leader>hr', ':Gitsigns reset_hunk<CR>', {
+          map('v', '<leader>hr', function()
+            gitsigns.reset_hunk({ vim.fn.line('.'), vim.fn.line('v') })
+          end, {
             buffer = bufnr,
             desc = "Reset hunk"
           })
@@ -703,12 +696,6 @@ require("lazy").setup({
     end,
   },
 
-  -- Better text objects, will seek to nearest match on line
-  {
-    'wellle/targets.vim',
-    event = "VeryLazy",
-  },
-
   -- Extend normal mode `ga` with more info like digraphs and emoji code
   {
     'tpope/vim-characterize',
@@ -728,14 +715,6 @@ require("lazy").setup({
   {
     'tpope/vim-fugitive',
     event = "VeryLazy",
-  },
-
-  {
-    'NeogitOrg/neogit',
-    dependencies = 'nvim-lua/plenary.nvim',
-    config = function()
-      require('neogit').setup({})
-    end
   },
 
   -- netrw, but better
@@ -771,16 +750,13 @@ require("lazy").setup({
   },
 
   -- git status for dirvish
+  -- [f Go to next git file
+  -- ]f Go to prev git file
   {
     'kristijanhusak/vim-dirvish-git',
     dependencies = {
       'justinmk/vim-dirvish'
     },
-  },
-
-  -- Comment / uncomment things quickly
-  {
-    'tpope/vim-commentary'
   },
 
   -- Edit surrounding quotes / parents / etc
@@ -815,45 +791,14 @@ require("lazy").setup({
     dependencies = {
       'nvim-treesitter/nvim-treesitter'
     },
-    config = function()
-      require('nvim-autopairs').setup({
-        -- Use Treesitter to check for pair
-        check_ts = true,
-      })
-    end
+    event = "InsertEnter",
+    config = true,
+    opts = {
+      -- Use Treesitter to check for pair
+      check_ts = true,
+      disable_filetype = { "TelescopePrompt" },
+    }
   },
-
-  -- Better Markdown handling
-  {
-    'plasticboy/vim-markdown',
-    config = function()
-      vim.g['vim_markdown_fenced_languages'] = {
-        'css',
-        'html',
-        'javascript',
-        'js=javascript',
-        'jsx=javascriptreact',
-        'typescript',
-        'ts=typescript',
-        'tsx=typescriptreact',
-        'sh',
-        'bash=sh',
-      }
-      vim.g['vim_markdown_frontmatter'] = 1
-    end
-  },
-
-  -- Only for Hugo template syntax
-  {
-    'fatih/vim-go',
-    ft = 'gohtmltmpl',
-    cond = function()
-      return vim.fn.has('nvim-0.4') == 1
-    end,
-    -- Since only using for syntax for now, don't do full setup
-    -- build = ':GoUpdateBinaries'
-  },
-
   -- Better UX for built-in vim UI like input and select
   {
     'stevearc/dressing.nvim',
@@ -870,6 +815,10 @@ require("lazy").setup({
   -- Check out stevearc/quicker.nvim at some point
   {
     'kevinhwang91/nvim-bqf',
+    dependencies = {
+      -- Used for highlighting preview windows
+      'nvim-treesitter/nvim-treesitter'
+    },
     config = function()
       require('bqf').setup({
         auto_enable = true,
@@ -903,14 +852,16 @@ require("lazy").setup({
 
   -- Reasonable colors
   {
-    'EdenEast/nightfox.nvim',
+    'RRethy/base16-nvim',
     lazy = false,
     config = function()
       if vim.o.termguicolors then
         if os.getenv('COLOR_THEME') == 'light' then
-          vim.cmd.colorscheme('dayfox')
+          vim.opt.background = 'light'
+          vim.cmd.colorscheme('base16-default-light')
         else
-          vim.cmd.colorscheme('carbonfox')
+          vim.opt.background = 'dark'
+          vim.cmd.colorscheme('base16-default-dark')
         end
       end
     end

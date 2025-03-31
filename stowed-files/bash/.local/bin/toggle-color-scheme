@@ -106,9 +106,9 @@ update_neovim_colors() {
   # Change colorscheme of all neovim instances
   while IFS= read -r socket; do
     if [[ "${new_theme}" == "light" ]]; then
-      nvim --server "${socket}" --remote-send "<Esc>:set background=light|colorscheme dayfox<cr>"
+      nvim --server "${socket}" --remote-send "<Esc>:set background=light|colorscheme base16-default-light<cr>"
     else
-      nvim --server "${socket}" --remote-send "<Esc>:set background=dark|colorscheme carbonfox<cr>"
+      nvim --server "${socket}" --remote-send "<Esc>:set background=dark|colorscheme base16-default-dark<cr>"
     fi
   done < <(find "${neovim_socket_dir}" -type s -name "nvim*" 2>/dev/null)
 }
