@@ -31,7 +31,9 @@ if !has('nvim')
   set include=.
   set incsearch
   set nojoinspaces
-  set jumpoptions=clean
+  if has('&jumpoptions')
+    set jumpoptions=clean
+  endif
   if has('langmap') && (v:version > 704 || v:version == 704 && has('patch502'))
     set langnoremap
   endif
@@ -102,8 +104,11 @@ set exrc
 " Don't allow shell and write commands in exrc
 set secure
 
-" Enable loading plugin / indent settings based on filetype
-filetype plugin indent on
+" Enable loading plugin / indent settings based on filetype, not supported
+" in vim-tiny
+if has('eval')
+  filetype plugin indent on
+endif
 
 " Don't redraw while executing macros, etc
 set lazyredraw
@@ -181,8 +186,11 @@ set sidescrolloff=5
 " of [readyonly], and don't give completion match messages
 set shortmess+=Imrc
 
-" Always show the signcolumn to avoid jitter, but show if multiple
-set signcolumn=auto:1-3
+" Always show the signcolumn to avoid jitter, but show if multiple (only
+" supported in neovim)
+if has('nvim')
+  set signcolumn=auto:1-3
+endif
 
 " Open new split panes to right and bottom, which feels more natural
 set splitbelow
@@ -399,54 +407,54 @@ set gdefault
 set ignorecase
 set smartcase
 
-function! s:Cmarks() abort
-  let items = []
-
-  " Global marks:
-  let marklist = getmarklist()
-  " Local marks:
-  let marklist += getmarklist(bufnr())
-
-  for mark in marklist
-    let name = mark.mark[1]
-    if name !~ '[a-zA-Z]'
-      continue
-    endif
-
-    if has_key(mark, 'file')
-      let filename = fnamemodify(mark.file, ':p')
-    else
-      let filename = expand('%:p')
-    endif
-
-    if !filereadable(filename)
-      " A mark could have been saved in a temporary file
-      continue
-    endif
-
-    let [buffer, line, col, _] = mark.pos
-    let text = readfile(filename)[line - 1]
-
-    call add(items, {
-          \ 'filename': filename,
-          \ 'buffer':   buffer,
-          \ 'text':     name..' | '..text,
-          \ 'lnum':     line,
-          \ 'col':      col || 1,
-          \ })
-  endfor
-
-  call setqflist([], 'r', {'title': 'Marks', 'items': items})
-  copen
-endfunction
-" Show marks in quickfix list
-command! Cmarks call s:Cmarks()
-
-" */# in visual mode searches for selected text, similar to normal mode
-vnoremap * :<C-u>call <SID>VisualSetSearch('/')<cr>/<C-R>=@/<cr><cr>
-vnoremap # :<C-u>call <SID>VisualSetSearch('#')<cr>/<C-R>=@/<cr><cr>
-
+" `vim.tiny` doesn't support scripting
 if has('eval')
+  " Shows marks in quickfix list
+  function! s:Cmarks() abort
+    let items = []
+
+    " Global marks:
+    let marklist = getmarklist()
+    " Local marks:
+    let marklist += getmarklist(bufnr())
+
+    for mark in marklist
+      let name = mark.mark[1]
+      if name !~ '[a-zA-Z]'
+        continue
+      endif
+
+      if has_key(mark, 'file')
+        let filename = fnamemodify(mark.file, ':p')
+      else
+        let filename = expand('%:p')
+      endif
+
+      if !filereadable(filename)
+        " A mark could have been saved in a temporary file
+        continue
+      endif
+
+      let [buffer, line, col, _] = mark.pos
+      let text = readfile(filename)[line - 1]
+
+      call add(items, {
+            \ 'filename': filename,
+            \ 'buffer':   buffer,
+            \ 'text':     name..' | '..text,
+            \ 'lnum':     line,
+            \ 'col':      col || 1,
+            \ })
+    endfor
+
+    call setqflist([], 'r', {'title': 'Marks', 'items': items})
+    copen
+  endfunction
+
+  " Show marks in quickfix list
+  command! Cmarks call s:Cmarks()
+  nnoremap <m-m> :Cmarks<cr>
+
   " Helper for visual search
   function! s:VisualSetSearch(cmdtype)
     let temp = @s
@@ -454,6 +462,10 @@ if has('eval')
     let @/ = '\V' . substitute(escape(@s, a:cmdtype.'\'), '\n', '\\n', 'g')
     let @s = temp
   endfunction
+
+  " */# in visual mode searches for selected text, similar to normal mode
+  vnoremap * :<C-u>call <SID>VisualSetSearch('/')<cr>/<C-R>=@/<cr><cr>
+  vnoremap # :<C-u>call <SID>VisualSetSearch('#')<cr>/<C-R>=@/<cr><cr>
 
   function! IsInsideGitRepo()
     let result=systemlist('git rev-parse --is-inside-work-tree')
