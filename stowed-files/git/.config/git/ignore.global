@@ -4,9 +4,6 @@
 # Aider
 .aider*
 
-# Directory-local overrides
-.nvimrc
-
 # Editor temp/swap files
 *.swp
 *.tmp
