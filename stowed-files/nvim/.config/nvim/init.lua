@@ -111,17 +111,17 @@ require("lazy").setup({
       -- `grn` to rename symbol
       -- `grr` to find references
       -- `gri` to find implementation
-      -- `g0` for document symbol
+      -- `gO` for document symbol
       -- `gra` for code actions
       -- `<C-S>` for signature help
       local lsp_on_attach = function(client, bufnr)
         if client.server_capabilities.referencesProvider then
           -- grr default in Neovim 0.11, use upper case to use Telescope
-          map('n', 'gRR', '<cmd>Telescope lsp_references<cr>', bufnr)
+          map('n', 'gRR', require('telescope.builtin').lsp_references, bufnr)
         end
 
-        map('n', '<leader>e', '<cmd>lua vim.diagnostic.open_float()<cr>', bufnr)
-        map('n', '<leader>q', '<cmd>lua vim.diagnostic.setloclist()<cr>', bufnr)
+        map('n', '<leader>e', vim.diagnostic.open_float, bufnr)
+        map('n', '<leader>q', vim.diagnostic.setloclist, bufnr)
       end
 
       local default_lsp_opts = {
@@ -145,9 +145,9 @@ require("lazy").setup({
         eslint = vim.tbl_deep_extend('force', default_lsp_opts, {
           on_attach = function(client, bufnr)
             -- <leader>x to autofix via eslint
-            map('n', '<leader>x', '<cmd>EslintFixAll<cr>', {
-              desc = "Fix all ESLint issues"
-            })
+            map('n', '<leader>x', function()
+              vim.cmd('EslintFixAll')
+            end, { desc = "Fix all ESLint issues" })
             lsp_on_attach(client, bufnr)
           end,
         }),
@@ -450,9 +450,7 @@ require("lazy").setup({
         local builtin = require('telescope.builtin')
 
         -- Key mappings
-        map('n', '<leader>t', '<cmd>Telescope<cr>', {
-          desc = "Telescope pickers",
-        })
+        map('n', '<leader>t', builtin.builtin, { desc = "Telescope pickers" })
         map('n', 'z=', builtin.spell_suggest, { desc = "Spelling suggestions" })
         map('n', '<c-p>', project_files, { desc = "Project files" })
         map('n', '<m-p>', builtin.oldfiles, { desc = "Old files" })
@@ -462,17 +460,32 @@ require("lazy").setup({
         map(
           'n',
           'Q',
-          '<cmd>lua require("telescope.builtin").live_grep{' ..
-          'default_text=vim.fn.expand("<cword>")' ..
-          '}<cr>',
+          function()
+            builtin.live_grep({
+              default_text = vim.fn.expand("<cword>")
+            })
+          end,
           { desc = "Live grep current word" }
         )
         map(
           'v',
           'Q',
-          ':<C-u>norm! gv"sy<cr>:lua require("telescope.builtin").live_grep{' ..
-          'default_text=vim.fn.getreg("s")' ..
-          '}<cr>',
+          function()
+            -- Save current `s` register before overwriting
+            local old_reg = vim.fn.getreg('s')
+            local old_regtype = vim.fn.getregtype('s')
+
+            -- Copy & save selection
+            vim.cmd('normal! "sy')
+            local selection = vim.fn.getreg('s')
+
+            -- Restore previous
+            vim.fn.setreg('s', old_reg, old_regtype)
+
+            builtin.live_grep({
+              default_text = selection
+            })
+          end,
           { desc = "Live grep selection" }
         )
       end
