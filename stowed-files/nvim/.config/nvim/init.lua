@@ -150,7 +150,6 @@ require("lazy").setup({
             })
             lsp_on_attach(client, bufnr)
           end,
-          root_dir = nvim_lsp.util.root_pattern('.git')
         }),
         html = default_lsp_opts,
         jsonls = default_lsp_opts,
@@ -185,7 +184,7 @@ require("lazy").setup({
           on_attach = function(client, bufnr)
             -- Don't run if in a deno project
             if (deno_root_pattern(vim.fn.getcwd())) then
-              client.stop()
+              client:stop()
               return
             end
 
