@@ -117,7 +117,11 @@ require("lazy").setup({
       local lsp_on_attach = function(client, bufnr)
         if client.server_capabilities.referencesProvider then
           -- grr default in Neovim 0.11, use upper case to use Telescope
-          map('n', 'gRR', require('telescope.builtin').lsp_references, bufnr)
+          map('n', 'gRR', function()
+            require('telescope.builtin').lsp_references({
+              include_declaration = false,
+            })
+          end, bufnr)
         end
 
         map('n', '<leader>e', vim.diagnostic.open_float, bufnr)
