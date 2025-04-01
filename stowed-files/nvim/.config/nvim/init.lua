@@ -136,14 +136,7 @@ require("lazy").setup({
       local lsp_configs = {
         bashls = default_lsp_opts,
         cssls = default_lsp_opts,
-        cssmodules_ls = vim.tbl_deep_extend('force', default_lsp_opts, {
-          on_attach = function(client, bufnr)
-            -- Don't use `definitionProvider` since it conflicts with ts_ls
-            client.server_capabilities.definitionProvider = false
-
-            lsp_on_attach(client, bufnr)
-          end,
-        }),
+        cssmodules_ls = default_lsp_opts,
         denols = vim.tbl_deep_extend('force', default_lsp_opts, {
           root_dir = deno_root_pattern,
           single_file_support = false,
