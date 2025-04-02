@@ -43,16 +43,24 @@ play-albums() {
   local beet_query_args=()
   local beet_query_results
   local column_name_arg
-
-  if ! cmus-remote --raw status > /dev/null 2>&1; then
-    echo "cmus not running"
-    exit 1
-  fi
+  local cmus_full_status
+  local play_status
 
   if [[ ! -d "${LOCAL_ALBUM_DIR}" ]]; then
     echo "Local album directory not found: ${LOCAL_ALBUM_DIR}"
     exit 1
   fi
+
+  set +o errexit
+  cmus_full_status=$(cmus-remote --raw status 2>/dev/null)
+  # shellcheck disable=SC2181
+  if [ $? -ne 0 ]; then
+    echo "cmus not running"
+    exit 1
+  fi
+  set -o errexit
+
+  play_status=$(echo "${cmus_full_status}" | grep '^status' | awk '{print $2}')
 
   # Make sure `LOCAL_ALBUM_DIR` ends with a trailing slash
   LOCAL_ALBUM_DIR="$(realpath "${LOCAL_ALBUM_DIR}")/"
@@ -128,14 +136,13 @@ play-albums() {
   # where trying to play off a remote share that is not mounted
   while IFS= read -r song_path; do
     if [[ ! -f "${song_path}" ]]; then
-      >&2 echo "Song not found in local dir: ${song_path#"${LOCAL_ALBUM_DIR}"}, aborting"
+      >&2 echo "Not found locally: ${song_path#"${LOCAL_ALBUM_DIR}"}, aborting"
       exit 1
     fi
   done < "${tmp_m3u_file}"
 
   if ! ${append}; then
     cmus-remote --clear --queue
-    cmus-remote --stop
   fi
 
   # Output number of albums being played
@@ -155,10 +162,14 @@ play-albums() {
   # Wait a beat in order to make sure cmus has queued the album
   sleep 2
 
-  # If the queue was cleared, advance to the next track to start new albums
-  if ! ${append}; then
+  if ! "${append}"; then
+    if [[ "${play_status}" != "stopped" ]]; then
+      # Skip current track (which isn't part of added queue)
+      cmus-remote --next
+    fi
+
+    # Ensure playing if paused / stopped
     cmus-remote --play
-    cmus-remote --next
   fi
 }
 
