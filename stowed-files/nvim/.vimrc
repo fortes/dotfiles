@@ -152,6 +152,11 @@ set foldlevelstart=99
 set foldnestmax=5
 
 set foldopen+=jump
+
+" Style for floating windows
+if exists('+winborder')
+  set winborder=rounded
+endif
 " }}}
 
 " Enable live substitution
@@ -315,12 +320,19 @@ set shiftround
 " }}}
 
 " Completion {{{
-" Keyword completion brings in the dictionary if spell check is enabled
-set complete+=kspell
+" Keyword completion brings in the dictionary if spell check is enabled.
+" Also include buffer names and included files
+set complete+=kspell,f,i
 
-" Show menu when only one match, don't insert until match selected,
-" and don't autoselect a match
-set completeopt=longest,menuone,noinsert,noselect,popup
+" Show menu even when only one match, don't autoselect, and show match info
+" in popup
+set completeopt=menuone,noselect,popup
+
+if has('nvim-0.11')
+  " Fuzzy completion added in 0.11
+  " TODO: Figure out how to check if fuzzy is available without version checker
+  set completeopt+=fuzzy
+endif
 
 " Make sure there's a default dictionary for completion
 if filereadable('/usr/share/dict/words')

@@ -184,6 +184,7 @@ git update-index --no-skip-worktree ./symlinks/npmrc
 - Adjust settings for Snipping tool, make sure to save to `Downloads` folder
 - Disable browser tabs from being in Alt-Tab list (Settings -> System -> Multitasking)
 - Disable "When I snap a window, suggest what I can snap next to it" in System -> Multitasking
+- Remove OneDrive and Microsoft Edge from startup items
 - Turn on clipboard history by hitting Windows-V
 - Set Windows Terminal as default terminal application
   - Download [JetBrains Mono](https://www.jetbrains.com/lp/mono/) and set it as the default font in Windows Terminal

@@ -124,8 +124,22 @@ require("lazy").setup({
           end, bufnr)
         end
 
+        if client:supports_method('textDocument/completion') then
+          vim.lsp.completion.enable(true, client.id, bufnr, {
+            autotrigger = true
+          })
+        end
+
         map('n', '<leader>e', vim.diagnostic.open_float, bufnr)
         map('n', '<leader>q', vim.diagnostic.setloclist, bufnr)
+
+        vim.diagnostic.config({
+          virtual_text = true,
+          virtual_lines = {
+            -- Only show multiple lines for current cursor line
+            current_line = true,
+          }
+        })
       end
 
       local default_lsp_opts = {
