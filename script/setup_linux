@@ -418,6 +418,7 @@ main() {
   # Don't install 1Password GUI for now, it's not working properly
   IS_HEADLESS=1 "${dotfiles_root}/script/install_1password"
   [[ -z "${IS_DOCKER:-}" ]] && "${dotfiles_root}/script/install_flatpak_packages"
+  [[ -z "${IS_DOCKER:-}" ]] && "${dotfiles_root}/script/install_snap_packages"
   [[ -z "${IS_DOCKER:-}" ]] && "${dotfiles_root}/script/install_et"
   [[ -z "${IS_HEADLESS:-}" ]] && "${dotfiles_root}/script/install_firefox"
   "${dotfiles_root}/script/install_github_packages"

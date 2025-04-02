@@ -54,6 +54,7 @@ BREW_PACKAGES=(
   jq
   keychain
   lua-language-server
+  marksman
   moreutils
   mpv
   ncdu

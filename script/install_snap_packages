@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# Install Snap packages on Debian systems.
+#
+# Usage: install_snap_packages
+
+set -euo pipefail
+IFS=$'\n\t'
+
+declare dotfiles_root
+dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+# Load command_exists helper and local paths
+. "${dotfiles_root}/stowed-files/bash/.profile"
+
+SNAP_PACKAGES=(
+  marksman
+)
+
+install_flatpak_packages() {
+  if ! command_exists snap; then
+    echo "⨯ snap not installed, installing (requires sudo)"
+    sudo -E apt-get update -qq
+    sudo -E apt-get install -qq -o=Dpkg::Use-Pty=0 --assume-yes \
+      --fix-broken --no-install-recommends snapd
+  fi
+
+  echo "Installing Snap packages ..."
+  for package in "${SNAP_PACKAGES[@]}"; do
+    [ -z "${package}" ] && continue
+    echo -n "Installing ${package} ... "
+    sudo snap install "${package}"
+    echo "done."
+  done
+  echo "Snap packages installed!"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  install_flatpak_packages "${@}"
+fi

@@ -192,6 +192,7 @@ require("lazy").setup({
             }
           }
         }),
+        marksman = default_lsp_opts,
         pyright = default_lsp_opts,
         ts_ls = vim.tbl_deep_extend('force', default_lsp_opts, {
           -- Increase memory limit to 16GB, might need to adjust on weaker
