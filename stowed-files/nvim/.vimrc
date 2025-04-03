@@ -753,6 +753,7 @@ endif
 " }}}
 
 if has('spell')
+  set spell
   set spelllang=en_us,pt_pt
 
   let s:spell_dir = fnamemodify($MYVIMRC, ':h').'/spell'
