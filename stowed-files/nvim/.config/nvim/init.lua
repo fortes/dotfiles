@@ -405,6 +405,9 @@ require("lazy").setup({
 
         telescope.setup {
           defaults = {
+            -- Conflicts with `winborder`, remove once
+            -- https://github.com/nvim-lua/plenary.nvim/pull/649 lands
+            border = false,
             -- Show all mappings via <C-/>
             mappings = {
               i = {
