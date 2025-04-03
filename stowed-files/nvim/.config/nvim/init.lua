@@ -52,9 +52,10 @@ require("lazy").setup({
 
   -- GitHub Copilot chat, which isn't in copilot.vim yet
   --
-  -- :CopilotChatOpen to open chat
+  -- <leader>cc to toggle chat
+  -- <C-l> to reset chat
+  -- <leader>cc in visual to chat using selection
   -- :CopilotChatModels to view/select models
-  -- :CopilotChatAgents to view/select agents
   -- :CopilotChatPrompts for predefined prompts like Explain/Review/Tests
   --
   -- <C-s> in insert mode to submit chat (<CR> in normal mode)
@@ -73,9 +74,39 @@ require("lazy").setup({
       },
       -- Note: Only on MacOS or Linux
       build = "make tiktoken",
-      opts = {
-        -- See Configuration section for options
-      },
+      config = function()
+        local chat = require('CopilotChat')
+        local select = require('CopilotChat.select')
+
+        chat.setup({})
+
+        map('n', '<leader>cc', chat.toggle, {
+          desc = "Toggle Copilot chat",
+        })
+        map(
+          'v',
+          '<leader>cc',
+          function()
+            chat.ask('', {
+              selection = select.visual
+            })
+          end,
+          { desc = "Toggle Copilot chat" }
+        )
+        map(
+          'v',
+          '<leader>cc',
+          function()
+            local input = vim.fn.input("Ask Copilot: ", "Fix this code")
+            if input ~= "" then
+              chat.ask(input, {
+                selection = select.visual
+              })
+            end
+          end,
+          { desc = "Copilot Chat with selection" }
+        )
+      end,
     },
   },
 
@@ -83,7 +114,8 @@ require("lazy").setup({
   {
     "olimorris/codecompanion.nvim",
     cond = function()
-      return os.getenv('ANTHROPIC_API_KEY') ~= '' or os.getenv('OPENAI_API_KEY') ~= ''
+      -- Can either piggyback off of GitHub Copilot or use Anthropic/OpenAI
+      return os.getenv("ENABLE_GITHUB_COPILOT") == "1" or os.getenv('ANTHROPIC_API_KEY') ~= '' or os.getenv('OPENAI_API_KEY') ~= ''
     end,
     dependencies = {
       "nvim-lua/plenary.nvim",
