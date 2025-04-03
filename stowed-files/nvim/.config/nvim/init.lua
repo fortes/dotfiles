@@ -745,6 +745,12 @@ require("lazy").setup({
   },
 
   -- netrw, but better
+  -- `-` to go up a directory
+  -- `x` to add files to arglist, then can nav via `[a` and `]a`
+  -- Visually select files and hit <Enter> to open all
+  -- `<leader>s` open in split
+  -- `<leader>v` open in vsplit
+  -- `<leader>t` open in new tab
   {
     'justinmk/vim-dirvish',
     config = function()
@@ -757,21 +763,57 @@ require("lazy").setup({
         nargs = '?',
         complete = 'dir'
       })
-      vim.api.nvim_create_user_command('Sexplore', 'belowright split | silent Dirvish <args>', {
-        nargs = '?',
-        complete = 'dir'
-      })
-      vim.api.nvim_create_user_command('Vexplore', 'leftabove vsplit | silent Dirvish <args>', {
-        nargs = '?',
-        complete = 'dir'
-      })
-      vim.api.nvim_create_user_command('Lexplore', 'topleft vsplit | silent Dirvish <args>', {
-        nargs = '?',
-        complete = 'dir'
-      })
-      vim.api.nvim_create_user_command('Texplore', 'tabnew | silent Dirvish <args>', {
-        nargs = '?',
-        complete = 'dir'
+      vim.api.nvim_create_user_command(
+        'Sexplore',
+        'belowright split | silent Dirvish <args>',
+        { nargs = '?', complete = 'dir' }
+      )
+      vim.api.nvim_create_user_command(
+        'Vexplore',
+        'leftabove vsplit | silent Dirvish <args>',
+        { nargs = '?', complete = 'dir' }
+      )
+      vim.api.nvim_create_user_command(
+        'Lexplore',
+        'topleft vsplit | silent Dirvish <args>',
+        { nargs = '?', complete = 'dir' }
+      )
+      vim.api.nvim_create_user_command(
+        'Texplore',
+        'tabnew | silent Dirvish <args>',
+        { nargs = '?', complete = 'dir' }
+      )
+
+      vim.api.nvim_create_augroup("dirvish_bindings", { clear = true })
+      vim.api.nvim_create_autocmd("FileType", {
+        group = "dirvish_bindings",
+        pattern = "dirvish",
+        callback = function()
+          map(
+            "n",
+            "<leader>t",
+            function()
+              vim.cmd('call dirvish#open("tabedit", 0)')
+            end,
+            { buffer = 0, noremap = true, silent = true }
+          )
+          map(
+            "n",
+            "<leader>s",
+            function()
+              vim.cmd('call dirvish#open("split", 0)')
+            end,
+            { buffer = 0, noremap = true, silent = true }
+          )
+          map(
+            "n",
+            "<leader>v",
+            function()
+              vim.cmd('call dirvish#open("vsplit", 0)')
+            end,
+            { buffer = 0, noremap = true, silent = true }
+          )
+        end,
       })
     end
   },
@@ -825,11 +867,6 @@ require("lazy").setup({
       check_ts = true,
       disable_filetype = { "TelescopePrompt" },
     }
-  },
-  -- Better UX for built-in vim UI like input and select
-  {
-    'stevearc/dressing.nvim',
-    opts = {},
   },
 
   -- Quickfix improvements
