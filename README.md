@@ -295,11 +295,7 @@ Also need to manually start neovim to install plugins
 
 ### Mac
 
-- Firefox and VSCode casks get ornery and no longer update via brew, currently need to install these manually via
-
-  ```sh
-  brew install --cask firefox visual-studio-code
-  ```
+- Firefox and VSCode casks get ornery and no longer update via brew, currently install once via script, but updates have to happen manually. Need to investigate further.
 
 ### Linux
 

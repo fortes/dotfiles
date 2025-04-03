@@ -34,7 +34,7 @@ BREW_PACKAGES=(
   fd
   # For yazi
   ffmpeg
-  # Conflicts with autoupdate
+  # Installed a single time via brew cask due to auto-updates
   # firefox
   fnm
   font-jetbrains-mono
@@ -74,7 +74,7 @@ BREW_PACKAGES=(
   stow
   tmux
   vifm
-  # Conflicts with autoupdate
+  # Installed a single time via brew cask due to auto-updates
   # visual-studio-code
   wezterm
   wget
@@ -195,6 +195,14 @@ main() {
 
   "${dotfiles_root}/script/lock_local_files"
   "${dotfiles_root}/script/set_dotfiles_remote"
+
+  # Install Firefox / VSCode a single time via brew, they'll auto-update
+  if ! command_exists firefox; then
+    brew install --cask firefox
+  fi
+  if ! command_exists code; then
+    brew install --cask visual-studio-code
+  fi
 
   # Non-brew package managers
   "${dotfiles_root}/script/install_node_packages"
