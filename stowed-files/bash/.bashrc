@@ -3,8 +3,8 @@
 # If not running interactively, don't do anything here. Anything
 # needed in non-interactive shells goes in `.profile`
 case $- in
-    *i*) ;;
-      *) return;;
+  *i*) ;;
+    *) return;;
 esac
 
 # Make sure we have always loaded ~/.profile, which can get lost
@@ -169,72 +169,47 @@ if command_exists zoxide; then
   eval "$(zoxide init bash --hook pwd)"
 fi
 
-BAT_COMMAND="bat"
-if ! command_exists "${BAT_COMMAND}"; then
-  # Debian uses `batcat`
-  BAT_COMMAND="batcat"
-fi
-export BAT_COMMAND
+# FZF {{{
 
-EZA_COMMAND="eza"
-if ! command_exists "${EZA_COMMAND}"; then
-  # Debian uses `exa` until `eza` is available
-  EZA_COMMAND="exa"
-fi
-export EZA_COMMAND
+# Keybindings (Debian)
+source_if_exists "/usr/share/doc/fzf/examples/key-bindings.bash"
+# Keybindings (Homebrew)
+source_if_exists "/opt/homebrew/opt/fzf/shell/key-bindings.bash"
 
-FD_COMMAND="fd"
-if ! command_exists "${FD_COMMAND}"; then
+fd_command="fd"
+if ! command_exists "${fd_command}"; then
   # Debian uses `fdfind`
-  FD_COMMAND="fdfind"
-fi
-export FD_COMMAND
-
-fzf_preview_command=""
-if command_exists pistol; then
-  fzf_preview_command="'pistol {}'"
-elif command_exists "${BAT_COMMAND}"; then
-  fzf_preview_command="'${BAT_COMMAND} --color always --style=grid,changes --line-range :300 {}'"
-else
-  fzf_preview_command="'cat {}'"
+  fd_command="fdfind"
 fi
 
-if command_exists "${FD_COMMAND}"; then
-  # Use `fd` when possible for far better performance
+# Note: --multi set by default here, so need to disable when inappropriate
+export FZF_DEFAULT_OPTS_FILE="$HOME/.fzf-default-options"
+
+if command_exists "${fd_command}"; then
+  # Use `fd` when available for far better performance
   #
   # $FZF_DEFAULT_COMMAND is executed with `sh -c`, so need to be careful with
   # POSIX compliance
-  export FZF_DEFAULT_COMMAND="fd_with_git"
-  export FZF_CTRL_T_COMMAND="fd_with_git"
-  export FZF_ALT_C_COMMAND="${FD_COMMAND} --type directory --hidden --color always"
+  export FZF_DEFAULT_COMMAND="${fd_command} --type file --hidden --color always"
+  export FZF_ALT_C_COMMAND="${fd_command} --type directory --hidden --color always"
+  export FZF_CTRL_T_COMMAND="${FZF_DEFAULT_COMMAND}"
 fi
 
-if command_exists "${EZA_COMMAND}"; then
-  # Show tree structure in preview window
-  export FZF_ALT_C_OPTS="
-    --preview '${EZA_COMMAND} --tree --all {}'
-    "
-fi
+export FZF_ALT_C_OPTS="\
+  --ghost 'Select directory' \
+  --keep-right \
+  --no-multi \
+  --preview 'fzf-directory-preview {}' \
+  --preview-window 'right:25%' \
+"
 
-export FZF_DEFAULT_OPTS="
-  --ansi
-  --bind 'ctrl-alt-a:select-all'
-  --bind 'ctrl-alt-d:deselect-all'
-  --extended
-  --inline-info
-  "
-# Alt-C to choose directory file lives in
-export FZF_CTRL_T_OPTS="
-  --bind 'alt-c:execute(echo -n {} | xargs dirname)+abort'
-  --preview ${fzf_preview_command}
-  --preview-window 'right:50%'
-  "
-export FZF_COMPLETION_OPTS='--smart-case'
+export FZF_CTRL_T_OPTS=" \
+  --ghost 'Select file(s)' \
+  --keep-right \
+  --preview 'fzf-file-preview {}' \
+"
 
-# FZF keybindings (Debian)
-source_if_exists "/usr/share/doc/fzf/examples/key-bindings.bash"
-# FZF keybindings (Homebrew)
-source_if_exists "/opt/homebrew/opt/fzf/shell/key-bindings.bash"
+# }}}
 
 if command_exists fnm; then
   eval "$(fnm env)"

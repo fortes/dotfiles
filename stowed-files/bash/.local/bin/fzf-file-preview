@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# Used to preview files in fzf when using Ctrl-T
+#
+# Usage: fzf-directory-preview [dir]
+set -euo pipefail
+
+function fzf-file-preview() {
+  local file="${1:-.}"
+
+  # Use pistol if available
+  if command -v pistol &>/dev/null; then
+    exec pistol "${file}"
+  fi
+
+  local bat_name="bat"
+
+  # For Debian-based systems that use `batcat`
+  if command -v exa &>/dev/null; then
+    bat_name="batcat"
+  fi
+
+  if ! type "${bat_name}" &>/dev/null; then
+    exec cat "${file}"
+  fi
+
+  exec "${bat_name}" "${file}" \
+    --color always
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  fzf-file-preview "$@"
+fi
+

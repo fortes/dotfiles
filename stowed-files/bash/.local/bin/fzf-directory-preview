@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# Used to preview directories in fzf when using Alt-C
+#
+# Usage: fzf-directory-preview [dir]
+set -euo pipefail
+
+function fzf-directory-preview() {
+  local dir="${1:-.}"
+  local eza_name="eza"
+
+  # For Debian-based systems that don't have eza yet
+  if command -v exa &>/dev/null; then
+    eza_name="exa"
+  fi
+
+  if ! type "${eza_name}" &>/dev/null; then
+    exec ls --color=always -A -1 "${dir}"
+  fi
+
+  exec "${eza_name}" "${dir}" \
+    --classify \
+    --color=always \
+    --git \
+    --header \
+    --long \
+    --no-filesize \
+    --no-permissions \
+    --no-user \
+    --time-style=long-iso
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  fzf-directory-preview "$@"
+fi

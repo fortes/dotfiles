@@ -1,0 +1,10 @@
+--ansi
+--bind 'alt-a:select-all'
+--bind 'alt-d:deselect-all'
+--bind 'end:last'
+--bind 'home:first'
+--cycle
+--ghost '<M-a> select all; <M-d> deselect'
+--info=right
+--multi
+--reverse
