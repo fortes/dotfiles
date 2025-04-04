@@ -38,6 +38,7 @@ export IS_HEADLESS="${is_headless:-}"
 
 # Used for 'llm' and 'aider'
 # export ANTHROPIC_API_KEY="xxxxxx"
+# export GEMINI_API_KEY="xxxxxx"
 # export OPENAI_API_KEY="xxxxxx"
 # export OPENROUTER_API_KEY="xxxxxx"
 
