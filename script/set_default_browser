@@ -28,14 +28,18 @@ set_default_browser() {
       >&2 echo "Firefox not found in WSL, using Edge as a fallback"
       desired_browser_path="/mnt/c/Program Files/Microsoft/Edge/Application/msedge.exe"
     fi
-  else
+  elif [[ -z "${IS_HEADLESS}" ]]; then
     desired_browser_path=$(command -v firefox)
     xdg_browser='firefox.desktop'
   fi
 
-  if [[ -z "${desired_browser_path}" ]]; then
+  if [[ -z "${desired_browser_path:-}" ]]; then
     >&2 echo "No desired browser found, skipping"
-    exit 1
+    if [[ -z "${IS_HEADLESS}" ]]; then
+      # Treat as an error on non-headless machines
+      exit 1
+    fi
+    exit
   fi
 
   local current_browser_path
