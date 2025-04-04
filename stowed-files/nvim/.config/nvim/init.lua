@@ -507,9 +507,11 @@ require("lazy").setup({
         map('n', '<leader>t', builtin.builtin, { desc = "Telescope pickers" })
         map('n', 'z=', builtin.spell_suggest, { desc = "Spelling suggestions" })
         map('n', '<c-p>', project_files, { desc = "Project files" })
-        map('n', '<m-p>', builtin.oldfiles, { desc = "Old files" })
         map('n', '<m-b>', builtin.buffers, { desc = "Buffers" })
+        map('n', '<m-g>', builtin.git_status, { desc = "Git status" })
         map('n', '<m-m>', builtin.marks, { desc = "Marks" })
+        map('n', '<m-p>', builtin.oldfiles, { desc = "Old files" })
+        map('n', '<m-r>', builtin.registers, { desc = "Git status" })
         -- Replace lgrep bindings from ~/.vimrc with live grepping and selection
         map(
           'n',
