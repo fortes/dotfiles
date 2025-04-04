@@ -17,6 +17,11 @@ SNAP_PACKAGES=(
 )
 
 install_flatpak_packages() {
+  if [[ -n "${IS_DOCKER:-}" || -n "${IS_CROSTINI:-}" ]]; then
+    echo "⨯ Snap packages cannot be installed in Docker or Crostini environments."
+    return 1
+  fi
+
   if ! command_exists snap; then
     echo "⨯ snap not installed, installing (requires sudo)"
     sudo -E apt-get update -qq
