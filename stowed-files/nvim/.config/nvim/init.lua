@@ -147,19 +147,30 @@ require("lazy").setup({
       -- `gra` for code actions
       -- `<C-S>` for signature help
       local lsp_on_attach = function(client, bufnr)
-        if client.server_capabilities.referencesProvider then
+        if client:supports_method('textDocument/completion') then
+          vim.lsp.completion.enable(true, client.id, bufnr, {
+            autotrigger = true
+          })
+        end
+
+        if client:supports_method('textDocument/hover') then
+          -- `K` mapped by default, add `gh` to match VSCode vim mappings
+          map('n', 'gh', vim.lsp.buf.hover, {
+            buffer = bufnr,
+            desc = "Show hover information"
+          })
+        end
+
+        if client:supports_method('textDocument/references') then
           -- grr default in Neovim 0.11, use upper case to use Telescope
           map('n', 'gRR', function()
             require('telescope.builtin').lsp_references({
               include_declaration = false,
             })
-          end, bufnr)
-        end
-
-        if client:supports_method('textDocument/completion') then
-          vim.lsp.completion.enable(true, client.id, bufnr, {
-            autotrigger = true
-          })
+          end, {
+              buffer = bufnr,
+              desc = "Telescope references"
+            })
         end
 
         map('n', '<leader>e', vim.diagnostic.open_float, bufnr)
