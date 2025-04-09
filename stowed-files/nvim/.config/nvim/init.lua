@@ -153,11 +153,19 @@ require("lazy").setup({
           })
         end
 
+        if client:supports_method('textDocument/definition') then
+          -- Match VSCode mapping
+          map('n', '<f12>', vim.lsp.buf.definition, {
+            buffer = bufnr,
+            desc = "Go to definition"
+          })
+        end
+
         if client:supports_method('textDocument/hover') then
           -- `K` mapped by default, add `gh` to match VSCode vim mappings
           map('n', 'gh', vim.lsp.buf.hover, {
             buffer = bufnr,
-            desc = "Show hover information"
+            desc = "Show LSP hover information"
           })
         end
 
@@ -168,9 +176,22 @@ require("lazy").setup({
               include_declaration = false,
             })
           end, {
-              buffer = bufnr,
-              desc = "Telescope references"
-            })
+            buffer = bufnr,
+            desc = "Telescope LSP references"
+          })
+          -- Match VSCode mapping
+          map('n', '<s-f12>', vim.lsp.buf.references, {
+            buffer = bufnr,
+            desc = "Show references"
+          })
+        end
+
+        if client:supports_method('textDocument/rename') then
+          -- Match VSCode mapping
+          map('n', '<f2>', vim.lsp.buf.rename, {
+            buffer = bufnr,
+            desc = "Rename symbol"
+          })
         end
 
         map('n', '<leader>e', vim.diagnostic.open_float, bufnr)
