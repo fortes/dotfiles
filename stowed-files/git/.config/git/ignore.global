@@ -3,6 +3,7 @@
 
 # Aider
 .aider*
+!.aider.conf.yml
 
 # Editor temp/swap files
 *.swp

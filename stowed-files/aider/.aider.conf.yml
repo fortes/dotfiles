@@ -1,0 +1,11 @@
+# Disable auto commit of LLM changes
+auto-commits: false
+
+# Disable update checks
+check-update: false
+
+# Can override with `-light-mode` when needed
+dark-mode: true
+
+# Watch files for changes (use AI!, etc in the editor)
+watch-files: true
