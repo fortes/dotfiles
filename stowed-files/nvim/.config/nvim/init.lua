@@ -194,8 +194,26 @@ require("lazy").setup({
           })
         end
 
-        map('n', '<leader>e', vim.diagnostic.open_float, bufnr)
-        map('n', '<leader>q', vim.diagnostic.setloclist, bufnr)
+        map('n', '<leader>e', vim.diagnostic.open_float, {
+          buffer = bufnr,
+          desc = "Show diagnostics under the cursor"
+        })
+        map('n', '<leader>q', vim.diagnostic.setloclist, {
+          buffer = bufnr,
+          desc = "Add buffer diagnostics to the location list"
+        })
+        -- `yod` already used by unimpaired for `diff`, use `yoe` (error)
+        map(
+          'n',
+          'yoe',
+          function()
+            vim.diagnostic.enable(not vim.diagnostic.is_enabled())
+          end,
+          {
+            buffer = bufnr,
+            desc = "Toggle diagnostic display"
+          }
+        )
 
         vim.diagnostic.config({
           virtual_text = true,
