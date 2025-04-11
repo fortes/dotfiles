@@ -683,6 +683,9 @@ require("lazy").setup({
   -- Display available key bindings, marks, registers, etc
   {
     'folke/which-key.nvim',
+    dependencies = {
+      'nvim-tree/nvim-web-devicons'
+    },
     event = "VeryLazy",
     keys = {
       {
@@ -996,6 +999,15 @@ require("lazy").setup({
           'less',
         })
       end
+    end
+  },
+
+  -- Icons
+  {
+    'nvim-tree/nvim-web-devicons',
+    config = function()
+      require('nvim-web-devicons').setup({
+      })
     end
   },
 
