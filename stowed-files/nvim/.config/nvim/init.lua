@@ -325,6 +325,7 @@ require("lazy").setup({
         ensure_installed = {
           'bash',
           'css',
+          'diff',
           'gotmpl',
           'html',
           'javascript',
