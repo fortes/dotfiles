@@ -11,6 +11,7 @@ dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 PACKAGES=(
   @anthropic-ai/claude-code
+  @openai/codex
   bash-language-server
   cssmodules-language-server
   dockerfile-language-server-nodejs
