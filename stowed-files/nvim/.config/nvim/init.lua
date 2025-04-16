@@ -400,15 +400,6 @@ require("lazy").setup({
     },
   },
 
-  -- Use Treesitter for rainbow delimiters
-  {
-    'HiPhish/rainbow-delimiters.nvim',
-    name = 'rainbow-delimiters',
-    dependencies = {
-      'nvim-treesitter/nvim-treesitter'
-    },
-  },
-
   -- Use Treesitter to do LSP-like things:
   {
     'nvim-treesitter/nvim-treesitter-refactor',
