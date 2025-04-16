@@ -291,6 +291,18 @@ docker run -it --rm --name dotfiles -v ~/src:/home/fortes/src dotfiles
 
 Also need to manually start neovim to install plugins
 
+## Other Notes
+
+### Finding packages in backports
+
+Since you have to manually install packages from backports, can be tricky to know what is available. To find out, run the following:
+
+```sh
+apt-cache policy $(dpkg --list | cut -d' ' -f3)
+```
+
+This will list out all the packages installed, then need to search through to manually check which have backports available (pipe to `nvim -`).
+
 ## Known Issues
 
 ### Mac
