@@ -733,6 +733,9 @@ augroup filetype_tweaks
   " Consider '-' part of a world when tab completion, etc in css/less
   autocmd FileType css,less setlocal iskeyword+=-
 
+  " Don't wrap in commit messages
+  autocmd FileType gitcommit setlocal nowrap textwidth=0
+
   " Makefiles use tabs
   autocmd FileType make setlocal noexpandtab shiftwidth=4
 
