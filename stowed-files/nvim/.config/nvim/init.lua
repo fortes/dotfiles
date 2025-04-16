@@ -868,13 +868,32 @@ require("lazy").setup({
         group = "dirvish_bindings",
         pattern = "dirvish",
         callback = function()
+          -- `Enter` already mapped in visual mode, but add to normal mode
+          map(
+            "n",
+            "<cr>",
+            function()
+              vim.cmd('call dirvish#open("edit", 0)')
+            end,
+            {
+              buffer = 0,
+              desc = "Open file",
+              noremap = true,
+              silent = true,
+            }
+          )
           map(
             "n",
             "<leader>t",
             function()
               vim.cmd('call dirvish#open("tabedit", 0)')
             end,
-            { buffer = 0, noremap = true, silent = true }
+            {
+              buffer = 0,
+              desc = "Open file in new tab",
+              noremap = true,
+              silent = true,
+            }
           )
           map(
             "n",
@@ -882,7 +901,12 @@ require("lazy").setup({
             function()
               vim.cmd('call dirvish#open("split", 0)')
             end,
-            { buffer = 0, noremap = true, silent = true }
+            {
+              buffer = 0,
+              desc = "Open file in split",
+              noremap = true,
+              silent = true,
+            }
           )
           map(
             "n",
@@ -890,7 +914,12 @@ require("lazy").setup({
             function()
               vim.cmd('call dirvish#open("vsplit", 0)')
             end,
-            { buffer = 0, noremap = true, silent = true }
+            {
+              buffer = 0,
+              desc = "Open file in vsplit",
+              noremap = true,
+              silent = true,
+            }
           )
         end,
       })
