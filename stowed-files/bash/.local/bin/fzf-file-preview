@@ -12,6 +12,18 @@ function fzf-file-preview() {
     exec pistol "${file}"
   fi
 
+  if file "${file}" | grep -i "image" >/dev/null; then
+    if command -v chafa &>/dev/null; then
+      local term_width
+      local term_height
+
+      term_width=$(tput cols)
+      term_height=$(tput lines)
+
+      exec chafa --size "${term_width}x${term_height}" --format symbols "${file}" 2>&1
+    fi
+  fi
+
   local bat_name="bat"
 
   # For Debian-based systems that use `batcat`
