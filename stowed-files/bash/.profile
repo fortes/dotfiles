@@ -2,7 +2,7 @@
 
 # Add path if not present
 add_to_path() {
-  if echo ":$PATH:" | grep -vq ":$*:"; then
+  if ! echo ":$PATH:" | grep -q ":$*:"; then
     export PATH="$*:$PATH"
   fi
 }
@@ -18,7 +18,7 @@ source_if_exists() {
       while IFS= read -r -d $'\0' f; do
         # shellcheck source=/dev/null
         . "${f}"
-      done < <(find "${file}" -type f -print0)
+      done < <(find "${file}" -maxdepth 2 -type f -print0)
     fi
   done
 }
@@ -34,9 +34,9 @@ export -f command_exists
 if [[ -x "$HOME/.local/bin/nvim" ]]; then
   VISUAL="$HOME/.local/bin/nvim"
 elif command_exists nvim; then
-  VISUAL="$(command -v nvim)"
+  VISUAL="nvim"
 elif command_exists vim; then
-  VISUAL="$(command -v vim)"
+  VISUAL="vim"
 fi
 
 if [[ -n ${VISUAL:-} ]]; then
@@ -49,6 +49,11 @@ source_if_exists "$HOME/.profile.brew"
 
 # Locally-installed packages belong in path
 add_to_path "$HOME/.local/bin"
+
+# Use NeoVim as man pager, when available
+if command_exists nvim; then
+  export MANPAGER="nvim +Man!"
+fi
 
 if [ -z "${XDG_CONFIG_HOME:-}" ]; then
   export XDG_CONFIG_HOME="$HOME/.config"
@@ -75,13 +80,16 @@ export MOZ_ENABLE_WAYLAND=1
 export RIPGREP_CONFIG_PATH="$XDG_CONFIG_HOME/ripgrep/rc"
 
 if [ -z "${SSH_AUTH_SOCK:-}" ] && command_exists keychain; then
-  # Don't prompt for password to load id_rsa if not already loaded
+  # Don't prompt for password to load key if not already loaded
   eval "$(keychain --eval --noask --agents ssh --quiet)"
 
+  # Use consistent location for SSH_AUTH_SOCK, useful for tmux sessions where
+  # can end up on different machines, or reconnecting to a session
   SSH_SOCKET_LOCATION="$HOME/.ssh/ssh_auth_sock"
   mkdir -p "$(dirname "${SSH_SOCKET_LOCATION}")"
   if [ ! -S "${SSH_SOCKET_LOCATION}" ] && [ -S "${SSH_AUTH_SOCK}" ]; then
-    ln -sf "${SSH_AUTH_SOCK}" "${SSH_SOCKET_LOCATION}"
+    ln -sf "${SSH_AUTH_SOCK}" "${SSH_SOCKET_LOCATION}" || \
+      echo "Warning: Failed to symlink SSH_AUTH_SOCK to ${SSH_SOCKET_LOCATION}"
   fi
 fi
 

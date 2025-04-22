@@ -11,7 +11,7 @@ alias utc='date -u'
 
 if command_exists dig; then
   alias myip="dig +short myip.opendns.com @resolver1.opendns.com"
-  alias mygeo="curl -w \"\\n\" http://api.hackertarget.com/geoip/\?q=\`myip\`"
+  alias mygeo="curl -w \"\\n\" https://api.hackertarget.com/geoip/\?q=\$(myip)"
 fi
 
 # Confirm file overwrite
@@ -19,14 +19,6 @@ alias mv='mv -i'
 
 # CD into root of git project via `...`
 alias ...="cd \$(git rev-parse --show-toplevel 2>/dev/null || echo '.')"
-
-if command_exists fzf; then
-  # CD into a directory within the project, selecting via fzf
-  alias cdp="git ls-files \$(git rev-parse --show-toplevel) | xargs -n1 dirname | sort | uniq | fzf || echo '.' | xargs --no-run-if-empty cd"
-
-  # Fuzzy find for killing processes
-  alias fkill="ps afx | fzf | cut -f1 -d' ' | xargs --no-run-if-empty kill"
-fi
 
 # Add current project NPM to path
 if command_exists npm; then

@@ -32,7 +32,7 @@ if ! infocmp "${TERM}" > /dev/null 2>&1; then
 fi
 
 # In these modern times, if 256 colors are supported, truecolor probably is too
-if [[ -z "${COLORTERM:-}" ]] && [[ "$TERM" =~ "256color" ]]; then
+if [[ -z "${COLORTERM:-}" && "$TERM" =~ "256color" ]]; then
   export COLORTERM="truecolor"
 fi
 
@@ -116,7 +116,7 @@ else
 fi
 JOB_COUNT="${BOLD}${BLUE}[\j]${RESET} "
 # Write out history after every command. Add job count if non-zero stopped
-export PROMPT_COMMAND="history -a; HAS_JOBS=\`jobs -sp\` "
+export PROMPT_COMMAND="history -a; HAS_JOBS=\$(jobs -sp) "
 PS1="$BASE_PROMPT ""\${HAS_JOBS:+$JOB_COUNT}"
 
 git_prompt_location="/etc/bash_completion.d/git-prompt"
@@ -145,24 +145,6 @@ if command_exists dircolors; then
   else
     eval "$(dircolors -b)"
   fi
-fi
-
-if command_exists yazi && ! declare -F y > /dev/null; then
-  # Change directory with yazi by hitting `q` after navigating to the directory,
-  # use `Q` to quit without changing directory
-  function y() {
-    local tmp
-    tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
-    yazi "${@}" --cwd-file="${tmp}"
-    if cwd="$(command cat -- "${tmp}")" && [ -n "${cwd}" ] && [ "${cwd}" != "${PWD}" ]; then
-      # Assume yazi is returning a valid directory
-      # shellcheck disable=SC2164
-      builtin cd -- "${cwd}"
-    fi
-    rm -f -- "${tmp}"
-  }
-
-  export -f y
 fi
 
 if command_exists zoxide; then
