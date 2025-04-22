@@ -1,7 +1,7 @@
 #!/usr/bin/python3
-# Usage: music-control [toggle] [previous] [next]
-
 # Note: Must be run from distro python, since venv doesn't work with PythonGObject
+#
+# Usage: music-control [toggle] [stop] [previous] [next]
 
 import gi
 import os
@@ -146,6 +146,8 @@ def main():
                 "title": "Paused" if selected_status == "Playing" else "Playing",
             },
         )
+    elif action == "stop":
+      selected_player.stop()
     elif action == "previous" or action == "next":
         if player_state == "paused":
             selected_player.play()

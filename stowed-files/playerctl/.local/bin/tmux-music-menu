@@ -32,6 +32,7 @@ playerctl_menu() {
 
   previous_command="music-control previous"
   toggle_command="music-control toggle"
+  stop_command="music-control stop"
   next_command="music-control next"
 
   if echo "${play_status}" | grep -qi "playing"; then
@@ -46,6 +47,7 @@ playerctl_menu() {
     genre="${genre}" \
     previous_command="${previous_command}" \
     toggle_command="${toggle_command}" \
+    stop_command="${stop_command}" \
     next_command="${next_command}" \
     display_menu
 }
@@ -58,6 +60,7 @@ cmus_menu() {
 
   local previous_command
   local toggle_command
+  local stop_command
   local next_command
 
   cmus_status=$(cmus-remote -Q 2>&1 || echo)
@@ -73,6 +76,7 @@ cmus_menu() {
 
   previous_command="cmus-remote --prev"
   toggle_command="cmus-remote --pause"
+  stop_command="cmus-remote --stop"
   next_command="cmus-remote --next"
 
   if echo "${cmus_status}" | grep -qi "^status playing"; then
@@ -87,6 +91,7 @@ cmus_menu() {
     genre="${genre}" \
     previous_command="${previous_command}" \
     toggle_command="${toggle_command}" \
+    stop_command="${stop_command}" \
     next_command="${next_command}" \
     display_menu
 }
@@ -101,6 +106,7 @@ display_menu() {
     "" \
     "Previous" "z" "run-shell -b '${previous_command}'" \
     "${verb}" "c" "run-shell -b '${toggle_command}'" \
+    "Stop" "v" "run-shell -b '${toggle_command}'" \
     "Next" "b" "run-shell -b '${next_command}'" \
     "" \
     "Close" "q" ""
