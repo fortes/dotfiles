@@ -321,8 +321,12 @@ set shiftround
 
 " Completion {{{
 " Keyword completion brings in the dictionary if spell check is enabled.
-" Also include buffer names and included files
-set complete+=kspell,f,i
+" Also included files
+set complete+=kspell,i
+if has ('nvim-0.11')
+  " Also include buffer names, if supported
+  set complete+=f
+endif
 
 " Show menu even when only one match, don't autoselect, and show match info
 " in popup
@@ -450,13 +454,7 @@ if has('eval')
       let [buffer, line, col, _] = mark.pos
       let text = readfile(filename)[line - 1]
 
-      call add(items, {
-            \ 'filename': filename,
-            \ 'buffer':   buffer,
-            \ 'text':     name..' | '..text,
-            \ 'lnum':     line,
-            \ 'col':      col || 1,
-            \ })
+      call add(items, { 'filename': filename, 'buffer': buffer, 'text': name..' | '..text, 'lnum': line, 'col': col || 1 })
     endfor
 
     call setqflist([], 'r', {'title': 'Marks', 'items': items})
@@ -543,10 +541,10 @@ if executable('rg')
   set grepprg=rg\ --vimgrep
 else
   " Mimic rg settings (literal, recursive, ignore common directories)
-  set grepprg=grep\ --with-filename\ --fixed-strings\
-    \ --binary-files=without-match\ --ignore-case\ --line-number\ --recursive\
-    \ --exclude-dir=socket\ --exclude-dir=.git\ --exclude-dir=node_modules\
-    \ $*\ /dev/null
+  set grepprg=grep\ --with-filename\ --fixed-strings\ \
+    --binary-files=without-match\ --ignore-case\ --line-number\ --recursive\ \
+    --exclude-dir=socket\ --exclude-dir=.git\ --exclude-dir=node_modules\ \
+    $*\ /dev/null
   set grepformat=%f:%l:%m
 endif
 " }}}
@@ -612,12 +610,12 @@ augroup filetype_tweaks
   autocmd BufNewFile,BufReadPost *.md,README,TODO set filetype=markdown
 
   " Not all files should wrap automatically
-  autocmd BufNewFile,BufReadPost *.txt,*.md,*.json,*.conf,*.ini,*.pug
-    \ setlocal textwidth=0
+  autocmd BufNewFile,BufReadPost *.txt,*.md,*.json,*.conf,*.ini,*.pug \
+    setlocal textwidth=0
 
   " Enable spell checking & linebreaking at words in some filetypes
-  autocmd BufNewFile,BufReadPost *.txt,*.md,*.markdown,COMMIT_EDITMSG
-    \ setlocal spell linebreak
+  autocmd BufNewFile,BufReadPost *.txt,*.md,*.markdown,COMMIT_EDITMSG \
+    setlocal spell linebreak
 
   " Disable spell checking on unmodifiable files (what's the point?)
   autocmd BufReadPost * if !&modifiable | setlocal nospell | endif
@@ -627,10 +625,8 @@ augroup filetype_tweaks
     autocmd FileType javascript setlocal makeprg=eslint\ -f\ compact\ %
 
     " Parse eslint errors correctly
-    autocmd FileType javascript setlocal
-          \ errorformat=%E%f:\ line\ %l\\,\ col\ %c\\,\ Error\ -\ %m
-    autocmd FileType javascript setlocal
-          \ errorformat+=%W%f:\ line\ %l\\,\ col\ %c\\,\ Warning\ -\ %m
+    autocmd FileType javascript setlocal errorformat=%E%f:\ line\ %l\\,\ col\ %c\\,\ Error\ -\ %m
+    autocmd FileType javascript setlocal errorformat+=%W%f:\ line\ %l\\,\ col\ %c\\,\ Warning\ -\ %m
     " Ignore lines that don't match the above
     autocmd FileType javascript setlocal errorformat+=%-G%.%#
   endif
@@ -652,19 +648,19 @@ augroup filetype_tweaks
   " Linting for LESS
   if executable('lessc')
     autocmd FileType less setlocal makeprg=lessc\ --lint\ --no-color\ %
-    autocmd FileType less setlocal
-          \ errorformat=%E%.%#Error:\ %m\ in\ %f\ on\ line\ %l\\,\ column\ %c:
+    autocmd FileType less setlocal \
+          errorformat=%E%.%#Error:\ %m\ in\ %f\ on\ line\ %l\\,\ column\ %c:
     " Ignore unmatched lines
     autocmd FileType less setlocal errorformat+=%-G%.%#
   endif
 
   " CSS linting
   if executable('stylelint')
-    autocmd FileType css setlocal
-          \ makeprg=stylelint\ %\ --no-color\ --fix\ --cache
+    autocmd FileType css setlocal \
+          makeprg=stylelint\ %\ --no-color\ --fix\ --cache
     " Push/pop filename on stack with %P%f
-    autocmd FileType css setlocal
-          \ errorformat+=%P%f,%*[\ ]%l:%c%*[\ ]✖%*[\ ]%m
+    autocmd FileType css setlocal \
+          errorformat+=%P%f,%*[\ ]%l:%c%*[\ ]✖%*[\ ]%m
     " Ignore unmatched lines
     autocmd FileType css setlocal errorformat+=%-G%.%#
   endif
@@ -692,8 +688,8 @@ augroup filetype_tweaks
   if executable('prettier')
     autocmd FileType javascript setlocal formatprg=prettier
 
-    autocmd FileType typescript,typescript.tsx
-      \ setlocal formatprg=prettier\ --parser\ typescript
+    autocmd FileType typescript,typescript.tsx \
+      setlocal formatprg=prettier\ --parser\ typescript
 
     autocmd FileType json setlocal formatprg=prettier\ --parser\ json
 
@@ -725,11 +721,6 @@ augroup filetype_tweaks
 
   autocmd FileType markdown setlocal suffixesadd=.md,index.md
 
-  " Alphabetic sort for import in JS (use on paragraph via leader si)
-  autocmd FileType javascript command!
-    \  -range=% Isort :<line1>,<line2>sort/^const {\=/
-  autocmd FileType javascript nnoremap <leader>s{ vip:Isort<cr>
-
   " Consider '-' part of a world when tab completion, etc in css/less
   autocmd FileType css,less setlocal iskeyword+=-
 
@@ -750,8 +741,7 @@ augroup END
 " Markdown config {{{
 if has('syntax')
   " Syntax highlight within fenced code blocks
-  let g:markdown_fenced_languages = ['bash=sh', 'css', 'html', 'js=javascript',
-        \ 'less', 'ts=typescript', 'python', 'sh']
+  let g:markdown_fenced_languages = ['bash=sh', 'css', 'html', 'js=javascript', 'less', 'ts=typescript', 'python', 'sh']
 endif
 " }}}
 
