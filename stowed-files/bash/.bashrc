@@ -153,10 +153,10 @@ fi
 
 # FZF {{{
 
-# Keybindings (Debian)
-source_if_exists "/usr/share/doc/fzf/examples/key-bindings.bash"
-# Keybindings (Homebrew)
-source_if_exists "/opt/homebrew/opt/fzf/shell/key-bindings.bash"
+# Shell integration for ctrl-t & alt-c
+if command_exists fzf; then
+  eval "$(fzf --bash)"
+fi
 
 fd_command="fd"
 if ! command_exists "${fd_command}"; then
