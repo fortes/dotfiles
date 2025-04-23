@@ -18,6 +18,14 @@ jobs:
         run: |
           docker build -t ghcr.io/${{ github.repository_owner }}/dotfiles:latest .
 
+      - name: Show Docker Image Size
+        run: docker image ls ghcr.io/${{ github.repository_owner }}/dotfiles:latest
+
+      - name: Docker Image Size
+        run: |
+          echo "## Docker Image Size" >> $GITHUB_STEP_SUMMARY
+          docker image ls --format "{{.Size}}" ghcr.io/${{ github.repository_owner }}/dotfiles:latest >> $GITHUB_STEP_SUMMARY
+
       - name: Log in to GitHub Container Registry
         if: ${{ github.event.workflow_run.head_branch == github.event.repository.default_branch }}
         uses: docker/login-action@v3
