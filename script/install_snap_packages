@@ -10,6 +10,7 @@ declare dotfiles_root
 dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 # Load command_exists helper and local paths
+# shellcheck source=./stowed-files/bash/.profile
 . "${dotfiles_root}/stowed-files/bash/.profile"
 
 SNAP_PACKAGES=(

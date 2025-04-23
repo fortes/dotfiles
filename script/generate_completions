@@ -7,7 +7,7 @@ declare dotfiles_root
 dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 # Pick up `command_exists` and correct paths
-# shellcheck source=../stowed-files/bash/.profile
+# shellcheck source=./stowed-files/bash/.profile
 source "${dotfiles_root}/stowed-files/bash/.profile"
 
 generate_completions() {

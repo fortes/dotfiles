@@ -29,7 +29,7 @@ install_zerotier() {
   sudo -E apt-get install -qq -o=Dpkg::Use-Pty=0 --assume-yes \
     --fix-broken --no-install-recommends zerotier-one
 
-  echo 'Join network via `sudo zerotier-cli join xxxxxxxxx`'
+  echo "Join network via \`sudo zerotier-cli join xxxxxxxxx\`"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then

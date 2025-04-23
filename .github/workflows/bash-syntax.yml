@@ -32,6 +32,6 @@ jobs:
           for file in script/*; do
             if [ -f "$file" ] && [ -x "$file" ]; then
               echo "Linting $file..."
-              shellcheck "$file"
+              shellcheck -x "$file"
             fi
           done
