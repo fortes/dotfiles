@@ -610,12 +610,10 @@ augroup filetype_tweaks
   autocmd BufNewFile,BufReadPost *.md,README,TODO set filetype=markdown
 
   " Not all files should wrap automatically
-  autocmd BufNewFile,BufReadPost *.txt,*.md,*.json,*.conf,*.ini,*.pug \
-    setlocal textwidth=0
+  autocmd BufNewFile,BufReadPost *.txt,*.md,*.json,*.conf,*.ini,*.pug setlocal textwidth=0
 
   " Enable spell checking & linebreaking at words in some filetypes
-  autocmd BufNewFile,BufReadPost *.txt,*.md,*.markdown,COMMIT_EDITMSG \
-    setlocal spell linebreak
+  autocmd BufNewFile,BufReadPost *.txt,*.md,*.markdown,COMMIT_EDITMSG setlocal spell linebreak
 
   " Disable spell checking on unmodifiable files (what's the point?)
   autocmd BufReadPost * if !&modifiable | setlocal nospell | endif
@@ -648,19 +646,16 @@ augroup filetype_tweaks
   " Linting for LESS
   if executable('lessc')
     autocmd FileType less setlocal makeprg=lessc\ --lint\ --no-color\ %
-    autocmd FileType less setlocal \
-          errorformat=%E%.%#Error:\ %m\ in\ %f\ on\ line\ %l\\,\ column\ %c:
+    autocmd FileType less setlocal errorformat=%E%.%#Error:\ %m\ in\ %f\ on\ line\ %l\\,\ column\ %c:
     " Ignore unmatched lines
     autocmd FileType less setlocal errorformat+=%-G%.%#
   endif
 
   " CSS linting
   if executable('stylelint')
-    autocmd FileType css setlocal \
-          makeprg=stylelint\ %\ --no-color\ --fix\ --cache
+    autocmd FileType css setlocal makeprg=stylelint\ %\ --no-color\ --fix\ --cache
     " Push/pop filename on stack with %P%f
-    autocmd FileType css setlocal \
-          errorformat+=%P%f,%*[\ ]%l:%c%*[\ ]✖%*[\ ]%m
+    autocmd FileType css setlocal errorformat+=%P%f,%*[\ ]%l:%c%*[\ ]✖%*[\ ]%m
     " Ignore unmatched lines
     autocmd FileType css setlocal errorformat+=%-G%.%#
   endif
@@ -688,8 +683,7 @@ augroup filetype_tweaks
   if executable('prettier')
     autocmd FileType javascript setlocal formatprg=prettier
 
-    autocmd FileType typescript,typescript.tsx \
-      setlocal formatprg=prettier\ --parser\ typescript
+    autocmd FileType typescript,typescript.tsx setlocal formatprg=prettier\ --parser\ typescript
 
     autocmd FileType json setlocal formatprg=prettier\ --parser\ json
 
