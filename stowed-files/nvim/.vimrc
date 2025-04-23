@@ -541,10 +541,7 @@ if executable('rg')
   set grepprg=rg\ --vimgrep
 else
   " Mimic rg settings (literal, recursive, ignore common directories)
-  set grepprg=grep\ --with-filename\ --fixed-strings\ \
-    --binary-files=without-match\ --ignore-case\ --line-number\ --recursive\ \
-    --exclude-dir=socket\ --exclude-dir=.git\ --exclude-dir=node_modules\ \
-    $*\ /dev/null
+  set grepprg=grep\ --with-filename\ --fixed-strings\ --binary-files=without-match\ --ignore-case\ --line-number\ --recursive\ --exclude-dir=socket\ --exclude-dir=.git\ --exclude-dir=node_modules\ $*\ /dev/null
   set grepformat=%f:%l:%m
 endif
 " }}}
