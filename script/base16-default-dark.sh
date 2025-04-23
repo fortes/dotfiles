@@ -3,6 +3,9 @@
 # Base16 Shell template by Chris Kempson (http://chriskempson.com)
 # Default Dark scheme by Chris Kempson (http://chriskempson.com)
 
+# TODO: clean up this script
+# shellcheck disable=all
+
 # This script doesn't support linux console (use 'vconsole' template instead)
 if [ "${TERM%%-*}" = 'linux' ]; then
     return 2>/dev/null || exit 0
