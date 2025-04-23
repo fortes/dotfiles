@@ -1,13 +1,6 @@
 name: Bash Syntax Check & Lint
 
-on:
-  push:
-    branches:
-      - '$default-branch'
-  pull_request:
-    paths:
-      - 'script/**'
-      - '.github/workflows/bash-syntax-check.yml'
+on: [push]
 
 jobs:
   bash-syntax:
