@@ -9,6 +9,7 @@ IFS=$'\n\t'
 PLUGINS=(
   llm-anthropic
   llm-gemini
+  llm-mistral
   llm-ollama
   llm-openrouter
 )
