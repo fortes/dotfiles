@@ -28,3 +28,7 @@ jobs:
       - name: Push Docker Image
         run: |
           docker push ghcr.io/${{ github.repository_owner }}/dotfiles:latest
+
+      - name: Run dotfiles health check
+        run: |
+          docker run --rm ghcr.io/${{ github.repository_owner }}/dotfiles:latest ./dotfiles/script/check_health
