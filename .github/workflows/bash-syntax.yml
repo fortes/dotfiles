@@ -1,0 +1,37 @@
+name: Bash Syntax Check & Lint
+
+on:
+  push:
+    paths:
+      - 'script/**'
+      - '.github/workflows/bash-syntax-check.yml'
+  pull_request:
+    paths:
+      - 'script/**'
+      - '.github/workflows/bash-syntax-check.yml'
+
+jobs:
+  bash-syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Install shellcheck
+        run: |
+          sudo apt-get update && sudo apt-get install -y shellcheck
+      - name: Check bash syntax in executable scripts/
+        run: |
+          for file in script/*; do
+            if [ -f "$file" ] && [ -x "$file" ]; then
+              echo "Checking $file..."
+              bash -n "$file"
+            fi
+          done
+      - name: Lint executable scripts with shellcheck
+        run: |
+          for file in script/*; do
+            if [ -f "$file" ] && [ -x "$file" ]; then
+              echo "Linting $file..."
+              shellcheck "$file"
+            fi
+          done
