@@ -271,16 +271,10 @@ Still a work in progress, but kinda works
 
 ### Docker
 
-Need to first build the thing
+Images are built with some frequency, via CI.
 
 ```sh
-docker build -t dotfiles .
-```
-
-Then run it like so to do work via your home directory
-
-```sh
-docker run -it --rm --name dotfiles dotfiles
+docker run -it --rm --name dotfiles ghcr.io/fortes/dotfiles:latest
 ```
 
 To share files, use `-v /path/to/host:/path/to/container`, for example if sharing the `~/src` folder:
@@ -289,7 +283,19 @@ To share files, use `-v /path/to/host:/path/to/container`, for example if sharin
 docker run -it --rm --name dotfiles -v ~/src:/home/fortes/src dotfiles
 ```
 
-Also need to manually start neovim to install plugins
+Will need to manually start neovim to install plugins. Some other things may or may not work, we'll have to test to find out!
+
+#### Local building
+
+```sh
+docker build -t dotfiles .
+```
+
+Then follow normal pattern, just use the local image name like so:
+
+```sh
+docker run -it --rm --name dotfiles dotfiles
+```
 
 ## Other Notes
 

@@ -36,5 +36,9 @@ ENV IS_DOCKER=1
 
 RUN ./dotfiles/script/setup
 
+# Free up disk space
+RUN sudo apt-get clean && \
+  sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
 SHELL ["/bin/bash", "-c"]
 CMD ["/bin/bash"]

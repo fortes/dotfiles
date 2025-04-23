@@ -26,9 +26,11 @@ jobs:
           docker build -t ghcr.io/${{ github.repository_owner }}/dotfiles:latest .
 
       - name: Push Docker Image
+        if: ${{ github.event.workflow_run.head_branch == github.event.repository.default_branch }}
         run: |
           docker push ghcr.io/${{ github.repository_owner }}/dotfiles:latest
 
       - name: Run dotfiles health check
+        if: ${{ github.event.workflow_run.head_branch == github.event.repository.default_branch }}
         run: |
           docker run --rm ghcr.io/${{ github.repository_owner }}/dotfiles:latest ./dotfiles/script/check_health

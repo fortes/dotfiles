@@ -333,6 +333,12 @@ install_neovim_stable() {
     echo "Must manually launch Neovim to install plugins"
   fi
 
+  # Don't try to set alternatives if not available
+  if ! update-alternatives --query vim &>/dev/null; then
+    >&2 echo "update-alternatives not available for vim, skipping"
+    return
+  fi
+
   # Assume if it's already set for `vim`, then it's set for the others
   if update-alternatives --list vim | head -n1 | grep -qv "${vim_path}"; then
     echo "Setting neovim as default editor (requires sudo)"
