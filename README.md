@@ -345,3 +345,7 @@ This will list out all the packages installed, then need to search through to ma
   - Get better resolution when booted into console by adding `GRUB_GFXMODE=auto` in `/etc/default/grub`, then run `sudo update-grub`
 - [ ] Learn from [Wayland Apps in Wireguard Docker Containers](https://www.procustodibus.com/blog/2024/10/wayland-wireguard-containers/) and see if anything worth copying
 - [ ] [Dotfile managers](https://dotfiles.github.io/utilities/) might have something better than GNU `stow`
+
+## License
+
+This repository is licensed under the BSD 3-Clause License. See the LICENSE file for more information.
