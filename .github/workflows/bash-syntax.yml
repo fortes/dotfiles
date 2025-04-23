@@ -2,9 +2,8 @@ name: Bash Syntax Check & Lint
 
 on:
   push:
-    paths:
-      - 'script/**'
-      - '.github/workflows/bash-syntax-check.yml'
+    branches:
+      - ${{ github.event.repository.default_branch }}
   pull_request:
     paths:
       - 'script/**'
@@ -32,6 +31,6 @@ jobs:
           for file in script/*; do
             if [ -f "$file" ] && [ -x "$file" ]; then
               echo "Linting $file..."
-              shellcheck "$file"
+              shellcheck -x "$file"
             fi
           done

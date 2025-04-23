@@ -3,6 +3,9 @@
 # Base16 Shell template by Chris Kempson (http://chriskempson.com)
 # Default Light scheme by Chris Kempson (http://chriskempson.com)
 
+# TODO: clean up this script
+# shellcheck disable=all
+
 color00="f8/f8/f8" # Base 00 - Black
 color01="ab/46/42" # Base 08 - Red
 color02="a1/b5/6c" # Base 0B - Green

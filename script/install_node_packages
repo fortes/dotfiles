@@ -31,7 +31,7 @@ PACKAGES=(
 )
 
 # Make sure to load `command_exists` helper as well as local paths
-# shellcheck source=../stowed-files/bash/.profile
+# shellcheck source=./stowed-files/bash/.profile
 . "${dotfiles_root}/stowed-files/bash/.profile"
 
 install_node_packages() {

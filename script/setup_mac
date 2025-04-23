@@ -143,7 +143,7 @@ main() {
   fi
 
   # Make sure to load `command_exists` helper
-  # shellcheck source=../stowed-files/bash/.profile
+  # shellcheck source=./stowed-files/bash/.profile
   . "${dotfiles_root}/stowed-files/bash/.profile"
 
   declare brew_only=''

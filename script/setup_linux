@@ -243,19 +243,14 @@ is_package_installed() {
 }
 
 set_default_applications() {
-  if command_exists nvim && ! update-alternatives --query editor | grep ^Value | grep -q nvim; then
+  if command_exists nvim && update-alternatives --query editor &>/dev/null && ! update-alternatives --query editor | grep ^Value | grep -q nvim; then
     echo "Setting Neovim as default text editor (requires sudo)"
     sudo update-alternatives --install /usr/bin/editor editor "$(command -v nvim)" 60
   fi
 
-  if command_exists alacritty && ! update-alternatives --query x-terminal-emulator | grep ^Value | grep -q alacritty; then
-    echo "Setting Alacritty as default terminal (requires sudo)"
-    sudo update-alternatives --set x-terminal-emulator "$(command -v alacritty)"
-  fi
-
-  if command_exists yarnpkg && ! update-alternatives --query yarn | grep ^Value | grep -q yarnpkg; then
-    echo "Setting 'yarn' as system alias to 'yarnpkg' (requires sudo)"
-    sudo update-alternatives --install /usr/bin/yarn yarn /usr/bin/yarnpkg 10
+  if command_exists wezterm && update-alternatives --query x-terminal-emulator &>/dev/null && ! update-alternatives --query x-terminal-emulator | grep ^Value | grep -q wezterm; then
+    echo "Setting WezTerm as default terminal (requires sudo)"
+    sudo update-alternatives --set x-terminal-emulator "$(command -v wezterm)"
   fi
 }
 
@@ -369,7 +364,7 @@ setup_shell() {
 
 main() {
   # Make sure to load `command_exists` helper
-  # shellcheck source=../stowed-files/bash/.profile
+  # shellcheck source=./stowed-files/bash/.profile
   . "${dotfiles_root}/stowed-files/bash/.profile"
 
   declare -r local_profile_path="$HOME/.profile.local"

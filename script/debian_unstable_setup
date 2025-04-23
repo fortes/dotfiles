@@ -7,9 +7,6 @@ set -euo pipefail
 IFS=$'\n\t'
 export DEBIAN_FRONTEND=noninteractive
 
-declare dotfiles_root
-dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-
 UNSTABLE_PACKAGES=()
 
 debian_unstable_setup() {

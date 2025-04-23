@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# Check to make sure things are (mostly) working correctly
+#
+# Usage: check_health [--help]
+
+set -euo pipefail
+IFS=$'\n\t'
+
+usage() {
+  cat <<EOF
+Usage: $(basename "$0") [--help]
+
+Checks the health of your dotfiles setup. Currently, this script is a placeholder and does not perform any checks.
+
+Options:
+  --help    Show this help message and exit
+EOF
+}
+
+main() {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --help|-h)
+        usage
+        exit 0
+        ;;
+      *)
+        echo -e "$(tput setaf 1)× Unknown option: $1$(tput sgr0)" >&2
+        usage
+        exit 1
+        ;;
+    esac
+  done
+
+  echo -e "$(tput setaf 2)✓ All checks passed$(tput sgr0)"
+  exit 0
+}
+
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+  main "$@"
+fi

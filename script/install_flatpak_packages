@@ -6,6 +6,7 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+# shellcheck source=./stowed-files/bash/.profile
 declare dotfiles_root
 dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
