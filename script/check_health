@@ -25,14 +25,14 @@ main() {
         exit 0
         ;;
       *)
-        >&2 echo -e "\e[31m× Unknown option: $1\e[0m"
+        echo -e "$(tput setaf 1)× Unknown option: $1$(tput sgr0)" >&2
         usage
         exit 1
         ;;
     esac
-    shift
   done
-  echo -e "\e[32m✓ All checks passed\e[0m"
+
+  echo -e "$(tput setaf 2)✓ All checks passed$(tput sgr0)"
   exit 0
 }
 
