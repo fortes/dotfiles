@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
-# check_health: Dotfiles health check script
-# Description: Placeholder for dotfiles health checks. Exits cleanly for now.
+# Check to make sure things are (mostly) working correctly
 #
-# Google Shell Style Guide: https://google.github.io/styleguide/shellguide.html
-# Strict mode enabled.
+# Usage: check_health [--help]
 
 set -euo pipefail
 IFS=$'\n\t'
@@ -20,10 +18,20 @@ EOF
 }
 
 main() {
-  if [[ "${1:-}" == "--help" ]]; then
-    usage
-    exit 0
-  fi
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --help|-h)
+        usage
+        exit 0
+        ;;
+      *)
+        >&2 echo -e "\e[31m× Unknown option: $1\e[0m"
+        usage
+        exit 1
+        ;;
+    esac
+    shift
+  done
   echo -e "\e[32m✓ All checks passed\e[0m"
   exit 0
 }
