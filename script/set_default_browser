@@ -42,6 +42,13 @@ set_default_browser() {
     exit
   fi
 
+  # Bail if `update-alternatives` isn't set up for x-www-browser, may want to
+  # manually install options at some point, but for now ignore
+  if ! update-alternatives --query x-www-browser &> /dev/null; then
+    >&2 echo "update-alternatives not set for x-www-browser, skipping"
+    exit
+  fi
+
   local current_browser_path
   current_browser_path="$(
     update-alternatives --query x-www-browser | grep '^Value:' | cut -d' ' -f2
