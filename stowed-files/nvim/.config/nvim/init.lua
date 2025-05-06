@@ -240,6 +240,7 @@ require("lazy").setup({
         denols = vim.tbl_deep_extend('force', default_lsp_opts, {
           root_dir = deno_root_pattern,
           single_file_support = false,
+          workspace_required = true,
         }),
         dockerls = default_lsp_opts,
         eslint = vim.tbl_deep_extend('force', default_lsp_opts, {
@@ -292,6 +293,7 @@ require("lazy").setup({
             lsp_on_attach(client, bufnr)
           end,
           root_dir = nvim_lsp.util.root_pattern('node_modules'),
+          workspace_required = true,
         }),
         vimls = default_lsp_opts,
         yamlls = default_lsp_opts
