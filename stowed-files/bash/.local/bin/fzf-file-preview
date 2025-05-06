@@ -27,7 +27,7 @@ function fzf-file-preview() {
   local bat_name="bat"
 
   # For Debian-based systems that use `batcat`
-  if command -v exa &>/dev/null; then
+  if command -v batcat &>/dev/null; then
     bat_name="batcat"
   fi
 
