@@ -18,6 +18,10 @@ generate_completions() {
 
   echo -n "… Generating completions & man pages"
 
+  if command_exists aider; then
+    aider --shell-completions bash >"${completion_dir}/aider_completion"
+  fi
+
   if command_exists beet; then
     beet completion >"${completion_dir}/beet_completion"
   fi
