@@ -18,7 +18,7 @@ UVX_PACKAGES=(
   "aider-chat --python python3.12"
   argcomplete
   # Requires additional dependencies due to plugins
-  "beets --with requests --with pylast"
+  "beets --with requests --with pylast --with beets[embedart,fetchart,lyrics,lastgenre,plexupdate]"
   epy-reader
   files-to-prompt
   llm
