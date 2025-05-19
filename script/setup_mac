@@ -42,6 +42,7 @@ BREW_PACKAGES=(
   # For yazi
   font-symbols-only-nerd-font
   fzf
+  gh
   git
   git-crypt
   git-extras
