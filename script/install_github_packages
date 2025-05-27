@@ -8,6 +8,7 @@
 # - deno
 # - difftastic
 # - docker-compose
+# - f2
 # - fnm
 # - fx
 # - fzf (because Bookworm is very old)
@@ -48,6 +49,7 @@ AVAILABLE_PACKAGES=(
   deno
   difftastic
   docker-compose
+  f2
   fnm
   fx
   fzf
@@ -238,6 +240,10 @@ install_docker_compose() {
 
 install_github_cli() {
   install_deb 'cli/cli' 'gh_.*_linux_amd64.deb'
+}
+
+install_f2() {
+  install_deb 'ayoisaiah/f2' 'f2_.*_linux_amd64.deb'
 }
 
 install_fnm() {
@@ -472,6 +478,9 @@ install_github_packages() {
       ;;
     github-cli)
       install_github_cli
+      ;;
+    f2)
+      install_f2
       ;;
     fnm)
       install_fnm
