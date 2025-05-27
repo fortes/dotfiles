@@ -32,6 +32,7 @@ BREW_PACKAGES=(
   duf
   MisterTea/et/et
   eza
+  f2
   fd
   # For yazi
   ffmpeg
