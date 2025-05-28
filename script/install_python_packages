@@ -24,6 +24,7 @@ UVX_PACKAGES=(
   llm
   pyright
   ruff
+  streamdown
   vim-vint
 )
 
