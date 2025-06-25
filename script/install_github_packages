@@ -16,6 +16,7 @@
 # - goose
 # - helix
 # - hugo (latest)
+# - jj
 # - lazydocker
 # - lazygit
 # - luals
@@ -58,14 +59,15 @@ AVAILABLE_PACKAGES=(
   goose
   helix
   hugo
+  jj
   lazydocker
   lazygit
   luals
   # Use via flatpak due to conflict in glibc
   # ncspot
+  neovim
   pistol
   psst
-  neovim
   sad
   shfmt
   wezterm
@@ -268,6 +270,10 @@ install_helix() {
 
 install_hugo() {
   install_deb 'gohugoio/hugo' 'hugo_extended_.*_linux-amd64.deb'
+}
+
+install_jj() {
+  install_tarball 'jj-vcs/jj' 'jj-v.*-x86_64-unknown-linux-musl.tar.gz'
 }
 
 install_lazydocker() {
@@ -514,6 +520,9 @@ install_github_packages() {
       ;;
     neovim)
       install_neovim_stable
+      ;;
+    jj)
+      install_jj
       ;;
     pistol)
       install_pistol

@@ -54,6 +54,7 @@ BREW_PACKAGES=(
   hugo
   # For yazi
   imagemagick
+  jj
   jq
   keychain
   lua-language-server
