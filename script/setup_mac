@@ -36,8 +36,6 @@ BREW_PACKAGES=(
   fd
   # For yazi
   ffmpeg
-  # Installed a single time via brew cask due to auto-updates
-  # firefox
   fnm
   font-jetbrains-mono
   # For yazi
@@ -66,9 +64,7 @@ BREW_PACKAGES=(
   neovim
   ollama
   pipx
-  psst
   rclone
-  rectangle
   ripgrep
   sad
   # For yazi
@@ -78,13 +74,18 @@ BREW_PACKAGES=(
   stow
   tmux
   vifm
-  # Installed a single time via brew cask due to auto-updates
-  # visual-studio-code
-  wezterm
   wget
   yazi
   yt-dlp
   zoxide
+)
+
+CASK_PACKAGES=(
+  firefox
+  psst
+  rectangle
+  visual-studio-code
+  wezterm
 )
 
 usage() {
@@ -139,6 +140,25 @@ install_homebrew_packages() {
   "${brew_prefix}/bin/brew" install --quiet "${BREW_PACKAGES[@]}"
 }
 
+install_homebrew_casks() {
+  echo "Installing homebrew casks"
+
+  local casks_to_install=()
+
+  for cask in "${CASK_PACKAGES[@]}"; do
+    if ! "${brew_prefix}/bin/brew" list --cask "$cask" &>/dev/null; then
+      casks_to_install+=("${cask}")
+    fi
+  done
+
+  if [[ ${#casks_to_install[@]} -gt 0 ]]; then
+    echo "Installing cask packages: ${casks_to_install[*]}"
+    "${brew_prefix}/bin/brew" install --cask --quiet "${casks_to_install[@]}"
+  else
+    echo "All cask packages already installed"
+  fi
+}
+
 main() {
   if ! uname -s | grep -q Darwin; then
     >&2 echo "Only works on Mac!"
@@ -171,6 +191,7 @@ main() {
 
   if [[ -n "${brew_only}" ]]; then
     install_homebrew_packages
+    install_homebrew_casks
     exit 0
   fi
 
@@ -187,6 +208,7 @@ main() {
   install_command_line_tools
   install_homebrew
   install_homebrew_packages
+  install_homebrew_casks
 
   # Remove default files before stowing, otherwise stow fails
   "${dotfiles_root}/script/remove_default_dotfiles"
@@ -199,14 +221,6 @@ main() {
 
   "${dotfiles_root}/script/lock_local_files"
   "${dotfiles_root}/script/set_dotfiles_remote"
-
-  # Install Firefox / VSCode a single time via brew, they'll auto-update
-  if ! command_exists firefox; then
-    brew install --cask firefox
-  fi
-  if ! command_exists code; then
-    brew install --cask visual-studio-code
-  fi
 
   # Non-brew package managers
   "${dotfiles_root}/script/install_node_packages"
