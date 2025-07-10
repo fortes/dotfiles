@@ -87,16 +87,6 @@ require("lazy").setup({
           'v',
           '<leader>cc',
           function()
-            chat.ask('', {
-              selection = select.visual
-            })
-          end,
-          { desc = "Toggle Copilot chat" }
-        )
-        map(
-          'v',
-          '<leader>cc',
-          function()
             local input = vim.fn.input("Ask Copilot: ", "Fix this code")
             if input ~= "" then
               chat.ask(input, {
