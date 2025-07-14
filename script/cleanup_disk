@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+#
+# cleanup_disk - Free up disk space by cleaning up package manager caches, etc
+#
+# Usage:
+#   cleanup_disk [OPTIONS]
+#
+# Options:
+#   -h, --help    Show help message
+set -euo pipefail
+
+usage() {
+  cat << EOF
+Usage: $(basename "$0") [OPTIONS]
+
+Free up disk space by cleaning up package manager caches, etc
+
+Options:
+  -h, --help    Show this help message
+
+Examples:
+  $(basename "$0")          # Run cleanup
+  $(basename "$0") -h       # Show help
+
+EOF
+}
+
+cleanup_apt() {
+  if command -v apt >/dev/null 2>&1; then
+    echo "Cleaning up APT (requires sudo)..."
+    sudo apt autoremove -y
+    sudo apt autoclean
+    sudo apt clean
+  fi
+}
+
+cleanup_brew() {
+  if command -v brew >/dev/null 2>&1; then
+    echo "Cleaning up Homebrew..."
+    brew cleanup --prune=all
+    brew autoremove
+  fi
+}
+
+cleanup_docker() {
+  if command -v docker >/dev/null 2>&1 && docker info >/dev/null 2>&1; then
+    echo "Cleaning up Docker..."
+    docker system prune -af
+    docker volume prune -f
+    docker image prune -af
+    docker builder prune -af
+    docker network prune -f
+  fi
+}
+
+cleanup_npx() {
+  if command -v npx >/dev/null 2>&1; then
+    echo "Cleaning up npx cache..."
+    npx clear-npx-cache 2>/dev/null || true
+  fi
+}
+
+cleanup_pip() {
+  if command -v pip >/dev/null 2>&1; then
+    echo "Cleaning up pip cache..."
+    pip cache purge 2>/dev/null || true
+  fi
+}
+
+cleanup_uv() {
+  if command -v uv >/dev/null 2>&1; then
+    echo "Cleaning up uv cache..."
+    uv cache clean
+  fi
+}
+
+main() {
+  echo "Running system cleanup..."
+
+  cleanup_apt
+  cleanup_brew
+  cleanup_docker
+  cleanup_npx
+  cleanup_pip
+  cleanup_uv
+}
+
+# Handle arguments
+case "${1:-}" in
+  -h|--help)
+    usage
+    exit 0
+    ;;
+esac
+
+main "$@"
