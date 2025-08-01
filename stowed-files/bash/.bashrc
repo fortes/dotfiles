@@ -94,7 +94,7 @@ STANDOUT="\[$(tput smso)\]"
 RESET="\[$(tput sgr0)\]"
 
 # Hide normal username
-if [ "$(whoami)" != 'fortes' ]; then
+if [ "$(whoami)" != "${DEFAULT_USERNAME:-fortes}" ]; then
   BASE_PROMPT="$RED\u@"
 else
   BASE_PROMPT=""

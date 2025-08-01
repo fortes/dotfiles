@@ -33,6 +33,9 @@ export IS_MAC="${is_mac:-}"
 export IS_WSL="${is_wsl:-}"
 export IS_HEADLESS="${is_headless:-}"
 
+# Affects bash prompt, which hides unless this is the username
+# export DEFAULT_USERNAME=ffortes
+
 # Enable if GitHub account has Copilot access
 # export ENABLE_GITHUB_COPILOT=1
 
