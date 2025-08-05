@@ -193,10 +193,6 @@ export FZF_CTRL_T_OPTS=" \
 
 # }}}
 
-if command_exists fnm; then
-  eval "$(fnm env)"
-fi
-
 # Load system bash completion
 source_if_exists "/etc/bash_completion"
 # Load Homebrew bash completion, see https://docs.brew.sh/Shell-Completion

@@ -50,6 +50,11 @@ source_if_exists "$HOME/.profile.brew"
 # Locally-installed packages belong in path
 add_to_path "$HOME/.local/bin"
 
+# Node versions
+if command_exists fnm; then
+  eval "$(fnm env)"
+fi
+
 # Use NeoVim as man pager, when available
 if command_exists nvim; then
   export MANPAGER="nvim +Man!"
