@@ -41,6 +41,7 @@ BREW_PACKAGES=(
   git-crypt
   git-extras
   git-lfs
+  google-chrome
   gron
   helix
   htop
@@ -84,6 +85,7 @@ CASK_PACKAGES=(
   font-symbols-only-nerd-font
   psst
   rectangle
+  signal
   visual-studio-code
   wezterm
 )
