@@ -18,7 +18,6 @@ dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BREW_PACKAGES=(
   1password
   1password-cli
-  alacritty
   bash
   bash-completion@2
   bat
