@@ -16,8 +16,6 @@ declare dotfiles_root
 dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 BREW_PACKAGES=(
-  1password
-  1password-cli
   bash
   bash-completion@2
   bat
@@ -37,9 +35,6 @@ BREW_PACKAGES=(
   # For yazi
   ffmpeg
   fnm
-  font-jetbrains-mono
-  # For yazi
-  font-symbols-only-nerd-font
   fzf
   gh
   git
@@ -81,7 +76,12 @@ BREW_PACKAGES=(
 )
 
 CASK_PACKAGES=(
+  1password
+  1password-cli
   firefox
+  font-jetbrains-mono
+  # For yazi
+  font-symbols-only-nerd-font
   psst
   rectangle
   visual-studio-code
