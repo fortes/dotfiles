@@ -93,7 +93,7 @@ CASK_PACKAGES=(
 )
 
 usage() {
-  echo "Usage: setup_mac [--brew-only]"
+  echo "Usage: setup_mac [--brew-only] [--cask-only]"
 }
 
 setup_shell() {
@@ -174,11 +174,15 @@ main() {
   . "${dotfiles_root}/stowed-files/bash/.profile"
 
   declare brew_only=''
+  declare cask_only=''
   # Parse arguments
   while [[ $# -gt 0 ]]; do
     case "$1" in
     --homebrew-only | --brew-only)
       brew_only=1
+      ;;
+    --cask-only)
+      cask_only=1
       ;;
     --help | -h)
       usage
@@ -195,6 +199,10 @@ main() {
 
   if [[ -n "${brew_only}" ]]; then
     install_homebrew_packages
+    exit 0
+  fi
+
+  if [[ -n "${cask_only}" ]]; then
     install_homebrew_casks
     exit 0
   fi
