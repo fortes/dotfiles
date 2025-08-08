@@ -63,4 +63,6 @@ CMUS_STATUS
   command_exists cmus-scrobbler && cmus-scrobbler >> /tmp/cmus-scrobbler.log
 }
 
-main "${@:-}"
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  main "@"
+fi
