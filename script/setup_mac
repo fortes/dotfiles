@@ -23,6 +23,8 @@ BREW_PACKAGES=(
   oven-sh/bun/bun
   chafa
   cmus
+  # For Docker
+  colima
   delta
   deno
   difftastic

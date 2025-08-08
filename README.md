@@ -268,6 +268,13 @@ Still a work in progress, but kinda works
 - `terminal.app` sucks with colors, switch to WezTerm and pin it in the dock
 - Make sure `Rectangle.app` starts on login
 - Install the 1Password extension in Safari (others should sync automatically)
+- If planning on using Docker a lot, can have Colima autostart on login by running the following:
+
+  ```sh
+  brew services start colima
+  ```
+
+  Otherwise, just run `colima start` manually when needed.
 
 ### Docker
 
