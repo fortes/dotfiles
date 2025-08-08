@@ -61,6 +61,7 @@ get_current_color_theme() {
   fi
 
   # Get terminal background color and extract red channel
+  local red_bg_value
   red_bg_value=$("${dir_path}/get-terminal-background-color" | cut -d: -f2)
 
   # Look at the first digit of the red value, and assume anything more than
@@ -104,6 +105,7 @@ update_neovim_colors() {
   fi
 
   # Change colorscheme of all neovim instances
+  local socket
   while IFS= read -r socket; do
     if [[ "${new_theme}" == "light" ]]; then
       nvim --server "${socket}" --remote-send "<Esc>:set background=light|colorscheme base16-default-light<cr>"
