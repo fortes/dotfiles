@@ -275,6 +275,17 @@ Still a work in progress, but kinda works
   ```
 
   Otherwise, just run `colima start` manually when needed.
+- If gaming, install Battle.net/Steam via brew:
+
+  ```sh
+  # May require this first in order to run Battle.net
+  # (Steam has a beta that doesn't require Rosetta)
+  softwareupdate --install-rosetta --agree-to-license
+
+  brew install --cask battle-net steam
+  # For battle.net, will need to manually run setup to install the app
+  # open /opt/homebrew/Caskroom/battle-net/VERSION/Battle.net-Setup.app
+  ```
 
 ### Docker
 
