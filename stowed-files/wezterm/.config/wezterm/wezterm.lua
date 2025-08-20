@@ -60,6 +60,12 @@ config.keys = {
       wezterm.action.EmitEvent "toggle-color-scheme",
     },
   },
+  -- Toggle fullscreen with Cmd+Enter on Mac
+  {
+    key = "Enter",
+    mods = "CMD",
+    action = wezterm.action.ToggleFullScreen,
+  },
 }
 
 return config
