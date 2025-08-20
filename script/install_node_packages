@@ -44,7 +44,14 @@ install_node_packages() {
   fi
 
   echo "Installing node LTS …"
-  fnm install --lts
+
+  # Use --arch arm64 when running on aarch64, otherwise fnm doesn't
+  # auto-detect (happens on Docker on MacOS)
+  if [[ "$(uname -m)" == "aarch64" ]]; then
+    fnm install --lts --arch arm64
+  else
+    fnm install --lts
+  fi
 
   echo "Setting node version to LTS …"
   fnm default lts-latest

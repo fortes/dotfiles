@@ -15,7 +15,7 @@ install_signal() {
   if [ ! -f "$signal_sources_list" ]; then
     echo "Adding signal GPG key (requires sudo)"
     curl -sS "$signal_key_url" |
-      sudo tee "$signal_key_path" >/dev/null
+      sudo tee "$signal_key_path" > /dev/null
 
     echo "signal sources list missing, adding (requires sudo)"
     echo "deb [arch=amd64 signed-by=${signal_key_path}] https://updates.signal.org/desktop/apt xenial main" |

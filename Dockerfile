@@ -1,5 +1,5 @@
 # Modify these to suit your needs
-FROM debian:bookworm
+FROM debian:trixie
 
 ARG USER_NAME=fortes \
     USER_ID=1000 \
@@ -14,7 +14,7 @@ ENV LANG=en_US.UTF-8 \
 
 RUN apt-get -qqy update && \
   apt-get install -qq --no-install-recommends -y \
-  ca-certificates sudo git locales lsb-release software-properties-common && \
+  ca-certificates sudo git locales lsb-release && \
   rm -rf /var/lib/apt/lists/*
 
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
@@ -22,10 +22,11 @@ RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
 # Don't require password for `sudo` use
 RUN echo "ALL ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/10-docker-nopasswd
 
-RUN addgroup --gid $GROUP_ID $USER_NAME && \
-  adduser --disabled-password --gecos '' \
-  --uid $USER_ID --gid $GROUP_ID $USER_NAME && \
-  adduser $USER_NAME sudo
+RUN groupadd --gid $GROUP_ID $USER_NAME && \
+  useradd --uid $USER_ID --gid $GROUP_ID \
+  --home-dir /home/$USER_NAME --create-home \
+  --shell /bin/bash $USER_NAME && \
+  usermod -aG sudo $USER_NAME
 
 USER $USER_NAME
 WORKDIR /home/$USER_NAME

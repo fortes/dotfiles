@@ -1,6 +1,0 @@
-# Hide Browse, Tracks, and Podcasts
-library_tabs = [
-  "playlists",
-  "artists",
-  "albums",
-]

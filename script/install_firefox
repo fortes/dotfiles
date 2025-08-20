@@ -14,11 +14,11 @@ install_firefox() {
 
   if [ ! -f "$firefox_sources_list" ]; then
     echo "Adding firefox GPG key (requires sudo)"
-    curl -sS "$firefox_key_url" | sudo tee ${firefox_key_path} >/dev/null
+    curl -sS "$firefox_key_url" | sudo tee ${firefox_key_path} > /dev/null
 
     echo "firefox sources list missing, adding (requires sudo)"
     echo "deb [signed-by=${firefox_key_path}] https://packages.mozilla.org/apt mozilla main" |
-      sudo tee "$firefox_sources_list" >/dev/null
+      sudo tee "$firefox_sources_list" > /dev/null
 
     echo "firefox sources added, updating packages"
     sudo -E apt-get update -qq

@@ -3,7 +3,6 @@
 #
 # - agg (asciinema gif generator)
 # - bun
-# - ctop
 # - delta
 # - difftastic
 # - docker-compose
@@ -12,22 +11,16 @@
 # - fx
 # - fzf (because Bookworm is very old)
 # - github cli
-# - goose
 # - helix
 # - hugo (latest)
 # - jj
 # - luals
-# - ncspot
 # - neovim (latest)
 # - pistol
-# - psst
 # - sad
-# - shfmt
 # - wezterm
 # - yazi
 # - yq
-# - zellij
-# - zoxide (Bookworm version is very old)
 #
 # Usage `install_github_packages [package_names...]`
 
@@ -42,7 +35,6 @@ dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 AVAILABLE_PACKAGES=(
   agg
   bun
-  ctop
   delta
   difftastic
   docker-compose
@@ -50,25 +42,18 @@ AVAILABLE_PACKAGES=(
   fnm
   fx
   fzf
-  # Bookworm tracking recent version already, can use apt
+  # Trixie tracking recent version already, can use apt
   # github-cli
-  goose
   helix
   hugo
   jj
   luals
-  # Use via flatpak due to conflict in glibc
-  # ncspot
   neovim
   pistol
-  psst
   sad
-  shfmt
   wezterm
   yazi
   yq
-  zellij
-  zoxide
 )
 
 print_usage() {
@@ -88,18 +73,71 @@ echo_stderr() {
   >&2 echo "${@}"
 }
 
+get_current_arch() {
+  case "$(uname -m)" in
+    x86_64) echo "amd64" ;;  # Standardize to amd64 as primary
+    aarch64) echo "arm64" ;; # Standardize to arm64 as primary
+    *)
+      echo_stderr "Error: Unsupported architecture: $(uname -m)"
+      echo_stderr "Supported architectures: x86_64, aarch64"
+      exit 1
+      ;;
+  esac
+}
+
+get_arch_patterns() {
+  case "$(get_current_arch)" in
+    amd64) printf "amd64\nx86_64\n" ;;  # Try amd64 first, fallback to x86_64
+    arm64) printf "arm64\naarch64\n" ;; # Try arm64 first, fallback to aarch64
+  esac
+}
+
+expand_arch_template() {
+  local template="$1"
+  local arch="$2"
+  echo "${template//\{ARCH\}/$arch}"
+}
+
 get_latest_release_url() {
   local repo="$1"
-  local match="$2"
+  local match_template="$2"
   local urls
 
   local release_json_url="https://api.github.com/repos/${repo}/releases/latest"
-  urls=$(curl --silent "${release_json_url}" | jq -r '.assets[]?.browser_download_url' | grep "${match}")
-  if [[ -z "${urls}" ]]; then
-    echo_stderr "Error: Could not find url for ${repo} matching ${match}"
+  local release_json
+  release_json=$(curl --silent "${release_json_url}")
+
+  # If template contains {ARCH}, try each architecture pattern
+  if [[ "${match_template}" == *"{ARCH}"* ]]; then
+    local tried_patterns=()
+    while IFS= read -r arch; do
+      local match_pattern
+      match_pattern=$(expand_arch_template "${match_template}" "${arch}")
+      tried_patterns+=("${match_pattern}")
+      urls=$(echo "${release_json}" | jq -r '.assets[]?.browser_download_url' | grep "${match_pattern}")
+      if [[ -n "${urls}" ]]; then
+        echo "${urls}" | head -n 1
+        return 0
+      fi
+    done < <(get_arch_patterns)
+    echo_stderr "Error: Could not find url for ${repo} matching any of:"
+    for pattern in "${tried_patterns[@]}"; do
+      echo_stderr "  - ${pattern}"
+    done
+    echo_stderr "Available assets:"
+    echo "${release_json}" | jq -r '.assets[]?.browser_download_url' | while read -r url; do
+      echo_stderr "  - $(basename "$url")"
+    done
     exit 2
+  else
+    # Original behavior for non-templated patterns
+    urls=$(echo "${release_json}" | jq -r '.assets[]?.browser_download_url' | grep "${match_template}")
+    if [[ -z "${urls}" ]]; then
+      echo_stderr "Error: Could not find url for ${repo} matching ${match_template}"
+      exit 2
+    fi
+    echo "${urls}" | head -n 1
   fi
-  echo "${urls}" | head -n 1
 }
 
 install_bin() {
@@ -133,11 +171,11 @@ install_deb() {
   url="$(get_latest_release_url "${repo}" "${match}")"
 
   download_dir="$(mktemp --directory "${name}"XXX)"
-  pushd "${download_dir}" >/dev/null
+  pushd "${download_dir}" > /dev/null
   wget --quiet -O "${name}.deb" "${url}"
   echo "Installing ${repo} (requires sudo) ... "
   sudo dpkg -i "${name}.deb"
-  popd >/dev/null
+  popd > /dev/null
   rm -rf "${download_dir}"
 }
 
@@ -157,10 +195,10 @@ install_tarball() {
   local download_dir
   download_dir="$(mktemp --directory "${name}"XXX)"
 
-  pushd "${download_dir}" >/dev/null
+  pushd "${download_dir}" > /dev/null
   wget --quiet -O "${name}.tar.gz" "${url}"
   echo -n "Expanding ${name}.tar.gz ... "
-  tar xvf "${name}.tar.gz" >/dev/null
+  tar xvf "${name}.tar.gz" > /dev/null
   if [[ -f "${name}" ]]; then
     mv "${name}" "${install_location}/${name}"
   else
@@ -176,7 +214,7 @@ install_tarball() {
     fi
   fi
   chmod 755 "${install_location}/${name}"
-  popd >/dev/null
+  popd > /dev/null
   rm -rf "${download_dir}"
   echo "${name} installed"
 }
@@ -191,84 +229,109 @@ install_zip() {
   url="$(get_latest_release_url "${repo}" "${match}")"
 
   local install_location="$HOME/.local/bin"
+  mkdir -p "${install_location}"
 
   local download_dir
   download_dir="$(mktemp --directory "${name}"XXX)"
 
-  pushd "${download_dir}" >/dev/null
+  pushd "${download_dir}" > /dev/null
   wget --quiet -O "${name}.zip" "${url}"
   echo -n "Unzipping ${name}.zip ... "
   unzip -q -o -j -d . "${name}.zip"
-  mv "${name}" "${install_location}/${name}"
-  chmod 755 "${install_location}/${name}"
-  popd >/dev/null
+
+  if [[ -f "${name}" ]]; then
+    mv "${name}" "${install_location}/${name}"
+    chmod 755 "${install_location}/${name}"
+  else
+    echo_stderr "Error: Could not find ${name} in ${download_dir}"
+    echo_stderr "Available files:"
+    find "${download_dir}" -type f -exec basename {} \;
+    popd > /dev/null
+    rm -rf "${download_dir}"
+    exit 2
+  fi
+
+  popd > /dev/null
   rm -rf "${download_dir}"
   echo "${name} installed"
 }
 
 install_agg() {
-  install_bin 'asciinema/agg' 'agg-x86_64-unknown-linux-musl'
+  if [[ "$(get_current_arch)" == "arm64" ]]; then
+    echo_stderr "Warning: agg is not available for ARM64 architecture"
+    return 0
+  fi
+  install_bin 'asciinema/agg' 'agg-{ARCH}-unknown-linux-musl'
 }
 
 install_bun() {
-  install_zip 'oven-sh/bun' 'bun-linux-x64-baseline.zip'
-}
-
-install_ctop() {
-  install_bin 'bcicen/ctop' 'ctop-.*-linux-amd64'
+  # bun uses x64/aarch64 naming instead of standard patterns
+  case "$(get_current_arch)" in
+    amd64) install_zip 'oven-sh/bun' 'bun-linux-x64.zip' ;;
+    arm64) install_zip 'oven-sh/bun' 'bun-linux-aarch64.zip' ;;
+  esac
 }
 
 install_delta() {
-  install_deb 'dandavison/delta' 'git-delta_.*_amd64.deb'
+  install_deb 'dandavison/delta' 'git-delta_.*_{ARCH}.deb'
 }
 
 install_difftastic() {
-  install_tarball 'wilfred/difftastic' 'difft-x86_64-unknown-linux-gnu.tar.gz' 'difft'
+  install_tarball 'wilfred/difftastic' 'difft-{ARCH}-unknown-linux-gnu.tar.gz' 'difft'
 }
 
 install_docker_compose() {
-  install_bin 'docker/compose' 'linux-x86_64' 'docker-compose'
+  install_bin 'docker/compose' 'linux-{ARCH}' 'docker-compose'
 }
 
 install_github_cli() {
-  install_deb 'cli/cli' 'gh_.*_linux_amd64.deb'
+  install_deb 'cli/cli' 'gh_.*_linux_{ARCH}.deb'
 }
 
 install_f2() {
-  install_deb 'ayoisaiah/f2' 'f2_.*_linux_amd64.deb'
+  install_deb 'ayoisaiah/f2' 'f2_.*_linux_{ARCH}.deb'
 }
 
 install_fnm() {
-  install_zip 'Schniz/fnm' 'fnm-linux.zip'
+  # fnm uses different naming: x64 for amd64, arm64 for arm64
+  case "$(get_current_arch)" in
+    amd64) install_zip 'Schniz/fnm' 'fnm-linux.zip' ;;
+    arm64) install_zip 'Schniz/fnm' 'fnm-arm64.zip' ;;
+  esac
 }
 
 install_fx() {
-  install_bin 'antonmedv/fx' 'fx_linux_amd64'
+  install_bin 'antonmedv/fx' 'fx_linux_{ARCH}'
 }
 
 install_fzf() {
-  install_tarball 'junegunn/fzf' 'fzf-.*-linux_amd64.tar.gz'
-}
-
-install_goose() {
-  install_tarball 'block/goose' 'goose-x86_64-unknown-linux-gnu.tar.bz2'
+  install_tarball 'junegunn/fzf' 'fzf-.*-linux_{ARCH}.tar.gz'
 }
 
 install_helix() {
-  install_bin 'helix-editor/helix' 'x86_64.AppImage' 'hx'
+  if [[ "$(get_current_arch)" == "arm64" ]]; then
+    echo_stderr "Warning: helix is not available for ARM64 architecture"
+    return 0
+  fi
+  # helix AppImage uses architecture-specific naming
+  install_bin 'helix-editor/helix' '{ARCH}.AppImage' 'hx'
 }
 
 install_hugo() {
-  install_deb 'gohugoio/hugo' 'hugo_extended_.*_linux-amd64.deb'
+  install_deb 'gohugoio/hugo' 'hugo_extended_.*_linux-{ARCH}.deb'
 }
 
 install_jj() {
-  install_tarball 'jj-vcs/jj' 'jj-v.*-x86_64-unknown-linux-musl.tar.gz'
+  install_tarball 'jj-vcs/jj' 'jj-v.*-{ARCH}-unknown-linux-musl.tar.gz'
 }
 
 install_lua_language_server() {
   local url
-  url="$(get_latest_release_url 'LuaLS/lua-language-server' 'lua-language-server-.*-linux-x64.tar.gz')"
+  # lua-language-server uses x64/arm64 naming instead of standard patterns
+  case "$(get_current_arch)" in
+    amd64) url="$(get_latest_release_url 'LuaLS/lua-language-server' 'lua-language-server-.*-linux-x64.tar.gz')" ;;
+    arm64) url="$(get_latest_release_url 'LuaLS/lua-language-server' 'lua-language-server-.*-linux-arm64.tar.gz')" ;;
+  esac
   local name="lua-language-server"
 
   local install_location="$HOME/.local/share/lua-language-server"
@@ -277,24 +340,20 @@ install_lua_language_server() {
   local download_dir
   download_dir="$(mktemp --directory "${name}"XXX)"
 
-  pushd "${download_dir}" >/dev/null
+  pushd "${download_dir}" > /dev/null
   wget --quiet -O "${name}.tar.gz" "${url}"
   echo -n "Expanding ${name}.tar.gz ... "
-  tar xzvf "${name}.tar.gz" -C "${install_location}" >/dev/null
+  tar xzvf "${name}.tar.gz" -C "${install_location}" > /dev/null
 
   # Binary is symlinked via stow
 
-  popd >/dev/null
+  popd > /dev/null
   rm -rf "${download_dir}"
   echo "${name} installed"
 }
 
-install_ncspot() {
-  install_tarball 'hrkfdn/ncspot' 'ncspot-v.*-linux-x86_64.tar.gz'
-}
-
 install_sad() {
-  install_deb 'ms-jpq/sad' 'x86_64-unknown-linux-gnu.deb'
+  install_deb 'ms-jpq/sad' '{ARCH}-unknown-linux-gnu.deb'
 }
 
 install_neovim_stable() {
@@ -303,7 +362,7 @@ install_neovim_stable() {
 
   echo -n "Installing neovim stable ... "
   mkdir -p "$(dirname "${vim_path}")"
-  url="$(get_latest_release_url "neovim/neovim" "nvim-linux-x86_64.appimage")"
+  url="$(get_latest_release_url "neovim/neovim" "nvim-linux-{ARCH}.appimage")"
   wget "${url}" --quiet --output-document "$vim_path"
   chmod +x "$vim_path"
   echo "neovim stable installed"
@@ -315,7 +374,7 @@ install_neovim_stable() {
     (
       cd "${vim_appimage_dir_path}"
       mv "${vim_path}" .
-      "${vim_appimage_dir_path}/nvim" --appimage-extract >/dev/null
+      "${vim_appimage_dir_path}/nvim" --appimage-extract > /dev/null
       ln -s "${vim_appimage_dir_path}/squashfs-root/AppRun" "${vim_path}"
     )
   fi
@@ -328,7 +387,7 @@ install_neovim_stable() {
   fi
 
   # Don't try to set alternatives if not available
-  if ! update-alternatives --query vim &>/dev/null; then
+  if ! update-alternatives --query vim &> /dev/null; then
     >&2 echo "update-alternatives not available for vim, skipping"
     return
   fi
@@ -345,28 +404,7 @@ install_neovim_stable() {
 }
 
 install_pistol() {
-  install_bin 'doronbehar/pistol' 'pistol-static-linux-x86_64'
-}
-
-install_psst() {
-  # One-off due to being a .deb which is in a .zip
-  local name="psst"
-  local repo="jpochyla/psst"
-  local url="https://nightly.link/jpochyla/psst/workflows/build/main/psst-deb-amd64.zip"
-
-  download_dir="$(mktemp --directory "${name}"XXX)"
-  pushd "${download_dir}" >/dev/null
-  wget --quiet -O "${name}.zip" "${url}"
-  echo -n "Unzipping ${name}.zip ... "
-  unzip -q -o -j -d . "${name}.zip"
-  echo "Installing ${repo} (requires sudo) ... "
-  sudo dpkg -i psst*.deb
-  popd >/dev/null
-  rm -rf "${download_dir}"
-}
-
-install_shfmt() {
-  install_bin 'mvdan/sh' 'shfmt_v.*_linux_amd64' 'shfmt'
+  install_bin 'doronbehar/pistol' 'pistol-static-linux-{ARCH}'
 }
 
 install_wezterm() {
@@ -376,7 +414,7 @@ install_wezterm() {
 install_yazi() {
   local url
   # musl version because Bookworm is old and yazi requires a newer glibc (2.39)
-  url="$(get_latest_release_url "sxyazi/yazi" "yazi-x86_64-unknown-linux-musl.zip")"
+  url="$(get_latest_release_url "sxyazi/yazi" "yazi-{ARCH}-unknown-linux-musl.zip")"
 
   local bin_location="$HOME/.local/bin"
   local completion_location="/home/fortes/.local/completion.d/"
@@ -384,7 +422,7 @@ install_yazi() {
   local download_dir
   download_dir="$(mktemp --directory yaziXXX)"
 
-  pushd "${download_dir}" >/dev/null
+  pushd "${download_dir}" > /dev/null
   wget --quiet -O yazi.zip "${url}"
   echo -n "Unzipping yazi.zip ... "
   unzip -q -o -j -d . yazi.zip
@@ -392,21 +430,13 @@ install_yazi() {
   mv -t "${bin_location}" {ya,yazi}
   chmod 755 "${bin_location}"/{ya,yazi}
   mv -t "${completion_location}" yazi.bash
-  popd >/dev/null
+  popd > /dev/null
   rm -rf "${download_dir}"
   echo "yazi installed"
 }
 
 install_yq() {
-  install_bin 'mikefarah/yq' 'yq_linux_amd64'
-}
-
-install_zellij() {
-  install_tarball 'zellij-org/zellij' 'zellij-x86_64-unknown-linux-musl.tar.gz'
-}
-
-install_zoxide() {
-  install_deb 'ajeetdsouza/zoxide' 'zoxide_.*_amd64.deb'
+  install_bin 'mikefarah/yq' 'yq_linux_{ARCH}'
 }
 
 install_github_packages() {
@@ -426,10 +456,10 @@ install_github_packages() {
 
   while (("$#")); do
     case "${1}" in
-    -h | --help)
-      print_usage
-      exit 0
-      ;;
+      -h | --help)
+        print_usage
+        exit 0
+        ;;
     esac
     shift
   done
@@ -443,91 +473,70 @@ install_github_packages() {
 
   for package in "${packages[@]}"; do
     case "${package}" in
-    agg)
-      install_agg
-      ;;
-    bun)
-      install_bun
-      ;;
-    ctop)
-      install_ctop
-      ;;
-    delta)
-      install_delta
-      ;;
-    difftastic)
-      install_difftastic
-      ;;
-    docker-compose)
-      install_docker_compose
-      ;;
-    github-cli)
-      install_github_cli
-      ;;
-    f2)
-      install_f2
-      ;;
-    fnm)
-      install_fnm
-      ;;
-    fx)
-      install_fx
-      ;;
-    fzf)
-      install_fzf
-      ;;
-    goose)
-      install_goose
-      ;;
-    helix)
-      install_helix
-      ;;
-    hugo)
-      install_hugo
-      ;;
-    luals)
-      install_lua_language_server
-      ;;
-    ncspot)
-      install_ncspot
-      ;;
-    neovim)
-      install_neovim_stable
-      ;;
-    jj)
-      install_jj
-      ;;
-    pistol)
-      install_pistol
-      ;;
-    psst)
-      [[ -z "${IS_HEADLESS:-}" ]] && install_psst
-      ;;
-    sad)
-      install_sad
-      ;;
-    shfmt)
-      install_shfmt
-      ;;
-    wezterm)
-      [[ -z "${IS_HEADLESS:-}" ]] && install_wezterm
-      ;;
-    yazi)
-      install_yazi
-      ;;
-    yq)
-      install_yq
-      ;;
-    zellij)
-      install_zellij
-      ;;
-    zoxide)
-      install_zoxide
-      ;;
-    *)
-      echo_stderr "Error: Unrecognized package: ${package}"
-      exit 1
-      ;;
+      agg)
+        install_agg
+        ;;
+      bun)
+        install_bun
+        ;;
+      delta)
+        install_delta
+        ;;
+      difftastic)
+        install_difftastic
+        ;;
+      docker-compose)
+        install_docker_compose
+        ;;
+      github-cli)
+        install_github_cli
+        ;;
+      f2)
+        install_f2
+        ;;
+      fnm)
+        install_fnm
+        ;;
+      fx)
+        install_fx
+        ;;
+      fzf)
+        install_fzf
+        ;;
+      helix)
+        install_helix
+        ;;
+      hugo)
+        install_hugo
+        ;;
+      luals)
+        install_lua_language_server
+        ;;
+      neovim)
+        install_neovim_stable
+        ;;
+      jj)
+        install_jj
+        ;;
+      pistol)
+        install_pistol
+        ;;
+      sad)
+        install_sad
+        ;;
+      wezterm)
+        [[ -z "${IS_HEADLESS:-}" ]] && install_wezterm
+        ;;
+      yazi)
+        install_yazi
+        ;;
+      yq)
+        install_yq
+        ;;
+      *)
+        echo_stderr "Error: Unrecognized package: ${package}"
+        exit 1
+        ;;
     esac
   done
 

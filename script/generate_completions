@@ -19,57 +19,57 @@ generate_completions() {
   echo -n "… Generating completions & man pages"
 
   if command_exists aider; then
-    aider --shell-completions bash >"${completion_dir}/aider_completion"
+    aider --shell-completions bash > "${completion_dir}/aider_completion"
   fi
 
   if command_exists beet; then
-    beet completion >"${completion_dir}/beet_completion"
+    beet completion > "${completion_dir}/beet_completion"
   fi
 
   if command_exists bun; then
-    SHELL=bash bun completions "${completion_dir}" >"${completion_dir}/bun.completion.bash"
+    SHELL=bash bun completions "${completion_dir}" > "${completion_dir}/bun.completion.bash"
   fi
 
   if command_exists delta; then
-    delta --generate-completion bash >"${completion_dir}/delta_completion"
+    delta --generate-completion bash > "${completion_dir}/delta_completion"
   fi
 
   if command_exists deno; then
-    deno completions bash >"${completion_dir}/deno_completion"
+    deno completions bash > "${completion_dir}/deno_completion"
   fi
 
   if command_exists fnm; then
-    fnm completions >"${completion_dir}/fnm_completion"
+    fnm completions > "${completion_dir}/fnm_completion"
   fi
 
   if command_exists gh; then
-    gh completion -s bash >"${completion_dir}/gh_completion"
+    gh completion -s bash > "${completion_dir}/gh_completion"
   fi
 
   if command_exists hugo; then
-    hugo completion bash >"${completion_dir}/hugo_completion"
-    hugo gen man --dir "${man_dir_path}" >/dev/null
+    hugo completion bash > "${completion_dir}/hugo_completion"
+    hugo gen man --dir "${man_dir_path}" > /dev/null
   fi
 
   # TODO: This fails to find node in some cases
   if command_exists npm; then
-    npm completion >"${completion_dir}/npm_completion"
+    npm completion > "${completion_dir}/npm_completion"
   fi
 
   if command_exists pipx; then
-    register-python-argcomplete --shell bash pipx >"${completion_dir}/pipx_completion"
+    register-python-argcomplete --shell bash pipx > "${completion_dir}/pipx_completion"
   fi
 
   if command_exists uv; then
-    uv generate-shell-completion bash >"${completion_dir}/uv_completion"
+    uv generate-shell-completion bash > "${completion_dir}/uv_completion"
   fi
 
   if command_exists wezterm; then
-    wezterm shell-completion --shell bash >"${completion_dir}/wezterm_completion"
+    wezterm shell-completion --shell bash > "${completion_dir}/wezterm_completion"
   fi
 
   if command_exists yq; then
-    yq shell-completion bash >"${completion_dir}/yq_completion"
+    yq shell-completion bash > "${completion_dir}/yq_completion"
   fi
 
   echo -e "\r\033[K✓ Completions generated"

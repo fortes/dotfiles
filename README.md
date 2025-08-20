@@ -97,9 +97,7 @@ Once you've run setup, you'll still have to do the following universal manual st
    # Make sure `ENABLE_GITHUB_COPILOT` variable is set in `~/.profile.local`
    ```
 
-7. Log into Spotify via `ncspot` and `psst`
-
-8. Add keys for `llm` via `llm keys set xxx` (or copy over from another machine from `~/.config/io.datasette.llm`)
+7. Add keys for `llm` via `llm keys set xxx` (or copy over from another machine from `~/.config/io.datasette.llm`)
 
 ## Ignoring changes to a file
 
@@ -344,9 +342,13 @@ This will list out all the packages installed, then need to search through to ma
 
 - [ ] Check out [harper](https://writewithharper.com/docs/integrations/neovim) for grammar checking using LSP
 - [ ] Install `m4xshen/hardtime.nvim` for improving vim motions
+- [ ] Debian Trixie upgrade
+  - [ ] Need to run `apt modernize-sources` to update source format
+    - [ ] Check scripts to make sure we use the new source format as well
+    - [ ] Look at using `extrepo`? [Lots of sources](https://salsa.debian.org/extrepo-team/extrepo-data/-/tree/master/repos/debian) can probably get rid of a bunch of manual addition
+  - [ ] Figure out what's wrong with `/etc/sysctl.d` on Docker Mac
 - [ ] Set up [network share](https://www.reddit.com/r/Crostini/wiki/howto/addnetworkshares/) in Crostini
 - [ ] Look into publishing a docker container via GitHub actions
-- [ ] `exa` is now unmaintained, need to either go to [eza](https://github.com/eza-community/eza) or `lsd`
 - [ ] Move from `docker` to `podman`
 - [ ] Get `devcontainer` setup for this repo
 - [ ] Get remote VSCode settings synced up as well, currently in `~/.vscode-server/data/Machine`

@@ -30,24 +30,16 @@ if command_exists ctop; then
   alias ctop='TERM="${TERM/#tmux/screen}" sudo ~/.local/bin/ctop'
 fi
 
-# exa deprecated, eza the fork
-eza_name=""
-if command_exists exa; then
-  eza_name="exa"
-elif command_exists eza; then
-  eza_name="eza"
-fi
-
-if [[ -n "${eza_name:-}" ]]; then
+if command_exists eza; then
   # Purposefully binding the variable immediately
   # shellcheck disable=SC2139
-  alias ls="${eza_name} --group-directories-first --classify"
+  alias ls="eza --group-directories-first --classify"
   # shellcheck disable=SC2139
-  alias la="${eza_name} --all --group-directories-first --classify"
+  alias la="eza --all --group-directories-first --classify"
   # shellcheck disable=SC2139
-  alias ll="${eza_name} --header --git --long --group-directories-first --classify"
+  alias ll="eza --header --git --long --group-directories-first --classify"
   # shellcheck disable=SC2139
-  alias ltree="${eza_name} --header --git --long --tree --level=2 --group-directories-first --classify"
+  alias ltree="eza --header --git --long --tree --level=2 --group-directories-first --classify"
 else
   # Map ls to be colorful and reasonable defaults
   if uname | grep -q Darwin; then
@@ -71,19 +63,10 @@ fi
 if command_exists bat; then
   alias batcat='bat'
 fi
-if command_exists eza; then
-  alias exa='eza'
-fi
 
 if command_exists code; then
   # Override Mac's default storage dir to match Linux
   alias code='code --user-data-dir="${XDG_CONFIG_HOME}/Code"'
-fi
-
-# Flatpak aliases
-if command_exists flatpak; then
-  # Make sure to use config from `~/.config`, not `~/.var/app/xxx`
-  alias ncspot='flatpak run io.github.hrkfdn.ncspot --config "${XDG_CONFIG_HOME}/ncspot/config.toml"'
 fi
 
 # Load local file if present

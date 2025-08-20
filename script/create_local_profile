@@ -25,7 +25,7 @@ main() {
     -z "${WAYLAND_DISPLAY:-}" ]] && printf 1)
   set -e
 
-  cat <<PROFILE_TEMPLATE
+  cat << PROFILE_TEMPLATE
 # Generated $(date +%F)
 export IS_CROSTINI="${is_crostini:-}"
 export IS_DOCKER="${is_docker:-}"

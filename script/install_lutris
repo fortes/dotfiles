@@ -19,7 +19,7 @@ install_lutris() {
 
     echo "Lutris sources list missing, adding (requires sudo)"
     echo "deb [signed-by=${lutris_key_path}] https://download.opensuse.org/repositories/home:/strycore/Debian_12/ ./" |
-      sudo tee "$lutris_sources_list" >/dev/null
+      sudo tee "$lutris_sources_list" > /dev/null
 
     echo "Lutris sources added, updating packages"
     sudo -E apt-get update -qq
