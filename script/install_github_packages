@@ -17,8 +17,6 @@
 # - helix
 # - hugo (latest)
 # - jj
-# - lazydocker
-# - lazygit
 # - luals
 # - ncspot
 # - neovim (latest)
@@ -60,8 +58,6 @@ AVAILABLE_PACKAGES=(
   helix
   hugo
   jj
-  lazydocker
-  lazygit
   luals
   # Use via flatpak due to conflict in glibc
   # ncspot
@@ -274,14 +270,6 @@ install_hugo() {
 
 install_jj() {
   install_tarball 'jj-vcs/jj' 'jj-v.*-x86_64-unknown-linux-musl.tar.gz'
-}
-
-install_lazydocker() {
-  install_tarball 'jesseduffield/lazydocker' 'lazydocker_.*_Linux_x86_64.tar.gz'
-}
-
-install_lazygit() {
-  install_tarball 'jesseduffield/lazygit' 'lazygit_.*_Linux_x86_64.tar.gz'
 }
 
 install_lua_language_server() {
@@ -505,12 +493,6 @@ install_github_packages() {
       ;;
     hugo)
       install_hugo
-      ;;
-    lazydocker)
-      install_lazydocker
-      ;;
-    lazygit)
-      install_lazygit
       ;;
     luals)
       install_lua_language_server
