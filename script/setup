@@ -6,7 +6,7 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 if uname -s | grep -q Darwin; then
   exec "${script_dir}/setup_mac" "$@"
-elif command -v apt >/dev/null 2>&1; then
+elif command -v apt > /dev/null 2>&1; then
   exec "${script_dir}/setup_linux" "$@"
 else
   >&2 echo 'Unsupported OS'

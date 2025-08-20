@@ -26,7 +26,7 @@ EOF
 }
 
 cleanup_apt() {
-  if command -v apt >/dev/null 2>&1; then
+  if command -v apt > /dev/null 2>&1; then
     echo "Cleaning up APT (requires sudo)..."
     sudo apt autoremove -y
     sudo apt autoclean
@@ -35,7 +35,7 @@ cleanup_apt() {
 }
 
 cleanup_brew() {
-  if command -v brew >/dev/null 2>&1; then
+  if command -v brew > /dev/null 2>&1; then
     echo "Cleaning up Homebrew..."
     brew cleanup --prune=all
     brew autoremove
@@ -43,7 +43,7 @@ cleanup_brew() {
 }
 
 cleanup_docker() {
-  if command -v docker >/dev/null 2>&1 && docker info >/dev/null 2>&1; then
+  if command -v docker > /dev/null 2>&1 && docker info > /dev/null 2>&1; then
     echo "Cleaning up Docker..."
     docker system prune -af
     docker volume prune -f
@@ -54,21 +54,21 @@ cleanup_docker() {
 }
 
 cleanup_npx() {
-  if command -v npx >/dev/null 2>&1; then
+  if command -v npx > /dev/null 2>&1; then
     echo "Cleaning up npx cache..."
-    npx clear-npx-cache 2>/dev/null || true
+    npx clear-npx-cache 2> /dev/null || true
   fi
 }
 
 cleanup_pip() {
-  if command -v pip >/dev/null 2>&1; then
+  if command -v pip > /dev/null 2>&1; then
     echo "Cleaning up pip cache..."
-    pip cache purge 2>/dev/null || true
+    pip cache purge 2> /dev/null || true
   fi
 }
 
 cleanup_uv() {
-  if command -v uv >/dev/null 2>&1; then
+  if command -v uv > /dev/null 2>&1; then
     echo "Cleaning up uv cache..."
     uv cache clean
   fi
@@ -87,7 +87,7 @@ main() {
 
 # Handle arguments
 case "${1:-}" in
-  -h|--help)
+  -h | --help)
     usage
     exit 0
     ;;

@@ -12,6 +12,17 @@ dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # Make sure not to get stuck on any prompts
 export DEBIAN_FRONTEND=noninteractive
 
+# Common apt-get arguments
+declare -r APT_ARGS=(
+  -qq
+  -o=Dpkg::Use-Pty=0
+  -o=Dpkg::Progress-Fancy=0
+  -o=APT::Get::Show-Progress=false
+  --assume-yes
+  --fix-broken
+  --no-install-recommends
+)
+
 HEADLESS_PACKAGES=(
   # For yazi
   7zip
@@ -34,8 +45,8 @@ HEADLESS_PACKAGES=(
   curl
   dnsutils
   duf
-  exa
   exiv2
+  eza
   fd-find
   ffmpeg
   # Required for `yazi`
@@ -89,7 +100,7 @@ HEADLESS_PACKAGES=(
   ripgrep
   rsync
   shellcheck
-  software-properties-common
+  shfmt
   speedtest-cli
   ssh
   ssh-import-id
@@ -97,8 +108,7 @@ HEADLESS_PACKAGES=(
   stow
   sudo
   tig
-  # Pick up tmux 3.4 which has sixel support
-  tmux/bookworm-backports
+  tmux
   trash-cli
   unzip
   vifm
@@ -107,9 +117,8 @@ HEADLESS_PACKAGES=(
   wget
   yank
   yq
-  yt-dlp/bookworm-backports
-  # Debian version ancient, get from `install_github_packages`
-  # zoxide
+  yt-dlp
+  zoxide
 )
 
 GUI_PACKAGES=(
@@ -148,7 +157,6 @@ GUI_PACKAGES=(
   pipewire
   playerctl
   pulseaudio
-  software-properties-common
   sway
   sway-backgrounds
   sway-notification-center
@@ -186,9 +194,8 @@ check_prerequisites() {
   if ! command_exists lsb_release || ! command_exists add-apt-repository; then
     echo "Installing add-apt-repository and lsb-release (requires sudo)"
     apt_update_once
-    sudo -E apt-get install -qq -o=Dpkg::Use-Pty=0 --assume-yes \
-      --fix-broken --no-install-recommends \
-      software-properties-common lsb-release
+    sudo -E apt-get install "${APT_ARGS[@]}" \
+      lsb-release
   fi
 
   if ! lsb_release -ds | tail -n 1 | grep -iq debian; then
@@ -200,14 +207,21 @@ echo_stderr() {
   >&2 echo "${@}"
 }
 
+# NOTE: Does not work on Docker, which relies on host config
 increase_max_watchers() {
-  declare -r conf_file_path="/etc/sysctl.d/20-increase-max-watchers.conf"
+  declare -r sysctl_conf_path="/etc/sysctl.d"
+  declare -r conf_file_path="${sysctl_conf_path}/20-increase-max-watchers.conf"
   declare -r max_watches="524288"
+
+  if [ ! -d "${sysctl_conf_path}" ]; then
+    echo "Creating sysctl.d directory (requires sudo)"
+    sudo mkdir -p "${sysctl_conf_path}"
+  fi
 
   if [ ! -f "$conf_file_path" ]; then
     echo "Increasing max watchers (requires sudo)"
     echo "fs.inotify.max_user_watches=$max_watches" |
-      sudo tee -a "$conf_file_path" &>/dev/null && sudo sysctl -p
+      sudo tee -a "$conf_file_path" &> /dev/null && sudo sysctl -p
     echo "Max watchers set to $max_watches"
   fi
 }
@@ -229,8 +243,7 @@ install_apt_packages() {
   apt_update_once
 
   echo "Ensuring apt packages installed (requires sudo)"
-  sudo -E apt-get install -qq -o=Dpkg::Use-Pty=0 --assume-yes \
-    --fix-broken --no-install-recommends "${apt_packages[@]}"
+  sudo -E apt-get install "${APT_ARGS[@]}" "${apt_packages[@]}"
   echo "Apt packages installed"
 }
 
@@ -243,12 +256,12 @@ is_package_installed() {
 }
 
 set_default_applications() {
-  if command_exists nvim && update-alternatives --query editor &>/dev/null && ! update-alternatives --query editor | grep ^Value | grep -q nvim; then
+  if command_exists nvim && update-alternatives --query editor &> /dev/null && ! update-alternatives --query editor | grep ^Value | grep -q nvim; then
     echo "Setting Neovim as default text editor (requires sudo)"
     sudo update-alternatives --install /usr/bin/editor editor "$(command -v nvim)" 60
   fi
 
-  if command_exists wezterm && update-alternatives --query x-terminal-emulator &>/dev/null && ! update-alternatives --query x-terminal-emulator | grep ^Value | grep -q wezterm; then
+  if command_exists wezterm && update-alternatives --query x-terminal-emulator &> /dev/null && ! update-alternatives --query x-terminal-emulator | grep ^Value | grep -q wezterm; then
     echo "Setting WezTerm as default terminal (requires sudo)"
     sudo update-alternatives --set x-terminal-emulator "$(command -v wezterm)"
   fi
@@ -258,16 +271,21 @@ setup_backports() {
   declare -r codename="$(lsb_release -cs | tail -n 1)"
 
   # WSL comes with backports pre-enabled
-  if grep -q "${codename}-backports" /etc/apt/sources.list{,.d/*} 2>/dev/null; then
+  if grep -q "${codename}-backports" /etc/apt/sources.list{,.d/*} 2> /dev/null; then
     echo "Backports already in sources.list"
     return
   fi
 
-  declare -r sources_path="/etc/apt/sources.list.d/backports.list"
+  declare -r sources_path="/etc/apt/sources.list.d/backports.sources"
 
   echo "${codename}-backports not in sources.list, adding (requires sudo)"
-  echo "deb http://ftp.debian.org/debian ${codename}-backports main contrib non-free non-free-firmware" |
-    sudo tee "$sources_path" &>/dev/null
+  sudo tee "$sources_path" > /dev/null <<EOF
+Types: deb
+URIs: http://ftp.debian.org/debian
+Suites: ${codename}-backports
+Components: main contrib non-free non-free-firmware
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+EOF
 
   # New source requires forced updates
   has_updated=""
@@ -277,8 +295,7 @@ setup_docker() {
   if ! is_package_installed docker.io; then
     apt_update_once
     echo "Installing docker (requires sudo)"
-    sudo -E apt-get install -qq -o=Dpkg::Use-Pty=0 --assume-yes \
-      --fix-broken --no-install-recommends \
+    sudo -E apt-get install "${APT_ARGS[@]}" \
       docker.io
   fi
 
@@ -313,8 +330,7 @@ setup_locale() {
     apt_update_once
 
     echo "Installing locales package (requires sudo)"
-    sudo -E apt-get install -qq -o=Dpkg::Use-Pty=0 --assume-yes \
-      --fix-broken --no-install-recommends \
+    sudo -E apt-get install "${APT_ARGS[@]}" \
       locales
   fi
 
@@ -325,7 +341,7 @@ setup_locale() {
     echo "Setting locale to ${locale}"
     sudo sudo -E dpkg-reconfigure --frontend=noninteractive locales &&
       sudo -E update-locale LANG=${locale}
-    sudo debconf-set-selections -c <<<"locales locales/default_environment_locale select ${locale}"
+    sudo debconf-set-selections -c <<< "locales locales/default_environment_locale select ${locale}"
   fi
 }
 
@@ -343,9 +359,9 @@ setup_nonfree() {
   elif ! grep -q non-free /etc/apt/sources.list; then
     # Assume contrib and non-free always travel together
     echo "Adding contrib & non-free to sources (requires sudo)"
-    sudo -E add-apt-repository --no-update --yes contrib >/dev/null
-    sudo -E add-apt-repository --no-update --yes non-free >/dev/null
-    sudo -E add-apt-repository --no-update --yes non-free-firmware >/dev/null
+    sudo -E add-apt-repository --no-update --yes contrib > /dev/null
+    sudo -E add-apt-repository --no-update --yes non-free > /dev/null
+    sudo -E add-apt-repository --no-update --yes non-free-firmware > /dev/null
 
     # New source requires forced updates
     has_updated=""
@@ -374,18 +390,18 @@ main() {
   # Parse arguments
   while [[ $# -gt 0 ]]; do
     case "$1" in
-    --apt-only)
-      apt_only=1
-      ;;
-    --help | -h)
-      usage
-      exit 0
-      ;;
-    *)
-      echo_stderr "Unknown argument: $1"
-      usage
-      exit 1
-      ;;
+      --apt-only)
+        apt_only=1
+        ;;
+      --help | -h)
+        usage
+        exit 0
+        ;;
+      *)
+        echo_stderr "Unknown argument: $1"
+        usage
+        exit 1
+        ;;
     esac
     shift
   done
@@ -401,7 +417,7 @@ main() {
 
   if [[ ! -f "${local_profile_path}" ]]; then
     echo "Generating ${local_profile_path}"
-    "${dotfiles_root}/script/create_local_profile" >"${local_profile_path}"
+    "${dotfiles_root}/script/create_local_profile" > "${local_profile_path}"
   fi
 
   # shellcheck source=/dev/null
@@ -412,8 +428,7 @@ main() {
   install_apt_packages
   # Don't install 1Password GUI for now, it's not working properly
   IS_HEADLESS=1 "${dotfiles_root}/script/install_1password"
-  [[ -z "${IS_DOCKER:-}" ]] && "${dotfiles_root}/script/install_flatpak_packages"
-  [[ -z "${IS_CROSTINI:-}" ]] && [[ -z "${IS_DOCKER:-}" ]] && \
+  [[ -z "${IS_CROSTINI:-}" ]] && [[ -z "${IS_DOCKER:-}" ]] &&
     "${dotfiles_root}/script/install_snap_packages"
   [[ -z "${IS_DOCKER:-}" ]] && "${dotfiles_root}/script/install_et"
   [[ -z "${IS_HEADLESS:-}" ]] && "${dotfiles_root}/script/install_firefox"
@@ -424,10 +439,10 @@ main() {
   "${dotfiles_root}/script/stow"
 
   # Misc system configs
-  increase_max_watchers
-  pushd "${dotfiles_root}" >/dev/null
+  [[ -z "${IS_DOCKER:-}" ]] && increase_max_watchers
+  pushd "${dotfiles_root}" > /dev/null
   "${dotfiles_root}/script/lock_local_files"
-  popd >/dev/null
+  popd > /dev/null
   set_default_applications
   [[ -z "${IS_DOCKER:-}" ]] && setup_docker
   setup_keyboard
