@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+# Find and list all Neovim server sockets on the system
+#
+# Usage `list-nvim-sockets [-h|--help]`
+
+set -euo pipefail
+
+SCRIPT_NAME="$(basename "${BASH_SOURCE[0]}")"
+readonly SCRIPT_NAME
+
+usage() {
+  cat <<EOF
+Usage: ${SCRIPT_NAME} [-h|--help]
+
+List all Neovim server sockets on the system.
+
+Options:
+  -h, --help    Show this help message and exit
+EOF
+}
+
+# Use Neovim's standard runtime directory (does not seem to work on Mac)
+list_from_stdpath() {
+  if command -v nvim >/dev/null 2>&1; then
+    local run_dir
+    run_dir="$(nvim --headless -c 'echo stdpath("run")' +qa 2>/dev/null || true)"
+    if [[ -n "${run_dir}" && -d "${run_dir}" ]]; then
+      find "${run_dir}" -maxdepth 3 -type s 2>/dev/null || true
+    fi
+  fi
+}
+
+# Required for Mac
+list_from_tmp() {
+  local search_dirs=()
+  [[ -n "${TMPDIR:-}" ]] && search_dirs+=("${TMPDIR%/}")
+  [[ -d "/tmp" ]] && search_dirs+=("/tmp")
+  [[ -d "/private/tmp" ]] && search_dirs+=("/private/tmp")
+
+  for d in "${search_dirs[@]}"; do
+    # Look for nvim sockets (typically in nvim.*/0 or similar patterns)
+    find "${d}" -maxdepth 3 -type s -path '*nvim*' 2>/dev/null || true
+  done
+}
+
+main() {
+  for arg in "$@"; do
+    case "$arg" in
+    -h | --help)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "Error: Unknown option: $arg" >&2
+      echo "Try '${SCRIPT_NAME} --help' for more information." >&2
+      exit 1
+      ;;
+    esac
+  done
+
+  # Find and list sockets
+  {
+    list_from_stdpath
+    list_from_tmp
+  } | awk '!seen[$0]++' # Remove duplicates
+}
+
+# Only run main if script is executed directly (not sourced)
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  main "$@"
+fi

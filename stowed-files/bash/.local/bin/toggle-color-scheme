@@ -20,7 +20,7 @@ main() {
     else
       new_theme="light"
     fi
-  elif  [[ "${new_theme}" != "light" && "${new_theme}" != "dark" ]]; then
+  elif [[ "${new_theme}" != "light" && "${new_theme}" != "dark" ]]; then
     echo "Error: Invalid theme. Use 'light' or 'dark'." >&2
     exit 1
   fi
@@ -46,7 +46,7 @@ main() {
 }
 
 get_current_color_theme() {
-  if tmux has-session > /dev/null 2>&1; then
+  if tmux has-session >/dev/null 2>&1; then
     local tmux_value
     tmux_value="$(tmux show-environment -g COLOR_THEME 2>/dev/null || true)"
     if [[ -n "${tmux_value}" ]]; then
@@ -57,7 +57,7 @@ get_current_color_theme() {
 
   if [[ -n "${COLOR_THEME:-}" ]]; then
     echo "${COLOR_THEME}"
-    return;
+    return
   fi
 
   # Get terminal background color and extract red channel
@@ -78,7 +78,7 @@ update_cmus_colors() {
   local new_theme
   new_theme="${1:-}"
 
-  if pgrep -x cmus > /dev/null; then
+  if pgrep -x cmus >/dev/null; then
     if [[ "${new_theme}" == "light" ]]; then
       cmus-remote -C "colorscheme xterm-white"
     else
@@ -90,29 +90,36 @@ update_cmus_colors() {
 # Check if neovim is running and update its colors if so
 update_neovim_colors() {
   local new_theme
-  local neovim_socket_dir
+  local sockets_output
 
   new_theme="${1:-}"
-  neovim_socket_dir="$(dirname "$(nvim --headless -c 'echo v:servername' +qa 2>&1)")"
 
-  if [[ "${neovim_socket_dir}" != "${XDG_RUNTIME_DIR:-}" ]]; then
-    # Mac has a directory per process it seems
-    neovim_socket_dir="$(dirname "${neovim_socket_dir}")"
-  fi
-
-  if [[ ! -d "${neovim_socket_dir}" ]]; then
+  if ! command -v nvim >/dev/null 2>&1; then
     return
   fi
 
-  # Change colorscheme of all neovim instances
+  sockets_output="$("${dir_path}/list-nvim-sockets" 2>/dev/null || true)"
+
+  if [[ -z "${sockets_output}" ]]; then
+    return
+  fi
+
   local socket
+  local background
+  local colorscheme
+
+  if [[ "${new_theme}" == "light" ]]; then
+    background="light"
+    colorscheme="base16-default-light"
+  else
+    background="dark"
+    colorscheme="base16-default-dark"
+  fi
+
   while IFS= read -r socket; do
-    if [[ "${new_theme}" == "light" ]]; then
-      nvim --server "${socket}" --remote-send "<Esc>:set background=light|colorscheme base16-default-light<cr>"
-    else
-      nvim --server "${socket}" --remote-send "<Esc>:set background=dark|colorscheme base16-default-dark<cr>"
-    fi
-  done < <(find "${neovim_socket_dir}" -type s -name "nvim*" 2>/dev/null)
+    [[ -S "${socket}" ]] || continue
+    nvim --server "${socket}" --remote-send "<Esc>:set background=${background}|colorscheme ${colorscheme}<cr>"
+  done <<<"${sockets_output}"
 }
 
 update_tmux_colors() {
@@ -120,13 +127,13 @@ update_tmux_colors() {
   new_theme="${1:-}"
 
   # Check if tmux is running first
-  if ! tmux has-session > /dev/null 2>&1; then
+  if ! tmux has-session >/dev/null 2>&1; then
     return
   fi
 
-  tmux set-environment -g COLOR_THEME "${new_theme}" && \
-    tmux set-environment COLOR_THEME "${new_theme}" && \
-    tmux source-file ~/.config/tmux/tmux.conf && \
+  tmux set-environment -g COLOR_THEME "${new_theme}" &&
+    tmux set-environment COLOR_THEME "${new_theme}" &&
+    tmux source-file ~/.config/tmux/tmux.conf &&
     tmux refresh-client -S
 }
 
