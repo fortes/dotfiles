@@ -126,8 +126,8 @@ update_tmux_colors() {
   local new_theme
   new_theme="${1:-}"
 
-  # Check if tmux is running first
-  if ! tmux has-session >/dev/null 2>&1; then
+  # Check if in a tmux session
+  if ! tmux info >/dev/null 2>&1; then
     return
   fi
 
