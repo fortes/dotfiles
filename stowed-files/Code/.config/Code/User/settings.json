@@ -35,5 +35,6 @@
   "workbench.preferredLightColorTheme": "Visual Studio Dark",
   "editor.formatOnSave": true,
   "editor.formatOnSaveMode": "modificationsIfAvailable",
-  "github.copilot.preferredAccount": "fortes"
+  "github.copilot.preferredAccount": "fortes",
+  "github.copilot.nextEditSuggestions.enabled": true
 }
