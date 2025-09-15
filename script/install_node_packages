@@ -14,6 +14,7 @@ PACKAGES=(
   @google/gemini-cli
   @openai/codex
   bash-language-server
+  corepack@latest
   cssmodules-language-server
   dockerfile-language-server-nodejs
   eslint
