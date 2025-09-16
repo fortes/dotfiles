@@ -67,6 +67,7 @@ BREW_PACKAGES=(
   # For yazi
   sevenzip
   shellcheck
+  shfmt
   speedtest-cli
   stow
   tmux
@@ -80,12 +81,14 @@ BREW_PACKAGES=(
 CASK_PACKAGES=(
   1password
   1password-cli
+  claude
   firefox
   font-jetbrains-mono
   # For yazi
   font-symbols-only-nerd-font
+  ghostty
   google-chrome
-  psst
+  plexamp
   rectangle
   signal
   visual-studio-code
