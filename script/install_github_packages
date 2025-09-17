@@ -5,7 +5,6 @@
 # - bun
 # - ctop
 # - delta
-# - deno
 # - difftastic
 # - docker-compose
 # - f2
@@ -45,7 +44,6 @@ AVAILABLE_PACKAGES=(
   bun
   ctop
   delta
-  deno
   difftastic
   docker-compose
   f2
@@ -222,10 +220,6 @@ install_ctop() {
 
 install_delta() {
   install_deb 'dandavison/delta' 'git-delta_.*_amd64.deb'
-}
-
-install_deno() {
-  install_zip 'denoland/deno' 'deno-x86_64-unknown-linux-gnu.zip'
 }
 
 install_difftastic() {
@@ -460,9 +454,6 @@ install_github_packages() {
       ;;
     delta)
       install_delta
-      ;;
-    deno)
-      install_deno
       ;;
     difftastic)
       install_difftastic
