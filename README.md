@@ -342,6 +342,8 @@ This will list out all the packages installed, then need to search through to ma
 
 ## TODO/Future Improvements
 
+- [ ] Check out [harper](https://writewithharper.com/docs/integrations/neovim) for grammar checking using LSP
+- [ ] Install `m4xshen/hardtime.nvim` for improving vim motions
 - [ ] Set up [network share](https://www.reddit.com/r/Crostini/wiki/howto/addnetworkshares/) in Crostini
 - [ ] Look into publishing a docker container via GitHub actions
 - [ ] `exa` is now unmaintained, need to either go to [eza](https://github.com/eza-community/eza) or `lsd`
