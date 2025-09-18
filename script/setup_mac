@@ -82,6 +82,7 @@ CASK_PACKAGES=(
   1password-cli
   claude
   firefox
+  font-google-sans-code
   font-jetbrains-mono
   # For yazi
   font-symbols-only-nerd-font
