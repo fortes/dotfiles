@@ -30,6 +30,252 @@ local function map(mode, lhs, rhs, opts_or_bufnr)
   vim.keymap.set(mode, lhs, rhs, opts)
 end
 
+-- Set up diagnostic configuration
+vim.diagnostic.config({
+  virtual_text = true,
+  virtual_lines = {
+    -- Only show multiple lines for current cursor line
+    current_line = true,
+  }
+})
+
+-- Set up LspAttach autocmd for keymaps and completion
+-- Quite a few are now default as of v0.11
+-- `grn` to rename symbol
+-- `grr` to find references
+-- `gri` to find implementation
+-- `gO` for document symbol
+-- `gra` for code actions
+-- `<C-S>` for signature help
+vim.api.nvim_create_autocmd('LspAttach', {
+  desc = 'LSP actions',
+  callback = function(event)
+    local client = vim.lsp.get_client_by_id(event.data.client_id)
+    local bufnr = event.buf
+
+    map('n', '<leader>e', vim.diagnostic.open_float, {
+      buffer = bufnr,
+      desc = "Show diagnostics under the cursor"
+    })
+    map('n', '<leader>q', vim.diagnostic.setloclist, {
+      buffer = bufnr,
+      desc = "Add buffer diagnostics to the location list"
+    })
+    -- `yod` already used by unimpaired for `diff`, use `yoe` (error)
+    map(
+      'n',
+      'yoe',
+      function()
+        vim.diagnostic.enable(not vim.diagnostic.is_enabled())
+      end,
+      {
+        buffer = bufnr,
+        desc = "Toggle diagnostic display"
+      }
+    )
+
+    if not client then
+      return
+    end
+
+    -- Special handling for specific LSP servers
+    if client.name == 'denols' then
+      -- Only attach if in a deno project
+      if not vim.fs.root(bufnr, { 'deno.json', 'deno.jsonc' }) then
+        client:stop()
+        return
+      end
+    elseif client.name == 'eslint' then
+      -- <leader>x to autofix via eslint
+      map('n', '<leader>x', function()
+        vim.cmd('EslintFixAll')
+      end, {
+        buffer = bufnr,
+        desc = "Fix all ESLint issues"
+      })
+    elseif client.name == 'ts_ls' then
+      -- Don't run if in a deno project
+      if vim.fs.root(bufnr, { 'deno.json', 'deno.jsonc' }) then
+        client:stop()
+        return
+      end
+    end
+
+    if client:supports_method('textDocument/completion') then
+      vim.lsp.completion.enable(true, client.id, bufnr, {
+        autotrigger = true
+      })
+    end
+
+    if client:supports_method('textDocument/definition') then
+      -- Match VSCode mapping
+      map('n', '<f12>', vim.lsp.buf.definition, {
+        buffer = bufnr,
+        desc = "Go to definition"
+      })
+    end
+
+    if client:supports_method('textDocument/hover') then
+      -- `K` mapped by default, add `gh` to match VSCode vim mappings
+      map('n', 'gh', vim.lsp.buf.hover, {
+        buffer = bufnr,
+        desc = "Show LSP hover information"
+      })
+    end
+
+    if client:supports_method('textDocument/references') then
+      -- grr default in Neovim 0.11, use upper case to use Telescope
+      map('n', 'gRR', function()
+        require('telescope.builtin').lsp_references({
+          include_declaration = false,
+        })
+      end, {
+        buffer = bufnr,
+        desc = "Telescope LSP references"
+      })
+      -- Match VSCode mapping
+      map('n', '<s-f12>', vim.lsp.buf.references, {
+        buffer = bufnr,
+        desc = "Show references"
+      })
+    end
+
+    if client:supports_method('textDocument/rename') then
+      -- Match VSCode mapping
+      map('n', '<f2>', vim.lsp.buf.rename, {
+        buffer = bufnr,
+        desc = "Rename symbol"
+      })
+    end
+  end,
+})
+
+-- Helper function to setup LSP servers using the new vim.lsp.config API
+local function setup_lsp(server_name, config)
+  if config then
+    vim.lsp.config(server_name, config)
+  end
+  vim.lsp.enable(server_name)
+end
+
+local default_lsp_opts = {
+  flags = {
+    debounce_text_changes = 150
+  }
+}
+
+-- Setup LSP servers using the new vim.lsp.config API
+setup_lsp('bashls', vim.tbl_deep_extend('force', default_lsp_opts, {
+  cmd = { 'bash-language-server', 'start' },
+  filetypes = { 'sh', 'bash' },
+  root_markers = { '.git' },
+}))
+
+setup_lsp('cssls', vim.tbl_deep_extend('force', default_lsp_opts, {
+  cmd = { 'vscode-css-language-server', '--stdio' },
+  filetypes = { 'css', 'scss', 'less' },
+  root_markers = { 'package.json', '.git' },
+}))
+
+setup_lsp('cssmodules_ls', vim.tbl_deep_extend('force', default_lsp_opts, {
+  cmd = { 'cssmodules-language-server' },
+  filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
+  root_markers = { 'package.json', '.git' },
+}))
+
+setup_lsp('denols', vim.tbl_deep_extend('force', default_lsp_opts, {
+  cmd = { 'deno', 'lsp' },
+  filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
+  root_markers = { 'deno.json', 'deno.jsonc' },
+}))
+
+setup_lsp('dockerls', vim.tbl_deep_extend('force', default_lsp_opts, {
+  cmd = { 'docker-langserver', '--stdio' },
+  filetypes = { 'dockerfile' },
+  root_markers = { '.git' },
+}))
+
+setup_lsp('eslint', vim.tbl_deep_extend('force', default_lsp_opts, {
+  cmd = { 'vscode-eslint-language-server', '--stdio' },
+  filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
+  root_markers = { '.eslintrc.js', '.eslintrc.json', 'package.json', '.git' },
+}))
+
+setup_lsp('html', vim.tbl_deep_extend('force', default_lsp_opts, {
+  cmd = { 'vscode-html-language-server', '--stdio' },
+  filetypes = { 'html' },
+  root_markers = { 'package.json', '.git' },
+}))
+
+setup_lsp('jsonls', vim.tbl_deep_extend('force', default_lsp_opts, {
+  cmd = { 'vscode-json-language-server', '--stdio' },
+  filetypes = { 'json', 'jsonc' },
+  root_markers = { '.git' },
+}))
+
+setup_lsp('lua_ls', vim.tbl_deep_extend('force', default_lsp_opts, {
+  cmd = { 'lua-language-server' },
+  filetypes = { 'lua' },
+  root_markers = { '.luarc.json', '.luarc.jsonc', '.luacheckrc', '.stylua.toml', 'stylua.toml', 'selene.toml', 'selene.yml', '.git' },
+  settings = {
+    Lua = {
+      diagnostics = {
+        -- Recognize the vim global
+        globals = { 'vim' }
+      },
+      workspace = {
+        -- Add Neovim runtime files
+        library = {
+          vim.env.VIMRUNTIME,
+          "${3rd}/luv/library"
+        },
+      },
+      -- Do not send telemetry data
+      telemetry = {
+        enable = false,
+      },
+    }
+  }
+}))
+
+-- Only setup marksman if it's executable
+if vim.fn.executable("marksman") == 1 then
+  setup_lsp('marksman', vim.tbl_deep_extend('force', default_lsp_opts, {
+    cmd = { 'marksman', 'server' },
+    filetypes = { 'markdown' },
+    root_markers = { '.marksman.toml', '.git' },
+  }))
+end
+
+setup_lsp('pyright', vim.tbl_deep_extend('force', default_lsp_opts, {
+  cmd = { 'pyright-langserver', '--stdio' },
+  filetypes = { 'python' },
+  root_markers = { 'pyproject.toml', 'setup.py', 'setup.cfg', 'requirements.txt', 'Pipfile', 'pyrightconfig.json', '.git' },
+}))
+
+setup_lsp('ts_ls', vim.tbl_deep_extend('force', default_lsp_opts, {
+  cmd = { 'typescript-language-server', '--stdio' },
+  filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
+  root_markers = { 'tsconfig.json', 'package.json', 'jsconfig.json', '.git' },
+  -- Increase memory limit to 16GB, might need to adjust on weaker
+  -- machines via `MAX_TS_SERVER_MEMORY` env var
+  init_options = {
+    maxTsServerMemory = tonumber(os.getenv('MAX_TS_SERVER_MEMORY')) or 32768,
+  },
+}))
+
+setup_lsp('vimls', vim.tbl_deep_extend('force', default_lsp_opts, {
+  cmd = { 'vim-language-server', '--stdio' },
+  filetypes = { 'vim' },
+  root_markers = { '.vimrc', '.vim', '.git' },
+}))
+
+setup_lsp('yamlls', vim.tbl_deep_extend('force', default_lsp_opts, {
+  cmd = { 'yaml-language-server', '--stdio' },
+  filetypes = { 'yaml', 'yaml.docker-compose' },
+  root_markers = { '.git' },
+}))
+
 require("lazy").setup({
   -- GitHub Co-Pilot is paid, so only load if #ENABLE_GITHUB_COPILOT is set
   {
@@ -62,42 +308,40 @@ require("lazy").setup({
   -- <C-y> to accept nearest diff
   -- gh for help
   {
-    {
-      "CopilotC-Nvim/CopilotChat.nvim",
-      cond = function()
-        return os.getenv("ENABLE_GITHUB_COPILOT") == "1"
-      end,
-      dependencies = {
-        { "github/copilot.vim" },
-        -- for curl, log and async functions
-        { "nvim-lua/plenary.nvim" },
-      },
-      -- Note: Only on MacOS or Linux
-      build = "make tiktoken",
-      config = function()
-        local chat = require('CopilotChat')
-        local select = require('CopilotChat.select')
-
-        chat.setup({})
-
-        map('n', '<leader>cc', chat.toggle, {
-          desc = "Toggle Copilot chat",
-        })
-        map(
-          'v',
-          '<leader>cc',
-          function()
-            local input = vim.fn.input("Ask Copilot: ", "Fix this code")
-            if input ~= "" then
-              chat.ask(input, {
-                selection = select.visual
-              })
-            end
-          end,
-          { desc = "Copilot Chat with selection" }
-        )
-      end,
+    "CopilotC-Nvim/CopilotChat.nvim",
+    cond = function()
+      return os.getenv("ENABLE_GITHUB_COPILOT") == "1"
+    end,
+    dependencies = {
+      { "github/copilot.vim" },
+      -- for curl, log and async functions
+      { "nvim-lua/plenary.nvim" },
     },
+    -- Note: Only on MacOS or Linux
+    build = "make tiktoken",
+    config = function()
+      local chat = require('CopilotChat')
+      local select = require('CopilotChat.select')
+
+      chat.setup({})
+
+      map('n', '<leader>cc', chat.toggle, {
+        desc = "Toggle Copilot chat",
+      })
+      map(
+        'v',
+        '<leader>cc',
+        function()
+          local input = vim.fn.input("Ask Copilot: ", "Fix this code")
+          if input ~= "" then
+            chat.ask(input, {
+              selection = select.visual
+            })
+          end
+        end,
+        { desc = "Copilot Chat with selection" }
+      )
+    end,
   },
 
   -- AI coding assistant
@@ -105,7 +349,8 @@ require("lazy").setup({
     "olimorris/codecompanion.nvim",
     cond = function()
       -- Can either piggyback off of GitHub Copilot or use Anthropic/OpenAI
-      return os.getenv("ENABLE_GITHUB_COPILOT") == "1" or os.getenv('ANTHROPIC_API_KEY') ~= '' or os.getenv('OPENAI_API_KEY') ~= ''
+      return os.getenv("ENABLE_GITHUB_COPILOT") == "1" or os.getenv('ANTHROPIC_API_KEY') ~= '' or
+      os.getenv('OPENAI_API_KEY') ~= ''
     end,
     dependencies = {
       "nvim-lua/plenary.nvim",
@@ -118,189 +363,9 @@ require("lazy").setup({
     config = true
   },
 
-  -- Language Server for all sorts of goodness
-  {
-    'neovim/nvim-lspconfig',
-    -- Use telescope in keybindings
-    dependencies = {
-      'nvim-telescope/telescope.nvim'
-    },
-    config = function()
-      local nvim_lsp = require('lspconfig')
-
-      -- Only map keys after language server has attached to buffer
-      -- Quite a few are now default as of v0.11
-      -- `grn` to rename symbol
-      -- `grr` to find references
-      -- `gri` to find implementation
-      -- `gO` for document symbol
-      -- `gra` for code actions
-      -- `<C-S>` for signature help
-      local lsp_on_attach = function(client, bufnr)
-        if client:supports_method('textDocument/completion') then
-          vim.lsp.completion.enable(true, client.id, bufnr, {
-            autotrigger = true
-          })
-        end
-
-        if client:supports_method('textDocument/definition') then
-          -- Match VSCode mapping
-          map('n', '<f12>', vim.lsp.buf.definition, {
-            buffer = bufnr,
-            desc = "Go to definition"
-          })
-        end
-
-        if client:supports_method('textDocument/hover') then
-          -- `K` mapped by default, add `gh` to match VSCode vim mappings
-          map('n', 'gh', vim.lsp.buf.hover, {
-            buffer = bufnr,
-            desc = "Show LSP hover information"
-          })
-        end
-
-        if client:supports_method('textDocument/references') then
-          -- grr default in Neovim 0.11, use upper case to use Telescope
-          map('n', 'gRR', function()
-            require('telescope.builtin').lsp_references({
-              include_declaration = false,
-            })
-          end, {
-            buffer = bufnr,
-            desc = "Telescope LSP references"
-          })
-          -- Match VSCode mapping
-          map('n', '<s-f12>', vim.lsp.buf.references, {
-            buffer = bufnr,
-            desc = "Show references"
-          })
-        end
-
-        if client:supports_method('textDocument/rename') then
-          -- Match VSCode mapping
-          map('n', '<f2>', vim.lsp.buf.rename, {
-            buffer = bufnr,
-            desc = "Rename symbol"
-          })
-        end
-
-        map('n', '<leader>e', vim.diagnostic.open_float, {
-          buffer = bufnr,
-          desc = "Show diagnostics under the cursor"
-        })
-        map('n', '<leader>q', vim.diagnostic.setloclist, {
-          buffer = bufnr,
-          desc = "Add buffer diagnostics to the location list"
-        })
-        -- `yod` already used by unimpaired for `diff`, use `yoe` (error)
-        map(
-          'n',
-          'yoe',
-          function()
-            vim.diagnostic.enable(not vim.diagnostic.is_enabled())
-          end,
-          {
-            buffer = bufnr,
-            desc = "Toggle diagnostic display"
-          }
-        )
-
-        vim.diagnostic.config({
-          virtual_text = true,
-          virtual_lines = {
-            -- Only show multiple lines for current cursor line
-            current_line = true,
-          }
-        })
-      end
-
-      local default_lsp_opts = {
-        on_attach = lsp_on_attach,
-        flags = {
-          debounce_text_changes = 150
-        }
-      }
-
-      local deno_root_pattern = nvim_lsp.util.root_pattern('deno.json', 'deno.jsonc')
-
-      local lsp_configs = {
-        bashls = default_lsp_opts,
-        cssls = default_lsp_opts,
-        cssmodules_ls = default_lsp_opts,
-        denols = vim.tbl_deep_extend('force', default_lsp_opts, {
-          root_dir = deno_root_pattern,
-          single_file_support = false,
-          workspace_required = true,
-        }),
-        dockerls = default_lsp_opts,
-        eslint = vim.tbl_deep_extend('force', default_lsp_opts, {
-          on_attach = function(client, bufnr)
-            -- <leader>x to autofix via eslint
-            map('n', '<leader>x', function()
-              vim.cmd('EslintFixAll')
-            end, { desc = "Fix all ESLint issues" })
-            lsp_on_attach(client, bufnr)
-          end,
-        }),
-        html = default_lsp_opts,
-        jsonls = default_lsp_opts,
-        lua_ls = vim.tbl_deep_extend('force', default_lsp_opts, {
-          settings = {
-            Lua = {
-              diagnostics = {
-                -- Recognize the vim global
-                globals = { 'vim' }
-              },
-              workspace = {
-                -- Add Neovim runtime files
-                library = {
-                  vim.env.VIMRUNTIME,
-                  "${3rd}/luv/library"
-                },
-              },
-              -- Do not send telemetry data
-              telemetry = {
-                enable = false,
-              },
-            }
-          }
-        }),
-        marksman = vim.fn.executable("marksman") == 1 and default_lsp_opts or nil,
-        pyright = default_lsp_opts,
-        ts_ls = vim.tbl_deep_extend('force', default_lsp_opts, {
-          -- Increase memory limit to 16GB, might need to adjust on weaker
-          -- machines via `MAX_TS_SERVER_MEMORY` env var
-          init_options = {
-            maxTsServerMemory = tonumber(os.getenv('MAX_TS_SERVER_MEMORY')) or 32768,
-          },
-          on_attach = function(client, bufnr)
-            -- Don't run if in a deno project
-            if (deno_root_pattern(vim.fn.getcwd())) then
-              client:stop()
-              return
-            end
-
-            lsp_on_attach(client, bufnr)
-          end,
-          root_dir = nvim_lsp.util.root_pattern('node_modules'),
-          workspace_required = true,
-        }),
-        vimls = default_lsp_opts,
-        yamlls = default_lsp_opts
-      }
-
-      for lsp, opts in pairs(lsp_configs) do
-        nvim_lsp[lsp].setup(opts)
-      end
-    end
-  },
-
   -- Show LSP progress in lower right
   {
     'j-hui/fidget.nvim',
-    dependencies = {
-      'neovim/nvim-lspconfig'
-    },
     config = function()
       require('fidget').setup({})
     end
