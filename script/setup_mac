@@ -36,6 +36,7 @@ BREW_PACKAGES=(
   # For yazi
   ffmpeg
   fnm
+  fx
   fzf
   gh
   git
