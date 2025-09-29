@@ -21,16 +21,6 @@ set_default_browser() {
   if [[ -n "${IS_CROSTINI}" ]]; then
     desired_browser_path="$(command -v garcon-url-handler)"
     xdg_browser='garcon_host_browser.desktop'
-  elif [[ -n "${IS_WSL}" ]]; then
-    if [[ -x "/mnt/c/Program Files/Mozilla Firefox/firefox.exe" ]]; then
-      desired_browser_path="/mnt/c/Program Files/Mozilla Firefox/firefox.exe"
-    else
-      >&2 echo "Firefox not found in WSL, using Edge as a fallback"
-      desired_browser_path="/mnt/c/Program Files/Microsoft/Edge/Application/msedge.exe"
-    fi
-  elif [[ -z "${IS_HEADLESS}" ]]; then
-    desired_browser_path="$(command -v firefox)"
-    xdg_browser='firefox.desktop'
   fi
 
   if [[ -z "${desired_browser_path:-}" ]]; then
