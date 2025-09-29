@@ -33,7 +33,7 @@ export IS_MAC="${is_mac:-}"
 # Enable if GitHub account has Copilot access
 # export ENABLE_GITHUB_COPILOT=1
 
-# Used for 'llm' and 'aider'
+# Used for 'llm'
 # export ANTHROPIC_API_KEY="xxxxxx"
 # export GEMINI_API_KEY="xxxxxx"
 # export LLM_GEMINI_KEY="\${GEMINI_API_KEY}"
