@@ -5,12 +5,11 @@
     "context": ".."
   },
 
-  // Mount the user's src directory for project access
+  // Mount /src for project access and Claude config persistence
   "mounts": [
-    "source=${localEnv:HOME}/src,target=/home/fortes/src,type=bind,consistency=cached"
+    "source=${localEnv:HOME}/src,target=/src,type=bind,consistency=cached"
   ],
 
-  // Set up the container user
   "remoteUser": "fortes",
   "workspaceFolder": "/home/fortes/dotfiles",
 
@@ -51,7 +50,6 @@
         ]
       },
       "extensions": [
-        "asvetliakov.vscode-neovim",
         "clinyong.vscode-css-modules",
         "dbaeumer.vscode-eslint",
         "denoland.vscode-deno",
@@ -74,16 +72,8 @@
     }
   },
 
-  // Run commands after container creation
   "postCreateCommand": "echo 'Dotfiles environment ready! Your terminal environment is fully configured.'",
 
-  // Forward any ports needed for development
-  "forwardPorts": [],
-
-  // Use bash as the default shell
-  "defaultProfile": "bash",
-
-  // Keep container running
   "features": {
     "ghcr.io/devcontainers/features/common-utils:2": {
       "installZsh": false,

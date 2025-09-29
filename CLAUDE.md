@@ -42,12 +42,21 @@ git update-index --no-skip-worktree ./path/to/file  # To undo
 ```
 
 ### Docker
-```bash
-# Build locally
-docker build -t dotfiles .
 
-# Run with shared directories
-docker run -it --rm --name dotfiles -v ~/src:/home/fortes/src dotfiles
+**Build locally:**
+```bash
+docker build -t dotfiles .
+```
+
+**Direct usage (for SSH/tmux development):**
+```bash
+# Run container with shared src directory
+docker run -it --rm --name dotfiles -v ~/src:/src dotfiles
+
+# In another terminal, attach to tmux session
+docker exec -it dotfiles tmux attach
+
+# Claude Code credentials persist in /src/.claude-container (survives container restarts)
 ```
 
 ### Devcontainer
@@ -58,6 +67,9 @@ This repo includes a devcontainer configuration for use with VS Code, Cursor, an
 - Open the repo in VS Code/Cursor and select "Reopen in Container"
 - Or open in GitHub Codespaces for cloud development
 - Your full terminal environment (bash, neovim, tmux, fzf, etc.) will be available
+- Claude Code credentials are stored in `/src/.claude-container` and persist via the `/src` mount
+- First time: authenticate with `claude auth login` - credentials will be saved and reused
+- Settings come from stowed `~/.claude/settings.json`
 
 **Using as a base image for other projects:**
 
@@ -90,6 +102,8 @@ Create a `.devcontainer/devcontainer.json` in your project:
 - Override `workspaceFolder` to mount your project in a custom location (default is `/workspace`)
 - All your shell aliases, neovim config, tmux setup, etc. are pre-configured
 - Add project-specific extensions and settings in the `customizations` section
+- Claude Code credentials persist in `/src/.claude-container` (mount `/src` to enable)
+- If you don't mount `/src`, credentials won't persist across rebuilds
 
 **Publishing new versions:**
 - Push to `main` branch → publishes `latest` tag automatically
