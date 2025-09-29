@@ -1,0 +1,93 @@
+{
+  "name": "Dotfiles Development Environment",
+  "build": {
+    "dockerfile": "../Dockerfile",
+    "context": ".."
+  },
+
+  // Mount the user's src directory for project access
+  "mounts": [
+    "source=${localEnv:HOME}/src,target=/home/fortes/src,type=bind,consistency=cached"
+  ],
+
+  // Set up the container user
+  "remoteUser": "fortes",
+  "workspaceFolder": "/home/fortes/dotfiles",
+
+  // Configure VS Code
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "tmux",
+        "terminal.integrated.profiles.linux": {
+          "bash": {
+            "path": "/bin/bash"
+          },
+          "tmux": {
+            "path": "tmux",
+            "icon": "terminal-tmux",
+            "args": ["new-session", "-A", "-s", "vscode-${workspaceFolderBasename}"]
+          }
+        },
+        "terminal.integrated.enableImages.linux": true,
+        "terminal.integrated.sendKeybindingsToShell": true,
+        "editor.formatOnSave": true,
+        "editor.formatOnSaveMode": "modificationsIfAvailable",
+        "editor.inlineSuggest.enabled": true,
+        "editor.accessibilitySupport": "off",
+        "files.autoSave": "afterDelay",
+        "github.copilot.enable": {
+          "markdown": true
+        },
+        "github.copilot.nextEditSuggestions.enabled": true,
+        "typescript.tsserver.maxTsServerMemory": 32000,
+        "window.autoDetectColorScheme": true,
+        "vim.showMarksInGutter": true,
+        "vim.normalModeKeyBindingsNonRecursive": [
+          {
+            "before": ["<C-p>"],
+            "commands": ["workbench.action.quickOpen"]
+          }
+        ]
+      },
+      "extensions": [
+        "asvetliakov.vscode-neovim",
+        "clinyong.vscode-css-modules",
+        "dbaeumer.vscode-eslint",
+        "denoland.vscode-deno",
+        "eamodio.gitlens",
+        "editorconfig.editorconfig",
+        "esbenp.prettier-vscode",
+        "github.copilot",
+        "github.copilot-chat",
+        "github.vscode-github-actions",
+        "mrmlnc.vscode-less",
+        "ms-azuretools.vscode-docker",
+        "ms-vscode-remote.remote-containers",
+        "ms-vscode-remote.remote-ssh",
+        "ms-vscode-remote.remote-ssh-edit",
+        "ms-vscode.remote-explorer",
+        "redhat.vscode-yaml",
+        "streetsidesoftware.code-spell-checker",
+        "wayou.vscode-todo-highlight"
+      ]
+    }
+  },
+
+  // Run commands after container creation
+  "postCreateCommand": "echo 'Dotfiles environment ready! Your terminal environment is fully configured.'",
+
+  // Forward any ports needed for development
+  "forwardPorts": [],
+
+  // Use bash as the default shell
+  "defaultProfile": "bash",
+
+  // Keep container running
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": false,
+      "upgradePackages": false
+    }
+  }
+}

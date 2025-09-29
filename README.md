@@ -230,8 +230,7 @@ This repository previously supported Linux GUI environments (using sway/i3) and 
     - [ ] Look at using `extrepo`? [Lots of sources](https://salsa.debian.org/extrepo-team/extrepo-data/-/tree/master/repos/debian) can probably get rid of a bunch of manual addition
   - [ ] Figure out what's wrong with `/etc/sysctl.d` on Docker Mac
 - [ ] Set up [network share](https://www.reddit.com/r/Crostini/wiki/howto/addnetworkshares/) in Crostini
-- [ ] Get `devcontainer` setup for this repo
-- [ ] Get remote VSCode settings synced up as well, currently in `~/.vscode-server/data/Machine`
+- [x] Get `devcontainer` setup for this repo
 - [ ] Figure out how to get [M1 CI running](https://github.blog/changelog/2024-01-30-github-actions-introducing-the-new-m1-macos-runner-available-to-open-source/) to check builds
 - [ ] Get things working in GitHub codespaces, which seems to use Ubuntu 20.04.06 LTS underneath. Currently fails silently trying to install backports sources. [Troubleshooting instructions](https://docs.github.com/en/codespaces/troubleshooting/troubleshooting-personalization-for-codespaces#troubleshooting-dotfiles) can be helpful
 - [ ] Figure out how to [use Hammerspoon](https://github.com/Hammerspoon/Spoons/blob/master/Source/MusicAppMediaFix.spoon/init.lua) to have media keys control cmus, instead of launching iTunes (gross)
