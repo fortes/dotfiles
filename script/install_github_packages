@@ -123,9 +123,9 @@ get_latest_release_url() {
       echo_stderr "  - ${pattern}"
     done
     echo_stderr "Available assets:"
-    echo "${release_json}" | jq -r '.assets[]?.browser_download_url' | while read -r url; do
+    while read -r url; do
       echo_stderr "  - $(basename "$url")"
-    done
+    done < <(echo "${release_json}" | jq -r '.assets[]?.browser_download_url')
     exit 2
   else
     # Original behavior for non-templated patterns
