@@ -181,7 +181,7 @@ docker run -it --rm --name dotfiles ghcr.io/fortes/dotfiles:latest
 To share files, use `-v /path/to/host:/path/to/container`, for example if sharing the `~/src` folder:
 
 ```sh
-docker run -it --rm --name dotfiles -v ~/src:/src dotfiles
+docker run -it --rm --name dotfiles -v ~/src:/workspaces dotfiles
 ```
 
 Will need to manually start neovim to install plugins. Some other things may or may not work, we'll have to test to find out!

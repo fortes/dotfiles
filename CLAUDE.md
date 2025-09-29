@@ -50,13 +50,13 @@ docker build -t dotfiles .
 
 **Direct usage (for SSH/tmux development):**
 ```bash
-# Run container with shared src directory
-docker run -it --rm --name dotfiles -v ~/src:/src dotfiles
+# Run container with shared src directory (maps ~/src to /workspaces in container)
+docker run -it --rm --name dotfiles -v ~/src:/workspaces dotfiles
 
 # In another terminal, attach to tmux session
 docker exec -it dotfiles tmux attach
 
-# Claude Code credentials persist in /src/.claude-container (survives container restarts)
+# Claude Code credentials persist in /workspaces/.claude-container (survives container restarts)
 ```
 
 ### Devcontainer
@@ -67,7 +67,7 @@ This repo includes a devcontainer configuration for use with VS Code, Cursor, an
 - Open the repo in VS Code/Cursor and select "Reopen in Container"
 - Or open in GitHub Codespaces for cloud development
 - Your full terminal environment (bash, neovim, tmux, fzf, etc.) will be available
-- Claude Code credentials are stored in `/src/.claude-container` and persist via the `/src` mount
+- Claude Code credentials are stored in `/workspaces/.claude-container` and persist
 - First time: authenticate with `claude auth login` - credentials will be saved and reused
 - Settings come from stowed `~/.claude/settings.json`
 
@@ -77,13 +77,15 @@ Published images are available at `ghcr.io/fortes/dotfiles` with tags:
 - `latest` - Built from main branch
 - `1.x.x` - Semantic version tags
 
-Create a `.devcontainer/devcontainer.json` in your project:
+Create a `.devcontainer/devcontainer.json` in your project (assuming it lives in `~/src/my-project`):
 ```json
 {
   "name": "My Project",
   "image": "ghcr.io/fortes/dotfiles:latest",
-  "workspaceFolder": "/workspace",
-  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
+  "workspaceFolder": "/workspaces/my-project",
+  "mounts": [
+    "source=${localEnv:HOME}/src,target=/workspaces,type=bind"
+  ],
   "customizations": {
     "vscode": {
       "extensions": [
@@ -99,11 +101,31 @@ Create a `.devcontainer/devcontainer.json` in your project:
 
 **Important notes for base image usage:**
 - The container runs as user `fortes` (uid 1000) with your full dotfiles environment
-- Override `workspaceFolder` to mount your project in a custom location (default is `/workspace`)
+- For local development: mount `~/src` to `/workspaces` and set `workspaceFolder` to your project path
+- For GitHub Codespaces: no mounts needed, just use the default `/workspaces/<repo-name>`
 - All your shell aliases, neovim config, tmux setup, etc. are pre-configured
 - Add project-specific extensions and settings in the `customizations` section
-- Claude Code credentials persist in `/src/.claude-container` (mount `/src` to enable)
-- If you don't mount `/src`, credentials won't persist across rebuilds
+- Claude Code credentials automatically persist in `/workspaces/.claude-container`
+
+**Passing secrets/API keys to containers:**
+
+Option 1 - From host environment variables:
+```json
+{
+  "containerEnv": {
+    "OPENAI_API_KEY": "${localEnv:OPENAI_API_KEY}",
+  }
+}
+```
+Set these in your host's `~/.profile.local` or `~/.bashrc.local`.
+
+Option 2 - Using a `.env` file:
+```json
+{
+  "runArgs": ["--env-file", ".env"]
+}
+```
+Create `.env` at your project root with your secrets (add to `.gitignore`).
 
 **Publishing new versions:**
 - Push to `main` branch → publishes `latest` tag automatically

@@ -31,13 +31,13 @@ RUN groupadd --gid $GROUP_ID $USER_NAME && \
 USER $USER_NAME
 WORKDIR /home/$USER_NAME
 
-# Create /src directory for projects and Claude config
-RUN sudo mkdir -p /src && sudo chown $USER_NAME:$USER_NAME /src
+# Create /workspaces directory for projects and Claude config
+RUN sudo mkdir -p /workspaces && sudo chown $USER_NAME:$USER_NAME /workspaces
 
 COPY --chown=$USER_NAME:$USER_NAME . /home/$USER_NAME/dotfiles
 
 ENV IS_DOCKER=1 \
-    CLAUDE_CONFIG_DIR=/src/.claude-container
+    CLAUDE_CONFIG_DIR=/workspaces/.claude-container
 
 RUN ./dotfiles/script/setup
 

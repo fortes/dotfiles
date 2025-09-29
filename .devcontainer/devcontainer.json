@@ -5,9 +5,9 @@
     "context": ".."
   },
 
-  // Mount /src for project access and Claude config persistence
+  // Mount ~/src to /workspaces for project access and Claude config persistence
   "mounts": [
-    "source=${localEnv:HOME}/src,target=/src,type=bind,consistency=cached"
+    "source=${localEnv:HOME}/src,target=/workspaces,type=bind,consistency=cached"
   ],
 
   "remoteUser": "fortes",
