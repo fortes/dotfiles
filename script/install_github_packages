@@ -5,7 +5,6 @@
 # - bun
 # - delta
 # - difftastic
-# - docker-compose
 # - f2
 # - fnm
 # - fx
@@ -36,7 +35,6 @@ AVAILABLE_PACKAGES=(
   bun
   delta
   difftastic
-  docker-compose
   f2
   fnm
   fx
@@ -278,10 +276,6 @@ install_difftastic() {
   install_tarball 'wilfred/difftastic' 'difft-{ARCH}-unknown-linux-gnu.tar.gz' 'difft'
 }
 
-install_docker_compose() {
-  install_bin 'docker/compose' 'linux-{ARCH}' 'docker-compose'
-}
-
 install_github_cli() {
   install_deb 'cli/cli' 'gh_.*_linux_{ARCH}.deb'
 }
@@ -478,9 +472,6 @@ install_github_packages() {
         ;;
       difftastic)
         install_difftastic
-        ;;
-      docker-compose)
-        install_docker_compose
         ;;
       github-cli)
         install_github_cli
