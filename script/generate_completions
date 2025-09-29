@@ -63,10 +63,6 @@ generate_completions() {
     uv generate-shell-completion bash > "${completion_dir}/uv_completion"
   fi
 
-  if command_exists wezterm; then
-    wezterm shell-completion --shell bash > "${completion_dir}/wezterm_completion"
-  fi
-
   if command_exists yq; then
     yq shell-completion bash > "${completion_dir}/yq_completion"
   fi

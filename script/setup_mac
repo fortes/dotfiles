@@ -92,7 +92,6 @@ CASK_PACKAGES=(
   rectangle
   signal
   visual-studio-code
-  wezterm
 )
 
 usage() {

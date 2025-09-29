@@ -124,7 +124,7 @@ git update-index --no-skip-worktree ./symlinks/npmrc
     defaults write -g com.todesktop.xxxxx ApplePressAndHoldEnabled -bool false
     ```
   - You'll also need to log in to VSCode to get stuff, plus you probably want to run `script/install_vscode_extensions` to get all the extensions installed
-- `terminal.app` sucks with colors, switch to WezTerm and pin it in the dock
+- `terminal.app` sucks with colors, switch to Ghostty and pin it in the dock
 - Make sure `Rectangle.app` starts on login
 - Install the 1Password extension in Safari (others should sync automatically)
 - If planning on using Docker a lot, can have Colima autostart on login by running the following:
