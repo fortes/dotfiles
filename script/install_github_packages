@@ -9,7 +9,7 @@
 # - f2
 # - fnm
 # - fx
-# - fzf (because Bookworm is very old)
+# - fzf (because older Debian versions are very old)
 # - github cli
 # - helix
 # - hugo (latest)
@@ -18,7 +18,6 @@
 # - neovim (latest)
 # - pistol
 # - sad
-# - wezterm
 # - yazi
 # - yq
 #
@@ -42,7 +41,7 @@ AVAILABLE_PACKAGES=(
   fnm
   fx
   fzf
-  # Trixie tracking recent version already, can use apt
+  # Trixie tracks recent version already, can use apt
   # github-cli
   helix
   hugo
@@ -51,7 +50,6 @@ AVAILABLE_PACKAGES=(
   neovim
   pistol
   sad
-  wezterm
   yazi
   yq
 )
@@ -407,13 +405,9 @@ install_pistol() {
   install_bin 'doronbehar/pistol' 'pistol-static-linux-{ARCH}'
 }
 
-install_wezterm() {
-  install_deb 'wez/wezterm' 'wezterm-.*.Debian12.deb'
-}
-
 install_yazi() {
   local url
-  # musl version because Bookworm is old and yazi requires a newer glibc (2.39)
+  # musl version because older Debian versions don't have yazi's required glibc (2.39)
   url="$(get_latest_release_url "sxyazi/yazi" "yazi-{ARCH}-unknown-linux-musl.zip")"
 
   local bin_location="$HOME/.local/bin"
@@ -523,9 +517,6 @@ install_github_packages() {
         ;;
       sad)
         install_sad
-        ;;
-      wezterm)
-        [[ -z "${IS_HEADLESS:-}" ]] && install_wezterm
         ;;
       yazi)
         install_yazi
