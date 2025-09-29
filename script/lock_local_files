@@ -23,7 +23,7 @@ lock_local_files() {
   done
 
   if [[ -n "${dry_run}" ]]; then
-    >&2 echo -e "⚠️\033[1;33m Dry run, no modifications will be made\033[0m"
+    echo -e "⚠️\033[1;33m Dry run, no modifications will be made\033[0m" >&2
   else
     echo "Locking .local files…"
   fi
