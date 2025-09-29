@@ -349,8 +349,9 @@ require("lazy").setup({
     "olimorris/codecompanion.nvim",
     cond = function()
       -- Can either piggyback off of GitHub Copilot or use Anthropic/OpenAI
-      return os.getenv("ENABLE_GITHUB_COPILOT") == "1" or os.getenv('ANTHROPIC_API_KEY') ~= '' or
-      os.getenv('OPENAI_API_KEY') ~= ''
+      return os.getenv("ENABLE_GITHUB_COPILOT") == "1" or
+          os.getenv('ANTHROPIC_API_KEY') ~= '' or
+          os.getenv('OPENAI_API_KEY') ~= ''
     end,
     dependencies = {
       "nvim-lua/plenary.nvim",
