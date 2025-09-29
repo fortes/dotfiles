@@ -411,7 +411,7 @@ install_yazi() {
   url="$(get_latest_release_url "sxyazi/yazi" "yazi-{ARCH}-unknown-linux-musl.zip")"
 
   local bin_location="$HOME/.local/bin"
-  local completion_location="/home/fortes/.local/completion.d/"
+  local completion_location="$HOME/.local/completion.d/"
 
   local download_dir
   download_dir="$(mktemp --directory yaziXXX)"
