@@ -5,41 +5,62 @@ on:
     workflows: ["Bash Syntax Check & Lint"]
     types:
       - completed
+  push:
+    tags:
+      - 'v*.*.*'
 
 jobs:
   build:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    # Run if triggered by successful workflow_run OR by tag push
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'push' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build Docker Image
-        run: |
-          docker build -t ghcr.io/${{ github.repository_owner }}/dotfiles:latest .
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
 
-      - name: Show Docker Image Size
-        run: docker image ls ghcr.io/${{ github.repository_owner }}/dotfiles:latest
-
-      - name: Docker Image Size
-        run: |
-          echo "## Docker Image Size" >> $GITHUB_STEP_SUMMARY
-          docker image ls --format "{{.Size}}" ghcr.io/${{ github.repository_owner }}/dotfiles:latest >> $GITHUB_STEP_SUMMARY
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Log in to GitHub Container Registry
-        if: ${{ github.event.workflow_run.head_branch == github.event.repository.default_branch }}
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Push Docker Image
-        if: ${{ github.event.workflow_run.head_branch == github.event.repository.default_branch }}
-        run: |
-          docker push ghcr.io/${{ github.repository_owner }}/dotfiles:latest
+      - name: Extract metadata (tags, labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/dotfiles
+          tags: |
+            # Tag with 'latest' on main branch pushes
+            type=raw,value=latest,enable=${{ github.event.workflow_run.head_branch == github.event.repository.default_branch || github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
+            # Tag with version on git tags (e.g., v1.2.3 -> 1.2.3)
+            type=semver,pattern={{version}}
+            # Tag with major.minor on git tags (e.g., v1.2.3 -> 1.2)
+            type=semver,pattern={{major}}.{{minor}}
+            # Tag with major on git tags (e.g., v1.2.3 -> 1)
+            type=semver,pattern={{major}}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: ${{ github.event.workflow_run.head_branch == github.event.repository.default_branch || startsWith(github.ref, 'refs/tags/v') }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Run dotfiles health check
-        if: ${{ github.event.workflow_run.head_branch == github.event.repository.default_branch }}
+        if: ${{ github.event.workflow_run.head_branch == github.event.repository.default_branch || startsWith(github.ref, 'refs/tags/v') }}
         run: |
-          docker run --rm ghcr.io/${{ github.repository_owner }}/dotfiles:latest ./dotfiles/script/check_health
+          docker run --rm --platform linux/amd64 ghcr.io/${{ github.repository_owner }}/dotfiles:latest ./dotfiles/script/check_health

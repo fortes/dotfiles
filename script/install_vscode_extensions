@@ -19,10 +19,6 @@ EXTENSIONS=(
   github.vscode-github-actions
   mrmlnc.vscode-less
   ms-azuretools.vscode-docker
-  ms-python.debugpy
-  ms-python.pylint
-  ms-python.python
-  ms-python.vscode-pylance
   ms-vscode-remote.remote-containers
   ms-vscode-remote.remote-ssh
   ms-vscode-remote.remote-ssh-edit

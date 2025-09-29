@@ -124,7 +124,7 @@ git update-index --no-skip-worktree ./symlinks/npmrc
     defaults write -g com.todesktop.xxxxx ApplePressAndHoldEnabled -bool false
     ```
   - You'll also need to log in to VSCode to get stuff, plus you probably want to run `script/install_vscode_extensions` to get all the extensions installed
-- `terminal.app` sucks with colors, switch to WezTerm and pin it in the dock
+- `terminal.app` sucks with colors, switch to Ghostty and pin it in the dock
 - Make sure `Rectangle.app` starts on login
 - Install the 1Password extension in Safari (others should sync automatically)
 - If planning on using Docker a lot, can have Colima autostart on login by running the following:
@@ -181,7 +181,7 @@ docker run -it --rm --name dotfiles ghcr.io/fortes/dotfiles:latest
 To share files, use `-v /path/to/host:/path/to/container`, for example if sharing the `~/src` folder:
 
 ```sh
-docker run -it --rm --name dotfiles -v ~/src:/home/fortes/src dotfiles
+docker run -it --rm --name dotfiles -v ~/src:/src dotfiles
 ```
 
 Will need to manually start neovim to install plugins. Some other things may or may not work, we'll have to test to find out!
@@ -230,8 +230,7 @@ This repository previously supported Linux GUI environments (using sway/i3) and 
     - [ ] Look at using `extrepo`? [Lots of sources](https://salsa.debian.org/extrepo-team/extrepo-data/-/tree/master/repos/debian) can probably get rid of a bunch of manual addition
   - [ ] Figure out what's wrong with `/etc/sysctl.d` on Docker Mac
 - [ ] Set up [network share](https://www.reddit.com/r/Crostini/wiki/howto/addnetworkshares/) in Crostini
-- [ ] Get `devcontainer` setup for this repo
-- [ ] Get remote VSCode settings synced up as well, currently in `~/.vscode-server/data/Machine`
+- [x] Get `devcontainer` setup for this repo
 - [ ] Figure out how to get [M1 CI running](https://github.blog/changelog/2024-01-30-github-actions-introducing-the-new-m1-macos-runner-available-to-open-source/) to check builds
 - [ ] Get things working in GitHub codespaces, which seems to use Ubuntu 20.04.06 LTS underneath. Currently fails silently trying to install backports sources. [Troubleshooting instructions](https://docs.github.com/en/codespaces/troubleshooting/troubleshooting-personalization-for-codespaces#troubleshooting-dotfiles) can be helpful
 - [ ] Figure out how to [use Hammerspoon](https://github.com/Hammerspoon/Spoons/blob/master/Source/MusicAppMediaFix.spoon/init.lua) to have media keys control cmus, instead of launching iTunes (gross)

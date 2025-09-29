@@ -10,7 +10,6 @@
 # - fx
 # - fzf (because older Debian versions are very old)
 # - github cli
-# - helix
 # - hugo (latest)
 # - jj
 # - luals
@@ -41,7 +40,6 @@ AVAILABLE_PACKAGES=(
   fzf
   # Trixie tracks recent version already, can use apt
   # github-cli
-  helix
   hugo
   jj
   luals
@@ -300,15 +298,6 @@ install_fzf() {
   install_tarball 'junegunn/fzf' 'fzf-.*-linux_{ARCH}.tar.gz'
 }
 
-install_helix() {
-  if [[ "$(get_current_arch)" == "arm64" ]]; then
-    echo_stderr "Warning: helix is not available for ARM64 architecture"
-    return 0
-  fi
-  # helix AppImage uses architecture-specific naming
-  install_bin 'helix-editor/helix' '{ARCH}.AppImage' 'hx'
-}
-
 install_hugo() {
   install_deb 'gohugoio/hugo' 'hugo_extended_.*_linux-{ARCH}.deb'
 }
@@ -487,9 +476,6 @@ install_github_packages() {
         ;;
       fzf)
         install_fzf
-        ;;
-      helix)
-        install_helix
         ;;
       hugo)
         install_hugo

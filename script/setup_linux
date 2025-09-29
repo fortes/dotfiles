@@ -37,7 +37,6 @@ APT_PACKAGES=(
   avahi-utils
   bash-completion
   bat
-  beets
   build-essential
   ca-certificates
   chafa
@@ -79,14 +78,12 @@ APT_PACKAGES=(
   man-db
   mergerfs
   moreutils
-  mosh
   ncal
   ncdu
   ncurses-term
   # Installed via `install_github_packages`
   # neovim
   pipx
-  progress
   python3
   python3-dev
   python3-pip
@@ -101,13 +98,11 @@ APT_PACKAGES=(
   rsync
   shellcheck
   shfmt
-  speedtest-cli
   ssh
   ssh-import-id
   sshfs
   stow
   sudo
-  tig
   tmux
   trash-cli
   unzip
@@ -198,11 +193,6 @@ set_default_applications() {
     echo "Setting Neovim as default text editor (requires sudo)"
     sudo update-alternatives --install /usr/bin/editor editor "$(command -v nvim)" 60
   fi
-
-  if command_exists wezterm && update-alternatives --query x-terminal-emulator &> /dev/null && ! update-alternatives --query x-terminal-emulator | grep ^Value | grep -q wezterm; then
-    echo "Setting WezTerm as default terminal (requires sudo)"
-    sudo update-alternatives --set x-terminal-emulator "$(command -v wezterm)"
-  fi
 }
 
 setup_backports() {
@@ -241,22 +231,6 @@ setup_docker() {
     echo "Adding $user to docker group (requires sudo)"
     sudo usermod -aG docker "${user}"
     echo "$user now in docker group, must log back in to take effect"
-  fi
-}
-
-setup_keyboard() {
-  if [[ ! -f /etc/default/keyboard ]]; then
-    # Crostini doesn't have this
-    return 0
-  fi
-
-  if ! grep -q "ctrl:nocaps" /etc/default/keyboard; then
-    echo "Mapping Caps Lock to Control (requires sudo)"
-    sudo sed -i.bak 's/^XKBOPTIONS=""/XKBOPTIONS="altwin:left_meta_win,ctrl:nocaps"/' /etc/default/keyboard
-
-    if is_package_installed console-setup; then
-      sudo dpkg-reconfigure -phigh console-setup
-    fi
   fi
 }
 
@@ -380,7 +354,6 @@ main() {
   popd > /dev/null
   set_default_applications
   [[ -z "${IS_DOCKER:-}" ]] && setup_docker
-  setup_keyboard
   setup_locale
   [[ -z "${IS_DOCKER:-}" ]] && "${dotfiles_root}/script/set_default_browser"
 
@@ -393,10 +366,6 @@ main() {
   "${dotfiles_root}/script/generate_completions"
 
   echo "Setup complete!"
-
-  # TODO:
-  # - tailscale / wireguard
-  # - chrome / steam / wine / others that require custom stuff
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
