@@ -223,7 +223,7 @@ setup_docker() {
     apt_update_once
     echo "Installing docker (requires sudo)"
     sudo -E apt-get install "${APT_ARGS[@]}" \
-      docker.io
+      docker.io docker-buildx docker-clean docker-cli docker-compose
   fi
 
   declare -r user="$(whoami)"
