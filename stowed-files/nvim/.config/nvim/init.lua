@@ -86,6 +86,12 @@ vim.api.nvim_create_autocmd('LspAttach', {
         return
       end
     elseif client.name == 'eslint' then
+      -- Don't run if in a deno project
+      if vim.fs.root(bufnr, { 'deno.json', 'deno.jsonc' }) then
+        client:stop()
+        return
+      end
+
       -- <leader>x to autofix via eslint
       map('n', '<leader>x', function()
         vim.cmd('EslintFixAll')
@@ -377,7 +383,6 @@ require("lazy").setup({
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
     config = function()
-      ---@diagnostic disable-next-line: missing-fields
       require('nvim-treesitter.configs').setup {
         auto_install = true,
         ensure_installed = {
@@ -418,7 +423,6 @@ require("lazy").setup({
       'nvim-treesitter/nvim-treesitter'
     },
     config = function()
-      ---@diagnostic disable-next-line: missing-fields
       require('nvim-treesitter.configs').setup {
         textobjects = {
           select = {
@@ -465,7 +469,6 @@ require("lazy").setup({
       'nvim-treesitter/nvim-treesitter'
     },
     config = function()
-      ---@diagnostic disable-next-line: missing-fields
       require('nvim-treesitter.configs').setup {
         refactor = {
           highlight_definitions = { enable = true },
