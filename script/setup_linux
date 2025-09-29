@@ -23,7 +23,7 @@ declare -r APT_ARGS=(
   --no-install-recommends
 )
 
-HEADLESS_PACKAGES=(
+APT_PACKAGES=(
   # For yazi
   7zip
   apt-file
@@ -121,55 +121,6 @@ HEADLESS_PACKAGES=(
   zoxide
 )
 
-GUI_PACKAGES=(
-  "${HEADLESS_PACKAGES[@]}"
-  alsa-utils
-  chromium
-  cmake
-  cmus
-  exfat-fuse
-  exfatprogs
-  foliate
-  fonts-dejavu
-  fonts-font-awesome
-  fonts-hack
-  fonts-jetbrains-mono
-  fonts-noto
-  fonts-noto-color-emoji
-  fonts-noto-mono
-  fonts-noto-ui-core
-  fonts-roboto
-  fonts-open-sans
-  fuzzel
-  gammastep
-  gnome-keyring
-  grimshot
-  hsetroot
-  imv
-  libnotify-bin
-  libpam-gnome-keyring
-  lxqt-policykit
-  mkchromecast
-  mpv
-  mpv-mpris
-  papirus-icon-theme
-  pasystray
-  pipewire
-  playerctl
-  pulseaudio
-  sway
-  sway-backgrounds
-  sway-notification-center
-  swayidle
-  swaylock
-  waybar
-  wev
-  wf-recorder
-  # Wanted by `grimshot`, but useful for scripts / yazi
-  wl-clipboard
-  xwayland
-)
-
 has_updated=""
 
 usage() {
@@ -227,23 +178,10 @@ increase_max_watchers() {
 }
 
 install_apt_packages() {
-  declare apt_packages
-
-  if [[ -n "${IS_HEADLESS:-}" ]]; then
-    apt_packages=(
-      "${HEADLESS_PACKAGES[@]}"
-    )
-  else
-    apt_packages=(
-      "${HEADLESS_PACKAGES[@]}"
-      "${GUI_PACKAGES[@]}"
-    )
-  fi
-
   apt_update_once
 
   echo "Ensuring apt packages installed (requires sudo)"
-  sudo -E apt-get install "${APT_ARGS[@]}" "${apt_packages[@]}"
+  sudo -E apt-get install "${APT_ARGS[@]}" "${APT_PACKAGES[@]}"
   echo "Apt packages installed"
 }
 
@@ -270,7 +208,6 @@ set_default_applications() {
 setup_backports() {
   declare -r codename="$(lsb_release -cs | tail -n 1)"
 
-  # WSL comes with backports pre-enabled
   if grep -q "${codename}-backports" /etc/apt/sources.list{,.d/*} 2> /dev/null; then
     echo "Backports already in sources.list"
     return
@@ -309,7 +246,7 @@ setup_docker() {
 
 setup_keyboard() {
   if [[ ! -f /etc/default/keyboard ]]; then
-    # Crostini / WSL don't have this
+    # Crostini doesn't have this
     return 0
   fi
 
@@ -426,12 +363,10 @@ main() {
   setup_nonfree
   setup_backports
   install_apt_packages
-  # Don't install 1Password GUI for now, it's not working properly
-  IS_HEADLESS=1 "${dotfiles_root}/script/install_1password"
-  [[ -z "${IS_CROSTINI:-}" ]] && [[ -z "${IS_DOCKER:-}" ]] && \
+  "${dotfiles_root}/script/install_1password"
+  [[ -z "${IS_CROSTINI:-}" ]] && [[ -z "${IS_DOCKER:-}" ]] &&
     "${dotfiles_root}/script/install_snap_packages"
   [[ -z "${IS_DOCKER:-}" ]] && "${dotfiles_root}/script/install_et"
-  [[ -z "${IS_HEADLESS:-}" ]] && "${dotfiles_root}/script/install_firefox"
   "${dotfiles_root}/script/install_github_packages"
 
   # Remove default files before stowing, otherwise stow fails

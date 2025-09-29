@@ -216,11 +216,9 @@ This will list out all the packages installed, then need to search through to ma
 
 - Firefox and VSCode casks get ornery and no longer update via brew, currently install once via script, but updates have to happen manually. Need to investigate further.
 
-## Linux GUI support, Windows WSL2, etc
+## Linux GUI and Windows WSL2 Support
 
-This all used to work for Linux GUI using sway (and i3 before that), but at some point I stopped using my Linux desktop so I went ahead and deleted all that old stuff. If you look back through history there's some good stuff there though.
-
-I also used to use Windows a lot for testing, and WSL2 worked pretty well. But I no longer use it.
+This repository previously supported Linux GUI environments (using sway/i3) and Windows WSL2. These configurations have been removed as they are no longer actively used. If you need these configurations, check the git history for older implementations.
 
 ## TODO/Future Improvements
 

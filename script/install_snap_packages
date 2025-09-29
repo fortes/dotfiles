@@ -17,7 +17,7 @@ SNAP_PACKAGES=(
   marksman
 )
 
-install_flatpak_packages() {
+install_snap_packages() {
   if [[ -n "${IS_DOCKER:-}" || -n "${IS_CROSTINI:-}" ]]; then
     echo "⨯ Snap packages cannot be installed in Docker or Crostini environments."
     return 1
@@ -41,5 +41,5 @@ install_flatpak_packages() {
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-  install_flatpak_packages "${@}"
+  install_snap_packages "${@}"
 fi

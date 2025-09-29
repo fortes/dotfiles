@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Sets the default browser on Chromebooks/WSL/Linux, using the Chromebook's
-# native browser (Garcon) on Chromebooks, and Firefox on WSL/Linux.
+# Sets the default browser on Chromebooks, using the Chromebook's native
+# browser (Garcon) on Crostini.
 
 set -euo pipefail
 IFS=$'\n\t'
@@ -9,7 +9,7 @@ set_default_browser() {
   local desired_browser_path
   local xdg_browser
 
-  # Make sure to pick up `command_exists`, as well as `IS_CROSTINI` and `IS_WSL`
+  # Make sure to pick up `command_exists` and `IS_CROSTINI`
   # shellcheck source=/dev/null
   . "${HOME}/.profile"
 
@@ -19,26 +19,12 @@ set_default_browser() {
   fi
 
   if [[ -n "${IS_CROSTINI}" ]]; then
-    desired_browser_path=$(command -v garcon-url-handler)
+    desired_browser_path="$(command -v garcon-url-handler)"
     xdg_browser='garcon_host_browser.desktop'
-  elif [[ -n "${IS_WSL}" ]]; then
-    if [[ -x "/mnt/c/Program Files/Mozilla Firefox/firefox.exe" ]]; then
-      desired_browser_path="/mnt/c/Program Files/Mozilla Firefox/firefox.exe"
-    else
-      >&2 echo "Firefox not found in WSL, using Edge as a fallback"
-      desired_browser_path="/mnt/c/Program Files/Microsoft/Edge/Application/msedge.exe"
-    fi
-  elif [[ -z "${IS_HEADLESS}" ]]; then
-    desired_browser_path=$(command -v firefox)
-    xdg_browser='firefox.desktop'
   fi
 
   if [[ -z "${desired_browser_path:-}" ]]; then
     >&2 echo "No desired browser found, skipping"
-    if [[ -z "${IS_HEADLESS}" ]]; then
-      # Treat as an error on non-headless machines
-      exit 1
-    fi
     exit
   fi
 

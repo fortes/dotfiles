@@ -11,28 +11,21 @@ main() {
   local is_crostini
   local is_mac
   local is_docker
-  local is_wsl
-  local is_headless
 
-  set +e
+  is_crostini=""
+  is_mac=""
+  is_docker=""
+
   # TODO: Update to use deb822 format when Crostini supports it
-  is_crostini=$([[ -f /etc/apt/sources.list.d/cros.list ]] && printf 1)
-  is_mac=$([[ ${OSTYPE:-} == 'darwin'* ]] && printf 1)
-  is_docker=$([[ -n "${IS_DOCKER:-}" || -f /.dockerenv ]] && printf 1)
-  is_wsl=$([[ -d /run/WSL ]] && printf 1)
-  # Default to headless in Crostini / Docker / WSL, even though GUI might be
-  # possible, can always be overridden
-  is_headless=$([[ -n "${is_crostini}${is_docker}${is_mac}${is_wsl}" ||
-    -z "${WAYLAND_DISPLAY:-}" ]] && printf 1)
-  set -e
+  [[ -f /etc/apt/sources.list.d/cros.list ]] && is_crostini=1
+  [[ ${OSTYPE:-} == 'darwin'* ]] && is_mac=1
+  [[ -n "${IS_DOCKER:-}" || -f /.dockerenv ]] && is_docker=1
 
   cat << PROFILE_TEMPLATE
 # Generated $(date +%F)
 export IS_CROSTINI="${is_crostini:-}"
 export IS_DOCKER="${is_docker:-}"
 export IS_MAC="${is_mac:-}"
-export IS_WSL="${is_wsl:-}"
-export IS_HEADLESS="${is_headless:-}"
 
 # Affects bash prompt, which hides unless this is the username
 # export DEFAULT_USERNAME=ffortes
