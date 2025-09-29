@@ -14,13 +14,13 @@ main() {
   local is_wsl
   local is_headless
 
-  # TODO: Update to use deb822 format when Crostini supports it
   is_crostini=""
   is_mac=""
   is_docker=""
   is_wsl=""
   is_headless=""
 
+  # TODO: Update to use deb822 format when Crostini supports it
   [[ -f /etc/apt/sources.list.d/cros.list ]] && is_crostini=1
   [[ ${OSTYPE:-} == 'darwin'* ]] && is_mac=1
   [[ -n "${IS_DOCKER:-}" || -f /.dockerenv ]] && is_docker=1
