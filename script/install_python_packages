@@ -45,9 +45,9 @@ install_python_packages() {
 
   echo "Installing global uvx packages …"
   for package in "${UVX_PACKAGES[@]}"; do
-    # Split package spec into array for proper argument handling
-    read -r -a args <<< "${package}"
-    uv tool install --quiet --force --refresh "${args[@]}"
+    # Use eval to properly handle quoted arguments and multiple flags
+    # shellcheck disable=SC2086
+    eval "uv tool install --quiet --force --refresh ${package}"
   done
   echo "uvx packages installed!"
 
