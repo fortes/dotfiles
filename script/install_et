@@ -8,7 +8,7 @@ IFS=$'\n\t'
 export DEBIAN_FRONTEND=noninteractive
 
 install_et() {
-  declare -r et_sources_list="/etc/apt/sources.list.d/et.list"
+  declare -r et_sources_list="/etc/apt/sources.list.d/et.sources"
   declare -r et_key_url="https://github.com/MisterTea/debian-et/raw/master/et.gpg"
   declare -r et_key_path="/etc/apt/keyrings/et.gpg"
 
@@ -18,8 +18,13 @@ install_et() {
       sudo tee "$et_key_path" > /dev/null
 
     echo "Eternal Terminal sources list missing, adding (requires sudo)"
-    echo "deb [signed-by=${et_key_path}] https://github.com/MisterTea/debian-et/raw/master/debian-source/ trixie main" |
-      sudo tee "${et_sources_list}" > /dev/null
+    sudo tee "${et_sources_list}" > /dev/null <<EOF
+Types: deb
+URIs: https://github.com/MisterTea/debian-et/raw/master/debian-source/
+Suites: trixie
+Components: main
+Signed-By: ${et_key_path}
+EOF
 
     echo "Eternal Terminal sources added, updating packages"
     sudo -E apt-get update -qq

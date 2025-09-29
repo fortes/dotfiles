@@ -276,11 +276,16 @@ setup_backports() {
     return
   fi
 
-  declare -r sources_path="/etc/apt/sources.list.d/backports.list"
+  declare -r sources_path="/etc/apt/sources.list.d/backports.sources"
 
   echo "${codename}-backports not in sources.list, adding (requires sudo)"
-  echo "deb http://ftp.debian.org/debian ${codename}-backports main contrib non-free non-free-firmware" |
-    sudo tee "$sources_path" &> /dev/null
+  sudo tee "$sources_path" > /dev/null <<EOF
+Types: deb
+URIs: http://ftp.debian.org/debian
+Suites: ${codename}-backports
+Components: main contrib non-free non-free-firmware
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+EOF
 
   # New source requires forced updates
   has_updated=""

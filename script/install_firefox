@@ -8,7 +8,7 @@ IFS=$'\n\t'
 export DEBIAN_FRONTEND=noninteractive
 
 install_firefox() {
-  declare -r firefox_sources_list="/etc/apt/sources.list.d/firefox.list"
+  declare -r firefox_sources_list="/etc/apt/sources.list.d/firefox.sources"
   declare -r firefox_key_url="https://packages.mozilla.org/apt/repo-signing-key.gpg"
   declare -r firefox_key_path="/etc/apt/keyrings/packages.mozilla.org.asc"
 
@@ -17,8 +17,13 @@ install_firefox() {
     curl -sS "$firefox_key_url" | sudo tee ${firefox_key_path} > /dev/null
 
     echo "firefox sources list missing, adding (requires sudo)"
-    echo "deb [signed-by=${firefox_key_path}] https://packages.mozilla.org/apt mozilla main" |
-      sudo tee "$firefox_sources_list" > /dev/null
+    sudo tee "$firefox_sources_list" > /dev/null <<EOF
+Types: deb
+URIs: https://packages.mozilla.org/apt
+Suites: mozilla
+Components: main
+Signed-By: ${firefox_key_path}
+EOF
 
     echo "firefox sources added, updating packages"
     sudo -E apt-get update -qq

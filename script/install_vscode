@@ -11,7 +11,7 @@ declare dotfiles_root
 dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 install_vscdoe() {
-  declare -r vscode_sources_list="/etc/apt/sources.list.d/vscode.list"
+  declare -r vscode_sources_list="/etc/apt/sources.list.d/vscode.sources"
   declare -r vscode_key_url="https://packages.microsoft.com/keys/microsoft.asc"
   declare -r vscode_key_path="/etc/apt/keyrings/microsoft.asc"
 
@@ -21,8 +21,14 @@ install_vscdoe() {
       sudo tee "$vscode_key_path" > /dev/null
 
     echo "Microsoft VSCode sources list missing, adding (requires sudo)"
-    echo "deb [arch=amd64 signed-by=${vscode_key_path}] https://packages.microsoft.com/repos/vscode stable main" |
-      sudo tee "$vscode_sources_list"
+    sudo tee "$vscode_sources_list" > /dev/null <<EOF
+Types: deb
+URIs: https://packages.microsoft.com/repos/vscode
+Suites: stable
+Components: main
+Architectures: amd64
+Signed-By: ${vscode_key_path}
+EOF
 
     echo "Microsoft VSCode sources added, updating packages"
     sudo -E apt-get update -qq
