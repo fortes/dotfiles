@@ -1,0 +1,41 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash([ -x \"$file\" ])",
+      "Bash(deno fmt:*)",
+      "Bash(deno lint:*)",
+      "Bash(deno task:*)",
+      "Bash(find:*)",
+      "Bash(gh pr:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git diff:*)",
+      "Bash(git grep:*)",
+      "Bash(git mv:*)",
+      "Bash(git push:*)",
+      "Bash(git reset:*)",
+      "Bash(git show:*)",
+      "Bash(git stash:*)",
+      "Bash(git status:*)",
+      "Bash(grep:*)",
+      "Bash(ls)",
+      "Bash(make:*)",
+      "Bash(shellcheck:*)",
+      "Bash(shfmt:*)",
+      "Bash(xargs ls)",
+      "WebFetch(domain:deno.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:gohugo.io)",
+      "WebFetch(domain:jsr.io)"
+    ],
+    "ask": [
+      "Bash(git rm:*)"
+    ],
+    "deny": [],
+    "enabledMcpjsonServers": [
+      "chrome-devtools",
+      "playwright"
+    ],
+    "includeCoAuthoredBy": false
+  }
+}

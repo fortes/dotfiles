@@ -1,0 +1,6 @@
+[mcp_servers.chrome-devtools]
+command = "npx"
+args = ["chrome-devtools-mcp@latest"]
+[mcp_servers.playwright]
+command = "npx"
+args = ["@playwright/mcp@latest"]
