@@ -44,7 +44,6 @@ BREW_PACKAGES=(
   git-extras
   git-lfs
   gron
-  helix
   htop
   hugo
   # For yazi
