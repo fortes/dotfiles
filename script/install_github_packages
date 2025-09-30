@@ -340,25 +340,30 @@ install_sad() {
 install_neovim_stable() {
   local url
   local vim_path="$HOME/.local/bin/nvim"
+  local download_dir
+  local install_prefix="$HOME/.local"
 
-  echo -n "Installing neovim stable ... "
-  mkdir -p "$(dirname "${vim_path}")"
-  url="$(get_latest_release_url "neovim/neovim" "nvim-linux-{ARCH}.appimage")"
-  wget "${url}" --quiet --output-document "$vim_path"
-  chmod +x "$vim_path"
-  echo "neovim stable installed"
+  echo "Installing neovim stable ..."
+  url="$(get_latest_release_url "neovim/neovim" "nvim-linux-{ARCH}.tar.gz")"
 
-  if [[ -n "${IS_DOCKER:-}" ]]; then
-    local vim_appimage_dir_path="$HOME/.local/appimages/nvim"
-    echo "Expanding neovim AppImage"
-    mkdir -p "${vim_appimage_dir_path}"
-    (
-      cd "${vim_appimage_dir_path}"
-      mv "${vim_path}" .
-      "${vim_appimage_dir_path}/nvim" --appimage-extract > /dev/null
-      ln -s "${vim_appimage_dir_path}/squashfs-root/AppRun" "${vim_path}"
-    )
+  download_dir="$(mktemp --directory nvimXXX)"
+  pushd "${download_dir}" > /dev/null
+  wget --quiet -O nvim.tar.gz "${url}"
+  echo -n "Expanding neovim tarball ... "
+  mkdir -p "${install_prefix}"
+  tar xzf nvim.tar.gz --strip-components=1 -C "${install_prefix}"
+  echo "done"
+
+  popd > /dev/null
+  rm -rf "${download_dir}"
+
+  if [[ ! -f "${vim_path}" ]]; then
+    echo_stderr "Error: Failed to install Neovim binary at ${vim_path}"
+    exit 2
   fi
+
+  chmod 755 "${vim_path}"
+  echo "neovim stable installed"
 
   if [[ -d "$HOME/.local/share/nvim/lazy/lazy.nvim" ]]; then
     echo "Syncing plugins"
