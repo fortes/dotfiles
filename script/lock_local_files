@@ -42,8 +42,7 @@ lock_local_files() {
       fi
     done
   else
-    >&2 echo "⨯ Not in a git repo"
-    exit 1
+    echo "Skipping lock_local_files (not in a git repository)"
   fi
 }
 

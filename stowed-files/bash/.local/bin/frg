@@ -29,10 +29,10 @@ main() {
     linenumber="$(echo "${result}" | cut -d: -f2)"
 
     if [ -n "$file" ]; then
-      $EDITOR +"${linenumber}" "$file"
+      "${EDITOR}" +"${linenumber}" "$file"
     fi
   }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-  main "@"
+  main "$@"
 fi

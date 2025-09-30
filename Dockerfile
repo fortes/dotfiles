@@ -12,10 +12,31 @@ ENV LANG=en_US.UTF-8 \
   LC_ALL=en_US.UTF-8 \
   TZ=$TZ
 
-RUN apt-get -qqy update && \
-  apt-get install -qq --no-install-recommends -y \
-  ca-certificates sudo git locales lsb-release && \
-  rm -rf /var/lib/apt/lists/*
+# Share the apt manifest with setup_linux so this layer only rebuilds when the package
+# list changes. That keeps apt downloads cached between Docker builds.
+COPY script/apt-packages.txt /tmp/apt-packages.txt
+
+# Enable contrib/non-free and backports before installing packages so that
+# every environment (Docker or host) sees the same repositories. Install all
+# base packages in a single layer, then purge apt caches so we don't carry
+# ~100 MB of metadata into later layers.
+RUN set -eux; \
+  codename="$(. /etc/os-release && echo "$VERSION_CODENAME")"; \
+  if [ -f /etc/apt/sources.list.d/debian.sources ]; then \
+    sed -i 's/Components: main$/Components: main contrib non-free non-free-firmware/' /etc/apt/sources.list.d/debian.sources; \
+  else \
+    sed -i 's/main$/main contrib non-free non-free-firmware/' /etc/apt/sources.list; \
+  fi; \
+  printf '%s\n' \
+    'Types: deb' \
+    'URIs: http://deb.debian.org/debian' \
+    "Suites: ${codename}-backports" \
+    'Components: main contrib non-free non-free-firmware' \
+    'Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg' \
+    > /etc/apt/sources.list.d/backports.sources; \
+  apt-get -qqy update; \
+  awk 'NF && $1 !~ /^#/' /tmp/apt-packages.txt | xargs -r apt-get install -qq --no-install-recommends -y; \
+  rm -rf /var/lib/apt/lists/* /tmp/apt-packages.txt
 
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
 
@@ -37,6 +58,7 @@ RUN sudo mkdir -p /workspaces && sudo chown $USER_NAME:$USER_NAME /workspaces
 COPY --chown=$USER_NAME:$USER_NAME . /home/$USER_NAME/dotfiles
 
 ENV IS_DOCKER=1 \
+    SKIP_INITIAL_APT_INSTALL=1 \
     CLAUDE_CONFIG_DIR=/workspaces/.claude-container
 
 RUN ./dotfiles/script/setup

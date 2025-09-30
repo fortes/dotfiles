@@ -3,7 +3,6 @@
 #
 # - agg (asciinema gif generator)
 # - bun
-# - delta
 # - difftastic
 # - f2
 # - fnm
@@ -32,7 +31,6 @@ dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 AVAILABLE_PACKAGES=(
   agg
   bun
-  delta
   difftastic
   f2
   fnm
@@ -266,9 +264,6 @@ install_bun() {
   esac
 }
 
-install_delta() {
-  install_deb 'dandavison/delta' 'git-delta_.*_{ARCH}.deb'
-}
 
 install_difftastic() {
   install_tarball 'wilfred/difftastic' 'difft-{ARCH}-unknown-linux-gnu.tar.gz' 'difft'
@@ -460,9 +455,6 @@ install_github_packages() {
         ;;
       bun)
         install_bun
-        ;;
-      delta)
-        install_delta
         ;;
       difftastic)
         install_difftastic
