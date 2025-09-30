@@ -9,49 +9,6 @@ IFS=$'\n\t'
 # shellcheck source=/dev/null
 . ~/.profile
 
-playerctl_menu() {
-  local play_status
-  local title
-  local artist
-  local album
-
-  local previous_command
-  local toggle_command
-  local next_command
-
-  play_status=$(playerctl -p cmus status 2>&1 || echo)
-  if echo "${play_status}" | grep -qiE '(no players found|stopped)'; then
-    tmux display-message "Not playing music"
-    return
-  fi
-
-  artist=$(playerctl metadata xesam:albumArtist)
-  album=$(playerctl metadata xesam:album)
-  title=$(playerctl metadata xesam:title)
-  genre=$(playerctl metadata xesam:genre)
-
-  previous_command="music-control previous"
-  toggle_command="music-control toggle"
-  stop_command="music-control stop"
-  next_command="music-control next"
-
-  if echo "${play_status}" | grep -qi "playing"; then
-    verb="Pause"
-  else
-    verb="Play"
-  fi
-
-  artist="${artist}" \
-    album="${album}" \
-    title="${title}" \
-    genre="${genre}" \
-    previous_command="${previous_command}" \
-    toggle_command="${toggle_command}" \
-    stop_command="${stop_command}" \
-    next_command="${next_command}" \
-    display_menu
-}
-
 cmus_menu() {
   local play_status
   local title
@@ -113,10 +70,5 @@ display_menu() {
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-  # playerctl not available on MacOS
-  if command_exists playerctl; then
-    playerctl_menu "${@}"
-  elif command_exists cmus-remote; then
-    cmus_menu "${@}"
-  fi
+  cmus_menu "${@}"
 fi
