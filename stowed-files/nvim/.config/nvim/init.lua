@@ -284,22 +284,44 @@ setup_lsp('yamlls', vim.tbl_deep_extend('force', default_lsp_opts, {
 
 require("lazy").setup({
   -- GitHub Co-Pilot is paid, so only load if #ENABLE_GITHUB_COPILOT is set
+  -- Use <leader><tab> to accept and go to next edit suggestion
   {
-    "github/copilot.vim",
+    "zbirenbaum/copilot.lua",
+    cmd = "Copilot",
     cond = function()
       return os.getenv("ENABLE_GITHUB_COPILOT") == "1"
     end,
     config = function()
-      vim.g.copilot_filetypes = {
-        -- Override default, which disables markdown
-        markdown = true,
-        -- Disable in places where it doesn't make sense
-        TelescopePrompt = false,
-        DressingInput = false,
-        codecompanion = false,
-        ["copilot-chat"] = false,
-      }
-    end
+      require("copilot").setup({
+        filetypes = {
+          markdown = true,
+          -- Disable in places where it doesn't make sense
+          ["copilot-chat"] = false,
+          codecomponion = false,
+          DressingInput = false,
+          TelescopePrompt = false,
+          sh = function()
+            if string.match(vim.fs.basename(vim.api.nvim_buf_get_name(0)), '^%.env.*') then
+              -- disable for .env files
+              return false
+            end
+            return true
+          end,
+        },
+        nes = {
+          enabled = true,
+          keymap = {
+            accept_and_goto = "<leader><tab>",
+            accept = false,
+            dismiss = "<Esc>",
+          },
+        }
+      })
+    end,
+    dependencies = {
+      { "copilotlsp-nvim/copilot-lsp" }
+    },
+    event = "InsertEnter",
   },
 
   -- GitHub Copilot chat, which isn't in copilot.vim yet
