@@ -33,5 +33,7 @@ cmus_status() {
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-  cmus_status "${@}"
+  if command_exists cmus-remote; then
+    cmus_status "${@}"
+  fi
 fi

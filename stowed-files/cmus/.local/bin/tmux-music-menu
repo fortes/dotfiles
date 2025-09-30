@@ -70,5 +70,7 @@ display_menu() {
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-  cmus_menu "${@}"
+  if command_exists cmus-remote; then
+    cmus_menu "${@}"
+  fi
 fi
