@@ -35,6 +35,7 @@ git
 git-crypt
 git-extras
 git-lfs
+git-delta
 gnupg
 gocryptfs
 gron
