@@ -16,6 +16,8 @@ declare dotfiles_root
 dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 BREW_PACKAGES=(
+  agg
+  asciinema
   bash
   bash-completion@2
   bat
@@ -43,9 +45,12 @@ BREW_PACKAGES=(
   git-crypt
   git-extras
   git-lfs
+  gnupg
+  gocryptfs
   gron
   htop
   hugo
+  iftop
   # For yazi
   imagemagick
   jj
@@ -59,7 +64,6 @@ BREW_PACKAGES=(
   neovim
   ollama
   pipx
-  rclone
   ripgrep
   sad
   # For yazi
@@ -69,9 +73,9 @@ BREW_PACKAGES=(
   speedtest-cli
   stow
   tmux
-  vifm
   wget
   yazi
+  yq
   yt-dlp
   zoxide
 )

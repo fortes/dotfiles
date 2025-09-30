@@ -8,26 +8,19 @@ apt-transport-https
 apt-utils
 aptitude
 asciinema
-autossh
-avahi-daemon
-avahi-dnsconfd
-avahi-utils
 bash-completion
 bat
 build-essential
 ca-certificates
 chafa
-cifs-utils
 curl
 dnsutils
 duf
-exiv2
 eza
 fd-find
 ffmpeg
 # Required for `yazi`
 file
-fuse3
 # Debian version ancient, get from `install_github_packages`
 # fzf
 gh
@@ -49,13 +42,9 @@ jq
 keychain
 less
 locales
-libimage-exiftool-perl
-libnss-mdns
 lsb-release
 lsof
-m4
 man-db
-mergerfs
 moreutils
 ncal
 ncdu
@@ -71,8 +60,6 @@ python3-pygments
 python3-pylast
 python3-venv
 python3-virtualenv
-rclone
-rename
 ripgrep
 rsync
 shellcheck
@@ -85,8 +72,6 @@ sudo
 tmux
 trash-cli
 unzip
-vifm
-w3m
 wamerican
 wget
 yank

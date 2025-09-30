@@ -150,6 +150,9 @@ git update-index --no-skip-worktree ./symlinks/npmrc
 
 - For servers, make sure to set up [email delivery](https://fortes.com/2020/getting-debian-to-send-emails-that-actually-get-delivered/)
 - Should also set up unattended upgrades via `sudo dpkg-reconfigure unattended-upgrades`
+- You may need to install `avahi-daemon`, `avahi-dnsconfd`, `avahi-utils`, and `libnss-mdns` to get `.local` hostnames to resolve properly
+- `mergerfs` if you want to do any pooling of drives
+- `cifs-utils` may also be useful to have installed for mounting Windows shares
 
 ### Chromebook
 
