@@ -29,7 +29,7 @@ RUN set -eux; \
   fi; \
   printf '%s\n' \
     'Types: deb' \
-    'URIs: http://ftp.debian.org/debian' \
+    'URIs: http://deb.debian.org/debian' \
     "Suites: ${codename}-backports" \
     'Components: main contrib non-free non-free-firmware' \
     'Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg' \

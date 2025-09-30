@@ -124,7 +124,7 @@ setup_backports() {
   echo "${codename}-backports not in sources.list, adding (requires sudo)"
   sudo tee "$sources_path" > /dev/null <<EOF
 Types: deb
-URIs: http://ftp.debian.org/debian
+URIs: http://deb.debian.org/debian
 Suites: ${codename}-backports
 Components: main contrib non-free non-free-firmware
 Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
