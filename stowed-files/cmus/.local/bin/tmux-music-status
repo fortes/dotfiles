@@ -9,30 +9,6 @@ IFS=$'\n\t'
 # shellcheck source=/dev/null
 . ~/.profile
 
-playerctl_status() {
-  local play_status
-
-  play_status=$(playerctl status -p cmus 2>&1 || echo)
-  if echo "${play_status}" | grep -qiE '(no players found|stopped)'; then
-    return
-  fi
-
-  local album
-  local artist
-  local title
-
-  album=$(playerctl -p cmus metadata xesam:album)
-  artist=$(playerctl -p cmus metadata xesam:artist)
-  albumArtist=$(playerctl -p cmus metadata xesam:albumArtist)
-  title=$(playerctl -p cmus metadata xesam:title)
-
-  if echo "${play_status}" | grep -qi "playing"; then
-    echo "${artist} ▸ ${title}  "
-  else
-    echo "${albumArtist} ♪ ${album}  "
-  fi
-}
-
 cmus_status() {
   local cmus_status
   cmus_status=$(cmus-remote -Q 2>&1 || echo)
@@ -57,10 +33,7 @@ cmus_status() {
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-  # playerctl not available on MacOS
-  if command_exists playerctl; then
-    playerctl_status "${@}"
-  elif command_exists cmus-remote; then
+  if command_exists cmus-remote; then
     cmus_status "${@}"
   fi
 fi
