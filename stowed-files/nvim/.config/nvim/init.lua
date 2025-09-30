@@ -1092,19 +1092,6 @@ require("lazy").setup({
     end
   },
 
-  -- Show colors in actual color
-  {
-    'norcalli/nvim-colorizer.lua',
-    config = function()
-      if vim.o.termguicolors then
-        require('colorizer').setup({
-          'css',
-          'less',
-        })
-      end
-    end
-  },
-
   -- Icons
   {
     'nvim-tree/nvim-web-devicons',
@@ -1129,7 +1116,7 @@ require("lazy").setup({
         end
       end
     end
-  }
+  },
 })
 
 -- Load local config, if present
