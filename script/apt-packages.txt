@@ -1,0 +1,94 @@
+# Debian/apt packages required by setup_linux and the Docker image
+# Lines starting with # are ignored
+
+# For yazi
+7zip
+apt-file
+apt-transport-https
+apt-utils
+aptitude
+asciinema
+autossh
+avahi-daemon
+avahi-dnsconfd
+avahi-utils
+bash-completion
+bat
+build-essential
+ca-certificates
+chafa
+cifs-utils
+curl
+dnsutils
+duf
+exiv2
+eza
+fd-find
+ffmpeg
+# Required for `yazi`
+file
+fuse3
+# Debian version ancient, get from `install_github_packages`
+# fzf
+gh
+git
+git-crypt
+git-extras
+git-lfs
+gnupg
+gocryptfs
+gron
+htop
+# Debian version ancient, get from `install_github_packages`
+# hugo
+iftop
+imagemagick
+info
+jq
+keychain
+less
+locales
+libimage-exiftool-perl
+libnss-mdns
+lsb-release
+lsof
+m4
+man-db
+mergerfs
+moreutils
+ncal
+ncdu
+ncurses-term
+# Installed via `install_github_packages`
+# neovim
+pipx
+python3
+python3-dev
+python3-pip
+python3-proselint
+python3-pygments
+python3-pylast
+python3-venv
+python3-virtualenv
+rclone
+rename
+ripgrep
+rsync
+shellcheck
+shfmt
+ssh
+ssh-import-id
+sshfs
+stow
+sudo
+tmux
+trash-cli
+unzip
+vifm
+w3m
+wamerican
+wget
+yank
+yq
+yt-dlp
+zoxide

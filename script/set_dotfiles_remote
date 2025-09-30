@@ -12,6 +12,11 @@ dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 set_dotfiles_remote() {
   (
     cd "${dotfiles_root}"
+    if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+      echo "Skipping git remote setup (no git repository detected)"
+      return
+    fi
+
     if git remote get-url "$(git remote)" | grep -q https; then
       echo "Setting dotfiles git remote"
       git remote set-url origin git@github.com:fortes/dotfiles.git
