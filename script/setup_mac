@@ -46,7 +46,6 @@ BREW_PACKAGES=(
   git-extras
   git-lfs
   gnupg
-  gocryptfs
   gron
   htop
   hugo
