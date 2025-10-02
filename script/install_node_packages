@@ -17,7 +17,7 @@ PACKAGES=(
   bash-language-server
   corepack@latest
   cssmodules-language-server
-  deno
+  deno@^2.5
   dockerfile-language-server-nodejs
   eslint
   fkill-cli
