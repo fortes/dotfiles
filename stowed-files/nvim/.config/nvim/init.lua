@@ -53,27 +53,6 @@ vim.api.nvim_create_autocmd('LspAttach', {
     local client = vim.lsp.get_client_by_id(event.data.client_id)
     local bufnr = event.buf
 
-    map('n', '<leader>e', vim.diagnostic.open_float, {
-      buffer = bufnr,
-      desc = "Show diagnostics under the cursor"
-    })
-    map('n', '<leader>q', vim.diagnostic.setloclist, {
-      buffer = bufnr,
-      desc = "Add buffer diagnostics to the location list"
-    })
-    -- `yod` already used by unimpaired for `diff`, use `yoe` (error)
-    map(
-      'n',
-      'yoe',
-      function()
-        vim.diagnostic.enable(not vim.diagnostic.is_enabled())
-      end,
-      {
-        buffer = bufnr,
-        desc = "Toggle diagnostic display"
-      }
-    )
-
     if not client then
       return
     end
@@ -106,6 +85,27 @@ vim.api.nvim_create_autocmd('LspAttach', {
         return
       end
     end
+
+    map('n', '<leader>e', vim.diagnostic.open_float, {
+      buffer = bufnr,
+      desc = "Show diagnostics under the cursor"
+    })
+    map('n', '<leader>q', vim.diagnostic.setloclist, {
+      buffer = bufnr,
+      desc = "Add buffer diagnostics to the location list"
+    })
+    -- `yod` already used by unimpaired for `diff`, use `yoe` (error)
+    map(
+      'n',
+      'yoe',
+      function()
+        vim.diagnostic.enable(not vim.diagnostic.is_enabled())
+      end,
+      {
+        buffer = bufnr,
+        desc = "Toggle diagnostic display"
+      }
+    )
 
     if client:supports_method('textDocument/completion') then
       vim.lsp.completion.enable(true, client.id, bufnr, {
@@ -156,133 +156,94 @@ vim.api.nvim_create_autocmd('LspAttach', {
   end,
 })
 
--- Helper function to setup LSP servers using the new vim.lsp.config API
-local function setup_lsp(server_name, config)
-  if config then
-    vim.lsp.config(server_name, config)
-  end
-  vim.lsp.enable(server_name)
-end
-
-local default_lsp_opts = {
-  flags = {
-    debounce_text_changes = 150
-  }
-}
-
--- Setup LSP servers using the new vim.lsp.config API
-setup_lsp('bashls', vim.tbl_deep_extend('force', default_lsp_opts, {
-  cmd = { 'bash-language-server', 'start' },
-  filetypes = { 'sh', 'bash' },
-  root_markers = { '.git' },
-}))
-
-setup_lsp('cssls', vim.tbl_deep_extend('force', default_lsp_opts, {
-  cmd = { 'vscode-css-language-server', '--stdio' },
-  filetypes = { 'css', 'scss', 'less' },
-  root_markers = { 'package.json', '.git' },
-}))
-
-setup_lsp('cssmodules_ls', vim.tbl_deep_extend('force', default_lsp_opts, {
-  cmd = { 'cssmodules-language-server' },
-  filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
-  root_markers = { 'package.json', '.git' },
-}))
-
-setup_lsp('denols', vim.tbl_deep_extend('force', default_lsp_opts, {
-  cmd = { 'deno', 'lsp' },
-  filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
-  root_markers = { 'deno.json', 'deno.jsonc' },
-}))
-
-setup_lsp('dockerls', vim.tbl_deep_extend('force', default_lsp_opts, {
-  cmd = { 'docker-langserver', '--stdio' },
-  filetypes = { 'dockerfile' },
-  root_markers = { '.git' },
-}))
-
-setup_lsp('eslint', vim.tbl_deep_extend('force', default_lsp_opts, {
-  cmd = { 'vscode-eslint-language-server', '--stdio' },
-  filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
-  root_markers = { '.eslintrc.js', '.eslintrc.json', 'package.json', '.git' },
-}))
-
-setup_lsp('html', vim.tbl_deep_extend('force', default_lsp_opts, {
-  cmd = { 'vscode-html-language-server', '--stdio' },
-  filetypes = { 'html' },
-  root_markers = { 'package.json', '.git' },
-}))
-
-setup_lsp('jsonls', vim.tbl_deep_extend('force', default_lsp_opts, {
-  cmd = { 'vscode-json-language-server', '--stdio' },
-  filetypes = { 'json', 'jsonc' },
-  root_markers = { '.git' },
-}))
-
-setup_lsp('lua_ls', vim.tbl_deep_extend('force', default_lsp_opts, {
-  cmd = { 'lua-language-server' },
-  filetypes = { 'lua' },
-  root_markers = { '.luarc.json', '.luarc.jsonc', '.luacheckrc', '.stylua.toml', 'stylua.toml', 'selene.toml', 'selene.yml', '.git' },
-  settings = {
-    Lua = {
-      diagnostics = {
-        -- Recognize the vim global
-        globals = { 'vim' }
-      },
-      workspace = {
-        -- Add Neovim runtime files
-        library = {
-          vim.env.VIMRUNTIME,
-          "${3rd}/luv/library"
-        },
-      },
-      -- Do not send telemetry data
-      telemetry = {
-        enable = false,
-      },
-    }
-  }
-}))
-
--- Only setup marksman if it's executable
-if vim.fn.executable("marksman") == 1 then
-  setup_lsp('marksman', vim.tbl_deep_extend('force', default_lsp_opts, {
-    cmd = { 'marksman', 'server' },
-    filetypes = { 'markdown' },
-    root_markers = { '.marksman.toml', '.git' },
-  }))
-end
-
-setup_lsp('pyright', vim.tbl_deep_extend('force', default_lsp_opts, {
-  cmd = { 'pyright-langserver', '--stdio' },
-  filetypes = { 'python' },
-  root_markers = { 'pyproject.toml', 'setup.py', 'setup.cfg', 'requirements.txt', 'Pipfile', 'pyrightconfig.json', '.git' },
-}))
-
-setup_lsp('ts_ls', vim.tbl_deep_extend('force', default_lsp_opts, {
-  cmd = { 'typescript-language-server', '--stdio' },
-  filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
-  root_markers = { 'tsconfig.json', 'package.json', 'jsconfig.json', '.git' },
-  -- Increase memory limit to 16GB, might need to adjust on weaker
-  -- machines via `MAX_TS_SERVER_MEMORY` env var
-  init_options = {
-    maxTsServerMemory = tonumber(os.getenv('MAX_TS_SERVER_MEMORY')) or 32768,
-  },
-}))
-
-setup_lsp('vimls', vim.tbl_deep_extend('force', default_lsp_opts, {
-  cmd = { 'vim-language-server', '--stdio' },
-  filetypes = { 'vim' },
-  root_markers = { '.vimrc', '.vim', '.git' },
-}))
-
-setup_lsp('yamlls', vim.tbl_deep_extend('force', default_lsp_opts, {
-  cmd = { 'yaml-language-server', '--stdio' },
-  filetypes = { 'yaml', 'yaml.docker-compose' },
-  root_markers = { '.git' },
-}))
-
 require("lazy").setup({
+  -- LSP configuration plugin providing defaults for all servers
+  {
+    'neovim/nvim-lspconfig',
+    config = function()
+      -- Bash
+      if vim.fn.executable('bash-language-server') == 1 then
+        vim.lsp.enable('bashls')
+      end
+
+      -- CSS
+      if vim.fn.executable('vscode-css-language-server') == 1 then
+        vim.lsp.enable('cssls')
+      end
+
+      -- Deno
+      if vim.fn.executable('deno') == 1 then
+        vim.lsp.enable('denols')
+      end
+
+      -- Docker
+      if vim.fn.executable('docker-langserver') == 1 then
+        vim.lsp.enable('dockerls')
+      end
+
+      -- HTML
+      if vim.fn.executable('vscode-html-language-server') == 1 then
+        vim.lsp.enable('html')
+      end
+
+      -- JSON
+      if vim.fn.executable('vscode-json-language-server') == 1 then
+        vim.lsp.enable('jsonls')
+      end
+
+      -- Lua (with custom settings)
+      if vim.fn.executable('lua-language-server') == 1 then
+        vim.lsp.config('lua_ls', {
+          settings = {
+            Lua = {
+              runtime = {
+                version = 'LuaJIT',
+              },
+              diagnostics = {
+                -- Recognize the `vim` global
+                globals = { 'vim' },
+              },
+              workspace = {
+                -- Make the server aware of Neovim runtime files
+                library = vim.api.nvim_get_runtime_file('', true),
+                checkThirdParty = false,
+              },
+              telemetry = {
+                enable = false,
+              },
+            },
+          },
+        })
+        vim.lsp.enable('lua_ls')
+      end
+
+      -- Markdown
+      if vim.fn.executable('marksman') == 1 then
+        vim.lsp.enable('marksman')
+      end
+
+      -- Python
+      if vim.fn.executable('pyright-langserver') == 1 then
+        vim.lsp.enable('pyright')
+      end
+
+      -- TypeScript
+      if vim.fn.executable('typescript-language-server') == 1 then
+        vim.lsp.enable('ts_ls')
+      end
+
+      -- Vim
+      if vim.fn.executable('vim-language-server') == 1 then
+        vim.lsp.enable('vimls')
+      end
+
+      -- YAML
+      if vim.fn.executable('yaml-language-server') == 1 then
+        vim.lsp.enable('yamlls')
+      end
+    end,
+  },
+
   -- GitHub Co-Pilot is paid, so only load if #ENABLE_GITHUB_COPILOT is set
   -- Use <leader><tab> to accept and go to next edit suggestion
   {
