@@ -64,7 +64,7 @@ Once you've run setup, you'll still have to do the following universal manual st
    # Launch codex CLI to log in
    codex
 
-   # Copilot Vim extension by doing `:Copilot setup`
+   # Copilot Vim extension by doing `:Copilot auth`
    # Make sure `ENABLE_GITHUB_COPILOT` variable is set in `~/.profile.local`
 
    # Launch Copilot CLI agent, open and do `/login
@@ -225,6 +225,7 @@ This repository previously supported Linux GUI environments (using sway/i3) and 
 
 ## TODO/Future Improvements
 
+- [ ] Get [folke/sidekick.nvim](https://github.com/folke/sidekick.nvim) working
 - [ ] Check out [harper](https://writewithharper.com/docs/integrations/neovim) for grammar checking using LSP
 - [ ] Install `m4xshen/hardtime.nvim` for improving vim motions
 - [x] ~~Debian Trixie upgrade~~ (completed)

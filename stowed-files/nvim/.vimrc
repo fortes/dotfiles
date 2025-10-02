@@ -762,6 +762,10 @@ if has('spell')
   endfor
 endif
 
+" Disable things we don't care about
+let g:loaded_perl_provider = 0
+let g:loaded_ruby_provider = 0
+
 " Local Settings {{{
 if filereadable(expand('~/.vimrc.local'))
   source ~/.vimrc.local
