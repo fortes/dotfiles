@@ -57,20 +57,8 @@ vim.api.nvim_create_autocmd('LspAttach', {
       return
     end
 
-    -- Special handling for specific LSP servers
-    if client.name == 'denols' then
-      -- Only attach if in a deno project
-      if not vim.fs.root(bufnr, { 'deno.json', 'deno.jsonc' }) then
-        client:stop()
-        return
-      end
-    elseif client.name == 'eslint' then
-      -- Don't run if in a deno project
-      if vim.fs.root(bufnr, { 'deno.json', 'deno.jsonc' }) then
-        client:stop()
-        return
-      end
-
+    -- ESLint-specific keymaps
+    if client.name == 'eslint' then
       -- <leader>x to autofix via eslint
       map('n', '<leader>x', function()
         vim.cmd('EslintFixAll')
@@ -78,12 +66,6 @@ vim.api.nvim_create_autocmd('LspAttach', {
         buffer = bufnr,
         desc = "Fix all ESLint issues"
       })
-    elseif client.name == 'ts_ls' then
-      -- Don't run if in a deno project
-      if vim.fs.root(bufnr, { 'deno.json', 'deno.jsonc' }) then
-        client:stop()
-        return
-      end
     end
 
     map('n', '<leader>e', vim.diagnostic.open_float, {
@@ -166,19 +148,32 @@ require("lazy").setup({
         vim.lsp.enable('bashls')
       end
 
+      -- Check if cwd is in a Deno project (or forced via env var)
+      local in_deno_project = os.getenv('ENABLE_DENO') == '1' or
+          vim.fs.root(vim.fn.getcwd(), { 'deno.json', 'deno.jsonc' }) ~= nil
+
       -- CSS
       if vim.fn.executable('vscode-css-language-server') == 1 then
         vim.lsp.enable('cssls')
       end
 
-      -- Deno
-      if vim.fn.executable('deno') == 1 then
+      -- Deno (only enable if cwd is a deno project)
+      if vim.fn.executable('deno') == 1 and in_deno_project then
+        vim.lsp.config('denols', {
+          root_markers = { "deno.json", "deno.jsonc" },
+          single_file_support = false,
+        })
         vim.lsp.enable('denols')
       end
 
       -- Docker
       if vim.fn.executable('docker-langserver') == 1 then
         vim.lsp.enable('dockerls')
+      end
+
+      -- ESLint (only enable if not in a deno project)
+      if vim.fn.executable('vscode-eslint-language-server') == 1 and not in_deno_project then
+        vim.lsp.enable('eslint')
       end
 
       -- HTML
@@ -227,8 +222,14 @@ require("lazy").setup({
         vim.lsp.enable('pyright')
       end
 
-      -- TypeScript
-      if vim.fn.executable('typescript-language-server') == 1 then
+      -- TypeScript (only enable if not in a deno project)
+      if vim.fn.executable('typescript-language-server') == 1 and not in_deno_project then
+        vim.lsp.config('ts_ls', {
+          init_options = {
+            maxTsServerMemory = tonumber(os.getenv('MAX_TS_SERVER_MEMORY')) or 32768,
+          },
+          single_file_support = false,
+        })
         vim.lsp.enable('ts_ls')
       end
 
@@ -258,7 +259,7 @@ require("lazy").setup({
           markdown = true,
           -- Disable in places where it doesn't make sense
           ["copilot-chat"] = false,
-          codecomponion = false,
+          codecompanion = false,
           DressingInput = false,
           TelescopePrompt = false,
           sh = function()
