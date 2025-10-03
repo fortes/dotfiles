@@ -19,7 +19,10 @@ if !has('nvim')
   set cscopeverbose
   set display=lastline
   set encoding=utf-8
-  set fillchars="vert:│,fold:·,foldsep:│"
+  set fillchars="vert:│,fold:·"
+  if exists('+foldsep')
+    set fillchars+=foldsep:│
+  endif
   set formatoptions=tcq
   if v:version >= 704
     set formatoptions+=j
@@ -31,10 +34,10 @@ if !has('nvim')
   set include=.
   set incsearch
   set nojoinspaces
-  if has('&jumpoptions')
+  if exists('+jumpoptions')
     set jumpoptions=clean
   endif
-  if has('langmap') && (v:version > 704 || v:version == 704 && has('patch502'))
+  if exists('+langnoremap')
     set langnoremap
   endif
   set laststatus=2
