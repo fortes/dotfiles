@@ -417,9 +417,10 @@ install_yq() {
 }
 
 install_github_packages() {
-  # Make sure to load `command_exists` helper
-  # shellcheck source=./stowed-files/bash/.profile
-  . "${dotfiles_root}/stowed-files/bash/.profile"
+  # Helper function to check if command exists
+  command_exists() {
+    command -v "$1" &> /dev/null
+  }
 
   if ! command_exists apt-get; then
     echo_stderr "Only works on Debian-like systems"

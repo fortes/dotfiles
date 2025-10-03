@@ -9,9 +9,10 @@ IFS=$'\n\t'
 declare dotfiles_root
 dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-# Make sure to load `command_exists` helper
-# shellcheck source=./stowed-files/bash/.profile
-. "${dotfiles_root}/stowed-files/bash/.profile"
+# Helper function to check if command exists
+command_exists() {
+  command -v "$1" &> /dev/null
+}
 
 PLUGINS=(
   llm-anthropic

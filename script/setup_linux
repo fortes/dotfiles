@@ -206,9 +206,10 @@ setup_shell() {
 }
 
 main() {
-  # Make sure to load `command_exists` helper
-  # shellcheck source=./stowed-files/bash/.profile
-  . "${dotfiles_root}/stowed-files/bash/.profile"
+  # Helper function to check if command exists
+  command_exists() {
+    command -v "$1" &> /dev/null
+  }
 
   declare -r local_profile_path="$HOME/.profile.local"
 

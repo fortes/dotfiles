@@ -34,9 +34,10 @@ PACKAGES=(
   yaml-language-server
 )
 
-# Make sure to load `command_exists` helper as well as local paths
-# shellcheck source=./stowed-files/bash/.profile
-. "${dotfiles_root}/stowed-files/bash/.profile"
+# Helper function to check if command exists
+command_exists() {
+  command -v "$1" &> /dev/null
+}
 
 install_node_packages() {
   if ! command_exists fnm; then
