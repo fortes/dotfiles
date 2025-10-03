@@ -55,13 +55,21 @@ WORKDIR /home/$USER_NAME
 # Create /workspaces directory for projects and Claude config
 RUN sudo mkdir -p /workspaces && sudo chown $USER_NAME:$USER_NAME /workspaces
 
-COPY --chown=$USER_NAME:$USER_NAME . /home/$USER_NAME/dotfiles
+# Copy only scripts needed for package installation (heavy layer, rarely changes)
+COPY --chown=$USER_NAME:$USER_NAME script/ /home/$USER_NAME/dotfiles/script/
 
 ENV IS_DOCKER=1 \
     SKIP_INITIAL_APT_INSTALL=1 \
     CLAUDE_CONFIG_DIR=/workspaces/.claude-container
 
+# Install all packages (cached unless script/ changes)
 RUN ./dotfiles/script/setup
+
+# Copy all dotfiles including stowed-files/ (cheap, but invalidates on config changes)
+COPY --chown=$USER_NAME:$USER_NAME . /home/$USER_NAME/dotfiles/
+
+# Re-run stow to pick up any config changes (fast)
+RUN ./dotfiles/script/stow
 
 # Free up disk space
 RUN sudo apt-get clean && \
