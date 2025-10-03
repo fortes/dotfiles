@@ -65,15 +65,15 @@ ENV IS_DOCKER=1 \
 # Install all packages (cached unless script/ changes)
 RUN ./dotfiles/script/setup
 
+# Free up disk space immediately after package installation
+RUN sudo apt-get clean && \
+  sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
 # Copy all dotfiles including stowed-files/ (cheap, but invalidates on config changes)
 COPY --chown=$USER_NAME:$USER_NAME . /home/$USER_NAME/dotfiles/
 
 # Re-run stow to pick up any config changes (fast)
 RUN ./dotfiles/script/stow
-
-# Free up disk space
-RUN sudo apt-get clean && \
-  sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 SHELL ["/bin/bash", "-c"]
 CMD ["/bin/bash"]
