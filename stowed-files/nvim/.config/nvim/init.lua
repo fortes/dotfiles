@@ -61,7 +61,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
     if client.name == 'eslint' then
       -- <leader>x to autofix via eslint
       map('n', '<leader>x', function()
-        vim.cmd('EslintFixAll')
+        vim.cmd('LspEslintFixAll')
       end, {
         buffer = bufnr,
         desc = "Fix all ESLint issues"
