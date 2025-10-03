@@ -177,19 +177,41 @@ git update-index --no-skip-worktree ./symlinks/npmrc
 
 Images are built with some frequency, via CI.
 
-```sh
-docker run -it --rm --name dotfiles ghcr.io/fortes/dotfiles:latest
-```
-
-To share files, use `-v /path/to/host:/path/to/container`, for example if sharing the `~/src` folder:
+### Long-running container
 
 ```sh
-docker run -it --rm --name dotfiles -v ~/src:/workspaces dotfiles
+# Start container in background
+docker-compose up -d
+
+# Connect to tmux session
+docker-compose exec dotfiles tmux attach -t main
+
+# Stop/restart as needed
+docker-compose stop
+docker-compose start
 ```
 
-Will need to manually start neovim to install plugins. Some other things may or may not work, we'll have to test to find out!
+### One-off ephemeral session
 
-#### Local building
+Gets deleted when you exit.
+
+```sh
+docker run -it --rm --name dotfiles -v ~/src:/workspaces ghcr.io/fortes/dotfiles:latest
+```
+
+### Persistent container
+
+Preserves state, but not always running
+
+```sh
+# First time
+docker run -it --name dotfiles -v ~/src:/workspaces ghcr.io/fortes/dotfiles:latest
+
+# Later sessions
+docker start -ai dotfiles
+```
+
+### Building locally
 
 ```sh
 docker build -t dotfiles .

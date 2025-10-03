@@ -1,0 +1,9 @@
+services:
+  dotfiles:
+    image: ghcr.io/fortes/dotfiles:latest
+    container_name: dotfiles
+    volumes:
+      - ~/src:/workspaces
+    command: tmux new-session -s main
+    stdin_open: true
+    tty: true

@@ -30,6 +30,7 @@ BREW_PACKAGES=(
   delta
   difftastic
   docker
+  docker-compose
   duf
   MisterTea/et/et
   eza
