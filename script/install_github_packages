@@ -24,10 +24,6 @@ set -euo pipefail
 IFS=$'\n\t'
 export DEBIAN_FRONTEND=noninteractive
 
-# shellcheck source=./stowed-files/bash/.profile
-declare dotfiles_root
-dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-
 AVAILABLE_PACKAGES=(
   agg
   bun

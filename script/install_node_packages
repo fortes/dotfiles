@@ -6,9 +6,6 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-declare dotfiles_root
-dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-
 PACKAGES=(
   @anthropic-ai/claude-code
   @github/copilot
