@@ -62,11 +62,9 @@ ENV IS_DOCKER=1 \
     SKIP_INITIAL_APT_INSTALL=1 \
     CLAUDE_CONFIG_DIR=/workspaces/.claude-container
 
-# Install all packages (cached unless script/ changes)
-RUN ./dotfiles/script/setup
-
-# Free up disk space immediately after package installation
-RUN sudo apt-get clean && \
+# Install all packages and clean up in same layer to reduce image size
+RUN ./dotfiles/script/setup && \
+  sudo apt-get clean && \
   sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Copy all dotfiles including stowed-files/ (cheap, but invalidates on config changes)

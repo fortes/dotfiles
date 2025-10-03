@@ -413,10 +413,8 @@ install_yq() {
 }
 
 install_github_packages() {
-  # Helper function to check if command exists
-  command_exists() {
-    command -v "$1" &> /dev/null
-  }
+  # shellcheck source=./lib.sh
+  . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
   if ! command_exists apt-get; then
     echo_stderr "Only works on Debian-like systems"

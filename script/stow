@@ -15,7 +15,7 @@ main() {
   local stowed_files_path="${dotfiles_root}/stowed-files"
 
   if [[ ! -d "${stowed_files_path}" ]]; then
-    echo "Warning: stowed-files directory not found at ${stowed_files_path}, skipping stow"
+    >&2 echo "Warning: stowed-files directory not found at ${stowed_files_path}, skipping stow"
     return 0
   fi
 

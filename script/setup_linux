@@ -206,10 +206,8 @@ setup_shell() {
 }
 
 main() {
-  # Helper function to check if command exists
-  command_exists() {
-    command -v "$1" &> /dev/null
-  }
+  # shellcheck source=./lib.sh
+  . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
   declare -r local_profile_path="$HOME/.profile.local"
 

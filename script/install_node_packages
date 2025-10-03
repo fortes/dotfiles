@@ -31,13 +31,8 @@ PACKAGES=(
   yaml-language-server
 )
 
-# Ensure ~/.local/bin is in PATH for locally-installed tools
-export PATH="$HOME/.local/bin:$PATH"
-
-# Helper function to check if command exists
-command_exists() {
-  command -v "$1" &> /dev/null
-}
+# shellcheck source=./lib.sh
+. "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 install_node_packages() {
   if ! command_exists fnm; then
