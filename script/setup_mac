@@ -173,9 +173,8 @@ main() {
     exit 1
   fi
 
-  # Make sure to load `command_exists` helper
-  # shellcheck source=./stowed-files/bash/.profile
-  . "${dotfiles_root}/stowed-files/bash/.profile"
+  # shellcheck source=script/lib.sh
+  . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
   declare brew_only=''
   declare cask_only=''

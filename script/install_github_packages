@@ -24,10 +24,6 @@ set -euo pipefail
 IFS=$'\n\t'
 export DEBIAN_FRONTEND=noninteractive
 
-# shellcheck source=./stowed-files/bash/.profile
-declare dotfiles_root
-dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-
 AVAILABLE_PACKAGES=(
   agg
   bun
@@ -417,9 +413,8 @@ install_yq() {
 }
 
 install_github_packages() {
-  # Make sure to load `command_exists` helper
-  # shellcheck source=./stowed-files/bash/.profile
-  . "${dotfiles_root}/stowed-files/bash/.profile"
+  # shellcheck source=script/lib.sh
+  . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
   if ! command_exists apt-get; then
     echo_stderr "Only works on Debian-like systems"
