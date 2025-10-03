@@ -206,7 +206,7 @@ setup_shell() {
 }
 
 main() {
-  # shellcheck source=./lib.sh
+  # shellcheck source=script/lib.sh
   . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
   declare -r local_profile_path="$HOME/.profile.local"

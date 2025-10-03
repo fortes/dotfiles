@@ -31,7 +31,7 @@ PACKAGES=(
   yaml-language-server
 )
 
-# shellcheck source=./lib.sh
+# shellcheck source=script/lib.sh
 . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 install_node_packages() {

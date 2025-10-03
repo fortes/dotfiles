@@ -173,7 +173,7 @@ main() {
     exit 1
   fi
 
-  # shellcheck source=./lib.sh
+  # shellcheck source=script/lib.sh
   . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
   declare brew_only=''

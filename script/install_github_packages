@@ -413,7 +413,7 @@ install_yq() {
 }
 
 install_github_packages() {
-  # shellcheck source=./lib.sh
+  # shellcheck source=script/lib.sh
   . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
   if ! command_exists apt-get; then
