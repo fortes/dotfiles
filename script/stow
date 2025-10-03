@@ -14,6 +14,11 @@ main() {
   dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
   local stowed_files_path="${dotfiles_root}/stowed-files"
 
+  if [[ ! -d "${stowed_files_path}" ]]; then
+    echo "Warning: stowed-files directory not found at ${stowed_files_path}, skipping stow"
+    return 0
+  fi
+
   # Purposefully allow word splitting on $@ to pass through flags
   # shellcheck disable=SC2046,SC2068
   stow --dir="${stowed_files_path}/" --target="$HOME" \
