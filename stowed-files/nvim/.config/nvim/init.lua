@@ -111,6 +111,12 @@ vim.api.nvim_create_autocmd('LspAttach', {
       })
     end
 
+    if client:supports_method('textDocument/foldingRange') then
+      -- Enable LSP folding, when available
+      vim.api.nvim_set_option_value('foldmethod', 'expr', { win = 0 })
+      vim.api.nvim_set_option_value('foldexpr', 'v:lua.vim.lsp.foldexpr()', { win = 0 })
+    end
+
     if client:supports_method('textDocument/references') then
       -- grr default in Neovim 0.11, use upper case to use Telescope
       map('n', 'gRR', function()
