@@ -34,6 +34,7 @@ AVAILABLE_PACKAGES=(
   fzf
   # Trixie tracks recent version already, can use apt
   # github-cli
+  harper-ls
   hugo
   jj
   luals
@@ -412,6 +413,10 @@ install_yq() {
   install_bin 'mikefarah/yq' 'yq_linux_{ARCH}'
 }
 
+install_harper_ls() {
+  install_tarball 'Automattic/harper' 'harper-ls-{ARCH}-unknown-linux-gnu.tar.gz' 'harper-ls'
+}
+
 install_github_packages() {
   # shellcheck source=script/lib.sh
   . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
@@ -468,6 +473,9 @@ install_github_packages() {
         ;;
       fzf)
         install_fzf
+        ;;
+      harper-ls)
+        install_harper_ls
         ;;
       hugo)
         install_hugo

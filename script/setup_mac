@@ -48,6 +48,7 @@ BREW_PACKAGES=(
   git-lfs
   gnupg
   gron
+  harper
   htop
   hugo
   iftop

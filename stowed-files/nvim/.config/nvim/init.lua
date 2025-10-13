@@ -182,6 +182,11 @@ require("lazy").setup({
         vim.lsp.enable('eslint')
       end
 
+      -- Harper (grammar/spell checker)
+      if vim.fn.executable('harper-ls') == 1 then
+        vim.lsp.enable('harper_ls')
+      end
+
       -- HTML
       if vim.fn.executable('vscode-html-language-server') == 1 then
         vim.lsp.enable('html')
