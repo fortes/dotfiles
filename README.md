@@ -248,7 +248,7 @@ This repository previously supported Linux GUI environments (using sway/i3) and 
 ## TODO/Future Improvements
 
 - [ ] Get [folke/sidekick.nvim](https://github.com/folke/sidekick.nvim) working
-- [ ] Check out [harper](https://writewithharper.com/docs/integrations/neovim) for grammar checking using LSP
+- [x] Check out [harper](https://writewithharper.com/docs/integrations/neovim) for grammar checking using LSP
 - [ ] Install `m4xshen/hardtime.nvim` for improving vim motions
 - [x] ~~Debian Trixie upgrade~~ (completed)
   - [x] ~~Need to run `apt modernize-sources` to update source format~~ (completed)
