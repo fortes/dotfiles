@@ -21,7 +21,6 @@ BREW_PACKAGES=(
   bash
   bash-completion@2
   bat
-  block-goose-cli
   oven-sh/bun/bun
   chafa
   cmus
