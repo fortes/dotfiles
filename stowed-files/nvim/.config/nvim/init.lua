@@ -154,6 +154,11 @@ require("lazy").setup({
         vim.lsp.enable('bashls')
       end
 
+      if vim.fn.executable('copilot-language-server') == 1 then
+        -- Enable built-in Copilot LSP (requires Neovim 0.11.2+)
+        vim.lsp.enable("copilot")
+      end
+
       -- Check if cwd is in a Deno project (or forced via env var)
       local in_deno_project = os.getenv('ENABLE_DENO') == '1' or
           vim.fs.root(vim.fn.getcwd(), { 'deno.json', 'deno.jsonc' }) ~= nil
@@ -259,42 +264,80 @@ require("lazy").setup({
   -- GitHub Co-Pilot is paid, so only load if #ENABLE_GITHUB_COPILOT is set
   -- Use <leader><tab> to accept and go to next edit suggestion
   {
-    "zbirenbaum/copilot.lua",
+    "github/copilot.vim",
     cmd = "Copilot",
     cond = function()
       return os.getenv("ENABLE_GITHUB_COPILOT") == "1"
     end,
     config = function()
-      require("copilot").setup({
-        filetypes = {
-          markdown = true,
-          -- Disable in places where it doesn't make sense
-          ["copilot-chat"] = false,
-          codecompanion = false,
-          DressingInput = false,
-          TelescopePrompt = false,
-          sh = function()
-            if string.match(vim.fs.basename(vim.api.nvim_buf_get_name(0)), '^%.env.*') then
-              -- disable for .env files
-              return false
-            end
-            return true
-          end,
-        },
-        nes = {
-          enabled = true,
-          keymap = {
-            accept_and_goto = "<leader><tab>",
-            accept = false,
-            dismiss = "<Esc>",
-          },
-        }
-      })
+      -- Enable for markdown
+      vim.g.copilot_filetypes = {
+        markdown = true,
+        DressingInput = false,
+        Telescope = false,
+        ['copilot-chat'] = false,
+      }
     end,
-    dependencies = {
-      { "copilotlsp-nvim/copilot-lsp" }
-    },
     event = "InsertEnter",
+  },
+
+  -- Sidekick for AI CLI integration (e.g., ChatGPT, Claude, etc)
+  -- Also supports next-edit suggestions from GitHub Copilot, via <tab>
+  -- TODO: Should be able to rely on native LSP support in v0.12+ once released
+  {
+    "folke/sidekick.nvim",
+    opts = {
+      -- add any options here
+      cli = {
+        mux = {
+          backend = "tmux",
+          enabled = true,
+        },
+      },
+    },
+    keys = {
+      {
+        "<tab>",
+        function()
+          -- if there is a next edit, jump to it, otherwise apply it if any
+          if not require("sidekick").nes_jump_or_apply() then
+            return "<Tab>" -- fallback to normal tab
+          end
+        end,
+        expr = true,
+        desc = "Goto/Apply Next Edit Suggestion",
+      },
+      {
+        "<leader>ac",
+        function()
+          require("sidekick.cli").toggle({ name = "claude", focus = true })
+        end,
+        desc = "Sidekick Toggle Claude",
+      },
+      {
+        "<leader>at",
+        function() require("sidekick.cli").send({ msg = "{this}" }) end,
+        mode = { "x", "n" },
+        desc = "Send This",
+      },
+      {
+        "<leader>af",
+        function() require("sidekick.cli").send({ msg = "{file}" }) end,
+        desc = "Send File",
+      },
+      {
+        "<leader>av",
+        function() require("sidekick.cli").send({ msg = "{selection}" }) end,
+        mode = { "x" },
+        desc = "Send Visual Selection",
+      },
+      {
+        "<leader>ap",
+        function() require("sidekick.cli").prompt() end,
+        mode = { "n", "x" },
+        desc = "Sidekick Select Prompt",
+      },
+    },
   },
 
   -- GitHub Copilot chat, which isn't in copilot.vim yet
@@ -345,26 +388,6 @@ require("lazy").setup({
     end,
   },
 
-  -- AI coding assistant
-  {
-    "olimorris/codecompanion.nvim",
-    cond = function()
-      -- Can either piggyback off of GitHub Copilot or use Anthropic/OpenAI
-      return os.getenv("ENABLE_GITHUB_COPILOT") == "1" or
-          os.getenv('ANTHROPIC_API_KEY') ~= '' or
-          os.getenv('OPENAI_API_KEY') ~= ''
-    end,
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-      "nvim-treesitter/nvim-treesitter",
-      -- Optional: For working with files with slash commands
-      "nvim-telescope/telescope.nvim",
-      -- Improves the default Neovim UI
-      "stevearc/dressing.nvim",
-    },
-    config = true
-  },
-
   -- Show LSP progress in lower right
   {
     'j-hui/fidget.nvim',
@@ -399,16 +422,18 @@ require("lazy").setup({
           enable = true
         },
         ignore_install = {},
-        -- Enable `=` for indentation based on treesitter (experimental)
+        -- Enable `=` for indentation based on Treesitter (experimental)
         indent = {
           enable = true
         },
+        modules = {},
         sync_install = false,
       }
 
       vim.wo.foldmethod = 'expr'
       vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
-    end
+    end,
+    lazy = false,
   },
 
   -- Create text objects using Treesitter queries

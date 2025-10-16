@@ -55,3 +55,5 @@ WSL2
 WinGet
 Neovim
 naïve
+vimrc
+autocmd
