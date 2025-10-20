@@ -25,6 +25,10 @@ generate_completions() {
     SHELL=bash bun completions "${completion_dir}" > "${completion_dir}/bun.completion.bash"
   fi
 
+  if command_exists codex; then
+    codex completion bash > "${completion_dir}/codex.completion.bash"
+  fi
+
   if command_exists delta; then
     delta --generate-completion bash > "${completion_dir}/delta_completion"
   fi
