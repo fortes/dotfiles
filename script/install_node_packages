@@ -10,6 +10,7 @@ PACKAGES=(
   @anthropic-ai/claude-code
   @github/copilot
   @google/gemini-cli
+  @google/jules
   @openai/codex
   bash-language-server
   corepack@latest
