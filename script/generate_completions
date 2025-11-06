@@ -21,6 +21,10 @@ generate_completions() {
     beet completion > "${completion_dir}/beet_completion"
   fi
 
+  if command_exists bd; then
+    bd completion bash > "${completion_dir}/bd.completion.bash"
+  fi
+
   if command_exists bun; then
     SHELL=bash bun completions "${completion_dir}" > "${completion_dir}/bun.completion.bash"
   fi

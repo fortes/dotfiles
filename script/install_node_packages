@@ -8,6 +8,7 @@ IFS=$'\n\t'
 
 PACKAGES=(
   @anthropic-ai/claude-code
+  @beads/bd
   @github/copilot
   @google/gemini-cli
   @google/jules

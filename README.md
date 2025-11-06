@@ -245,26 +245,6 @@ This will list out all the packages installed, then need to search through to ma
 
 This repository previously supported Linux GUI environments (using sway/i3) and Windows WSL2. These configurations have been removed as they are no longer actively used. If you need these configurations, check the git history for older implementations.
 
-## TODO/Future Improvements
-
-- [ ] Get [folke/sidekick.nvim](https://github.com/folke/sidekick.nvim) working
-- [x] Check out [harper](https://writewithharper.com/docs/integrations/neovim) for grammar checking using LSP
-- [ ] Install `m4xshen/hardtime.nvim` for improving vim motions
-- [x] ~~Debian Trixie upgrade~~ (completed)
-  - [x] ~~Need to run `apt modernize-sources` to update source format~~ (completed)
-    - [x] ~~Check scripts to make sure we use the new source format as well~~ (completed)
-    - [ ] Look at using `extrepo`? [Lots of sources](https://salsa.debian.org/extrepo-team/extrepo-data/-/tree/master/repos/debian) can probably get rid of a bunch of manual addition
-  - [ ] Figure out what's wrong with `/etc/sysctl.d` on Docker Mac
-- [ ] Set up [network share](https://www.reddit.com/r/Crostini/wiki/howto/addnetworkshares/) in Crostini
-- [x] Get `devcontainer` setup for this repo
-- [ ] Figure out how to get [M1 CI running](https://github.blog/changelog/2024-01-30-github-actions-introducing-the-new-m1-macos-runner-available-to-open-source/) to check builds
-- [ ] Get things working in GitHub codespaces, which seems to use Ubuntu 20.04.06 LTS underneath. Currently fails silently trying to install backports sources. [Troubleshooting instructions](https://docs.github.com/en/codespaces/troubleshooting/troubleshooting-personalization-for-codespaces#troubleshooting-dotfiles) can be helpful
-- [ ] Figure out how to [use Hammerspoon](https://github.com/Hammerspoon/Spoons/blob/master/Source/MusicAppMediaFix.spoon/init.lua) to have media keys control cmus, instead of launching iTunes (gross)
-- [ ] Move from `docker` to `podman`
-- [ ] Look into `glances` and `btop`
-- [ ] [Auto-publish Docker images](https://docs.github.com/en/actions/publishing-packages/publishing-docker-images#publishing-images-to-github-packages)
-- [ ] [Dotfile managers](https://dotfiles.github.io/utilities/) might have something better than GNU `stow`
-
 ## License
 
 This repository is licensed under the BSD 3-Clause License. See the LICENSE file for more information.

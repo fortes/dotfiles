@@ -11,6 +11,7 @@ IFS=$'\n\t'
 
 UVX_PACKAGES=(
   argcomplete
+  beads-mcp
   # Requires additional dependencies due to plugins
   "beets --with requests --with pylast --with beets[embedart,fetchart,lyrics,lastgenre,plexupdate]"
   epy-reader
