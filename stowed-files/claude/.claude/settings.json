@@ -2,6 +2,7 @@
   "permissions": {
     "allow": [
       "Bash([ -x \"$file\" ])",
+      "Bash(bd:*)",
       "Bash(deno fmt:*)",
       "Bash(deno lint:*)",
       "Bash(deno task:*)",
@@ -28,14 +29,24 @@
       "WebFetch(domain:gohugo.io)",
       "WebFetch(domain:jsr.io)"
     ],
+    "deny": [],
     "ask": [
       "Bash(git rm:*)"
     ],
-    "deny": [],
-    "enabledMcpjsonServers": [
+    "disabledMcpjsonServers": [
       "chrome-devtools",
       "playwright"
     ],
+    "enabledMcpjsonServers": [
+      "beads"
+    ],
     "includeCoAuthoredBy": false
-  }
+  },
+  "model": "haiku",
+  "enabledPlugins": {
+    "pr-review-toolkit@claude-code-plugins": true,
+    "commit-commands@claude-code-plugins": true,
+    "feature-dev@claude-code-plugins": true
+  },
+  "alwaysThinkingEnabled": false
 }

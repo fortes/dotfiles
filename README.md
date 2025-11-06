@@ -48,7 +48,7 @@ Once you've run setup, you'll still have to do the following universal manual st
      path = ~/.config/git/company.gitconfig
    ```
 
-6. Log into GitHub Copilot / Claude Code
+6. Log into Coding agents
 
    ```sh
    # GitHub CLI client
@@ -88,15 +88,20 @@ To make changes in the future:
 git update-index --no-skip-worktree ./symlinks/npmrc
 ```
 
+8. Run global pnpm package build scripts (needed for `bd` at least)
+
+```sh
+pnpm approve-builds --global
+```
+
 ### Firefox
 
 - Log into sync accounts, extensions should automatically install
-- Run `dotfiles/script/stow` manually to make sure to link `user.js` for Firefox now that a profile has been created
 - Configure uBlock Origin
   - Enable in private mode
   - Enable cloud storage mode. Should do the following for you, but doesn't always work:
     - Enable annoyances filters
-    - Add [Bypass paywalls clean filter](https://gitflic.ru/project/magnolia1234/bypass-paywalls-clean-filters)
+    - Add [Bypass paywalls clean filter](https://gitflic.ru/project/magnolia1234/bypass-paywalls-clean-filters) by copy-pasting the contents
 
 ### Chrome
 
@@ -134,6 +139,7 @@ git update-index --no-skip-worktree ./symlinks/npmrc
   ```
 
   Otherwise, just run `colima start` manually when needed.
+
 - If gaming, install battle.net/Steam via brew:
 
   ```sh
@@ -166,7 +172,7 @@ git update-index --no-skip-worktree ./symlinks/npmrc
   - Add the following to custom CSS:
     ```css
     @font-face {
-      font-family: "DejaVu Sans Mono Nerd";
+      font-family: 'DejaVu Sans Mono Nerd';
       src: url(https://raw.githubusercontent.com/ryanoasis/nerd-fonts/master/patched-fonts/DejaVuSansMono/Regular/DejaVuSansMNerdFontMono-Regular.ttf);
       font-weight: normal;
       font-style: normal;
