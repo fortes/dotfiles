@@ -76,3 +76,9 @@ viewport
 vim
 vimrc
 virtualization
+corepack
+fnm
+env
+pnpm
+shellcheck
+arm64

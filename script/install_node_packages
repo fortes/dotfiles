@@ -13,7 +13,6 @@ PACKAGES=(
   @google/jules
   @openai/codex
   bash-language-server
-  corepack@latest
   cssmodules-language-server
   deno@^2.5
   dockerfile-language-server-nodejs
@@ -54,11 +53,27 @@ install_node_packages() {
   echo "Setting node version to LTS …"
   fnm default lts-latest
 
-  # Pick up `fnm`-provided paths for node/npm
+  # Make sure to pick up necessary env vars
   eval "$(fnm env)"
 
+  if [[ -f "$HOME/.profile" ]]; then
+    # Load up PNPM_HOME and add to path
+    # shellcheck source=/dev/null
+    . "$HOME/.profile"
+  else
+    # `.profile` might not be created yet within the docker build process
+    export PNPM_HOME="$HOME/.local/share/pnpm"
+    export PATH="$PNPM_HOME:$PATH"
+  fi
+
+  # Make sure pnpm is setup (corepack is added by fnm when installing node)
+  corepack enable
+
+  # Corepack may need to download pnpm the first time
+  corepack prepare pnpm@latest --activate
+
   echo "Installing global node packages …"
-  npm install --global --fund false "${PACKAGES[@]}"
+  pnpm add --global "${PACKAGES[@]}"
   echo "Node packages installed!"
 }
 

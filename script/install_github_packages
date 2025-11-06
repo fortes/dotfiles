@@ -441,8 +441,10 @@ install_github_packages() {
     shift
   done
 
-  # shellcheck source=/dev/null
-  . "${HOME}/.profile.local"
+  if [[ -f "${HOME}/.profile.local" ]]; then
+    # shellcheck source=/dev/null
+    . "${HOME}/.profile.local"
+  fi
 
   echo -n "Installing GitHub packages:"
   printf " %s" "${packages[@]}"
