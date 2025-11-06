@@ -59,7 +59,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
 
     -- ESLint-specific keymaps
     if client.name == 'eslint' then
-      -- <leader>x to autofix via eslint
+      -- <leader>x to autofix via ESLint
       map('n', '<leader>x', function()
         vim.cmd('LspEslintFixAll')
       end, {
@@ -189,6 +189,18 @@ require("lazy").setup({
 
       -- Harper (grammar/spell checker)
       if vim.fn.executable('harper-ls') == 1 then
+        vim.lsp.config('harper_ls', {
+          settings = {
+            ['harper-ls'] = {
+              linters = {
+                SpellCheck = false,
+              },
+              -- Default on MacOS goes in ~/Library/Application Support/ which
+              -- isn't stowed
+              userDictPath = vim.fn.expand('~/.config/harper-ls/dictionary.txt'),
+            }
+          }
+        })
         vim.lsp.enable('harper_ls')
       end
 

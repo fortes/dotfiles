@@ -5,9 +5,9 @@ This is only public so I can easily share it across machines. There is probably 
 My usage is mostly terminal-based on MacOS, Debian Trixie over SSH, or sometimes Crostini (Debian) on Chromebook. Making heavy use of:
 
 - Ghostty
-- Bash / Tmux
+- bash / tmux
 - Neovim
-- FZF / fd / ripgrep
+- fzf / fd / ripgrep
 - cmus
 
 ## Letting me own your machine
@@ -105,17 +105,17 @@ git update-index --no-skip-worktree ./symlinks/npmrc
 
 ### Mac
 
-- Set up TouchID, Apple account if required
+- Set up Touch ID, Apple account if required
 - Remove all the junk from the dock
 - Enable _Night Shift_ and set to _Sunset to Sunrise_
 - Turn off Natural Scrolling
-- Increase keyboard repeat rate to max, delay to min
+- Increase keyboard repeat rate to max, delay to minimum
 - Change Globe key to Control dictation
 - Disable iCloud syncing of all but Find My Mac & Safari
 - Set `terminal.app` profile, send option as meta key
 - May want to install command line tools manually in order to get `git`: `xcode-select --install`
 - Run `setup_mac`
-- Make sure keys repeat properly in VSCode: `defaults write com.microsoft.VSCode ApplePressAndHoldEnabled -bool false`
+- Make sure keys repeat properly in VS Code: `defaults write com.microsoft.VSCode ApplePressAndHoldEnabled -bool false`
   - For other apps that have this issue, do the following:
     ```sh
     # Get the app id
@@ -127,14 +127,14 @@ git update-index --no-skip-worktree ./symlinks/npmrc
 - `terminal.app` sucks with colors, switch to Ghostty and pin it in the dock
 - Make sure `Rectangle.app` starts on login
 - Install the 1Password extension in Safari (others should sync automatically)
-- If planning on using Docker a lot, can have Colima autostart on login by running the following:
+- If planning on using Docker a lot, can have Colima auto-start on login by running the following:
 
   ```sh
   brew services start colima
   ```
 
   Otherwise, just run `colima start` manually when needed.
-- If gaming, install Battle.net/Steam via brew:
+- If gaming, install battle.net/Steam via brew:
 
   ```sh
   # May require this first in order to run Battle.net
@@ -239,7 +239,7 @@ This will list out all the packages installed, then need to search through to ma
 
 ### Mac
 
-- Firefox and VSCode casks get ornery and no longer update via brew, currently install once via script, but updates have to happen manually. Need to investigate further.
+- Firefox and VS Code casks get ornery and no longer update via brew, currently install once via script, but updates have to happen manually. Need to investigate further.
 
 ## Linux GUI and Windows WSL2 Support
 
