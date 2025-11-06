@@ -1,0 +1,43 @@
+# TypeScript/Deno: Use appropriate LSP based on project type
+[[language]]
+name = "typescript"
+roots = ["deno.json", "deno.jsonc", "package.json"]
+file-types = ["ts", "tsx"]
+auto-format = true
+language-servers = ["typescript-language-server", "deno-lsp"]
+
+[language-server.typescript-language-server]
+required-root-patterns = ["package.json", "tsconfig.json"]
+
+[language-server.deno-lsp]
+command = "deno"
+args = ["lsp"]
+config.deno.enable = true
+required-root-patterns = ["deno.*"]
+
+# Python: Add pyright for better type checking (ruff is default for linting)
+[[language]]
+name = "python"
+language-servers = ["pyright", "ruff"]
+
+[language-server.pyright]
+command = "pyright-langserver"
+args = ["--stdio"]
+
+# Markdown: Add harper-ls for grammar/spell checking
+[[language]]
+name = "markdown"
+language-servers = ["marksman", "harper-ls"]
+
+# Git commit messages: Enable grammar checking
+[[language]]
+name = "git-commit"
+language-servers = ["harper-ls"]
+
+# Harper-ls: Grammar and spell checker
+[language-server.harper-ls]
+command = "harper-ls"
+args = ["--stdio"]
+
+[language-server.harper-ls.config.harper-ls]
+userDictPath = "~/.config/harper-ls/dictionary.txt"

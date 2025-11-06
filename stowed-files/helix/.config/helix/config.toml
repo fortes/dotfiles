@@ -1,1 +1,30 @@
 theme = 'base16_default_dark'
+
+[editor]
+# Display color column guides
+rulers = [80]
+
+# Show indent guides for easier navigation in Python, YAML, etc
+[editor.indent-guides]
+render = true
+
+[editor.soft-wrap]
+enable = true
+
+# Enable inline diagnostics (new in 25.01+)
+# Shows diagnostic messages directly in the editor
+[editor.inline-diagnostics]
+cursor-line = "warning"  # Show warnings+ on current line
+other-lines = "error"    # Show only errors on other lines
+
+# LSP configuration
+[editor.lsp]
+display-inlay-hints = true          # Show type hints inline
+display-progress-messages = true    # Show LSP loading progress
+auto-signature-help = true          # Show function signatures
+
+# Auto-save configuration
+[editor.auto-save]
+focus-lost = true           # vvave when switching away from Helix
+after-delay.enable = true   # Save after idle time (waits until exiting insert mode)
+after-delay.timeout = 500   # 500ms of inactivity
