@@ -9,12 +9,15 @@
       "Bash(find:*)",
       "Bash(gh pr:*)",
       "Bash(git add:*)",
+      "Bash(git cherry-pick:*)",
       "Bash(git commit:*)",
       "Bash(git diff:*)",
       "Bash(git grep:*)",
       "Bash(git mv:*)",
       "Bash(git push:*)",
+      "Bash(git rebase:*)",
       "Bash(git reset:*)",
+      "Bash(git rev-parse:*)",
       "Bash(git show:*)",
       "Bash(git stash:*)",
       "Bash(git status:*)",
@@ -42,7 +45,6 @@
     ],
     "includeCoAuthoredBy": false
   },
-  "model": "haiku",
   "enabledPlugins": {
     "pr-review-toolkit@claude-code-plugins": true,
     "commit-commands@claude-code-plugins": true,
