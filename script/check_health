@@ -7,7 +7,7 @@ set -euo pipefail
 IFS=$'\n\t'
 
 usage() {
-  cat << EOF
+  cat <<EOF
 Usage: $(basename "$0") [--help]
 
 Checks the health of your dotfiles setup. Currently, this script is a placeholder and does not perform any checks.

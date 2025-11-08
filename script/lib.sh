@@ -8,5 +8,5 @@ export PATH="$HOME/.local/bin:$PATH"
 
 # Helper function to check if command exists
 command_exists() {
-  command -v "$1" &> /dev/null
+  command -v "$1" &>/dev/null
 }

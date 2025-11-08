@@ -14,11 +14,11 @@ install_et() {
 
   if [ ! -f "${et_sources_list}" ]; then
     echo "Adding Eternal Terminal GPG key (requires sudo)"
-    curl -sSL "${et_key_url}" |
-      sudo tee "$et_key_path" > /dev/null
+    curl -sSL "${et_key_url}" \
+      | sudo tee "$et_key_path" >/dev/null
 
     echo "Eternal Terminal sources list missing, adding (requires sudo)"
-    sudo tee "${et_sources_list}" > /dev/null <<EOF
+    sudo tee "${et_sources_list}" >/dev/null <<EOF
 Types: deb
 URIs: https://github.com/MisterTea/debian-et/raw/master/debian-source/
 Suites: trixie

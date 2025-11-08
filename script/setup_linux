@@ -77,8 +77,8 @@ increase_max_watchers() {
 
   if [ ! -f "$conf_file_path" ]; then
     echo "Increasing max watchers (requires sudo)"
-    echo "fs.inotify.max_user_watches=$max_watches" |
-      sudo tee -a "$conf_file_path" &> /dev/null && sudo sysctl -p
+    echo "fs.inotify.max_user_watches=$max_watches" \
+      | sudo tee -a "$conf_file_path" &>/dev/null && sudo sysctl -p
     echo "Max watchers set to $max_watches"
   fi
 }
@@ -105,7 +105,7 @@ is_package_installed() {
 }
 
 set_default_applications() {
-  if command_exists nvim && update-alternatives --query editor &> /dev/null && ! update-alternatives --query editor | grep ^Value | grep -q nvim; then
+  if command_exists nvim && update-alternatives --query editor &>/dev/null && ! update-alternatives --query editor | grep ^Value | grep -q nvim; then
     echo "Setting Neovim as default text editor (requires sudo)"
     sudo update-alternatives --install /usr/bin/editor editor "$(command -v nvim)" 60
   fi
@@ -114,7 +114,7 @@ set_default_applications() {
 setup_backports() {
   declare -r codename="$(lsb_release -cs | tail -n 1)"
 
-  if grep -q "${codename}-backports" /etc/apt/sources.list{,.d/*} 2> /dev/null; then
+  if grep -q "${codename}-backports" /etc/apt/sources.list{,.d/*} 2>/dev/null; then
     echo "Backports already in sources.list"
     return
   fi
@@ -122,7 +122,7 @@ setup_backports() {
   declare -r sources_path="/etc/apt/sources.list.d/backports.sources"
 
   echo "${codename}-backports not in sources.list, adding (requires sudo)"
-  sudo tee "$sources_path" > /dev/null <<EOF
+  sudo tee "$sources_path" >/dev/null <<EOF
 Types: deb
 URIs: http://deb.debian.org/debian
 Suites: ${codename}-backports
@@ -166,9 +166,9 @@ setup_locale() {
     # Uncomment from `locale.gen` file
     sudo sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
     echo "Setting locale to ${locale}"
-    sudo sudo -E dpkg-reconfigure --frontend=noninteractive locales &&
-      sudo -E update-locale LANG=${locale}
-    sudo debconf-set-selections -c <<< "locales locales/default_environment_locale select ${locale}"
+    sudo sudo -E dpkg-reconfigure --frontend=noninteractive locales \
+      && sudo -E update-locale LANG=${locale}
+    sudo debconf-set-selections -c <<<"locales locales/default_environment_locale select ${locale}"
   fi
 }
 
@@ -186,9 +186,9 @@ setup_nonfree() {
   elif ! grep -q non-free /etc/apt/sources.list; then
     # Assume contrib and non-free always travel together
     echo "Adding contrib & non-free to sources (requires sudo)"
-    sudo -E add-apt-repository --no-update --yes contrib > /dev/null
-    sudo -E add-apt-repository --no-update --yes non-free > /dev/null
-    sudo -E add-apt-repository --no-update --yes non-free-firmware > /dev/null
+    sudo -E add-apt-repository --no-update --yes contrib >/dev/null
+    sudo -E add-apt-repository --no-update --yes non-free >/dev/null
+    sudo -E add-apt-repository --no-update --yes non-free-firmware >/dev/null
 
     # New source requires forced updates
     has_updated=""
@@ -243,7 +243,7 @@ main() {
 
   if [[ ! -f "${local_profile_path}" ]]; then
     echo "Generating ${local_profile_path}"
-    "${dotfiles_root}/script/create_local_profile" > "${local_profile_path}"
+    "${dotfiles_root}/script/create_local_profile" >"${local_profile_path}"
   fi
 
   # shellcheck source=/dev/null
@@ -253,8 +253,8 @@ main() {
   setup_backports
   install_apt_packages
   "${dotfiles_root}/script/install_1password"
-  [[ -z "${IS_CROSTINI:-}" ]] && [[ -z "${IS_DOCKER:-}" ]] &&
-    "${dotfiles_root}/script/install_snap_packages"
+  [[ -z "${IS_CROSTINI:-}" ]] && [[ -z "${IS_DOCKER:-}" ]] \
+    && "${dotfiles_root}/script/install_snap_packages"
   [[ -z "${IS_DOCKER:-}" ]] && "${dotfiles_root}/script/install_et"
   "${dotfiles_root}/script/install_github_packages"
 
@@ -264,9 +264,9 @@ main() {
 
   # Misc system configs
   [[ -z "${IS_DOCKER:-}" ]] && increase_max_watchers
-  pushd "${dotfiles_root}" > /dev/null
+  pushd "${dotfiles_root}" >/dev/null
   "${dotfiles_root}/script/lock_local_files"
-  popd > /dev/null
+  popd >/dev/null
   set_default_applications
   [[ -z "${IS_DOCKER:-}" ]] && setup_docker
   setup_locale

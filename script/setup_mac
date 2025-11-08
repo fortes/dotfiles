@@ -108,7 +108,7 @@ setup_shell() {
   if [[ -x "${homebrew_bash_path}" ]] && [[ "${SHELL:-}" != "${homebrew_bash_path}" ]]; then
     if ! grep -q "${homebrew_bash_path}" /etc/shells; then
       echo "Adding ${homebrew_bash_path} to shell list (requires sudo)"
-      echo "${homebrew_bash_path}" | sudo tee -a /etc/shells > /dev/null
+      echo "${homebrew_bash_path}" | sudo tee -a /etc/shells >/dev/null
     fi
 
     # Only change shell if running interactively, otherwise fails in CI which
@@ -121,7 +121,7 @@ setup_shell() {
 }
 
 install_command_line_tools() {
-  if ! xcode-select -p > /dev/null 2>&1; then
+  if ! xcode-select -p >/dev/null 2>&1; then
     echo "Installing command line tools"
     xcode-select --install
   fi
@@ -135,7 +135,7 @@ install_homebrew() {
 
   if [[ ! -f "$HOME/.profile.brew" ]]; then
     echo "Exporting brew shellenv"
-    "${brew_prefix}/bin/brew" shellenv > "$HOME/.profile.brew"
+    "${brew_prefix}/bin/brew" shellenv >"$HOME/.profile.brew"
   fi
 
   # Ensure `brew` in path for rest of script
@@ -155,7 +155,7 @@ install_homebrew_casks() {
   local casks_to_install=()
 
   for cask in "${CASK_PACKAGES[@]}"; do
-    if ! "${brew_prefix}/bin/brew" list --cask "$cask" &> /dev/null; then
+    if ! "${brew_prefix}/bin/brew" list --cask "$cask" &>/dev/null; then
       casks_to_install+=("${cask}")
     fi
   done
@@ -215,7 +215,7 @@ main() {
 
   if [[ ! -f "$local_profile_path" ]]; then
     echo "Generating $local_profile_path"
-    "${dotfiles_root}/script/create_local_profile" > "$local_profile_path"
+    "${dotfiles_root}/script/create_local_profile" >"$local_profile_path"
   fi
 
   # shellcheck source=/dev/null

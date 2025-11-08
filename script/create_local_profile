@@ -21,7 +21,7 @@ main() {
   [[ ${OSTYPE:-} == 'darwin'* ]] && is_mac=1
   [[ -n "${IS_DOCKER:-}" || -f /.dockerenv ]] && is_docker=1
 
-  cat << PROFILE_TEMPLATE
+  cat <<PROFILE_TEMPLATE
 # Generated $(date +%F)
 export IS_CROSTINI="${is_crostini:-}"
 export IS_DOCKER="${is_docker:-}"

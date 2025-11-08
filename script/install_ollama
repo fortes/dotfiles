@@ -26,11 +26,11 @@ install_ollama() {
 
   if [[ ${force:-} || ! -x "${install_location}" ]]; then
     echo "Installing Ollama..."
-    pushd "${download_dir}" > /dev/null
+    pushd "${download_dir}" >/dev/null
     wget --quiet -O "ollama-linux-amd64.tgz" \
       "https://ollama.com/download/ollama-linux-amd64.tgz"
-    tar -C "$HOME/.local" -xzf "ollama-linux-amd64.tgz" > /dev/null
-    popd > /dev/null
+    tar -C "$HOME/.local" -xzf "ollama-linux-amd64.tgz" >/dev/null
+    popd >/dev/null
   fi
 
   echo "Ollama installed, starting service"
