@@ -21,7 +21,7 @@ syntax-check:
 lint:
 	@echo "Linting shell scripts..."
 	@for file in script/*; do \
-		if [ -f "$$file" ] && [ -x "$$file" ] && [ "$$(basename $$file)" != "lib.sh" ]; then \
+		if [ -f "$$file" ] && [ -x "$$file" ]; then \
 			echo "  Checking $$file"; \
 			shellcheck -x "$$file" || exit 1; \
 		fi \

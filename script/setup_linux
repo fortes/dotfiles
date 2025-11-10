@@ -166,7 +166,7 @@ setup_locale() {
     # Uncomment from `locale.gen` file
     sudo sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
     echo "Setting locale to ${locale}"
-    sudo sudo -E dpkg-reconfigure --frontend=noninteractive locales \
+    sudo -E dpkg-reconfigure --frontend=noninteractive locales \
       && sudo -E update-locale LANG=${locale}
     sudo debconf-set-selections -c <<<"locales locales/default_environment_locale select ${locale}"
   fi
