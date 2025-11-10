@@ -30,7 +30,7 @@ set_default_browser() {
 
   # Bail if `update-alternatives` isn't set up for x-www-browser, may want to
   # manually install options at some point, but for now ignore
-  if ! update-alternatives --query x-www-browser &> /dev/null; then
+  if ! update-alternatives --query x-www-browser &>/dev/null; then
     >&2 echo "update-alternatives not set for x-www-browser, skipping"
     exit
   fi

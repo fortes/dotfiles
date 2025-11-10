@@ -1,29 +1,25 @@
 name: Bash Syntax Check & Lint
 
-on: [push]
+on:
+  push:
+    paths:
+      - 'script/**'
+      - 'Makefile'
+      - '.github/workflows/bash-syntax.yml'
 
 jobs:
   bash-syntax:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Sparse checkout (script/ and Makefile only)
         uses: actions/checkout@v4
-      - name: Install shellcheck
+        with:
+          sparse-checkout: |
+            script
+            Makefile
+      - name: Install shellcheck and shfmt
         run: |
-          sudo apt-get update && sudo apt-get install -y shellcheck
-      - name: Check bash syntax in executable scripts/
+          sudo apt-get update && sudo apt-get install -y shellcheck shfmt
+      - name: Run all checks (syntax + lint + format)
         run: |
-          for file in script/*; do
-            if [ -f "$file" ] && [ -x "$file" ]; then
-              echo "Checking $file..."
-              bash -n "$file"
-            fi
-          done
-      - name: Lint executable scripts with shellcheck
-        run: |
-          for file in script/*; do
-            if [ -f "$file" ] && [ -x "$file" ]; then
-              echo "Linting $file..."
-              shellcheck -x "$file"
-            fi
-          done
+          make test

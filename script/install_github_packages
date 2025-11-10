@@ -160,11 +160,11 @@ install_deb() {
   url="$(get_latest_release_url "${repo}" "${match}")"
 
   download_dir="$(mktemp --directory "${name}"XXX)"
-  pushd "${download_dir}" > /dev/null
+  pushd "${download_dir}" >/dev/null
   wget --quiet -O "${name}.deb" "${url}"
   echo "Installing ${repo} (requires sudo) ... "
   sudo dpkg -i "${name}.deb"
-  popd > /dev/null
+  popd >/dev/null
   rm -rf "${download_dir}"
 }
 
@@ -184,10 +184,10 @@ install_tarball() {
   local download_dir
   download_dir="$(mktemp --directory "${name}"XXX)"
 
-  pushd "${download_dir}" > /dev/null
+  pushd "${download_dir}" >/dev/null
   wget --quiet -O "${name}.tar.gz" "${url}"
   echo -n "Expanding ${name}.tar.gz ... "
-  tar xvf "${name}.tar.gz" > /dev/null
+  tar xvf "${name}.tar.gz" >/dev/null
   if [[ -f "${name}" ]]; then
     mv "${name}" "${install_location}/${name}"
   else
@@ -203,7 +203,7 @@ install_tarball() {
     fi
   fi
   chmod 755 "${install_location}/${name}"
-  popd > /dev/null
+  popd >/dev/null
   rm -rf "${download_dir}"
   echo "${name} installed"
 }
@@ -223,7 +223,7 @@ install_zip() {
   local download_dir
   download_dir="$(mktemp --directory "${name}"XXX)"
 
-  pushd "${download_dir}" > /dev/null
+  pushd "${download_dir}" >/dev/null
   wget --quiet -O "${name}.zip" "${url}"
   echo -n "Unzipping ${name}.zip ... "
   unzip -q -o -j -d . "${name}.zip"
@@ -235,12 +235,12 @@ install_zip() {
     echo_stderr "Error: Could not find ${name} in ${download_dir}"
     echo_stderr "Available files:"
     find "${download_dir}" -type f -exec basename {} \;
-    popd > /dev/null
+    popd >/dev/null
     rm -rf "${download_dir}"
     exit 2
   fi
 
-  popd > /dev/null
+  popd >/dev/null
   rm -rf "${download_dir}"
   echo "${name} installed"
 }
@@ -260,7 +260,6 @@ install_bun() {
     arm64) install_zip 'oven-sh/bun' 'bun-linux-aarch64.zip' ;;
   esac
 }
-
 
 install_difftastic() {
   install_tarball 'wilfred/difftastic' 'difft-{ARCH}-unknown-linux-gnu.tar.gz' 'difft'
@@ -313,14 +312,14 @@ install_lua_language_server() {
   local download_dir
   download_dir="$(mktemp --directory "${name}"XXX)"
 
-  pushd "${download_dir}" > /dev/null
+  pushd "${download_dir}" >/dev/null
   wget --quiet -O "${name}.tar.gz" "${url}"
   echo -n "Expanding ${name}.tar.gz ... "
-  tar xzvf "${name}.tar.gz" -C "${install_location}" > /dev/null
+  tar xzvf "${name}.tar.gz" -C "${install_location}" >/dev/null
 
   # Binary is symlinked via stow
 
-  popd > /dev/null
+  popd >/dev/null
   rm -rf "${download_dir}"
   echo "${name} installed"
 }
@@ -339,14 +338,14 @@ install_neovim_stable() {
   url="$(get_latest_release_url "neovim/neovim" "nvim-linux-{ARCH}.tar.gz")"
 
   download_dir="$(mktemp --directory nvimXXX)"
-  pushd "${download_dir}" > /dev/null
+  pushd "${download_dir}" >/dev/null
   wget --quiet -O nvim.tar.gz "${url}"
   echo -n "Expanding neovim tarball ... "
   mkdir -p "${install_prefix}"
   tar xzf nvim.tar.gz --strip-components=1 -C "${install_prefix}"
   echo "done"
 
-  popd > /dev/null
+  popd >/dev/null
   rm -rf "${download_dir}"
 
   if [[ ! -f "${vim_path}" ]]; then
@@ -365,7 +364,7 @@ install_neovim_stable() {
   fi
 
   # Don't try to set alternatives if not available
-  if ! update-alternatives --query vim &> /dev/null; then
+  if ! update-alternatives --query vim &>/dev/null; then
     >&2 echo "update-alternatives not available for vim, skipping"
     return
   fi
@@ -396,7 +395,7 @@ install_yazi() {
   local download_dir
   download_dir="$(mktemp --directory yaziXXX)"
 
-  pushd "${download_dir}" > /dev/null
+  pushd "${download_dir}" >/dev/null
   wget --quiet -O yazi.zip "${url}"
   echo -n "Unzipping yazi.zip ... "
   unzip -q -o -j -d . yazi.zip
@@ -404,7 +403,7 @@ install_yazi() {
   mv -t "${bin_location}" {ya,yazi}
   chmod 755 "${bin_location}"/{ya,yazi}
   mv -t "${completion_location}" yazi.bash
-  popd > /dev/null
+  popd >/dev/null
   rm -rf "${download_dir}"
   echo "yazi installed"
 }
