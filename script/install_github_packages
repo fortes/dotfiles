@@ -3,6 +3,7 @@
 #
 # - agg (asciinema gif generator)
 # - bun
+# - deno
 # - difftastic
 # - f2
 # - fnm
@@ -27,6 +28,7 @@ export DEBIAN_FRONTEND=noninteractive
 AVAILABLE_PACKAGES=(
   agg
   bun
+  deno
   difftastic
   f2
   fnm
@@ -261,6 +263,10 @@ install_bun() {
   esac
 }
 
+install_deno() {
+  install_zip 'denoland/deno' 'deno-{ARCH}-unknown-linux-gnu.zip'
+}
+
 install_difftastic() {
   install_tarball 'wilfred/difftastic' 'difft-{ARCH}-unknown-linux-gnu.tar.gz' 'difft'
 }
@@ -456,6 +462,9 @@ install_github_packages() {
         ;;
       bun)
         install_bun
+        ;;
+      deno)
+        install_deno
         ;;
       difftastic)
         install_difftastic

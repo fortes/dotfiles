@@ -15,7 +15,6 @@ PACKAGES=(
   @openai/codex
   bash-language-server
   cssmodules-language-server
-  deno@^2.5
   dockerfile-language-server-nodejs
   eslint
   fkill-cli
