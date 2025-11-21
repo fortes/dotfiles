@@ -27,6 +27,7 @@ export DEBIAN_FRONTEND=noninteractive
 
 AVAILABLE_PACKAGES=(
   agg
+  beads
   bun
   deno
   difftastic
@@ -255,6 +256,14 @@ install_agg() {
   install_bin 'asciinema/agg' 'agg-{ARCH}-unknown-linux-musl'
 }
 
+install_beads() {
+  if [[ "$(get_current_arch)" == "arm64" ]]; then
+    echo_stderr "Warning: beads is not available for ARM64 architecture"
+    return 0
+  fi
+  install_tarball 'steveyegge/beads' 'beads_.*_linux_amd64.tar.gz' 'bd'
+}
+
 install_bun() {
   # bun uses x64/aarch64 naming instead of standard patterns
   case "$(get_current_arch)" in
@@ -459,6 +468,9 @@ install_github_packages() {
     case "${package}" in
       agg)
         install_agg
+        ;;
+      beads)
+        install_beads
         ;;
       bun)
         install_bun
