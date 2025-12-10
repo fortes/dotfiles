@@ -140,10 +140,18 @@ install_bin() {
     name="$(basename "${repo}")"
   fi
 
+  local install_location="$HOME/.local/bin"
+  local target_path="${install_location}/${name}"
+  
+  # Check if already installed
+  if [[ -f "${target_path}" ]]; then
+    echo "${name} already installed at ${target_path}, skipping"
+    return 0
+  fi
+
   local url
   url="$(get_latest_release_url "${repo}" "${match}")"
 
-  local install_location="$HOME/.local/bin"
   mkdir -p "${install_location}"
   echo -n "Downloading ${name} ... "
   wget --quiet -O "${install_location}/${name}" "${url}"
@@ -179,10 +187,17 @@ install_tarball() {
     name="$(basename "${repo}")"
   fi
 
+  local install_location="$HOME/.local/bin"
+  local target_path="${install_location}/${name}"
+  
+  # Check if already installed
+  if [[ -f "${target_path}" ]]; then
+    echo "${name} already installed at ${target_path}, skipping"
+    return 0
+  fi
+
   local url
   url="$(get_latest_release_url "${repo}" "${match}")"
-
-  local install_location="$HOME/.local/bin"
 
   local download_dir
   download_dir="$(mktemp --directory "${name}"XXX)"
@@ -217,10 +232,18 @@ install_zip() {
   local name
   name="$(basename "${repo}")"
 
+  local install_location="$HOME/.local/bin"
+  local target_path="${install_location}/${name}"
+  
+  # Check if already installed
+  if [[ -f "${target_path}" ]]; then
+    echo "${name} already installed at ${target_path}, skipping"
+    return 0
+  fi
+
   local url
   url="$(get_latest_release_url "${repo}" "${match}")"
 
-  local install_location="$HOME/.local/bin"
   mkdir -p "${install_location}"
 
   local download_dir
@@ -322,6 +345,13 @@ install_lua_language_server() {
   local name="lua-language-server"
 
   local install_location="$HOME/.local/share/lua-language-server"
+  
+  # Check if already installed
+  if [[ -d "${install_location}" ]] && [[ -n "$(find "${install_location}" -type f -name "bin/*" 2>/dev/null)" ]]; then
+    echo "${name} already installed at ${install_location}, skipping"
+    return 0
+  fi
+
   mkdir -p "${install_location}"
 
   local download_dir
@@ -348,6 +378,12 @@ install_neovim_stable() {
   local vim_path="$HOME/.local/bin/nvim"
   local download_dir
   local install_prefix="$HOME/.local"
+
+  # Check if already installed
+  if [[ -f "${vim_path}" ]]; then
+    echo "neovim already installed at ${vim_path}, skipping"
+    return 0
+  fi
 
   echo "Installing neovim stable ..."
   url="$(get_latest_release_url "neovim/neovim" "nvim-linux-{ARCH}.tar.gz")"
@@ -406,6 +442,12 @@ install_yazi() {
 
   local bin_location="$HOME/.local/bin"
   local completion_location="$HOME/.local/completion.d/"
+  
+  # Check if already installed
+  if [[ -f "${bin_location}/yazi" ]] && [[ -f "${bin_location}/ya" ]]; then
+    echo "yazi already installed at ${bin_location}, skipping"
+    return 0
+  fi
 
   local download_dir
   download_dir="$(mktemp --directory yaziXXX)"

@@ -39,18 +39,23 @@ install_node_packages() {
     exit 1
   fi
 
-  echo "Installing node LTS …"
-
-  # Use --arch arm64 when running on aarch64, otherwise fnm doesn't
-  # auto-detect (happens on Docker on MacOS)
-  if [[ "$(uname -m)" == "aarch64" ]]; then
-    fnm install --lts --arch arm64
+  # Check if node LTS is already installed
+  if fnm list | grep -q "lts/latest"; then
+    echo "Node LTS already installed, skipping"
   else
-    fnm install --lts
-  fi
+    echo "Installing node LTS …"
 
-  echo "Setting node version to LTS …"
-  fnm default lts-latest
+    # Use --arch arm64 when running on aarch64, otherwise fnm doesn't
+    # auto-detect (happens on Docker on MacOS)
+    if [[ "$(uname -m)" == "aarch64" ]]; then
+      fnm install --lts --arch arm64
+    else
+      fnm install --lts
+    fi
+
+    echo "Setting node version to LTS …"
+    fnm default lts-latest
+  fi
 
   # Make sure to pick up necessary env vars
   eval "$(fnm env)"
@@ -71,8 +76,24 @@ install_node_packages() {
   # Corepack may need to download pnpm the first time
   corepack prepare pnpm@latest --activate
 
-  echo "Installing global node packages …"
-  pnpm add --global "${PACKAGES[@]}"
+  # Check if packages are already installed
+  local missing_packages=()
+  for package in "${PACKAGES[@]}"; do
+    # Extract package name (remove @scope/ if present)
+    local package_name="${package#*/}"
+    package_name="${package_name%%@*}"  # Remove version if present
+    
+    if ! pnpm list --global | grep -q "${package_name}"; then
+      missing_packages+=("${package}")
+    fi
+  done
+
+  if [[ ${#missing_packages[@]} -gt 0 ]]; then
+    echo "Installing missing global node packages …"
+    pnpm add --global "${missing_packages[@]}"
+  else
+    echo "All node packages already installed, skipping"
+  fi
   echo "Node packages installed!"
 }
 
