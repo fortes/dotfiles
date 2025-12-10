@@ -40,7 +40,7 @@ install_node_packages() {
   fi
 
   # Check if node LTS is already installed
-  if fnm list | grep -q "lts/latest"; then
+  if fnm list | grep -qE "\(lts/|lts-latest"; then
     echo "Node LTS already installed, skipping"
   else
     echo "Installing node LTS …"
@@ -78,12 +78,17 @@ install_node_packages() {
 
   # Check if packages are already installed
   local missing_packages=()
+  # Get a flat list of globally installed packages once to be efficient
+  # Redirect stderr to avoid errors if no packages are installed, and use `|| true` to prevent script exit
+  local installed_list
+  installed_list="$(pnpm list --global --depth=0 2>/dev/null || true)"
+
   for package in "${PACKAGES[@]}"; do
-    # Extract package name (remove @scope/ if present)
-    local package_name="${package#*/}"
-    package_name="${package_name%%@*}"  # Remove version if present
-    
-    if ! pnpm list --global | grep -q "${package_name}"; then
+    # Extract package name, removing only the version specifier (keep scope)
+    local package_name_no_version="${package%%@*}"
+
+    # Check for an exact match at the beginning of a line, followed by a space
+    if ! echo "${installed_list}" | grep -q -E "^${package_name_no_version} "; then
       missing_packages+=("${package}")
     fi
   done

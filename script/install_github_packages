@@ -347,7 +347,7 @@ install_lua_language_server() {
   local install_location="$HOME/.local/share/lua-language-server"
   
   # Check if already installed
-  if [[ -d "${install_location}" ]] && [[ -n "$(find "${install_location}" -type f -name "bin/*" 2>/dev/null)" ]]; then
+  if [[ -x "${install_location}/bin/lua-language-server" ]]; then
     echo "${name} already installed at ${install_location}, skipping"
     return 0
   fi

@@ -33,11 +33,11 @@ main() {
     return 1
   fi
 
-  # Get list of packages to stow
+  # Get list of packages to stow (basenames only)
   local packages=()
   while IFS= read -r -d '' package; do
     packages+=("${package}")
-  done < <(find "${stowed_files_path}" -mindepth 1 -maxdepth 1 -type d -print0)
+  done < <(find "${stowed_files_path}" -mindepth 1 -maxdepth 1 -type d -printf '%f\0')
 
   if [[ ${#packages[@]} -eq 0 ]]; then
     >&2 echo "Warning: no packages found in ${stowed_files_path}, nothing to stow"
