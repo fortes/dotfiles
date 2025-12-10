@@ -39,18 +39,23 @@ install_node_packages() {
     exit 1
   fi
 
-  echo "Installing node LTS …"
-
-  # Use --arch arm64 when running on aarch64, otherwise fnm doesn't
-  # auto-detect (happens on Docker on MacOS)
-  if [[ "$(uname -m)" == "aarch64" ]]; then
-    fnm install --lts --arch arm64
+  # Check if node LTS is already installed
+  if fnm list | grep -qE "\(lts/|lts-latest"; then
+    echo "Node LTS already installed, skipping"
   else
-    fnm install --lts
-  fi
+    echo "Installing node LTS …"
 
-  echo "Setting node version to LTS …"
-  fnm default lts-latest
+    # Use --arch arm64 when running on aarch64, otherwise fnm doesn't
+    # auto-detect (happens on Docker on MacOS)
+    if [[ "$(uname -m)" == "aarch64" ]]; then
+      fnm install --lts --arch arm64
+    else
+      fnm install --lts
+    fi
+
+    echo "Setting node version to LTS …"
+    fnm default lts-latest
+  fi
 
   # Make sure to pick up necessary env vars
   eval "$(fnm env)"
@@ -71,8 +76,29 @@ install_node_packages() {
   # Corepack may need to download pnpm the first time
   corepack prepare pnpm@latest --activate
 
-  echo "Installing global node packages …"
-  pnpm add --global "${PACKAGES[@]}"
+  # Check if packages are already installed
+  local missing_packages=()
+  # Get a flat list of globally installed packages once to be efficient
+  # Redirect stderr to avoid errors if no packages are installed, and use `|| true` to prevent script exit
+  local installed_list
+  installed_list="$(pnpm list --global --depth=0 2>/dev/null || true)"
+
+  for package in "${PACKAGES[@]}"; do
+    # Extract package name, removing only the version specifier (keep scope)
+    local package_name_no_version="${package%%@*}"
+
+    # Check for an exact match at the beginning of a line, followed by a space
+    if ! echo "${installed_list}" | grep -q -E "^${package_name_no_version} "; then
+      missing_packages+=("${package}")
+    fi
+  done
+
+  if [[ ${#missing_packages[@]} -gt 0 ]]; then
+    echo "Installing missing global node packages …"
+    pnpm add --global "${missing_packages[@]}"
+  else
+    echo "All node packages already installed, skipping"
+  fi
   echo "Node packages installed!"
 }
 
