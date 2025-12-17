@@ -34,27 +34,82 @@ PACKAGES=(
 # shellcheck source=script/lib.sh
 . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
+print_usage() {
+  cat <<EOF
+Usage: $(basename "$0") [OPTIONS]
+
+Set node to LTS and install global packages
+
+Options:
+  -p, --packages-only   Only install packages, skip Node.js installation
+                        (useful for updating packages without changing Node version)
+  -h, --help           Show this help message
+EOF
+}
+
 install_node_packages() {
+  # Parse arguments
+  local packages_only=0
+
+  while [[ "$#" -gt 0 ]]; do
+    case "${1}" in
+      -p | --packages-only)
+        packages_only=1
+        shift
+        ;;
+      -h | --help)
+        print_usage
+        exit 0
+        ;;
+      *)
+        >&2 echo "Unknown option: ${1}"
+        print_usage
+        exit 1
+        ;;
+    esac
+  done
+
   if ! command_exists fnm; then
     >&2 echo "⨯ fnm not installed"
     exit 1
   fi
 
-  echo "Installing node LTS …"
+  if [[ "${packages_only}" -eq 0 ]]; then
+    echo "Installing node LTS …"
 
-  # Use --arch arm64 when running on aarch64, otherwise fnm doesn't
-  # auto-detect (happens on Docker on MacOS)
-  if [[ "$(uname -m)" == "aarch64" ]]; then
-    fnm install --lts --arch arm64
+    # Use --arch arm64 when running on aarch64, otherwise fnm doesn't
+    # auto-detect (happens on Docker on MacOS)
+    if [[ "$(uname -m)" == "aarch64" ]]; then
+      fnm install --lts --arch "arm64"
+    else
+      fnm install --lts
+    fi
+
+    echo "Setting node version to LTS …"
+    fnm default "lts-latest"
   else
-    fnm install --lts
+    echo "Only installing packages (--packages-only flag provided)"
   fi
-
-  echo "Setting node version to LTS …"
-  fnm default lts-latest
 
   # Make sure to pick up necessary env vars
   eval "$(fnm env)"
+
+  # Validate that node is available when using packages-only mode
+  if [[ "${packages_only}" -eq 1 ]]; then
+    if ! command_exists node; then
+      >&2 echo "⨯ Node.js not found"
+      >&2 echo "Either install Node.js first or run without --packages-only flag"
+      exit 1
+    fi
+
+    if ! command_exists corepack; then
+      >&2 echo "⨯ corepack not found (should be included with Node.js)"
+      exit 1
+    fi
+
+    # Show current Node version
+    echo "Using Node $(node --version)"
+  fi
 
   if [[ -f "$HOME/.profile" ]]; then
     # Load up PNPM_HOME and add to path
