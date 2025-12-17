@@ -61,6 +61,13 @@ cleanup_npx() {
   fi
 }
 
+cleanup_pnpm() {
+  if command -v pnpm >/dev/null 2>&1; then
+    echo "Cleaning up pnpm store..."
+    pnpm store prune
+  fi
+}
+
 cleanup_pip() {
   if command -v pip >/dev/null 2>&1; then
     echo "Cleaning up pip cache..."
@@ -82,6 +89,7 @@ main() {
   cleanup_brew
   cleanup_docker
   cleanup_npx
+  cleanup_pnpm
   cleanup_pip
   cleanup_uv
 }
