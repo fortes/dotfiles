@@ -251,14 +251,8 @@ require("lazy").setup({
       end
 
       -- TypeScript (only enable if not in a deno project)
-      if vim.fn.executable('typescript-language-server') == 1 and not in_deno_project then
-        vim.lsp.config('ts_ls', {
-          init_options = {
-            maxTsServerMemory = tonumber(os.getenv('MAX_TS_SERVER_MEMORY')) or 32768,
-          },
-          single_file_support = false,
-        })
-        vim.lsp.enable('ts_ls')
+      if vim.fn.executable('tsgo') == 1 and not in_deno_project then
+        vim.lsp.enable('tsgo')
       end
 
       -- Vim

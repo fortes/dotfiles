@@ -603,7 +603,7 @@ augroup filetype_tweaks
   autocmd!
   " Recognize typescript
   autocmd BufNewFile,BufReadPost *.ts set filetype=typescript
-  autocmd BufNewFile,BufReadPost *.tsx set filetype=typescript.tsx
+  autocmd BufNewFile,BufReadPost *.tsx set filetype=typescriptreact
 
   " .md is markdown, not modula
   autocmd BufNewFile,BufReadPost *.md,README,TODO set filetype=markdown
@@ -682,7 +682,7 @@ augroup filetype_tweaks
   if executable('prettier')
     autocmd FileType javascript setlocal formatprg=prettier
 
-    autocmd FileType typescript,typescript.tsx setlocal formatprg=prettier\ --parser\ typescript
+    autocmd FileType typescript,typescriptreact setlocal formatprg=prettier\ --parser\ typescript
 
     autocmd FileType json setlocal formatprg=prettier\ --parser\ json
 
@@ -696,7 +696,7 @@ augroup filetype_tweaks
 
     " Use `formatprg` for `formatexpr` wherever we use `prettier`
     autocmd FileType javascript setlocal formatexpr=
-    autocmd FileType typescript,typescript.tsx setlocal formatexpr=
+    autocmd FileType typescript,typescriptreact setlocal formatexpr=
     autocmd FileType json setlocal formatexpr=
     autocmd FileType css,less setlocal formatexpr=
     autocmd FileType html setlocal formatexpr=

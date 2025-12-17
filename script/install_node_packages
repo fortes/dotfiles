@@ -12,6 +12,7 @@ PACKAGES=(
   @google/gemini-cli
   @google/jules
   @openai/codex
+  @typescript/native-preview
   bash-language-server
   cssmodules-language-server
   dockerfile-language-server-nodejs
