@@ -85,6 +85,7 @@ BREW_PACKAGES=(
 CASK_PACKAGES=(
   1password
   1password-cli
+  antigravity
   claude
   firefox
   font-google-sans-code
