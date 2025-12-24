@@ -94,6 +94,7 @@ CASK_PACKAGES=(
   font-symbols-only-nerd-font
   ghostty
   google-chrome
+  obsidian
   plexamp
   rectangle
   signal

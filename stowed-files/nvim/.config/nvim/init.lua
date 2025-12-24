@@ -751,6 +751,37 @@ require("lazy").setup({
     end,
   },
 
+  {
+    "obsidian-nvim/obsidian.nvim",
+    -- Latest release instead of latest commit
+    version = "*",
+    ft = "markdown",
+    ---@module 'obsidian'
+    ---@type obsidian.config
+    opts = {
+      workspaces = {
+        {
+          name = "notes",
+          path = "~/notes",
+        },
+      },
+    },
+    init = function()
+      -- Set `conceallevel` for markdown files in ~/notes before obsidian loads
+      vim.api.nvim_create_autocmd("BufEnter", {
+        pattern = "*.md",
+        callback = function()
+          local file_path = vim.fn.expand('%:p')
+          local notes_path = vim.fn.expand('~/notes/')
+          if vim.startswith(file_path, notes_path) then
+            vim.opt_local.conceallevel = 2
+          end
+        end,
+        desc = "Set conceallevel for obsidian notes"
+      })
+    end,
+  },
+
   -- Highlight ranges in timeline
   {
     'winston0410/range-highlight.nvim',

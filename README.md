@@ -121,6 +121,8 @@ pnpm approve-builds --global
 - May want to install command line tools manually in order to get `git`: `xcode-select --install`
 - Run `setup_mac`
 - Make sure keys repeat properly in VS Code: `defaults write com.microsoft.VSCode ApplePressAndHoldEnabled -bool false`
+  - Antigravity: `defaults write com.google.antigravity ApplePressAndHoldEnabled -bool false`
+  - Obsidian: `defaults write md.obsidian ApplePressAndHoldEnabled -bool false`
   - For other apps that have this issue, do the following:
     ```sh
     # Get the app id
