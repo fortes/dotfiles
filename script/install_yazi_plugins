@@ -20,7 +20,7 @@ install_yazi_plugins() {
   fi
 
   echo "Updating yazi plugins …"
-  ya pack upgrade
+  ya pkg upgrade
   for plugin in "${PLUGINS[@]}"; do
     if ! ya pkg list | grep -q "${plugin}"; then
       echo "Installing yazi plugin ${plugin}"
