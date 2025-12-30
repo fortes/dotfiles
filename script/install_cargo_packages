@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+# Install cargo packages
+#
+# Usage: install_cargo_packages
+
+set -euo pipefail
+IFS=$'\n\t'
+
+CARGO_PACKAGES=(
+  google-calendar3-cli
+  google-gmail1-cli
+  google-tasks1-cli
+)
+
+# shellcheck source=script/lib.sh
+. "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+
+print_usage() {
+  cat <<EOF
+Usage: $(basename "$0") [OPTIONS]
+
+Install cargo packages
+
+Options:
+  -h, --help           Show this help message
+EOF
+}
+
+install_cargo_packages() {
+  # Parse arguments
+  while [[ "$#" -gt 0 ]]; do
+    case "${1}" in
+      -h | --help)
+        print_usage
+        exit 0
+        ;;
+      *)
+        >&2 echo "Unknown option: ${1}"
+        print_usage
+        exit 1
+        ;;
+    esac
+  done
+
+  if ! command_exists cargo; then
+    >&2 echo "⨯ cargo not installed"
+    exit 1
+  fi
+
+  echo "Using $(cargo --version)"
+
+  echo "Installing cargo packages …"
+  for package in "${CARGO_PACKAGES[@]}"; do
+    cargo install --locked --quiet "${package}"
+  done
+
+  echo "Cargo packages installed!"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  install_cargo_packages "${@}"
+fi

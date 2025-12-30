@@ -65,6 +65,10 @@ fi
 export PNPM_HOME="${HOME}/.local/share/pnpm"
 add_to_path "${PNPM_HOME}"
 
+export CARGO_HOME="${HOME}/.local/share/cargo"
+# Cargo packages install to ~/.local/bin
+export CARGO_INSTALL_ROOT="${HOME}/.local"
+
 # Use NeoVim as man pager, when available
 if command_exists nvim; then
   export MANPAGER="nvim +Man!"

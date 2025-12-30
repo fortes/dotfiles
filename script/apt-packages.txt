@@ -12,6 +12,7 @@ bash-completion
 bat
 build-essential
 ca-certificates
+cargo
 chafa
 curl
 dnsutils
