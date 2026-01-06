@@ -13,6 +13,7 @@ fzf
 iCloud
 ripgrep
 tmux
+typecheck
 uBlock
 vimrc
 vimrc
