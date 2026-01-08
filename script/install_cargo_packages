@@ -7,9 +7,7 @@ set -euo pipefail
 IFS=$'\n\t'
 
 CARGO_PACKAGES=(
-  google-calendar3-cli
-  google-gmail1-cli
-  google-tasks1-cli
+  google-fitness1-cli
 )
 
 # shellcheck source=script/lib.sh
