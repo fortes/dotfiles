@@ -41,3 +41,9 @@ args = ["--stdio"]
 
 [language-server.harper-ls.config.harper-ls]
 userDictPath = "~/.config/harper-ls/dictionary.txt"
+
+# Bash: Use shfmt with 2 spaces indentation
+[[language]]
+name = "bash"
+auto-format = true
+formatter = { command = "shfmt", args = ["-i", "2", "-ci", "-bn"] }

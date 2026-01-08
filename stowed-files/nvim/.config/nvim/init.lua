@@ -735,6 +735,11 @@ require("lazy").setup({
           async = true,
           timeout_ms = 500,
         },
+        formatters = {
+          shfmt = {
+            prepend_args = { "-i", "2", "-ci", "-bn" },
+          },
+        },
         formatters_by_ft = {
           bash = { 'shfmt' },
           css = { 'prettier' },
