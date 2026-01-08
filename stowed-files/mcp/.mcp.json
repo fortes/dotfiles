@@ -1,16 +1,4 @@
 {
   "mcpServers": {
-    "beads": {
-      "command": "beads-mcp",
-      "args": []
-    },
-    "chrome-devtools": {
-      "command": "pnpx",
-      "args": ["chrome-devtools-mcp@latest"]
-    },
-    "playwright": {
-      "command": "pnpx",
-      "args": ["@playwright/mcp@latest"]
-    }
   }
 }

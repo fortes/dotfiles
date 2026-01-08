@@ -26,11 +26,14 @@
       "Bash(git stash:*)",
       "Bash(git status:*)",
       "Bash(grep:*)",
-      "Bash(ls)",
+      "Bash(ls:*)",
       "Bash(make:*)",
+      "Bash(pnpm exec:*)",
+      "Bash(pnpm test:*)",
       "Bash(shellcheck:*)",
       "Bash(shfmt:*)",
       "Bash(xargs ls)",
+      "Bash(wc:*)",
       "WebFetch(domain:deno.com)",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:gohugo.io)",
@@ -40,22 +43,20 @@
     "ask": [
       "Bash(git rm:*)"
     ],
-    "disabledMcpjsonServers": [
-      "chrome-devtools",
-      "playwright"
-    ],
-    "enabledMcpjsonServers": [
-      "beads"
-    ],
+    "disabledMcpjsonServers": [],
+    "enabledMcpjsonServers": [],
     "includeCoAuthoredBy": false
   },
   "enabledPlugins": {
-    "pr-review-toolkit@claude-code-plugins": true,
-    "commit-commands@claude-code-plugins": true,
-    "feature-dev@claude-code-plugins": true,
-    "code-review@claude-code-plugins": true,
-    "explanatory-output-style@claude-code-plugins": true,
-    "learning-output-style@claude-code-plugins": true,
-    "frontend-design@claude-code-plugins": true
+    "code-review@claude-plugins-official": true,
+    "commit-commands@claude-plugins-official": true,
+    "feature-dev@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": true,
+    "hookify@claude-plugins-official": true,
+    "lua-lsp@claude-plugins-official": true,
+    "pr-review-toolkit@claude-plugins-official": true,
+    "pyright-lsp@claude-plugins-official": true,
+    "ralph-loop@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true
   }
 }
