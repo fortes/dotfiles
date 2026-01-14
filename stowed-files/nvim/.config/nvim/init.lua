@@ -776,9 +776,14 @@ require("lazy").setup({
           local notes_path = vim.fn.expand('~/notes/')
           if vim.startswith(file_path, notes_path) then
             vim.opt_local.conceallevel = 2
+            -- Use tabs instead of spaces
+            vim.opt_local.expandtab = false
+            vim.opt_local.shiftwidth = 4
+            vim.opt_local.tabstop = 4
+            vim.opt_local.softtabstop = 4
           end
         end,
-        desc = "Set conceallevel for obsidian notes"
+        desc = "Set conceallevel and tab settings for obsidian notes"
       })
     end,
   },
