@@ -21,6 +21,7 @@ PACKAGES=(
   neovim
   npm
   npm-check-updates
+  opencode-ai
   prettier
   rome
   tsx
