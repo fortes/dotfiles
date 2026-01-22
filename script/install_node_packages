@@ -7,7 +7,6 @@ set -euo pipefail
 IFS=$'\n\t'
 
 PACKAGES=(
-  @anthropic-ai/claude-code
   @github/copilot
   @google/gemini-cli
   @google/jules

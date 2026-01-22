@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# Install Claude Code from official distribution
+#
+# Usage: install_claude_code
+
+set -euo pipefail
+IFS=$'\n\t'
+
+# shellcheck source=script/lib.sh
+. "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+
+install_claude_code() {
+  if command_exists claude; then
+    return 0
+  fi
+
+  # Source .profile to get fnm and pnpm in PATH
+  if [[ -f "$HOME/.profile" ]]; then
+    # shellcheck source=/dev/null
+    . "$HOME/.profile"
+  fi
+
+  if ! command_exists pnpm; then
+    >&2 echo "⨯ pnpm not installed"
+    exit 1
+  fi
+
+  echo "Installing Claude Code..."
+  pnpm dlx @anthropic-ai/claude-code install
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  install_claude_code
+fi

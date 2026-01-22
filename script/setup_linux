@@ -274,6 +274,7 @@ main() {
 
   # Non-apt package managers
   "${dotfiles_root}/script/install_node_packages"
+  "${dotfiles_root}/script/install_claude_code"
   "${dotfiles_root}/script/install_python_packages"
   "${dotfiles_root}/script/install_cargo_packages"
   "${dotfiles_root}/script/install_llm_plugins"
