@@ -10,14 +10,15 @@ IFS=$'\n\t'
 . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 install_claude_code() {
+  # Once installed, claude auto-updates
   if command_exists claude; then
     return 0
   fi
 
-  # Source .profile to get fnm and pnpm in PATH
-  if [[ -f "$HOME/.profile" ]]; then
-    # shellcheck source=/dev/null
-    . "$HOME/.profile"
+  # Make sure pnpm is in the path, important for first run before all the right
+  # env is set up
+  if command_exists fnm; then
+    eval "$(fnm env)"
   fi
 
   if ! command_exists pnpm; then
@@ -27,6 +28,7 @@ install_claude_code() {
 
   echo "Installing Claude Code..."
   pnpm dlx @anthropic-ai/claude-code install
+  echo "Claude code installed!"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
