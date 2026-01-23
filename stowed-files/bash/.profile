@@ -47,12 +47,6 @@ fi
 # Homebrew paths, etc
 source_if_exists "$HOME/.profile.brew"
 
-# Java requires a different path setup
-java_bin_path="/opt/homebrew/opt/openjdk/bin"
-if [[ -d "${java_bin_path}" ]]; then
-  add_to_path "${java_bin_path}"
-fi
-
 # Locally-installed packages belong in path
 add_to_path "$HOME/.local/bin"
 
