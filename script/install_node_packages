@@ -32,6 +32,10 @@ PACKAGES=(
   yaml-language-server
 )
 
+BUN_PACKAGES=(
+  tobi/qmd
+)
+
 # shellcheck source=script/lib.sh
 . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
@@ -131,6 +135,16 @@ install_node_packages() {
   echo "Installing global node packages …"
   pnpm add --global "${PACKAGES[@]}"
   echo "Node packages installed!"
+
+  # Install bun packages if bun is available
+  if command_exists bun; then
+    echo "Installing global bun packages …"
+    # BUN_INSTALL is set in .profile to install to ~/.local/bin
+    bun install --global "${BUN_PACKAGES[@]}"
+    echo "Bun packages installed!"
+  else
+    echo "⚠ bun not found, skipping bun packages"
+  fi
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then

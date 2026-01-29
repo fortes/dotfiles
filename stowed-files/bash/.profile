@@ -63,6 +63,9 @@ export CARGO_HOME="${HOME}/.local/share/cargo"
 # Cargo packages install to ~/.local/bin
 export CARGO_INSTALL_ROOT="${HOME}/.local"
 
+# Bun packages install to ~/.local/bin
+export BUN_INSTALL="${HOME}/.local"
+
 # Use NeoVim as man pager, when available
 if command_exists nvim; then
   export MANPAGER="nvim +Man!"
