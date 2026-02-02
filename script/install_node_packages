@@ -13,6 +13,7 @@ PACKAGES=(
   @openai/codex
   @playwright/mcp@latest
   @typescript/native-preview
+  agent-browser
   bash-language-server
   cssmodules-language-server
   dockerfile-language-server-nodejs
