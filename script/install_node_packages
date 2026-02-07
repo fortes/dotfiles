@@ -23,6 +23,8 @@ PACKAGES=(
   npm
   npm-check-updates
   opencode-ai
+  oxfmt
+  oxlint
   prettier
   rome
   tsx

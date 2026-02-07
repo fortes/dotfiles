@@ -57,14 +57,17 @@ vim.api.nvim_create_autocmd('LspAttach', {
       return
     end
 
-    -- ESLint-specific keymaps
-    if client.name == 'eslint' then
-      -- <leader>x to autofix via ESLint
+    -- OXlint-specific keymaps
+    if client.name == 'oxlint' then
+      -- <leader>x to apply source.fixAll from OXlint
       map('n', '<leader>x', function()
-        vim.cmd('LspEslintFixAll')
+        vim.lsp.buf.code_action({
+          context = { only = { "source.fixAll" } },
+          apply = true,
+        })
       end, {
         buffer = bufnr,
-        desc = "Fix all ESLint issues"
+        desc = "Fix all OXlint issues"
       })
     end
 
@@ -182,9 +185,14 @@ require("lazy").setup({
         vim.lsp.enable('dockerls')
       end
 
-      -- ESLint (only enable if not in a deno project)
-      if vim.fn.executable('vscode-eslint-language-server') == 1 and not in_deno_project then
-        vim.lsp.enable('eslint')
+      -- OXfmt (only enable if not in a deno project)
+      if vim.fn.executable('oxfmt') == 1 and not in_deno_project then
+        vim.lsp.enable('oxfmt')
+      end
+
+      -- OXlint (only enable if not in a deno project)
+      if vim.fn.executable('oxlint') == 1 and not in_deno_project then
+        vim.lsp.enable('oxlint')
       end
 
       -- Harper (grammar/spell checker)
@@ -717,13 +725,13 @@ require("lazy").setup({
     init = function()
       vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
 
-      -- Use `deno` for formatting when in a deno project, prettier otherwise
-      local deno_or_prettier = function(bufnr)
-        -- Let `deno` LSP format when in a deno project, fall back to prettier
+      -- Use `deno` for formatting when in a deno project, oxfmt otherwise
+      local deno_or_oxfmt = function(bufnr)
+        -- Let `deno` LSP format when in a deno project, fall back to oxfmt
         if vim.fs.root(bufnr, { 'deno.json', 'deno.jsonc' }) ~= nil then
           return { 'deno_fmt', lsp_format = 'prefer' }
         end
-        return { 'prettier' }
+        return { 'oxfmt' }
       end
 
       require("conform").setup({
@@ -736,21 +744,28 @@ require("lazy").setup({
           timeout_ms = 500,
         },
         formatters = {
+          oxfmt = {
+            command = 'oxfmt',
+            args = { '--stdin-filename', '$FILENAME' },
+            stdin = true,
+          },
           shfmt = {
             prepend_args = { "-i", "2", "-ci", "-bn" },
           },
         },
         formatters_by_ft = {
           bash = { 'shfmt' },
-          css = { 'prettier' },
-          html = { 'prettier' },
-          javascript = deno_or_prettier,
-          json = deno_or_prettier,
-          jsonc = deno_or_prettier,
-          markdown = deno_or_prettier,
+          css = { 'oxfmt' },
+          html = { 'oxfmt' },
+          javascript = deno_or_oxfmt,
+          javascriptreact = deno_or_oxfmt,
+          json = deno_or_oxfmt,
+          jsonc = deno_or_oxfmt,
+          markdown = deno_or_oxfmt,
           python = { 'ruff' },
-          typescript = deno_or_prettier,
-          yaml = { 'prettier' },
+          typescript = deno_or_oxfmt,
+          typescriptreact = deno_or_oxfmt,
+          yaml = { 'oxfmt' },
         },
       })
     end,

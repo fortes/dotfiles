@@ -617,15 +617,14 @@ augroup filetype_tweaks
   " Disable spell checking on unmodifiable files (what's the point?)
   autocmd BufReadPost * if !&modifiable | setlocal nospell | endif
 
-  " Set up linting for JS
-  if executable('eslint')
-    autocmd FileType javascript setlocal makeprg=eslint\ -f\ compact\ %
+  " Set up linting for JS/TS
+  if executable('oxlint')
+    autocmd FileType javascript,javascriptreact,typescript,typescriptreact setlocal makeprg=oxlint\ --format\ unix\ %
 
-    " Parse eslint errors correctly
-    autocmd FileType javascript setlocal errorformat=%E%f:\ line\ %l\\,\ col\ %c\\,\ Error\ -\ %m
-    autocmd FileType javascript setlocal errorformat+=%W%f:\ line\ %l\\,\ col\ %c\\,\ Warning\ -\ %m
+    " Parse oxlint unix formatter output
+    autocmd FileType javascript,javascriptreact,typescript,typescriptreact setlocal errorformat=%f:%l:%c:\ %m
     " Ignore lines that don't match the above
-    autocmd FileType javascript setlocal errorformat+=%-G%.%#
+    autocmd FileType javascript,javascriptreact,typescript,typescriptreact setlocal errorformat+=%-G%.%#
   endif
 
   " TypeScript type checking
@@ -678,30 +677,12 @@ augroup filetype_tweaks
     autocmd FileType sh setlocal formatprg=shfmt\ --indent\ 2
   endif
 
-  " Use prettier to autoformat (gq in Visual mode)
-  if executable('prettier')
-    autocmd FileType javascript setlocal formatprg=prettier
+  " Use oxfmt to autoformat (gq in Visual mode)
+  if executable('oxfmt')
+    autocmd FileType javascript,javascriptreact,typescript,typescriptreact,json,css,less,html,markdown,yaml setlocal formatprg=oxfmt\ --stdin-filepath\ %
 
-    autocmd FileType typescript,typescriptreact setlocal formatprg=prettier\ --parser\ typescript
-
-    autocmd FileType json setlocal formatprg=prettier\ --parser\ json
-
-    autocmd FileType css,less setlocal formatprg=prettier\ --parser\ css
-
-    autocmd FileType html setlocal formatprg=prettier\ --parser\ html
-
-    autocmd FileType markdown setlocal formatprg=prettier\ --parser\ markdown
-
-    autocmd FileType yaml setlocal formatprg=prettier\ --parser\ yaml
-
-    " Use `formatprg` for `formatexpr` wherever we use `prettier`
-    autocmd FileType javascript setlocal formatexpr=
-    autocmd FileType typescript,typescriptreact setlocal formatexpr=
-    autocmd FileType json setlocal formatexpr=
-    autocmd FileType css,less setlocal formatexpr=
-    autocmd FileType html setlocal formatexpr=
-    autocmd FileType markdown setlocal formatexpr=
-    autocmd FileType yaml setlocal formatexpr=
+    " Use `formatprg` for `formatexpr` wherever we use `oxfmt`
+    autocmd FileType javascript,javascriptreact,typescript,typescriptreact,json,css,less,html,markdown,yaml setlocal formatexpr=
   endif
 
   if executable('ruff')
