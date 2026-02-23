@@ -98,6 +98,7 @@
     "enabledMcpjsonServers": [],
     "includeCoAuthoredBy": false
   },
+  "model": "opus",
   "enabledPlugins": {
     "code-review@claude-plugins-official": true,
     "commit-commands@claude-plugins-official": true,
@@ -109,6 +110,5 @@
     "pyright-lsp@claude-plugins-official": true,
     "ralph-loop@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": true
-  },
-  "model": "opus"
+  }
 }

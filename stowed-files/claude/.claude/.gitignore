@@ -3,3 +3,5 @@
 
 !.gitignore
 !settings.json
+!skills/
+!skills/**
