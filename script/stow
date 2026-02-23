@@ -13,16 +13,32 @@ main() {
   local dotfiles_root
   dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
   local stowed_files_path="${dotfiles_root}/stowed-files"
+  local target_dir="${HOME}"
+
+  if ! command -v stow >/dev/null 2>&1; then
+    >&2 echo "Error: stow command not found. Please install GNU Stow first."
+    return 1
+  fi
 
   if [[ ! -d "${stowed_files_path}" ]]; then
     >&2 echo "Warning: stowed-files directory not found at ${stowed_files_path}, skipping stow"
     return 0
   fi
 
-  # Purposefully allow word splitting on $@ to pass through flags
-  # shellcheck disable=SC2046,SC2068
-  stow --dir="${stowed_files_path}/" --target="$HOME" \
-    $(ls "${stowed_files_path}") ${@}
+  local packages=()
+  local package_path
+  for package_path in "${stowed_files_path}"/*; do
+    [[ -d "${package_path}" ]] || continue
+    packages+=("$(basename "${package_path}")")
+  done
+
+  if [[ ${#packages[@]} -eq 0 ]]; then
+    >&2 echo "Warning: no packages found in ${stowed_files_path}, nothing to stow"
+    return 0
+  fi
+
+  stow --dir="${stowed_files_path}/" --target="${target_dir}" \
+    "${packages[@]}" "$@"
 }
 
 main "${@}"
