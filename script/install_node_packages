@@ -10,6 +10,7 @@ PACKAGES=(
   @github/copilot
   @google/gemini-cli
   @google/jules
+  @mariozechner/pi-coding-agent
   @openai/codex
   @playwright/mcp@latest
   @typescript/native-preview
