@@ -5,7 +5,7 @@ IFS=$'\n\t'
 
 main() {
   # Args are passed in but annoying to parse, easier to call into `cmus-remote`
-  if ! command_exists cmus-remote; then
+  if ! command -v cmus-remote >/dev/null 2>&1; then
     return
   fi
 
@@ -60,7 +60,7 @@ CMUS_STATUS
     cmus-album-background >> /tmp/cmus-album-background.log 2>&1 &
   fi
 
-  command_exists cmus-scrobbler && cmus-scrobbler >> /tmp/cmus-scrobbler.log
+  command -v cmus-scrobbler >/dev/null 2>&1 && cmus-scrobbler >> /tmp/cmus-scrobbler.log
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then

@@ -6,7 +6,6 @@ add_to_path() {
     export PATH="$*:$PATH"
   fi
 }
-export -f add_to_path
 
 # Source file only if it exists
 source_if_exists() {
@@ -22,13 +21,11 @@ source_if_exists() {
     fi
   done
 }
-export -f source_if_exists
 
 # Check for command in path
 command_exists() {
   command -v "$1" &> /dev/null
 }
-export -f command_exists
 
 # Use local NeoVim if we have it
 if [[ -x "$HOME/.local/bin/nvim" ]]; then
