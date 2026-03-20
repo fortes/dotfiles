@@ -120,7 +120,7 @@ pnpm approve-builds --global
 - Set `terminal.app` profile, send option as meta key
 - May want to install command line tools manually in order to get `git`: `xcode-select --install`
 - Run `setup_mac`
-- Make sure keys repeat properly in VS Code: `defaults write com.microsoft.VSCode ApplePressAndHoldEnabled -bool false`
+- Make sure keys repeat properly in apps:
   - Antigravity: `defaults write com.google.antigravity ApplePressAndHoldEnabled -bool false`
   - Obsidian: `defaults write md.obsidian ApplePressAndHoldEnabled -bool false`
   - For other apps that have this issue, do the following:
@@ -130,7 +130,6 @@ pnpm approve-builds --global
     # Outputs something like `com.todesktop.xxxxx`
     defaults write -g com.todesktop.xxxxx ApplePressAndHoldEnabled -bool false
     ```
-  - You'll also need to log in to VSCode to get stuff, plus you probably want to run `script/install_vscode_extensions` to get all the extensions installed
 - `terminal.app` sucks with colors, switch to Ghostty and pin it in the dock
 - Make sure `Rectangle.app` starts on login
 - Install the 1Password extension in Safari (others should sync automatically)

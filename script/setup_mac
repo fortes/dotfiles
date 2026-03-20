@@ -98,7 +98,6 @@ CASK_PACKAGES=(
   plexamp
   rectangle
   signal
-  visual-studio-code
 )
 
 usage() {
@@ -235,9 +234,6 @@ main() {
   "${dotfiles_root}/script/stow"
 
   setup_shell
-
-  # Disable press and hold in VSCode
-  defaults write com.microsoft.VSCode ApplePressAndHoldEnabled -bool false
 
   "${dotfiles_root}/script/lock_local_files"
   "${dotfiles_root}/script/set_dotfiles_remote"
