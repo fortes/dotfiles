@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# Gracefully kill a process, escalating to SIGKILL if needed
+#
+# Usage: murder <pid>
+set -euo pipefail
+
+main() {
+  if [ "$#" -ne 1 ]; then
+    echo "Usage: murder <pid>" >&2
+    exit 1
+  fi
+
+  local pid="$1"
+
+  if ! kill -0 "$pid" 2>/dev/null; then
+    echo "murder: no process with PID $pid" >&2
+    exit 1
+  fi
+
+  # Try SIGTERM first
+  kill -TERM "$pid"
+
+  # Wait up to 5 seconds for it to die
+  for _ in $(seq 1 10); do
+    sleep 0.5
+    if ! kill -0 "$pid" 2>/dev/null; then
+      exit 0
+    fi
+  done
+
+  # Escalate to SIGKILL
+  echo "murder: PID $pid didn't die, escalating to SIGKILL" >&2
+  kill -KILL "$pid"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  main "$@"
+fi
