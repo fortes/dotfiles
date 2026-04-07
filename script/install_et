@@ -12,12 +12,12 @@ install_et() {
   declare -r et_key_url="https://github.com/MisterTea/debian-et/raw/master/et.gpg"
   declare -r et_key_path="/etc/apt/keyrings/et.gpg"
 
-  if [ ! -f "${et_sources_list}" ]; then
+  if [ ! -f "${et_key_path}" ] || [ ! -f "${et_sources_list}" ]; then
     echo "Adding Eternal Terminal GPG key (requires sudo)"
-    curl -sSL "${et_key_url}" \
-      | sudo tee "$et_key_path" >/dev/null
+    curl --silent --show-error --location --fail "${et_key_url}" \
+      | sudo tee "${et_key_path}" >/dev/null
 
-    echo "Eternal Terminal sources list missing, adding (requires sudo)"
+    echo "Adding Eternal Terminal sources list (requires sudo)"
     sudo tee "${et_sources_list}" >/dev/null <<EOF
 Types: deb
 URIs: https://github.com/MisterTea/debian-et/raw/master/debian-source/
