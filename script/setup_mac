@@ -73,7 +73,6 @@ BREW_PACKAGES=(
   shellcheck
   shfmt
   speedtest-cli
-  steveyegge/beads/bd
   stow
   tmux
   wget
