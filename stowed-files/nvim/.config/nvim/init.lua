@@ -194,10 +194,6 @@ use('https://github.com/neovim/nvim-lspconfig', function()
     vim.lsp.enable('bashls')
   end
 
-  -- Built-in Copilot LSP (requires Neovim 0.11.2+)
-  if vim.fn.executable('copilot-language-server') == 1 then
-    vim.lsp.enable('copilot')
-  end
 
   if vim.fn.executable('vscode-css-language-server') == 1 then
     vim.lsp.enable('cssls')
@@ -294,15 +290,35 @@ use('https://github.com/neovim/nvim-lspconfig', function()
   end
 end)
 
--- GitHub Copilot inline suggestions (requires subscription + ENABLE_GITHUB_COPILOT=1)
+-- GitHub Copilot inline suggestions + NES (requires subscription + ENABLE_GITHUB_COPILOT=1)
 if copilot_enabled then
-  use('https://github.com/github/copilot.vim', function()
-    -- Enable for markdown, disable in UI buffers
-    vim.g.copilot_filetypes = {
-      markdown = true,
-      DressingInput = false,
-      Telescope = false,
-    }
+  use('https://github.com/zbirenbaum/copilot.lua', function()
+    require('copilot').setup({
+      filetypes = {
+        markdown = true,
+        -- Disable in UI/picker buffers
+        TelescopePrompt = false,
+        ['dressing.input'] = false,
+      },
+      suggestion = {
+        enabled = true,
+        auto_trigger = true,
+        keymap = {
+          accept = '<M-l>',
+          next = '<M-]>',
+          prev = '<M-[>',
+          dismiss = '<C-]>',
+        },
+      },
+      -- Next-edit suggestion: predicts and jumps to the next edit location
+      nes = {
+        enabled = true,
+        keymap = {
+          accept_word = '<M-w>',
+          accept_line = '<M-l>',
+        },
+      },
+    })
   end)
 end
 
