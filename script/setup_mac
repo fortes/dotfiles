@@ -26,6 +26,7 @@ BREW_PACKAGES=(
   cmus
   # For Docker
   colima
+  container
   delta
   deno
   difftastic
@@ -75,6 +76,7 @@ BREW_PACKAGES=(
   speedtest-cli
   stow
   tmux
+  tree-sitter-cli
   wget
   yazi
   yq

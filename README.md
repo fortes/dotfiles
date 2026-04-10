@@ -94,6 +94,16 @@ git update-index --no-skip-worktree ./symlinks/npmrc
 pnpm approve-builds --global
 ```
 
+### Neovim
+
+After setup, open `nvim` and run the following to install plugins, build native components (fzf sorter), and compile treesitter parsers:
+
+```
+:lua vim.pack.update()
+```
+
+Re-run this command whenever you pull updates that add or change plugins.
+
 ### Firefox
 
 - Log into sync accounts, extensions should automatically install

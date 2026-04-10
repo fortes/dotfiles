@@ -362,12 +362,7 @@ install_neovim_stable() {
   chmod 755 "${vim_path}"
   echo "neovim stable installed"
 
-  if [[ -d "$HOME/.local/share/nvim/lazy/lazy.nvim" ]]; then
-    echo "Syncing plugins"
-    "${vim_path}" --headless "+Lazy! sync" +qa
-  else
-    echo "Must manually launch Neovim to install plugins"
-  fi
+  echo "Run ':lua vim.pack.update()' in Neovim to install plugins"
 
   # Don't try to set alternatives if not available
   if ! update-alternatives --query vim &>/dev/null; then
