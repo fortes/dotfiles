@@ -348,6 +348,23 @@ map('i', '<S-Tab>', function()
   return vim.fn.pumvisible() == 1 and '<C-p>' or '<S-Tab>'
 end, { expr = true, desc = 'Completion prev / S-Tab' })
 
+-- Normal-mode Tab: accept NES when visible, else fall through. In terminals
+-- that don't distinguish <Tab> from <C-i>, the fallthrough preserves the
+-- default jumplist-forward behaviour; in terminals that do (kitty protocol),
+-- <Tab> stays unmapped.
+if copilot_enabled then
+  map('n', '<Tab>', function()
+    if vim.b.nes_state then
+      local nes_api = require('copilot.nes.api')
+      if nes_api.nes_apply_pending_nes() then
+        nes_api.nes_walk_cursor_end_edit()
+        return ''
+      end
+    end
+    return '<Tab>'
+  end, { expr = true, desc = 'Copilot accept NES / Tab' })
+end
+
 -- Treesitter: highlighting, indent, folding (use main branch for nvim 0.12 API)
 -- Parsers are installed manually via :TSInstall <lang> (requires tree-sitter-cli)
 use({ src = 'https://github.com/nvim-treesitter/nvim-treesitter', version = 'main' }, function()
