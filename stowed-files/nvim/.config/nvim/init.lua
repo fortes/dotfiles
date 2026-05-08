@@ -640,6 +640,12 @@ use('https://github.com/obsidian-nvim/obsidian.nvim', function()
         vim.opt_local.softtabstop = 4
         -- Required by obsidian.nvim for [[wikilink]] / link rendering
         vim.opt_local.conceallevel = 1
+
+        local bufnr = vim.api.nvim_get_current_buf()
+        map('n', '<cr>', '<cmd>Obsidian smart_action<cr>', { buffer = bufnr, desc = 'Obsidian smart action' })
+        map('n', 'gf', '<cmd>Obsidian follow_link<cr>', { buffer = bufnr, desc = 'Follow Obsidian link' })
+        map('n', ']o', '<cmd>Obsidian nav_link next<cr>', { buffer = bufnr, desc = 'Next Obsidian link' })
+        map('n', '[o', '<cmd>Obsidian nav_link prev<cr>', { buffer = bufnr, desc = 'Previous Obsidian link' })
       end
     end,
   })
