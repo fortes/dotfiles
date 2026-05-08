@@ -83,9 +83,7 @@ stowed-files/
 ├── tmux/          # Tmux configuration
 ├── ghostty/       # Ghostty terminal emulator config
 ├── yazi/          # File manager config
-├── Code/          # VS Code settings
-├── mozilla/       # Firefox user.js (with special stowing logic)
-└── [38 other packages]
+└── [37 other packages]
 ```
 
 The `script/stow` wrapper handles:

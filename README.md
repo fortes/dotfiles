@@ -118,7 +118,7 @@ Re-run this command whenever you pull updates that add or change plugins.
 - Set `terminal.app` profile, send option as meta key
 - May want to install command line tools manually in order to get `git`: `xcode-select --install`
 - Run `setup_mac`
-- Make sure keys repeat properly in apps:
+- Make sure keys repeat properly in apps that disable it by default:
   - Antigravity: `defaults write com.google.antigravity ApplePressAndHoldEnabled -bool false`
   - Obsidian: `defaults write md.obsidian ApplePressAndHoldEnabled -bool false`
   - For other apps that have this issue, do the following:
@@ -244,7 +244,7 @@ This will list out all the packages installed, then need to search through to ma
 
 ### Mac
 
-- Firefox and VS Code casks get ornery and no longer update via brew, currently install once via script, but updates have to happen manually. Need to investigate further.
+- Firefox cask gets ornery and no longer updates via brew, currently installed once via script, but updates have to happen manually. Need to investigate further.
 
 ## Linux GUI and Windows WSL2 Support
 
