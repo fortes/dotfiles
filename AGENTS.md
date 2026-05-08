@@ -88,7 +88,6 @@ stowed-files/
 
 The `script/stow` wrapper handles:
 - Stowing all packages to `$HOME`
-- Special case for Firefox profiles (dynamically finds `*.default*` dirs)
 - Uses `.stow-local-ignore` files to prevent certain files from being stowed
 
 ### Shell Configuration Flow
@@ -114,7 +113,7 @@ The `script/stow` wrapper handles:
 ### Neovim Configuration
 
 - **`init.lua`** - Main Neovim config, sources legacy `.vimrc`
-- Uses `lazy.nvim` for plugin management
+- Uses built-in `vim.pack` for plugin management (run `:lua vim.pack.update()` to install/update)
 - LSP setup with special handling for:
   - `denols` - Only in projects with `deno.json`/`deno.jsonc`
   - `eslint` - Disabled in Deno projects

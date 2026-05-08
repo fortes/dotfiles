@@ -402,7 +402,7 @@ set listchars+=extends:»,precedes:«
 set listchars+=multispace:\ ·,leadmultispace:\┊\ ,
 if has('nvim-0.12')
   " Indent guide for leading tabs (added in 0.12)
-  set listchars+=leadtab:\┊\ 
+  set listchars+=leadtab:\┊\ ,
 endif
 
 " Allow incrementing letters

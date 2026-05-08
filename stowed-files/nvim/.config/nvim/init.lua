@@ -131,7 +131,7 @@ vim.api.nvim_create_autocmd('PackChanged', {
   callback = function(ev)
     local spec = ev.data.spec
     local kind = ev.data.kind
-    if kind == 'remove' then return end
+    if kind == 'delete' then return end
 
     -- ev.data.path is the plugin's install directory (provided by vim.pack)
     local path = ev.data.path
