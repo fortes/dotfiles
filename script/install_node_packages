@@ -33,12 +33,14 @@ BUN_PACKAGES=(
   typescript-language-server
   vim-language-server
   vscode-langservers-extracted
-  yaml-language-server
 )
 
-# Bun's hoisting can't find this package's bundled language-server binary
+# Bun's hoisting fails to resolve nested peer-deps for these packages:
+# - copilot-language-server bundles its own language server binary
+# - yaml-language-server's ajv-draft-04 dep does `require('ajv/dist/core')`
 NPM_PACKAGES=(
   @github/copilot-language-server
+  yaml-language-server
 )
 
 # shellcheck source=script/lib.sh
