@@ -64,6 +64,19 @@ Once you've run setup, you'll still have to do the following universal manual st
    gemini
    ```
 
+## Cleaning up stale symlinks
+
+`script/stow` doesn't unstow packages that no longer exist in the repo. After pulling changes that delete a `stowed-files/<pkg>/` directory, broken symlinks can linger in `$HOME`. To remove broken symlinks that point into the dotfiles tree:
+
+```sh
+find ~ -maxdepth 5 -type l 2>/dev/null \
+  | while read -r link; do
+      [ -e "$link" ] && continue
+      target=$(readlink "$link")
+      case "$target" in *dotfiles/stowed-files*) rm -v "$link" ;; esac
+    done
+```
+
 ## Ignoring changes to a file
 
 ```sh
