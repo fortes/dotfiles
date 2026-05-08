@@ -553,7 +553,7 @@ use('https://github.com/stevearc/conform.nvim', function()
     formatters = {
       oxfmt = {
         command = 'oxfmt',
-        args = { '--stdin-filename', '$FILENAME' },
+        args = { '--stdin-filepath', '$FILENAME' },
         stdin = true,
       },
       shfmt = {
