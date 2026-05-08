@@ -78,5 +78,5 @@ wamerican
 wget
 yank
 yq
-yt-dlp
+yt-dlp/trixie-backports
 zoxide
