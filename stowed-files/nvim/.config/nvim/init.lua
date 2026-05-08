@@ -137,7 +137,8 @@ vim.api.nvim_create_autocmd('PackChanged', {
         vim.opt.rtp:prepend(path)
         require('nvim-treesitter').install({
           'bash', 'css', 'diff', 'gotmpl', 'html', 'javascript',
-          'json', 'lua', 'python', 'tsx', 'typescript', 'vim', 'yaml',
+          'json', 'lua', 'markdown', 'markdown_inline', 'python',
+          'tsx', 'typescript', 'vim', 'yaml',
         })
       end)
     end
@@ -383,7 +384,8 @@ use({ src = 'https://github.com/nvim-treesitter/nvim-treesitter', version = 'mai
     desc = 'Enable treesitter highlighting and indentation',
     pattern = {
       'bash', 'css', 'diff', 'gotmpl', 'html', 'javascript', 'json',
-      'lua', 'python', 'tsx', 'typescript', 'vim', 'yaml',
+      'lua', 'markdown', 'markdown_inline', 'python', 'tsx',
+      'typescript', 'vim', 'yaml',
     },
     callback = function()
       local ok = pcall(vim.treesitter.start)
