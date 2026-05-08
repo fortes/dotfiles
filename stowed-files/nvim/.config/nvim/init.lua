@@ -616,6 +616,16 @@ use('https://github.com/obsidian-nvim/obsidian.nvim', function()
     -- conceallevel is set per-buffer in the BufEnter autocmd below
     ui = { ignore_conceal_warn = true },
   })
+
+  map('n', '<leader>os', '<cmd>Obsidian quick_switch<cr>', { desc = 'Obsidian quick switch' })
+  map('n', '<leader>of', '<cmd>Obsidian search<cr>', { desc = 'Obsidian search' })
+  map('n', '<leader>ob', '<cmd>Obsidian backlinks<cr>', { desc = 'Obsidian backlinks' })
+  map('n', '<leader>ot', '<cmd>Obsidian today<cr>', { desc = 'Obsidian today' })
+  map('n', '<leader>on', '<cmd>Obsidian new<cr>', { desc = 'Obsidian new note' })
+  map('n', '<leader>or', '<cmd>Obsidian rename<cr>', { desc = 'Obsidian rename' })
+  map('n', '<leader>oc', '<cmd>Obsidian toc<cr>', { desc = 'Obsidian table of contents' })
+  map('v', '<leader>ol', '<cmd>Obsidian link<cr>', { desc = 'Obsidian link selection' })
+
   vim.api.nvim_create_autocmd('BufEnter', {
     pattern = '*.md',
     desc = 'Notes-specific buffer settings',
