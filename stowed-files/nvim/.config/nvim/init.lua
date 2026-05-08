@@ -584,6 +584,12 @@ end)
 -- Obsidian notes integration (active only in ~/notes directory)
 -- No version pin: vim.pack doesn't support wildcard releases, tracks main branch
 use('https://github.com/obsidian-nvim/obsidian.nvim', function()
+  -- obsidian.nvim hard-errors if no configured workspace path exists; skip
+  -- setup entirely on machines without a notes dir (e.g. fresh containers)
+  if vim.fn.isdirectory(vim.fn.expand('~/notes')) == 0 then
+    return
+  end
+
   require('obsidian').setup({
     legacy_commands = false,
     workspaces = {
