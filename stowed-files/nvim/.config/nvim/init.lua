@@ -292,8 +292,13 @@ end)
 
 -- GitHub Copilot inline suggestions + NES (requires subscription + ENABLE_GITHUB_COPILOT=1)
 if copilot_enabled then
+  -- NES (next-edit suggestion) support; copilot.lua delegates NES to this plugin
+  use('https://github.com/copilotlsp-nvim/copilot-lsp')
   use('https://github.com/zbirenbaum/copilot.lua', function()
     require('copilot').setup({
+      -- Disable panel (we use inline suggestions only); clear its default
+      -- open = '<M-CR>' keymap to avoid conflict with NES accept_and_goto
+      panel = { enabled = false, keymap = { open = false } },
       filetypes = {
         markdown = true,
         -- Disable in UI/picker buffers
@@ -304,23 +309,44 @@ if copilot_enabled then
         enabled = true,
         auto_trigger = true,
         keymap = {
-          accept = '<M-l>',
+          -- Tab is handled manually below to integrate with popup-menu navigation
+          accept = false,
+          accept_word = '<M-w>',
           next = '<M-]>',
           prev = '<M-[>',
           dismiss = '<C-]>',
         },
       },
       -- Next-edit suggestion: predicts and jumps to the next edit location
+      -- NES keymaps are normal mode (valid fields: accept_and_goto, accept, dismiss)
       nes = {
         enabled = true,
         keymap = {
-          accept_word = '<M-w>',
-          accept_line = '<M-l>',
+          accept_and_goto = '<M-CR>',
         },
       },
     })
   end)
 end
+
+-- Tab / S-Tab: override the vimrc pumvisible mappings (last definition wins,
+-- since init.lua sources .vimrc at the top). Adds copilot accept at the front
+-- of the priority chain when the plugin is loaded; otherwise identical to the
+-- vimrc behaviour.
+map('i', '<Tab>', function()
+  if package.loaded['copilot.suggestion'] and require('copilot.suggestion').is_visible() then
+    -- Undo point so `u` reverts just the accepted suggestion
+    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<C-g>u', true, false, true), 'n', false)
+    require('copilot.suggestion').accept()
+  elseif vim.fn.pumvisible() == 1 then
+    return '<C-n>'
+  else
+    return '<Tab>'
+  end
+end, { expr = true, desc = 'Copilot accept / completion next / tab' })
+map('i', '<S-Tab>', function()
+  return vim.fn.pumvisible() == 1 and '<C-p>' or '<S-Tab>'
+end, { expr = true, desc = 'Completion prev / S-Tab' })
 
 -- Treesitter: highlighting, indent, folding (use main branch for nvim 0.12 API)
 -- Parsers are installed manually via :TSInstall <lang> (requires tree-sitter-cli)
@@ -539,17 +565,21 @@ use('https://github.com/obsidian-nvim/obsidian.nvim', function()
         path = '~/notes',
       },
     },
+    daily_notes = {
+      folder = 'journal',
+      date_format = 'YYYY-MM/YYYY-MM-DD',
+    },
+    -- We set conceallevel per-buffer via BufEnter below; suppress the warning
+    ui = { ignore_conceal_warn = true },
   })
-  -- Set conceallevel and tab settings for obsidian notes
+  -- Use tabs instead of spaces in notes
   vim.api.nvim_create_autocmd('BufEnter', {
     pattern = '*.md',
-    desc = 'Set conceallevel and tab settings for obsidian notes',
+    desc = 'Set tab settings for obsidian notes',
     callback = function()
       local file_path = vim.fn.expand('%:p')
       local notes_path = vim.fn.expand('~/notes/')
       if vim.startswith(file_path, notes_path) then
-        vim.opt_local.conceallevel = 2
-        -- Use tabs instead of spaces in notes
         vim.opt_local.expandtab = false
         vim.opt_local.shiftwidth = 4
         vim.opt_local.tabstop = 4

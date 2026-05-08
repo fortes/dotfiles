@@ -35,6 +35,11 @@ PACKAGES=(
   yaml-language-server
 )
 
+# These packages don't work with pnpm global installation
+NPM_PACKAGES=(
+  @github/copilot-language-server
+)
+
 BUN_PACKAGES=(
   tobi/qmd
 )
@@ -138,6 +143,11 @@ install_node_packages() {
   echo "Installing global node packages …"
   pnpm add --global "${PACKAGES[@]}"
   echo "Node packages installed!"
+
+  # Install npm-only packages
+  echo "Installing global npm packages …"
+  npm install --global "${NPM_PACKAGES[@]}"
+  echo "Npm packages installed!"
 
   # Install bun packages if bun is available
   if command_exists bun; then

@@ -53,10 +53,6 @@ Once you've run setup, you'll still have to do the following universal manual st
    ```sh
    # GitHub CLI client
    gh auth login
-   # Install the Copilot extension
-   gh extension install github/gh-copilot
-   # May also need to update the Copilot extensions
-   gh extension upgrade gh-copilot
 
    # Launch Claude Code, which will take you through the flow
    claude
@@ -64,17 +60,9 @@ Once you've run setup, you'll still have to do the following universal manual st
    # Launch codex CLI to log in
    codex
 
-   # Copilot Vim extension by doing `:Copilot auth`
-   # Make sure `ENABLE_GITHUB_COPILOT` variable is set in `~/.profile.local`
-
-   # Launch Copilot CLI agent, open and do `/login
-   copilot
-
    # Launch Gemini CLI agent, open and do `/login
    gemini
    ```
-
-7. Add keys for `llm` via `llm keys set xxx` (or copy over from another machine from `~/.config/io.datasette.llm`)
 
 ## Ignoring changes to a file
 

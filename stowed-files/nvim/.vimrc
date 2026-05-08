@@ -372,7 +372,6 @@ endif
 
 " Make completion work a bit more like traditional IDEs w/o losing useful keys
 
-" Enable tab navigation between completion items
 inoremap <silent><expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <silent><expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 
