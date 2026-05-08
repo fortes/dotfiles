@@ -55,7 +55,6 @@ BREW_PACKAGES=(
   iftop
   # For yazi
   imagemagick
-  jj
   jq
   keychain
   lua-language-server
