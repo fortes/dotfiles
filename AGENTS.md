@@ -83,7 +83,7 @@ stowed-files/
 ├── tmux/          # Tmux configuration
 ├── ghostty/       # Ghostty terminal emulator config
 ├── yazi/          # File manager config
-└── [37 other packages]
+└── [14 other packages]
 ```
 
 The `script/stow` wrapper handles:

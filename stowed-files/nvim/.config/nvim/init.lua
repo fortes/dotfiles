@@ -371,7 +371,8 @@ if copilot_enabled then
 end
 
 -- Treesitter: highlighting, indent, folding (use main branch for nvim 0.12 API)
--- Parsers are installed manually via :TSInstall <lang> (requires tree-sitter-cli)
+-- Parsers are installed automatically via the PackChanged hook above
+-- (requires tree-sitter-cli on PATH).
 use({ src = 'https://github.com/nvim-treesitter/nvim-treesitter', version = 'main' }, function()
   vim.api.nvim_create_autocmd('FileType', {
     desc = 'Enable treesitter highlighting and indentation',
