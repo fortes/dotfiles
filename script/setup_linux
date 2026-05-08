@@ -48,8 +48,8 @@ check_prerequisites() {
     exit 1
   fi
 
-  if ! command_exists lsb_release || ! command_exists add-apt-repository; then
-    echo "Installing add-apt-repository and lsb-release (requires sudo)"
+  if ! command_exists lsb_release; then
+    echo "Installing lsb-release (requires sudo)"
     apt_update_once
     sudo -E apt-get install "${APT_ARGS[@]}" \
       lsb-release
@@ -173,26 +173,32 @@ setup_locale() {
 }
 
 setup_nonfree() {
-  if [[ -f /etc/apt/sources.list.d/debian.sources ]]; then
-    if grep -q non-free /etc/apt/sources.list.d/debian.sources; then
-      echo "Non-free already in sources.list"
+  declare -r deb822_path="/etc/apt/sources.list.d/debian.sources"
+  declare -r legacy_path="/etc/apt/sources.list"
+
+  if [[ -f "$deb822_path" ]]; then
+    if grep -q non-free "$deb822_path"; then
+      echo "Non-free already in ${deb822_path}"
       return
     fi
-
-    # `add-apt-repository` doesn't seem to support the deb822 format
-    # TODO: Find a better way to do this
+    echo "Adding contrib & non-free to ${deb822_path} (requires sudo)"
     sudo sed -i.bak 's/Components: main$/Components: main contrib non-free non-free-firmware/' \
-      /etc/apt/sources.list.d/debian.sources
-  elif ! grep -q non-free /etc/apt/sources.list; then
-    # Assume contrib and non-free always travel together
-    echo "Adding contrib & non-free to sources (requires sudo)"
-    sudo -E add-apt-repository --no-update --yes contrib >/dev/null
-    sudo -E add-apt-repository --no-update --yes non-free >/dev/null
-    sudo -E add-apt-repository --no-update --yes non-free-firmware >/dev/null
-
-    # New source requires forced updates
-    has_updated=""
+      "$deb822_path"
+  elif [[ -f "$legacy_path" ]] && grep -qE '^deb ' "$legacy_path"; then
+    if grep -q non-free "$legacy_path"; then
+      echo "Non-free already in ${legacy_path}"
+      return
+    fi
+    echo "Adding contrib & non-free to ${legacy_path} (requires sudo)"
+    sudo sed -i.bak -E 's|^(deb .* main)$|\1 contrib non-free non-free-firmware|' \
+      "$legacy_path"
+  else
+    echo_stderr "No debian sources found, skipping non-free setup"
+    return
   fi
+
+  # New components require forced update so install_apt_packages sees them
+  has_updated=""
 }
 
 setup_shell() {
