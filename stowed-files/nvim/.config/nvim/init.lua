@@ -116,16 +116,11 @@ vim.api.nvim_create_autocmd('LspAttach', {
   end,
 })
 
--- ============================================================================
--- Plugin manager: vim.pack (built-in, nvim 0.12+)
---
--- After cloning this repo / adding new plugins, run:
---   :lua vim.pack.update()
--- This installs/updates plugins AND triggers PackChanged for native builds
--- (telescope-fzf-native).
--- ============================================================================
+-- Plugin manager: vim.pack (built-in, nvim 0.12+).
+-- Run `:lua vim.pack.update()` to install/update plugins.
 
--- Build hooks must be registered BEFORE vim.pack.add()
+-- Build hooks must be registered before vim.pack.add() so that PackChanged
+-- fires for the initial install
 vim.api.nvim_create_autocmd('PackChanged', {
   desc = 'Build native plugin components after install/update',
   callback = function(ev)
@@ -133,14 +128,11 @@ vim.api.nvim_create_autocmd('PackChanged', {
     local kind = ev.data.kind
     if kind == 'delete' then return end
 
-    -- ev.data.path is the plugin's install directory (provided by vim.pack)
     local path = ev.data.path
 
     if spec.name == 'nvim-treesitter' then
-      -- Equivalent to lazy.nvim's `build = ':TSUpdate'`: compile parsers after
-      -- install/update so they are ready before the next nvim session opens a file.
-      -- PackChanged fires before pack_add adds the plugin to rtp, so prepend path
-      -- manually to make the module requireable.
+      -- PackChanged fires before pack_add adds the plugin to rtp, so prepend
+      -- manually to make `require('nvim-treesitter')` resolve
       vim.schedule(function()
         vim.opt.rtp:prepend(path)
         require('nvim-treesitter').install({
@@ -154,7 +146,7 @@ vim.api.nvim_create_autocmd('PackChanged', {
       vim.notify('Building telescope-fzf-native...', vim.log.levels.INFO)
       vim.system({ 'make', '-C', path }, { text = true }, function(result)
         if result.code ~= 0 then
-          -- vim.notify cannot be called in a fast event (libuv callback), schedule it
+          -- vim.notify can't be called in a libuv callback
           vim.schedule(function()
             vim.notify(
               'telescope-fzf-native build failed:\n' .. (result.stderr or ''),
@@ -167,10 +159,8 @@ vim.api.nvim_create_autocmd('PackChanged', {
   end,
 })
 
--- `use(spec, setup_fn?)` queues a plugin and its optional setup function.
 -- All specs are passed to vim.pack.add() at once; setups run in declaration
--- order after vim.pack.add() — giving the same colocated feel as lazy.nvim's
--- `config =` without any lazy-loading machinery.
+-- order after.
 local _specs = {}
 local _setups = {}
 local function use(spec, setup_fn)
@@ -584,8 +574,7 @@ end)
 -- Obsidian notes integration (active only in ~/notes directory)
 -- No version pin: vim.pack doesn't support wildcard releases, tracks main branch
 use('https://github.com/obsidian-nvim/obsidian.nvim', function()
-  -- obsidian.nvim hard-errors if no configured workspace path exists; skip
-  -- setup entirely on machines without a notes dir (e.g. fresh containers)
+  -- obsidian.nvim hard-errors if no configured workspace path exists
   if vim.fn.isdirectory(vim.fn.expand('~/notes')) == 0 then
     return
   end

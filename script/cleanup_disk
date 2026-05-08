@@ -54,6 +54,13 @@ cleanup_docker() {
   fi
 }
 
+cleanup_bun() {
+  if command -v bun >/dev/null 2>&1; then
+    echo "Cleaning up bun cache..."
+    bun pm cache rm 2>/dev/null || true
+  fi
+}
+
 cleanup_npx() {
   if command -v npx >/dev/null 2>&1; then
     echo "Cleaning up npx cache..."
@@ -88,6 +95,7 @@ main() {
   cleanup_apt
   cleanup_brew
   cleanup_docker
+  cleanup_bun
   cleanup_npx
   cleanup_pnpm
   cleanup_pip

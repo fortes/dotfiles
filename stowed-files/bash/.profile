@@ -52,10 +52,6 @@ if command_exists fnm; then
   eval "$(fnm env)"
 fi
 
-# pnpm home (used by pnpm for store/config when run for project-local
-# installs via corepack). Globals are installed via bun, so we don't add
-# ${PNPM_HOME}/bin to PATH — old pnpm-9 shims there would shadow new bun
-# globals in ~/.local/bin.
 export PNPM_HOME="${HOME}/.local/share/pnpm"
 
 export CARGO_HOME="${HOME}/.local/share/cargo"

@@ -6,7 +6,6 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-# Most packages install via bun (faster, simpler global layout than pnpm)
 BUN_PACKAGES=(
   @google/gemini-cli
   @google/jules
@@ -131,8 +130,7 @@ install_node_packages() {
     export BUN_INSTALL="$HOME/.local"
   fi
 
-  # Enable corepack so pnpm/yarn are available on demand for project work,
-  # even though we no longer use them for global installs.
+  # Make pnpm/yarn available on demand for project-local work
   corepack enable
 
   if ! command_exists bun; then
