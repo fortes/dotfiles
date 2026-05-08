@@ -610,6 +610,7 @@ use('https://github.com/obsidian-nvim/obsidian.nvim', function()
       folder = 'journal',
       date_format = 'YYYY-MM/YYYY-MM-DD',
     },
+    picker = { name = 'telescope.nvim' },
     -- conceallevel is set per-buffer in the BufEnter autocmd below
     ui = { ignore_conceal_warn = true },
   })
