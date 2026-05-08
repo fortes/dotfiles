@@ -5,7 +5,7 @@ on:
     paths:
       - 'script/**'
       - 'Makefile'
-      - '.github/workflows/bash-syntax.yml'
+      - '.github/workflows/**'
 
 jobs:
   bash-syntax:
