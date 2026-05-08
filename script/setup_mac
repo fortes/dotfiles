@@ -11,6 +11,12 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+if [[ "$(uname -m)" != "arm64" ]]; then
+  >&2 echo "⨯ This dotfiles setup only supports Apple Silicon Macs."
+  >&2 echo "  Detected architecture: $(uname -m)"
+  exit 1
+fi
+
 declare -r brew_prefix="/opt/homebrew"
 declare dotfiles_root
 dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

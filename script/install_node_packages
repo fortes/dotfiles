@@ -126,9 +126,13 @@ install_node_packages() {
     # shellcheck source=/dev/null
     . "$HOME/.profile"
   else
-    # `.profile` might not be created yet within the docker build process
+    # .profile / .npmrc may not be stowed yet during the docker build
     export BUN_INSTALL="$HOME/.local"
   fi
+
+  # npm prefix lives in stowed .npmrc, but we may run before stow. Set it
+  # here so npm globals always land in ~/.local/bin (alongside bun globals).
+  export NPM_CONFIG_PREFIX="$HOME/.local"
 
   # Make pnpm/yarn available on demand for project-local work
   corepack enable

@@ -70,5 +70,15 @@ install_gcloud() {
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  case "${1:-}" in
+    -h | --help)
+      cat <<EOF
+Usage: $(basename "$0")
+
+Install Google Cloud CLI (Homebrew cask on Mac, apt repo on Debian).
+EOF
+      exit 0
+      ;;
+  esac
   install_gcloud
 fi
