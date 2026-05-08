@@ -53,10 +53,6 @@ Once you've run setup, you'll still have to do the following universal manual st
    ```sh
    # GitHub CLI client
    gh auth login
-   # Install the Copilot extension
-   gh extension install github/gh-copilot
-   # May also need to update the Copilot extensions
-   gh extension upgrade gh-copilot
 
    # Launch Claude Code, which will take you through the flow
    claude
@@ -64,17 +60,22 @@ Once you've run setup, you'll still have to do the following universal manual st
    # Launch codex CLI to log in
    codex
 
-   # Copilot Vim extension by doing `:Copilot auth`
-   # Make sure `ENABLE_GITHUB_COPILOT` variable is set in `~/.profile.local`
-
-   # Launch Copilot CLI agent, open and do `/login
-   copilot
-
    # Launch Gemini CLI agent, open and do `/login
    gemini
    ```
 
-7. Add keys for `llm` via `llm keys set xxx` (or copy over from another machine from `~/.config/io.datasette.llm`)
+## Cleaning up stale symlinks
+
+`script/stow` doesn't unstow packages that no longer exist in the repo. After pulling changes that delete a `stowed-files/<pkg>/` directory, broken symlinks can linger in `$HOME`. To remove broken symlinks that point into the dotfiles tree:
+
+```sh
+find ~ -maxdepth 5 -type l 2>/dev/null \
+  | while read -r link; do
+      [ -e "$link" ] && continue
+      target=$(readlink "$link")
+      case "$target" in *dotfiles/stowed-files*) rm -v "$link" ;; esac
+    done
+```
 
 ## Ignoring changes to a file
 
@@ -88,11 +89,16 @@ To make changes in the future:
 git update-index --no-skip-worktree ./symlinks/npmrc
 ```
 
-8. Run global pnpm package build scripts (needed for `bd` at least)
+### Neovim
 
-```sh
-pnpm approve-builds --global
+After setup, open `nvim` and run the following to install plugins, build native components (fzf sorter), and compile treesitter parsers:
+
+```vim
+:lua vim.pack.update()
+" Must do `:write` to accept the updates, then `:restart`
 ```
+
+Re-run this command whenever you pull updates that add or change plugins.
 
 ### Firefox
 
@@ -120,7 +126,7 @@ pnpm approve-builds --global
 - Set `terminal.app` profile, send option as meta key
 - May want to install command line tools manually in order to get `git`: `xcode-select --install`
 - Run `setup_mac`
-- Make sure keys repeat properly in apps:
+- Make sure keys repeat properly in apps that disable it by default:
   - Antigravity: `defaults write com.google.antigravity ApplePressAndHoldEnabled -bool false`
   - Obsidian: `defaults write md.obsidian ApplePressAndHoldEnabled -bool false`
   - For other apps that have this issue, do the following:
@@ -246,7 +252,7 @@ This will list out all the packages installed, then need to search through to ma
 
 ### Mac
 
-- Firefox and VS Code casks get ornery and no longer update via brew, currently install once via script, but updates have to happen manually. Need to investigate further.
+- Firefox cask gets ornery and no longer updates via brew, currently installed once via script, but updates have to happen manually. Need to investigate further.
 
 ## Linux GUI and Windows WSL2 Support
 

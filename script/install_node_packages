@@ -6,13 +6,13 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-PACKAGES=(
-  @github/copilot
+BUN_PACKAGES=(
   @google/gemini-cli
   @google/jules
   @mariozechner/pi-coding-agent
   @openai/codex
   @playwright/mcp@latest
+  @tobilu/qmd
   @typescript/native-preview
   agent-browser
   bash-language-server
@@ -21,7 +21,6 @@ PACKAGES=(
   eslint
   fkill-cli
   neovim
-  npm
   npm-check-updates
   opencode-ai
   oxfmt
@@ -33,11 +32,14 @@ PACKAGES=(
   typescript-language-server
   vim-language-server
   vscode-langservers-extracted
-  yaml-language-server
 )
 
-BUN_PACKAGES=(
-  tobi/qmd
+# Bun's hoisting fails to resolve nested peer-deps for these packages:
+# - copilot-language-server bundles its own language server binary
+# - yaml-language-server's ajv-draft-04 dep does `require('ajv/dist/core')`
+NPM_PACKAGES=(
+  @github/copilot-language-server
+  yaml-language-server
 )
 
 # shellcheck source=script/lib.sh
@@ -121,33 +123,33 @@ install_node_packages() {
   fi
 
   if [[ -f "$HOME/.profile" ]]; then
-    # Load up PNPM_HOME and add to path
     # shellcheck source=/dev/null
     . "$HOME/.profile"
   else
-    # `.profile` might not be created yet within the docker build process
-    export PNPM_HOME="$HOME/.local/share/pnpm"
-    export PATH="$PNPM_HOME:$PATH"
+    # .profile / .npmrc may not be stowed yet during the docker build
+    export BUN_INSTALL="$HOME/.local"
   fi
 
-  # Make sure pnpm is setup (corepack is added by fnm when installing node)
+  # npm prefix lives in stowed .npmrc, but we may run before stow. Set it
+  # here so npm globals always land in ~/.local/bin (alongside bun globals).
+  export NPM_CONFIG_PREFIX="$HOME/.local"
+
+  # Make pnpm/yarn available on demand for project-local work
   corepack enable
 
-  # Corepack may need to download pnpm the first time
-  corepack prepare pnpm@latest --activate
+  if ! command_exists bun; then
+    >&2 echo "⨯ bun not installed (expected on PATH from install_github_packages or brew)"
+    exit 1
+  fi
 
-  echo "Installing global node packages …"
-  pnpm add --global "${PACKAGES[@]}"
-  echo "Node packages installed!"
+  echo "Installing global bun packages …"
+  bun install --global "${BUN_PACKAGES[@]}"
+  echo "Bun packages installed!"
 
-  # Install bun packages if bun is available
-  if command_exists bun; then
-    echo "Installing global bun packages …"
-    # BUN_INSTALL is set in .profile to install to ~/.local/bin
-    bun install --global "${BUN_PACKAGES[@]}"
-    echo "Bun packages installed!"
-  else
-    echo "⚠ bun not found, skipping bun packages"
+  if [[ ${#NPM_PACKAGES[@]} -gt 0 ]]; then
+    echo "Installing global npm packages …"
+    npm install --global "${NPM_PACKAGES[@]}"
+    echo "Npm packages installed!"
   fi
 }
 

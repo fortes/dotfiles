@@ -52,9 +52,7 @@ if command_exists fnm; then
   eval "$(fnm env)"
 fi
 
-# pnpm global packages
 export PNPM_HOME="${HOME}/.local/share/pnpm"
-add_to_path "${PNPM_HOME}"
 
 export CARGO_HOME="${HOME}/.local/share/cargo"
 # Cargo packages install to ~/.local/bin
@@ -80,14 +78,13 @@ if [ -z "${XDG_DOWNLOAD_DIR:-}" ]; then
   fi
 fi
 
-# Opt-out of Eternal Terminal telemetry
+# Opt-out of telemetry
+export DO_NOT_TRACK=true
 export ET_NO_TELEMETRY=1
+export GH_TELEMETRY=false
 
 # Make sure to use system for virsh by default
 export LIBVIRT_DEFAULT_URI="qemu:///system"
-
-# Use wayland for Firefox
-export MOZ_ENABLE_WAYLAND=1
 
 # Rg, for whatever reason, needs to manually specify location for config
 export RIPGREP_CONFIG_PATH="$XDG_CONFIG_HOME/ripgrep/rc"

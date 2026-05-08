@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+# Install Google Cloud CLI
+#
+# Usage: install_gcloud
+
+set -euo pipefail
+IFS=$'\n\t'
+export DEBIAN_FRONTEND=noninteractive
+
+# shellcheck source=script/lib.sh
+. "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+
+install_gcloud_mac() {
+  declare -r brew_prefix="/opt/homebrew"
+
+  if ! command_exists brew; then
+    >&2 echo "Homebrew not installed"
+    exit 1
+  fi
+
+  if "${brew_prefix}/bin/brew" list --cask gcloud-cli &>/dev/null; then
+    echo "gcloud-cli already installed"
+    return 0
+  fi
+
+  echo "Installing gcloud-cli via Homebrew"
+  "${brew_prefix}/bin/brew" install --cask --quiet gcloud-cli
+}
+
+install_gcloud_linux() {
+  declare -r gcloud_sources_list="/etc/apt/sources.list.d/google-cloud-sdk.sources"
+  declare -r gcloud_key_url="https://packages.cloud.google.com/apt/doc/apt-key.gpg"
+  declare -r gcloud_key_path="/usr/share/keyrings/cloud.google.gpg"
+
+  if [ ! -f "$gcloud_sources_list" ]; then
+    echo "Adding Google Cloud GPG key (requires sudo)"
+    curl -sS "$gcloud_key_url" \
+      | sudo gpg --dearmor --yes --output "$gcloud_key_path"
+
+    echo "Adding Google Cloud SDK sources list (requires sudo)"
+    sudo tee "$gcloud_sources_list" >/dev/null <<EOF
+Types: deb
+URIs: https://packages.cloud.google.com/apt
+Suites: cloud-sdk
+Components: main
+Signed-By: ${gcloud_key_path}
+EOF
+
+    echo "Google Cloud SDK sources added, updating packages"
+    sudo -E apt-get update -qq
+  fi
+
+  echo "Installing google-cloud-cli package (requires sudo)"
+  sudo -E apt-get install -qq -o=Dpkg::Use-Pty=0 --assume-yes \
+    --fix-broken --no-install-recommends \
+    google-cloud-cli
+}
+
+install_gcloud() {
+  if command_exists gcloud; then
+    echo "gcloud already installed"
+    return 0
+  fi
+
+  if uname -s | grep -q Darwin; then
+    install_gcloud_mac
+  else
+    install_gcloud_linux
+  fi
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  case "${1:-}" in
+    -h | --help)
+      cat <<EOF
+Usage: $(basename "$0")
+
+Install Google Cloud CLI (Homebrew cask on Mac, apt repo on Debian).
+EOF
+      exit 0
+      ;;
+  esac
+  install_gcloud
+fi

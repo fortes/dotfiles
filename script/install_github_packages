@@ -11,7 +11,6 @@
 # - fzf (because older Debian versions are very old)
 # - github cli
 # - hugo (latest)
-# - jj
 # - luals
 # - neovim (latest)
 # - pistol
@@ -38,7 +37,6 @@ AVAILABLE_PACKAGES=(
   # github-cli
   harper-ls
   hugo
-  jj
   luals
   neovim
   pistol
@@ -299,10 +297,6 @@ install_hugo() {
   install_deb 'gohugoio/hugo' 'hugo_extended_.*_linux-{ARCH}.deb'
 }
 
-install_jj() {
-  install_tarball 'jj-vcs/jj' 'jj-v.*-{ARCH}-unknown-linux-musl.tar.gz'
-}
-
 install_lua_language_server() {
   local url
   # lua-language-server uses x64/arm64 naming instead of standard patterns
@@ -362,12 +356,7 @@ install_neovim_stable() {
   chmod 755 "${vim_path}"
   echo "neovim stable installed"
 
-  if [[ -d "$HOME/.local/share/nvim/lazy/lazy.nvim" ]]; then
-    echo "Syncing plugins"
-    "${vim_path}" --headless "+Lazy! sync" +qa
-  else
-    echo "Must manually launch Neovim to install plugins"
-  fi
+  echo "Run ':lua vim.pack.update()' in Neovim to install plugins"
 
   # Don't try to set alternatives if not available
   if ! update-alternatives --query vim &>/dev/null; then
@@ -495,9 +484,6 @@ install_github_packages() {
         ;;
       neovim)
         install_neovim_stable
-        ;;
-      jj)
-        install_jj
         ;;
       pistol)
         install_pistol

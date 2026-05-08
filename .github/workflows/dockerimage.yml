@@ -19,7 +19,11 @@ jobs:
       packages: write
 
     steps:
+      # workflow_run-triggered runs default to checking out the default branch;
+      # use the SHA from the originating workflow so we test the actual branch
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
