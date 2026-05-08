@@ -76,12 +76,6 @@ To make changes in the future:
 git update-index --no-skip-worktree ./symlinks/npmrc
 ```
 
-8. Run global pnpm package build scripts (needed for `bd` at least)
-
-```sh
-pnpm approve-builds --global
-```
-
 ### Neovim
 
 After setup, open `nvim` and run the following to install plugins, build native components (fzf sorter), and compile treesitter parsers:

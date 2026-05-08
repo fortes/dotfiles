@@ -6,12 +6,14 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-PACKAGES=(
+# Most packages install via bun (faster, simpler global layout than pnpm)
+BUN_PACKAGES=(
   @google/gemini-cli
   @google/jules
   @mariozechner/pi-coding-agent
   @openai/codex
   @playwright/mcp@latest
+  @tobilu/qmd
   @typescript/native-preview
   agent-browser
   bash-language-server
@@ -20,7 +22,6 @@ PACKAGES=(
   eslint
   fkill-cli
   neovim
-  npm
   npm-check-updates
   opencode-ai
   oxfmt
@@ -35,13 +36,9 @@ PACKAGES=(
   yaml-language-server
 )
 
-# These packages don't work with pnpm global installation
+# Bun's hoisting can't find this package's bundled language-server binary
 NPM_PACKAGES=(
   @github/copilot-language-server
-)
-
-BUN_PACKAGES=(
-  tobi/qmd
 )
 
 # shellcheck source=script/lib.sh
@@ -125,40 +122,30 @@ install_node_packages() {
   fi
 
   if [[ -f "$HOME/.profile" ]]; then
-    # Load up PNPM_HOME and add to path
     # shellcheck source=/dev/null
     . "$HOME/.profile"
   else
     # `.profile` might not be created yet within the docker build process
-    export PNPM_HOME="$HOME/.local/share/pnpm"
-    export PATH="$PNPM_HOME/bin:$PATH"
+    export BUN_INSTALL="$HOME/.local"
   fi
 
-  # Make sure pnpm is setup (corepack is added by fnm when installing node)
+  # Enable corepack so pnpm/yarn are available on demand for project work,
+  # even though we no longer use them for global installs.
   corepack enable
 
-  # Corepack may need to download pnpm the first time
-  corepack prepare pnpm@latest --activate
+  if ! command_exists bun; then
+    >&2 echo "⨯ bun not installed (expected on PATH from install_github_packages or brew)"
+    exit 1
+  fi
 
-  echo "Installing global node packages …"
-  pnpm add --global "${PACKAGES[@]}"
-  echo "Node packages installed!"
+  echo "Installing global bun packages …"
+  bun install --global "${BUN_PACKAGES[@]}"
+  echo "Bun packages installed!"
 
-  # Install npm-only packages
   if [[ ${#NPM_PACKAGES[@]} -gt 0 ]]; then
     echo "Installing global npm packages …"
     npm install --global "${NPM_PACKAGES[@]}"
     echo "Npm packages installed!"
-  fi
-
-  # Install bun packages if bun is available
-  if command_exists bun; then
-    echo "Installing global bun packages …"
-    # BUN_INSTALL is set in .profile to install to ~/.local/bin
-    bun install --global "${BUN_PACKAGES[@]}"
-    echo "Bun packages installed!"
-  else
-    echo "⚠ bun not found, skipping bun packages"
   fi
 }
 
