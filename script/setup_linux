@@ -64,25 +64,6 @@ echo_stderr() {
   >&2 echo "${@}"
 }
 
-# NOTE: Does not work on Docker, which relies on host config
-increase_max_watchers() {
-  declare -r sysctl_conf_path="/etc/sysctl.d"
-  declare -r conf_file_path="${sysctl_conf_path}/20-increase-max-watchers.conf"
-  declare -r max_watches="524288"
-
-  if [ ! -d "${sysctl_conf_path}" ]; then
-    echo "Creating sysctl.d directory (requires sudo)"
-    sudo mkdir -p "${sysctl_conf_path}"
-  fi
-
-  if [ ! -f "$conf_file_path" ]; then
-    echo "Increasing max watchers (requires sudo)"
-    echo "fs.inotify.max_user_watches=$max_watches" \
-      | sudo tee -a "$conf_file_path" &>/dev/null && sudo sysctl -p
-    echo "Max watchers set to $max_watches"
-  fi
-}
-
 install_apt_packages() {
   if [[ -n "${SKIP_INITIAL_APT_INSTALL:-}" ]]; then
     echo "Skipping apt package installation (SKIP_INITIAL_APT_INSTALL set)"
@@ -268,8 +249,6 @@ main() {
   "${dotfiles_root}/script/remove_default_dotfiles"
   "${dotfiles_root}/script/stow"
 
-  # Misc system configs
-  [[ -z "${IS_DOCKER:-}" ]] && increase_max_watchers
   pushd "${dotfiles_root}" >/dev/null
   "${dotfiles_root}/script/lock_local_files"
   popd >/dev/null
