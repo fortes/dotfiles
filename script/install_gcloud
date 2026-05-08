@@ -35,7 +35,7 @@ install_gcloud_linux() {
   if [ ! -f "$gcloud_sources_list" ]; then
     echo "Adding Google Cloud GPG key (requires sudo)"
     curl -sS "$gcloud_key_url" \
-      | sudo gpg --dearmor --output "$gcloud_key_path"
+      | sudo gpg --dearmor --yes --output "$gcloud_key_path"
 
     echo "Adding Google Cloud SDK sources list (requires sudo)"
     sudo tee "$gcloud_sources_list" >/dev/null <<EOF

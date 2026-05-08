@@ -145,9 +145,11 @@ install_node_packages() {
   echo "Node packages installed!"
 
   # Install npm-only packages
-  echo "Installing global npm packages …"
-  npm install --global "${NPM_PACKAGES[@]}"
-  echo "Npm packages installed!"
+  if [[ ${#NPM_PACKAGES[@]} -gt 0 ]]; then
+    echo "Installing global npm packages …"
+    npm install --global "${NPM_PACKAGES[@]}"
+    echo "Npm packages installed!"
+  fi
 
   # Install bun packages if bun is available
   if command_exists bun; then
