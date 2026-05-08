@@ -56,9 +56,16 @@ vim.api.nvim_create_autocmd('LspAttach', {
       buffer = bufnr,
       desc = 'Add buffer diagnostics to the location list',
     })
-    -- `yod` already used by unimpaired for `diff`, use `yoe` (error)
+    -- `yod` already used by unimpaired for `diff`, use `yoe` (error). Toggles
+    -- inline display only — diagnostics keep being collected so signs, the
+    -- location list, and `<leader>e` floats still work.
     map('n', 'yoe', function()
-      vim.diagnostic.enable(not vim.diagnostic.is_enabled())
+      local cfg = vim.diagnostic.config()
+      local on = not cfg.virtual_text
+      vim.diagnostic.config({
+        virtual_text = on,
+        virtual_lines = on and { current_line = true } or false,
+      })
     end, { buffer = bufnr, desc = 'Toggle diagnostic display' })
 
     if client:supports_method('textDocument/completion') then
@@ -194,7 +201,6 @@ use('https://github.com/neovim/nvim-lspconfig', function()
     vim.lsp.enable('bashls')
   end
 
-
   if vim.fn.executable('vscode-css-language-server') == 1 then
     vim.lsp.enable('cssls')
   end
@@ -303,7 +309,6 @@ if copilot_enabled then
         markdown = true,
         -- Disable in UI/picker buffers
         TelescopePrompt = false,
-        ['dressing.input'] = false,
       },
       suggestion = {
         enabled = true,
@@ -459,7 +464,6 @@ use('https://github.com/nvim-telescope/telescope.nvim', function()
       git_files = { show_untracked = true },
       live_grep = {
         additional_args = function() return { '--hidden' } end,
-        hidden = true,
       },
     },
   })
@@ -536,10 +540,15 @@ use('https://github.com/stevearc/conform.nvim', function()
     default_format_opts = {
       lsp_format = 'fallback',
     },
-    format_after_save = {
-      async = true,
-      timeout_ms = 500,
-    },
+    format_after_save = function(bufnr)
+      -- Skip ~/notes — obsidian.nvim sets tabs there, but oxfmt would
+      -- reformat with spaces and undo the per-buffer setting.
+      local file_path = vim.api.nvim_buf_get_name(bufnr)
+      if vim.startswith(file_path, vim.fn.expand('~/notes/')) then
+        return nil
+      end
+      return { async = true, timeout_ms = 500 }
+    end,
     formatters = {
       oxfmt = {
         command = 'oxfmt',
