@@ -170,8 +170,13 @@ end
 
 -- Variables shared across multiple plugin setups
 local copilot_enabled = os.getenv('ENABLE_GITHUB_COPILOT') == '1'
-local in_deno_project = os.getenv('ENABLE_DENO') == '1'
-  or vim.fs.root(vim.fn.getcwd(), { 'deno.json', 'deno.jsonc' }) ~= nil
+
+-- Per-buffer Deno detection so opening a Deno file from a non-Deno cwd
+-- still routes to the right LSP/formatter
+local function in_deno_project(bufnr)
+  if os.getenv('ENABLE_DENO') == '1' then return true end
+  return vim.fs.root(bufnr or 0, { 'deno.json', 'deno.jsonc' }) ~= nil
+end
 
 -- ============================================================================
 -- Plugin declarations
@@ -195,8 +200,9 @@ use('https://github.com/neovim/nvim-lspconfig', function()
     vim.lsp.enable('cssls')
   end
 
-  -- Deno (only in Deno projects)
-  if vim.fn.executable('deno') == 1 and in_deno_project then
+  -- Deno: root_markers gate attachment to buffers actually inside a Deno
+  -- project (so this is safe to enable unconditionally)
+  if vim.fn.executable('deno') == 1 then
     vim.lsp.config('denols', {
       root_markers = { 'deno.json', 'deno.jsonc' },
       single_file_support = false,
@@ -208,13 +214,22 @@ use('https://github.com/neovim/nvim-lspconfig', function()
     vim.lsp.enable('dockerls')
   end
 
-  -- OXfmt (only if not in a Deno project)
-  if vim.fn.executable('oxfmt') == 1 and not in_deno_project then
+  -- root_dir returning nil prevents attachment, so oxfmt/oxlint/tsgo
+  -- skip Deno-managed buffers per-buffer (not just at startup)
+  local function not_in_deno(extra_markers)
+    return function(bufnr, on_dir)
+      if in_deno_project(bufnr) then return end
+      on_dir(vim.fs.root(bufnr, extra_markers) or vim.fn.getcwd())
+    end
+  end
+
+  if vim.fn.executable('oxfmt') == 1 then
+    vim.lsp.config('oxfmt', { root_dir = not_in_deno({ 'package.json' }) })
     vim.lsp.enable('oxfmt')
   end
 
-  -- OXlint (only if not in a Deno project)
-  if vim.fn.executable('oxlint') == 1 and not in_deno_project then
+  if vim.fn.executable('oxlint') == 1 then
+    vim.lsp.config('oxlint', { root_dir = not_in_deno({ 'package.json', '.oxlintrc.json' }) })
     vim.lsp.enable('oxlint')
   end
 
@@ -272,8 +287,8 @@ use('https://github.com/neovim/nvim-lspconfig', function()
     vim.lsp.enable('pyright')
   end
 
-  -- TypeScript (only if not in a Deno project)
-  if vim.fn.executable('tsgo') == 1 and not in_deno_project then
+  if vim.fn.executable('tsgo') == 1 then
+    vim.lsp.config('tsgo', { root_dir = not_in_deno({ 'tsconfig.json', 'package.json' }) })
     vim.lsp.enable('tsgo')
   end
 
@@ -464,13 +479,15 @@ use('https://github.com/nvim-telescope/telescope.nvim', function()
   pcall(telescope.load_extension, 'fzf')
   telescope.load_extension('ui-select')
 
-  -- Fallback to file search if not in a git repo
+  -- Fallback to file search if not in a git repo. git_files is async so
+  -- pcall around it doesn't catch "not a git repo" — check up front.
   local function project_files()
-    local ok = pcall(require('telescope.builtin').git_files, {
-      use_git_root = true,
-      show_untracked = true,
-    })
-    if not ok then
+    if vim.fs.root(0, '.git') then
+      require('telescope.builtin').git_files({
+        use_git_root = true,
+        show_untracked = true,
+      })
+    else
       require('telescope.builtin').find_files({ hidden = true })
     end
   end
@@ -538,7 +555,7 @@ use('https://github.com/stevearc/conform.nvim', function()
       if vim.startswith(file_path, vim.fn.expand('~/notes/')) then
         return nil
       end
-      return { async = true, timeout_ms = 500 }
+      return {}
     end,
     formatters = {
       oxfmt = {
@@ -591,21 +608,23 @@ use('https://github.com/obsidian-nvim/obsidian.nvim', function()
       folder = 'journal',
       date_format = 'YYYY-MM/YYYY-MM-DD',
     },
-    -- We set conceallevel per-buffer via BufEnter below; suppress the warning
+    -- conceallevel is set per-buffer in the BufEnter autocmd below
     ui = { ignore_conceal_warn = true },
   })
-  -- Use tabs instead of spaces in notes
   vim.api.nvim_create_autocmd('BufEnter', {
     pattern = '*.md',
-    desc = 'Set tab settings for obsidian notes',
+    desc = 'Notes-specific buffer settings',
     callback = function()
       local file_path = vim.fn.expand('%:p')
       local notes_path = vim.fn.expand('~/notes/')
       if vim.startswith(file_path, notes_path) then
+        -- Tabs instead of spaces
         vim.opt_local.expandtab = false
         vim.opt_local.shiftwidth = 4
         vim.opt_local.tabstop = 4
         vim.opt_local.softtabstop = 4
+        -- Required by obsidian.nvim for [[wikilink]] / link rendering
+        vim.opt_local.conceallevel = 1
       end
     end,
   })
@@ -698,7 +717,7 @@ use('https://github.com/justinmk/vim-dirvish', function()
       map('n', '<cr>', function()
         vim.cmd('call dirvish#open("edit", 0)')
       end, { buffer = 0, desc = 'Open file' })
-      map('n', '<leader>t', function()
+      map('n', '<leader>T', function()
         vim.cmd('call dirvish#open("tabedit", 0)')
       end, { buffer = 0, desc = 'Open file in new tab' })
       map('n', '<leader>s', function()
