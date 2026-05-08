@@ -131,7 +131,7 @@ install_node_packages() {
   else
     # `.profile` might not be created yet within the docker build process
     export PNPM_HOME="$HOME/.local/share/pnpm"
-    export PATH="$PNPM_HOME:$PATH"
+    export PATH="$PNPM_HOME/bin:$PATH"
   fi
 
   # Make sure pnpm is setup (corepack is added by fnm when installing node)

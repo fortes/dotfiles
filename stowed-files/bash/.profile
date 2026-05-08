@@ -52,9 +52,9 @@ if command_exists fnm; then
   eval "$(fnm env)"
 fi
 
-# pnpm global packages
+# pnpm global packages (pnpm 10+ links binaries into ${PNPM_HOME}/bin)
 export PNPM_HOME="${HOME}/.local/share/pnpm"
-add_to_path "${PNPM_HOME}"
+add_to_path "${PNPM_HOME}/bin"
 
 export CARGO_HOME="${HOME}/.local/share/cargo"
 # Cargo packages install to ~/.local/bin

@@ -86,8 +86,9 @@ pnpm approve-builds --global
 
 After setup, open `nvim` and run the following to install plugins, build native components (fzf sorter), and compile treesitter parsers:
 
-```
+```vim
 :lua vim.pack.update()
+" Must do `:write` to accept the updates, then `:restart`
 ```
 
 Re-run this command whenever you pull updates that add or change plugins.
