@@ -609,6 +609,9 @@ use('https://github.com/obsidian-nvim/obsidian.nvim', function()
     -- Vault convention is TitleCase filenames; default zettel_id produces
     -- random short IDs which don't match.
     note_id_func = require('obsidian.builtin').title_id,
+    -- Notes use rich custom frontmatter (location, journal flags, etc) that
+    -- the built-in func would normalize away. Leave it alone.
+    frontmatter = { enabled = false },
     templates = {
       folder = '_templates',
     },
