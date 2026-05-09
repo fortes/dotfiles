@@ -607,13 +607,13 @@ use('https://github.com/obsidian-nvim/obsidian.nvim', function()
       },
     },
     templates = {
-      folder = 'templates',
+      folder = '_templates',
     },
     daily_notes = {
       folder = 'journal',
       date_format = 'YYYY/MM/YYYY-MM-DD',
       -- Applied only on creation; editing the template won't retro-fit existing notes
-      template = 'daily.md',
+      template = 'journal-entry.md',
     },
     picker = { name = 'telescope.nvim' },
     -- Use [[wikilinks]] with the shortest unambiguous path
