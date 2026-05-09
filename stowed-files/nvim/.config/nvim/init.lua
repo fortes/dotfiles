@@ -606,6 +606,9 @@ use('https://github.com/obsidian-nvim/obsidian.nvim', function()
         path = '~/notes',
       },
     },
+    -- Vault convention is TitleCase filenames; default zettel_id produces
+    -- random short IDs which don't match.
+    note_id_func = require('obsidian.builtin').title_id,
     templates = {
       folder = '_templates',
     },
