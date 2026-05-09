@@ -606,9 +606,15 @@ use('https://github.com/obsidian-nvim/obsidian.nvim', function()
         path = '~/notes',
       },
     },
-    -- Vault convention is TitleCase filenames; default zettel_id produces
-    -- random short IDs which don't match.
-    note_id_func = require('obsidian.builtin').title_id,
+    -- Vault convention is TitleCase filenames (e.g. "My Note Title" →
+    -- MyNoteTitle.md). builtin.title_id slugifies to lowercase-with-hyphens,
+    -- and zettel_id produces random short IDs - neither matches.
+    note_id_func = function(title)
+      if not title or title == '' then
+        return require('obsidian.builtin').zettel_id()
+      end
+      return (title:gsub('%s+', ''))
+    end,
     -- Notes use rich custom frontmatter (location, journal flags, etc) that
     -- the built-in func would normalize away. Leave it alone.
     frontmatter = { enabled = false },
