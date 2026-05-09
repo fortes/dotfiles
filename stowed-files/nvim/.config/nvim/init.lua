@@ -626,8 +626,9 @@ use('https://github.com/obsidian-nvim/obsidian.nvim', function()
       workdays_only = false,
     },
     picker = { name = 'telescope.nvim' },
-    -- Use [[wikilinks]] with the shortest unambiguous path
-    link = { style = 'wiki', format = 'shortest' },
+    -- Use [[wikilinks]] with the shortest unambiguous path; auto_update
+    -- rewrites existing references when renaming via :Obsidian rename
+    link = { style = 'wiki', format = 'shortest', auto_update = true },
     -- conceallevel is set per-buffer in the BufEnter autocmd below
     ui = { ignore_conceal_warn = true },
   })
@@ -655,7 +656,7 @@ use('https://github.com/obsidian-nvim/obsidian.nvim', function()
         vim.opt_local.tabstop = 4
         vim.opt_local.softtabstop = 4
         -- Required by obsidian.nvim for [[wikilink]] / link rendering
-        vim.opt_local.conceallevel = 1
+        vim.opt_local.conceallevel = 2
 
         local bufnr = vim.api.nvim_get_current_buf()
         map('n', '<cr>', '<cmd>Obsidian smart_action<cr>', { buffer = bufnr, desc = 'Obsidian smart action' })
