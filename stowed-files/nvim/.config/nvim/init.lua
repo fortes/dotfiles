@@ -620,6 +620,10 @@ use('https://github.com/obsidian-nvim/obsidian.nvim', function()
       date_format = 'YYYY/MM/YYYY-MM-DD',
       -- Applied only on creation; editing the template won't retro-fit existing notes
       template = 'journal-entry.md',
+      -- Existing journal entries don't carry this tag
+      default_tags = {},
+      -- `:Obsidian today` should land on today, not skip back to Friday
+      workdays_only = false,
     },
     picker = { name = 'telescope.nvim' },
     -- Use [[wikilinks]] with the shortest unambiguous path
