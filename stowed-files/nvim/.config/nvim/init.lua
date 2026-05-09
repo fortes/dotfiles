@@ -661,11 +661,14 @@ use('https://github.com/obsidian-nvim/obsidian.nvim', function()
         -- Required by obsidian.nvim for [[wikilink]] / link rendering
         vim.opt_local.conceallevel = 2
 
-        local bufnr = vim.api.nvim_get_current_buf()
-        map('n', '<cr>', '<cmd>Obsidian smart_action<cr>', { buffer = bufnr, desc = 'Obsidian smart action' })
-        map('n', 'gf', '<cmd>Obsidian follow_link<cr>', { buffer = bufnr, desc = 'Follow Obsidian link' })
-        map('n', ']o', '<cmd>Obsidian nav_link next<cr>', { buffer = bufnr, desc = 'Next Obsidian link' })
-        map('n', '[o', '<cmd>Obsidian nav_link prev<cr>', { buffer = bufnr, desc = 'Previous Obsidian link' })
+        -- <CR>, ]o, [o are bound by obsidian.nvim's own autocmd (api.smart_action,
+        -- api.nav_link) for any buffer in the workspace; don't override them.
+        -- `:Obsidian smart_action` and `:Obsidian nav_link` aren't registered
+        -- as subcommands, so the cmdline form would error.
+        map('n', 'gf', '<cmd>Obsidian follow_link<cr>', {
+          buffer = vim.api.nvim_get_current_buf(),
+          desc = 'Follow Obsidian link',
+        })
       end
     end,
   })
