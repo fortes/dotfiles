@@ -625,6 +625,9 @@ use('https://github.com/obsidian-nvim/obsidian.nvim', function()
       -- `:Obsidian today` should land on today, not skip back to Friday
       workdays_only = false,
     },
+    -- Colocate pasted images with the note: `./` resolves relative to the
+    -- current file, so people/Foo.md pastes into people/attachments/.
+    attachments = { folder = './attachments' },
     picker = { name = 'telescope.nvim' },
     -- Use [[wikilinks]] with the shortest unambiguous path; auto_update
     -- rewrites existing references when renaming via :Obsidian rename
