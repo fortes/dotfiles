@@ -11,7 +11,7 @@ BUN_PACKAGES=(
   @google/jules
   @mariozechner/pi-coding-agent
   @openai/codex
-  @playwright/mcp@latest
+  @playwright/mcp
   @tobilu/qmd
   @typescript/native-preview
   agent-browser
@@ -26,7 +26,6 @@ BUN_PACKAGES=(
   oxfmt
   oxlint
   prettier
-  rome
   tsx
   typescript
   typescript-language-server
@@ -105,22 +104,17 @@ install_node_packages() {
   # Make sure to pick up necessary env vars
   eval "$(fnm env)"
 
-  # Validate that node is available when using packages-only mode
-  if [[ "${packages_only}" -eq 1 ]]; then
-    if ! command_exists node; then
-      >&2 echo "⨯ Node.js not found"
-      >&2 echo "Either install Node.js first or run without --packages-only flag"
-      exit 1
-    fi
-
-    if ! command_exists corepack; then
-      >&2 echo "⨯ corepack not found (should be included with Node.js)"
-      exit 1
-    fi
-
-    # Show current Node version
-    echo "Using Node $(node --version)"
+  if ! command_exists node; then
+    >&2 echo "⨯ Node.js not found on PATH after fnm env"
+    exit 1
   fi
+
+  if ! command_exists corepack; then
+    >&2 echo "⨯ corepack not found (should be included with Node.js)"
+    exit 1
+  fi
+
+  echo "Using Node $(node --version)"
 
   if [[ -f "$HOME/.profile" ]]; then
     # shellcheck source=/dev/null
