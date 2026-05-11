@@ -610,10 +610,11 @@ use('https://github.com/obsidian-nvim/obsidian.nvim', function()
     -- MyNoteTitle.md). builtin.title_id slugifies to lowercase-with-hyphens,
     -- and zettel_id produces random short IDs - neither matches.
     note_id_func = function(title)
-      if not title or title == '' then
+      local id = title and (title:gsub('%s+', '')) or ''
+      if id == '' then
         return require('obsidian.builtin').zettel_id()
       end
-      return (title:gsub('%s+', ''))
+      return id
     end,
     -- Notes use rich custom frontmatter (location, journal flags, etc) that
     -- the built-in func would normalize away. Leave it alone.
