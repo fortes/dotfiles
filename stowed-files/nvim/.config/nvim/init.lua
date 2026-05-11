@@ -137,7 +137,8 @@ vim.api.nvim_create_autocmd('PackChanged', {
         vim.opt.rtp:prepend(path)
         require('nvim-treesitter').install({
           'bash', 'css', 'diff', 'gotmpl', 'html', 'javascript',
-          'json', 'lua', 'python', 'tsx', 'typescript', 'vim', 'yaml',
+          'json', 'lua', 'markdown', 'markdown_inline', 'python',
+          'tsx', 'typescript', 'vim', 'yaml',
         })
       end)
     end
@@ -383,7 +384,8 @@ use({ src = 'https://github.com/nvim-treesitter/nvim-treesitter', version = 'mai
     desc = 'Enable treesitter highlighting and indentation',
     pattern = {
       'bash', 'css', 'diff', 'gotmpl', 'html', 'javascript', 'json',
-      'lua', 'python', 'tsx', 'typescript', 'vim', 'yaml',
+      'lua', 'markdown', 'markdown_inline', 'python', 'tsx',
+      'typescript', 'vim', 'yaml',
     },
     callback = function()
       local ok = pcall(vim.treesitter.start)
@@ -596,6 +598,47 @@ use('https://github.com/obsidian-nvim/obsidian.nvim', function()
     return
   end
 
+  -- Honor the vault's Obsidian.app daily-notes config so `:Obsidian today`
+  -- and the Obsidian app stay in sync. Each field falls back independently to
+  -- a canonical default if the file is missing or that field is unset. Read
+  -- once at setup; restart nvim to pick up changes. The template is applied
+  -- only on creation; editing it won't retro-fit existing notes.
+  local function obsidian_sync()
+    local synced = {
+      templates_folder = '_templates',
+      daily_notes = {
+        folder = 'journal',
+        date_format = 'YYYY-MM/YYYY-MM-DD',
+        template = 'daily-journal.md',
+      },
+    }
+    local path = vim.fn.expand('~/notes/.obsidian/daily-notes.json')
+    if vim.fn.filereadable(path) == 0 then return synced end
+    local ok, decoded = pcall(vim.json.decode, table.concat(vim.fn.readfile(path), '\n'))
+    if not ok or type(decoded) ~= 'table' then return synced end
+    if type(decoded.folder) == 'string' and decoded.folder ~= '' then
+      synced.daily_notes.folder = decoded.folder
+    end
+    if type(decoded.format) == 'string' and decoded.format ~= '' then
+      synced.daily_notes.date_format = decoded.format
+    end
+    if type(decoded.template) == 'string' and decoded.template ~= '' then
+      -- Obsidian stores a vault-relative path (often without .md), e.g.
+      -- "_templates/daily-journal". Split into the templates folder and the
+      -- filename obsidian.nvim expects relative to it. A bare filename
+      -- (fnamemodify ':h' returns '.') leaves the folder default in place.
+      local dir = vim.fn.fnamemodify(decoded.template, ':h')
+      local name = vim.fn.fnamemodify(decoded.template, ':t')
+      if dir ~= '' and dir ~= '.' then
+        synced.templates_folder = dir
+      end
+      synced.daily_notes.template = name:match('%.md$') and name or name .. '.md'
+    end
+    return synced
+  end
+
+  local synced = obsidian_sync()
+
   require('obsidian').setup({
     legacy_commands = false,
     workspaces = {
@@ -604,13 +647,49 @@ use('https://github.com/obsidian-nvim/obsidian.nvim', function()
         path = '~/notes',
       },
     },
-    daily_notes = {
-      folder = 'journal',
-      date_format = 'YYYY-MM/YYYY-MM-DD',
+    -- Vault convention is TitleCase filenames (e.g. "My Note Title" →
+    -- MyNoteTitle.md). builtin.title_id slugifies to lowercase-with-hyphens,
+    -- and zettel_id produces random short IDs - neither matches.
+    note_id_func = function(title)
+      local id = title and (title:gsub('%s+', '')) or ''
+      if id == '' then
+        return require('obsidian.builtin').zettel_id()
+      end
+      return id
+    end,
+    -- Notes use rich custom frontmatter (location, journal flags, etc) that
+    -- the built-in func would normalize away. Leave it alone.
+    frontmatter = { enabled = false },
+    templates = {
+      folder = synced.templates_folder,
     },
+    daily_notes = vim.tbl_extend('force', synced.daily_notes, {
+      -- Existing journal entries don't carry this tag
+      default_tags = {},
+      -- `:Obsidian today` should land on today, not skip back to Friday
+      workdays_only = false,
+    }),
+    -- Colocate pasted images with the note: `./` resolves relative to the
+    -- current file, so people/Foo.md pastes into people/attachments/.
+    attachments = { folder = './attachments' },
+    picker = { name = 'telescope.nvim' },
+    -- Use [[wikilinks]] with the shortest unambiguous path; auto_update
+    -- rewrites existing references when renaming via :Obsidian rename
+    link = { style = 'wiki', format = 'shortest', auto_update = true },
     -- conceallevel is set per-buffer in the BufEnter autocmd below
     ui = { ignore_conceal_warn = true },
   })
+
+  map('n', '<leader>os', '<cmd>Obsidian quick_switch<cr>', { desc = 'Obsidian quick switch' })
+  map('n', '<leader>of', '<cmd>Obsidian search<cr>', { desc = 'Obsidian search' })
+  map('n', '<leader>ob', '<cmd>Obsidian backlinks<cr>', { desc = 'Obsidian backlinks' })
+  map('n', '<leader>ot', '<cmd>Obsidian today<cr>', { desc = 'Obsidian today' })
+  map('n', '<leader>oT', '<cmd>Obsidian template<cr>', { desc = 'Obsidian insert template' })
+  map('n', '<leader>on', '<cmd>Obsidian new<cr>', { desc = 'Obsidian new note' })
+  map('n', '<leader>or', '<cmd>Obsidian rename<cr>', { desc = 'Obsidian rename' })
+  map('n', '<leader>oc', '<cmd>Obsidian toc<cr>', { desc = 'Obsidian table of contents' })
+  map('v', '<leader>ol', '<cmd>Obsidian link<cr>', { desc = 'Obsidian link selection' })
+
   vim.api.nvim_create_autocmd('BufEnter', {
     pattern = '*.md',
     desc = 'Notes-specific buffer settings',
@@ -624,7 +703,13 @@ use('https://github.com/obsidian-nvim/obsidian.nvim', function()
         vim.opt_local.tabstop = 4
         vim.opt_local.softtabstop = 4
         -- Required by obsidian.nvim for [[wikilink]] / link rendering
-        vim.opt_local.conceallevel = 1
+        vim.opt_local.conceallevel = 2
+
+        -- <CR>, ]o, [o are bound by obsidian.nvim's own autocmd (api.smart_action,
+        -- api.nav_link) for any buffer in the workspace; don't override them.
+        -- `:Obsidian smart_action` and `:Obsidian nav_link` aren't registered
+        -- as subcommands, so the cmdline form would error. <CR> follows
+        -- wikilinks; built-in gf keeps working for raw paths and URLs.
       end
     end,
   })
