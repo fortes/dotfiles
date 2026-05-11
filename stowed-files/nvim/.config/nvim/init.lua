@@ -598,6 +598,37 @@ use('https://github.com/obsidian-nvim/obsidian.nvim', function()
     return
   end
 
+  -- Honor the vault's Obsidian.app daily-notes config (folder, format,
+  -- template) so `:Obsidian today` and the Obsidian app stay in sync. Each
+  -- field falls back to a canonical default if the file is missing or that
+  -- field is unset. Read once at setup; restart nvim to pick up changes. The
+  -- template is applied only on creation; editing it won't retro-fit existing
+  -- notes.
+  local function daily_notes_config()
+    local config = {
+      folder = 'journal',
+      date_format = 'YYYY/MM/YYYY-MM-DD',
+      template = 'daily-journal.md',
+    }
+    local path = vim.fn.expand('~/notes/.obsidian/daily-notes.json')
+    if vim.fn.filereadable(path) == 0 then return config end
+    local ok, decoded = pcall(vim.json.decode, table.concat(vim.fn.readfile(path), '\n'))
+    if not ok or type(decoded) ~= 'table' then return config end
+    if type(decoded.folder) == 'string' and decoded.folder ~= '' then
+      config.folder = decoded.folder
+    end
+    if type(decoded.format) == 'string' and decoded.format ~= '' then
+      config.date_format = decoded.format
+    end
+    if type(decoded.template) == 'string' and decoded.template ~= '' then
+      -- Obsidian stores a vault-relative path (often without .md);
+      -- obsidian.nvim wants a filename relative to templates.folder.
+      local name = vim.fn.fnamemodify(decoded.template, ':t')
+      config.template = name:match('%.md$') and name or name .. '.md'
+    end
+    return config
+  end
+
   require('obsidian').setup({
     legacy_commands = false,
     workspaces = {
@@ -622,16 +653,12 @@ use('https://github.com/obsidian-nvim/obsidian.nvim', function()
     templates = {
       folder = '_templates',
     },
-    daily_notes = {
-      folder = 'journal',
-      date_format = 'YYYY/MM/YYYY-MM-DD',
-      -- Applied only on creation; editing the template won't retro-fit existing notes
-      template = 'daily-journal.md',
+    daily_notes = vim.tbl_extend('force', daily_notes_config(), {
       -- Existing journal entries don't carry this tag
       default_tags = {},
       -- `:Obsidian today` should land on today, not skip back to Friday
       workdays_only = false,
-    },
+    }),
     -- Colocate pasted images with the note: `./` resolves relative to the
     -- current file, so people/Foo.md pastes into people/attachments/.
     attachments = { folder = './attachments' },
