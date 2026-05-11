@@ -626,7 +626,7 @@ use('https://github.com/obsidian-nvim/obsidian.nvim', function()
       folder = 'journal',
       date_format = 'YYYY/MM/YYYY-MM-DD',
       -- Applied only on creation; editing the template won't retro-fit existing notes
-      template = 'journal-entry.md',
+      template = 'daily-journal.md',
       -- Existing journal entries don't carry this tag
       default_tags = {},
       -- `:Obsidian today` should land on today, not skip back to Friday
