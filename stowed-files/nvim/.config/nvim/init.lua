@@ -671,11 +671,8 @@ use('https://github.com/obsidian-nvim/obsidian.nvim', function()
         -- <CR>, ]o, [o are bound by obsidian.nvim's own autocmd (api.smart_action,
         -- api.nav_link) for any buffer in the workspace; don't override them.
         -- `:Obsidian smart_action` and `:Obsidian nav_link` aren't registered
-        -- as subcommands, so the cmdline form would error.
-        map('n', 'gf', '<cmd>Obsidian follow_link<cr>', {
-          buffer = vim.api.nvim_get_current_buf(),
-          desc = 'Follow Obsidian link',
-        })
+        -- as subcommands, so the cmdline form would error. <CR> follows
+        -- wikilinks; built-in gf keeps working for raw paths and URLs.
       end
     end,
   })
