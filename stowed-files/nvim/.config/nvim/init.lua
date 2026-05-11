@@ -598,36 +598,46 @@ use('https://github.com/obsidian-nvim/obsidian.nvim', function()
     return
   end
 
-  -- Honor the vault's Obsidian.app daily-notes config (folder, format,
-  -- template) so `:Obsidian today` and the Obsidian app stay in sync. Each
-  -- field falls back to a canonical default if the file is missing or that
-  -- field is unset. Read once at setup; restart nvim to pick up changes. The
-  -- template is applied only on creation; editing it won't retro-fit existing
-  -- notes.
-  local function daily_notes_config()
-    local config = {
-      folder = 'journal',
-      date_format = 'YYYY/MM/YYYY-MM-DD',
-      template = 'daily-journal.md',
+  -- Honor the vault's Obsidian.app daily-notes config so `:Obsidian today`
+  -- and the Obsidian app stay in sync. Each field falls back independently to
+  -- a canonical default if the file is missing or that field is unset. Read
+  -- once at setup; restart nvim to pick up changes. The template is applied
+  -- only on creation; editing it won't retro-fit existing notes.
+  local function obsidian_sync()
+    local synced = {
+      templates_folder = '_templates',
+      daily_notes = {
+        folder = 'journal',
+        date_format = 'YYYY-MM/YYYY-MM-DD',
+        template = 'daily-journal.md',
+      },
     }
     local path = vim.fn.expand('~/notes/.obsidian/daily-notes.json')
-    if vim.fn.filereadable(path) == 0 then return config end
+    if vim.fn.filereadable(path) == 0 then return synced end
     local ok, decoded = pcall(vim.json.decode, table.concat(vim.fn.readfile(path), '\n'))
-    if not ok or type(decoded) ~= 'table' then return config end
+    if not ok or type(decoded) ~= 'table' then return synced end
     if type(decoded.folder) == 'string' and decoded.folder ~= '' then
-      config.folder = decoded.folder
+      synced.daily_notes.folder = decoded.folder
     end
     if type(decoded.format) == 'string' and decoded.format ~= '' then
-      config.date_format = decoded.format
+      synced.daily_notes.date_format = decoded.format
     end
     if type(decoded.template) == 'string' and decoded.template ~= '' then
-      -- Obsidian stores a vault-relative path (often without .md);
-      -- obsidian.nvim wants a filename relative to templates.folder.
+      -- Obsidian stores a vault-relative path (often without .md), e.g.
+      -- "_templates/daily-journal". Split into the templates folder and the
+      -- filename obsidian.nvim expects relative to it. A bare filename
+      -- (fnamemodify ':h' returns '.') leaves the folder default in place.
+      local dir = vim.fn.fnamemodify(decoded.template, ':h')
       local name = vim.fn.fnamemodify(decoded.template, ':t')
-      config.template = name:match('%.md$') and name or name .. '.md'
+      if dir ~= '' and dir ~= '.' then
+        synced.templates_folder = dir
+      end
+      synced.daily_notes.template = name:match('%.md$') and name or name .. '.md'
     end
-    return config
+    return synced
   end
+
+  local synced = obsidian_sync()
 
   require('obsidian').setup({
     legacy_commands = false,
@@ -651,9 +661,9 @@ use('https://github.com/obsidian-nvim/obsidian.nvim', function()
     -- the built-in func would normalize away. Leave it alone.
     frontmatter = { enabled = false },
     templates = {
-      folder = '_templates',
+      folder = synced.templates_folder,
     },
-    daily_notes = vim.tbl_extend('force', daily_notes_config(), {
+    daily_notes = vim.tbl_extend('force', synced.daily_notes, {
       -- Existing journal entries don't carry this tag
       default_tags = {},
       -- `:Obsidian today` should land on today, not skip back to Friday
