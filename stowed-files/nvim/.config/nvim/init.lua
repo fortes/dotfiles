@@ -311,6 +311,14 @@ if copilot_enabled then
       -- Disable panel (we use inline suggestions only); clear its default
       -- open = '<M-CR>' keymap to avoid conflict with NES accept_and_goto
       panel = { enabled = false, keymap = { open = false } },
+      -- Suppress Copilot inside the Obsidian vault
+      should_attach = function(bufnr)
+        local file_path = vim.api.nvim_buf_get_name(bufnr)
+        if vim.startswith(file_path, vim.fn.expand('~/notes/')) then
+          return false
+        end
+        return true
+      end,
       filetypes = {
         markdown = true,
         -- Disable in UI/picker buffers
