@@ -7,7 +7,6 @@ set -euo pipefail
 IFS=$'\n\t'
 
 BUN_PACKAGES=(
-  @google/gemini-cli
   @google/jules
   @mariozechner/pi-coding-agent
   @openai/codex
@@ -137,12 +136,12 @@ install_node_packages() {
   fi
 
   echo "Installing global bun packages …"
-  bun install --global "${BUN_PACKAGES[@]}"
+  bun install --global --silent "${BUN_PACKAGES[@]}"
   echo "Bun packages installed!"
 
   if [[ ${#NPM_PACKAGES[@]} -gt 0 ]]; then
     echo "Installing global npm packages …"
-    npm install --global "${NPM_PACKAGES[@]}"
+    npm install --global --silent --no-fund --no-audit "${NPM_PACKAGES[@]}"
     echo "Npm packages installed!"
   fi
 }

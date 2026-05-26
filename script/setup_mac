@@ -93,6 +93,7 @@ CASK_PACKAGES=(
   1password
   1password-cli
   antigravity
+  antigravity-cli
   claude
   firefox
   font-google-sans-code

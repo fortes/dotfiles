@@ -24,8 +24,10 @@ install_llm_plugins() {
   fi
 
   echo "Installing / Updating llm plugins …"
+  # PIP_QUIET silences pip's "Requirement already satisfied" spam from the
+  # pip invocation that `llm install` runs under the hood.
   for plugin in "${PLUGINS[@]}"; do
-    llm install -U "${plugin}"
+    PIP_QUIET=1 llm install -U "${plugin}"
   done
   echo "llm plugins installed!"
 }

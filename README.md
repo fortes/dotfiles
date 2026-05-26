@@ -60,8 +60,8 @@ Once you've run setup, you'll still have to do the following universal manual st
    # Launch codex CLI to log in
    codex
 
-   # Launch Gemini CLI agent, open and do `/login
-   gemini
+   # Launch Antigravity CLI agent (replaces deprecated Gemini CLI)
+   agy
    ```
 
 ## Cleaning up stale symlinks

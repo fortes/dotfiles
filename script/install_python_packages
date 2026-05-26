@@ -36,7 +36,7 @@ install_python_packages() {
 
   if ! command_exists uv; then
     >&2 echo "⨯ uv not installed, installing"
-    pipx install --force uv
+    pipx install --quiet --force uv
   fi
 
   echo "Installing global uvx packages …"

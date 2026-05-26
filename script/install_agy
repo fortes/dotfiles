@@ -1,0 +1,137 @@
+#!/usr/bin/env bash
+# Install the Antigravity CLI (`agy`) from Google's official distribution.
+# On macOS use the `antigravity-cli` Homebrew cask instead.
+# Adapted from https://antigravity.google/cli/install.sh
+#
+# Usage: install_agy
+
+set -euo pipefail
+IFS=$'\n\t'
+
+# shellcheck source=script/lib.sh
+. "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+
+readonly DOWNLOAD_BASE_URL="https://antigravity-cli-auto-updater-974169037036.us-central1.run.app"
+readonly INSTALL_DIR="$HOME/.local/bin"
+readonly BINARY_PATH="${INSTALL_DIR}/agy"
+readonly STAGING_DIR="$HOME/.cache/antigravity/staging"
+
+detect_platform() {
+  local arch
+  case "$(uname -m)" in
+    x86_64 | amd64) arch="amd64" ;;
+    arm64 | aarch64) arch="arm64" ;;
+    *)
+      >&2 echo "⨯ Unsupported architecture: $(uname -m)"
+      exit 1
+      ;;
+  esac
+
+  if [[ -f /lib/libc.musl-x86_64.so.1 ]] \
+    || [[ -f /lib/libc.musl-aarch64.so.1 ]] \
+    || ldd /bin/ls 2>&1 | grep -q musl; then
+    echo "linux_${arch}_musl"
+  else
+    echo "linux_${arch}"
+  fi
+}
+
+parse_json_key() {
+  local payload="$1"
+  local key="$2"
+  # POSIX-friendly extraction so we don't need jq during bootstrap
+  echo "${payload}" | sed -n 's/.*"'"${key}"'"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p'
+}
+
+install_agy() {
+  # Check the install target rather than $PATH: on macOS, the `antigravity`
+  # desktop cask drops its own `agy` shim that would otherwise mask us.
+  # Once installed, agy auto-updates itself in the background.
+  if [[ -x "${BINARY_PATH}" ]]; then
+    return 0
+  fi
+
+  if ! command_exists curl; then
+    >&2 echo "⨯ curl is required"
+    exit 1
+  fi
+
+  local platform
+  platform="$(detect_platform)"
+  echo "Detected platform: ${platform}"
+
+  local manifest_url="${DOWNLOAD_BASE_URL}/manifests/${platform}.json"
+  local manifest_json
+  if ! manifest_json="$(curl -fsSL "${manifest_url}")" || [[ -z "${manifest_json}" ]]; then
+    >&2 echo "⨯ Failed to fetch release manifest from ${manifest_url}"
+    exit 1
+  fi
+
+  local version url sha512
+  version="$(parse_json_key "${manifest_json}" version)"
+  url="$(parse_json_key "${manifest_json}" url)"
+  sha512="$(parse_json_key "${manifest_json}" sha512)"
+
+  if [[ -z "${url}" || -z "${sha512}" ]]; then
+    >&2 echo "⨯ Malformed release manifest"
+    exit 1
+  fi
+
+  echo "Installing agy ${version} ..."
+
+  mkdir -p "${STAGING_DIR}" "${INSTALL_DIR}"
+
+  local is_tarball=0 staging_payload extracted_binary
+  if [[ "${url}" == *.tar.gz* ]]; then
+    is_tarball=1
+    staging_payload="${STAGING_DIR}/agy.tar.gz"
+    extracted_binary="${STAGING_DIR}/antigravity"
+  else
+    staging_payload="${STAGING_DIR}/agy"
+    extracted_binary="${staging_payload}"
+  fi
+
+  # shellcheck disable=SC2064
+  trap "rm -f '${staging_payload}' '${extracted_binary}' 2>/dev/null || true" EXIT
+
+  echo -n "Downloading release package ... "
+  if ! curl -fsSL -o "${staging_payload}" "${url}"; then
+    echo
+    >&2 echo "⨯ Failed to download from ${url}"
+    exit 1
+  fi
+  echo "done"
+
+  local actual_hash
+  actual_hash="$(sha512sum "${staging_payload}" | cut -d' ' -f1)"
+  if [[ "${actual_hash}" != "${sha512}" ]]; then
+    >&2 echo "⨯ Checksum mismatch: downloaded payload may be corrupted or tampered with"
+    exit 1
+  fi
+
+  if [[ "${is_tarball}" -eq 1 ]]; then
+    echo -n "Extracting binary ... "
+    if ! tar -xzf "${staging_payload}" -C "${STAGING_DIR}" antigravity; then
+      echo
+      >&2 echo "⨯ Failed to extract release archive"
+      exit 1
+    fi
+    echo "done"
+  fi
+
+  cp "${extracted_binary}" "${BINARY_PATH}"
+  chmod 755 "${BINARY_PATH}"
+
+  # Let agy wire up its own completions / native setup. Absorbs soft warnings.
+  "${BINARY_PATH}" install || true
+
+  echo "agy installed!"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  if ! command_exists apt-get; then
+    >&2 echo "⨯ install_agy is Linux-only; use the antigravity-cli brew cask on macOS"
+    exit 1
+  fi
+  install_agy "${@}"
+fi
