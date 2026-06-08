@@ -5,10 +5,9 @@
 
 set -euo pipefail
 IFS=$'\n\t'
-
 BUN_PACKAGES=(
-  @google/jules
-  @mariozechner/pi-coding-agent
+  # @google/jules
+  # @mariozechner/pi-coding-agent
   @openai/codex
   @playwright/mcp
   @tobilu/qmd
@@ -21,7 +20,7 @@ BUN_PACKAGES=(
   fkill-cli
   neovim
   npm-check-updates
-  opencode-ai
+  # opencode-ai
   oxfmt
   oxlint
   prettier
