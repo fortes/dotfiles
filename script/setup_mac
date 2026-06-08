@@ -95,6 +95,7 @@ CASK_PACKAGES=(
   antigravity
   antigravity-cli
   claude
+  codex-app
   firefox
   font-google-sans-code
   font-jetbrains-mono
