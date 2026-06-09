@@ -158,6 +158,11 @@ Re-run this command whenever you pull updates that add or change plugins.
   # For battle.net, will need to manually run setup to install the app
   # open /opt/homebrew/Caskroom/battle-net/VERSION/Battle.net-Setup.app
   ```
+- Log into PlexAmp, and set `music-decoy` to open it with the play button:
+
+  ```sh
+  defaults write com.lowtechguys.MusicDecoy mediaAppPath /Applications/Plexamp.app
+  ```
 
 ### Debian Server / Crostini
 

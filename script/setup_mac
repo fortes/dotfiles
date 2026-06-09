@@ -67,6 +67,7 @@ BREW_PACKAGES=(
   marksman
   moreutils
   mpv
+  music-decoy
   ncdu
   neovim
   ollama
