@@ -135,12 +135,12 @@ install_node_packages() {
   fi
 
   echo "Installing global bun packages …"
-  bun install --global --silent "${BUN_PACKAGES[@]}"
+  bun install --global --silent "${BUN_PACKAGES[@]/%/@latest}"
   echo "Bun packages installed!"
 
   if [[ ${#NPM_PACKAGES[@]} -gt 0 ]]; then
     echo "Installing global npm packages …"
-    npm install --global --silent --no-fund --no-audit "${NPM_PACKAGES[@]}"
+    npm install --global --silent --no-fund --no-audit "${NPM_PACKAGES[@]/%/@latest}"
     echo "Npm packages installed!"
   fi
 }
