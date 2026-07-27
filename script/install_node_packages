@@ -11,7 +11,6 @@ BUN_PACKAGES=(
   @openai/codex
   @playwright/mcp
   @tobilu/qmd
-  @typescript/native-preview
   agent-browser
   bash-language-server
   cssmodules-language-server
