@@ -33,13 +33,13 @@ fi
 if command_exists eza; then
   # Purposefully binding the variable immediately
   # shellcheck disable=SC2139
-  alias ls="eza --group-directories-first --classify"
+  alias ls="eza --group-directories-first --classify=auto"
   # shellcheck disable=SC2139
-  alias la="eza --all --group-directories-first --classify"
+  alias la="eza --all --group-directories-first --classify=auto"
   # shellcheck disable=SC2139
-  alias ll="eza --header --git --long --group-directories-first --classify"
+  alias ll="eza --header --git --long --group-directories-first --classify=auto"
   # shellcheck disable=SC2139
-  alias ltree="eza --header --git --long --tree --level=2 --group-directories-first --classify"
+  alias ltree="eza --header --git --long --tree --level=2 --group-directories-first --classify=auto"
 else
   # Map ls to be colorful and reasonable defaults
   if uname | grep -q Darwin; then
