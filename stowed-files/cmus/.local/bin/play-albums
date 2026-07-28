@@ -23,8 +23,8 @@ BEETS_ALBUM_DIR="/data/media/music/albums/"
 LOCAL_ALBUM_DIR="${LOCAL_ALBUM_DIR:-${BEETS_ALBUM_DIR}}"
 
 # shellcheck disable=SC2016
-BEET_FORMAT_STRING='$mb_albumid|$original_year|%left{$albumartist,40}|%left{$album,40}|$genre'
-COLUMN_NAMES='ID,Year,Artist,Album,Genre'
+BEET_FORMAT_STRING='$mb_albumid|$original_year|%left{$albumartist,40}|%left{$album,40}|$genres'
+COLUMN_NAMES='ID,Year,Artist,Album,Genres'
 
 FZF_ARGS=(
   --header-lines 1
