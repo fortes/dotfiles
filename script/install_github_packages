@@ -15,6 +15,7 @@
 # - neovim (latest)
 # - pistol
 # - sad
+# - tree-sitter-cli (Trixie's apt version is too old for nvim-treesitter)
 # - yazi
 # - yq
 #
@@ -41,6 +42,7 @@ AVAILABLE_PACKAGES=(
   neovim
   pistol
   sad
+  tree-sitter-cli
   yazi
   yq
 )
@@ -379,6 +381,14 @@ install_pistol() {
   install_bin 'doronbehar/pistol' 'pistol-static-linux-{ARCH}'
 }
 
+install_tree_sitter_cli() {
+  # tree-sitter uses x64/aarch64->arm64 naming instead of standard patterns
+  case "$(get_current_arch)" in
+    amd64) install_zip 'tree-sitter/tree-sitter' 'tree-sitter-cli-linux-x64.zip' ;;
+    arm64) install_zip 'tree-sitter/tree-sitter' 'tree-sitter-cli-linux-arm64.zip' ;;
+  esac
+}
+
 install_yazi() {
   local url
   # musl version because older Debian versions don't have yazi's required glibc (2.39)
@@ -490,6 +500,9 @@ install_github_packages() {
         ;;
       sad)
         install_sad
+        ;;
+      tree-sitter-cli)
+        install_tree_sitter_cli
         ;;
       yazi)
         install_yazi

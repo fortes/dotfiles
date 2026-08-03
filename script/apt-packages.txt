@@ -72,7 +72,6 @@ stow
 sudo
 tmux
 trash-cli
-tree-sitter-cli
 unzip
 wamerican
 wget
