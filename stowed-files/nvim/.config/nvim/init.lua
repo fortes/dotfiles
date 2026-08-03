@@ -135,11 +135,15 @@ vim.api.nvim_create_autocmd('PackChanged', {
       -- manually to make `require('nvim-treesitter')` resolve
       vim.schedule(function()
         vim.opt.rtp:prepend(path)
-        require('nvim-treesitter').install({
+        local ts = require('nvim-treesitter')
+        ts.install({
           'bash', 'css', 'diff', 'gotmpl', 'html', 'javascript',
           'json', 'lua', 'markdown', 'markdown_inline', 'python',
           'tsx', 'typescript', 'vim', 'yaml',
         })
+        -- `install` skips parsers that already exist, so refresh those too: a
+        -- parser's ABI and queries have to match the plugin version
+        if kind == 'update' then ts.update() end
       end)
     end
 
@@ -388,23 +392,51 @@ end
 -- Parsers are installed automatically via the PackChanged hook above
 -- (requires tree-sitter-cli on PATH).
 use({ src = 'https://github.com/nvim-treesitter/nvim-treesitter', version = 'main' }, function()
+  -- A buffer's treesitter language, or nil when there's no usable parser.
+  -- Parser names aren't always filetypes (`.tsx` is filetype `typescriptreact`
+  -- but parser `tsx`, `.sh` is `sh` but parser `bash`), so let treesitter map it
+  -- rather than keeping a second list of filetypes here. `add` loads the parser
+  -- as well as checking for it, and throws on one it can't load — notably an ABI
+  -- mismatch after a Neovim upgrade, until `:TSUpdate` runs — hence the pcall.
+  local function buf_lang(bufnr)
+    local lang = vim.treesitter.language.get_lang(vim.bo[bufnr].filetype)
+    if not lang then return nil end
+    local ok, added = pcall(vim.treesitter.language.add, lang)
+    if not ok or not added then return nil end
+    return lang
+  end
+
   vim.api.nvim_create_autocmd('FileType', {
     desc = 'Enable treesitter highlighting and indentation',
-    pattern = {
-      'bash', 'css', 'diff', 'gotmpl', 'html', 'javascript', 'json',
-      'lua', 'markdown', 'markdown_inline', 'python', 'tsx',
-      'typescript', 'vim', 'yaml',
-    },
-    callback = function()
-      local ok = pcall(vim.treesitter.start)
-      if ok then
+    callback = function(ev)
+      local lang = buf_lang(ev.buf)
+      if not lang then return end
+      if not pcall(vim.treesitter.start) then return end
+
+      -- Without an `indents` query treesitter indents nothing at all, so leave
+      -- those filetypes (diff, gotmpl, vim, ...) to Neovim's own indent plugins
+      if vim.treesitter.query.get(lang, 'indents') then
         vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
       end
     end,
   })
-  -- Treesitter folding (LSP overrides per-buffer in LspAttach above)
-  vim.opt.foldmethod = 'expr'
-  vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+
+  -- Set per-window rather than globally so buffers with no parser keep
+  -- `foldmethod=marker` from ~/.vimrc. BufWinEnter as well as FileType because a
+  -- buffer can be loaded while outside any window (nvim-bqf `bufload`s quickfix
+  -- entries to preview them), leaving no window to apply fold options to.
+  vim.api.nvim_create_autocmd({ 'FileType', 'BufWinEnter' }, {
+    desc = 'Enable treesitter folding',
+    callback = function(ev)
+      if not buf_lang(ev.buf) then return end
+      -- Don't clobber the LSP folding set up in LspAttach above
+      for _, client in ipairs(vim.lsp.get_clients({ bufnr = ev.buf })) do
+        if client:supports_method('textDocument/foldingRange') then return end
+      end
+      vim.wo[0][0].foldmethod = 'expr'
+      vim.wo[0][0].foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+    end,
+  })
 end)
 
 -- Autoclose / rename HTML/JSX/TSX tags
