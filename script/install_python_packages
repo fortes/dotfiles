@@ -57,7 +57,7 @@ install_python_packages() {
   . "${venv_path}/bin/activate"
 
   echo "Installing venv libraries …"
-  "${venv_path}/bin/python" -m pip install --quiet --upgrade "${VENV_LIBRARIES[@]}"
+  "${venv_path}/bin/python" -m pip install --quiet --upgrade pip "${VENV_LIBRARIES[@]}"
   echo "venv libraries installed!"
 }
 
