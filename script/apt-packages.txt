@@ -14,7 +14,7 @@ bat
 bubblewrap
 build-essential
 ca-certificates
-cargo/trixie-backports
+cargo
 chafa
 curl
 dnsutils
