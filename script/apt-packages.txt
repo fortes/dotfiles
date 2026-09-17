@@ -14,7 +14,7 @@ bat
 bubblewrap
 build-essential
 ca-certificates
-cargo
+cargo/trixie-backports
 chafa
 curl
 dnsutils
@@ -33,7 +33,7 @@ git-extras
 git-lfs
 git-delta
 gnupg
-gocryptfs
+gocryptfs/trixie-backports
 gron
 htop
 # Debian version ancient, get from `install_github_packages`
@@ -65,19 +65,19 @@ python3-venv
 python3-virtualenv
 ripgrep
 rsync
-shellcheck
+shellcheck/trixie-backports
 shfmt
 ssh
 ssh-import-id
 sshfs
 stow
 sudo
-tmux
+tmux/trixie-backports
 trash-cli
 unzip
 wamerican
 wget
 yank
-yq
+yq/trixie-backports
 yt-dlp/trixie-backports
 zoxide
