@@ -26,7 +26,7 @@ set -euo pipefail
 IFS=$'\n\t'
 export DEBIAN_FRONTEND=noninteractive
 
-# Extra curl args for api.github.com, populated by init_github_api_auth
+# Auth header for api.github.com, if a token is available
 GITHUB_API_CURL_ARGS=()
 
 AVAILABLE_PACKAGES=(
@@ -92,25 +92,22 @@ expand_arch_template() {
   echo "${template//\{ARCH\}/$arch}"
 }
 
-# A token raises the GitHub API limit from 60 requests/hour per IP to 5000. A
-# full run makes one request per package, so unauthenticated allows only about
-# three runs an hour -- and re-running is how this repo updates things.
+# One API request per package, against 60/hour per IP unauthenticated or
+# 5000 with a token
 github_api_token() {
   if [[ -n "${GH_TOKEN:-}" ]]; then
     echo "${GH_TOKEN}"
   elif [[ -n "${GITHUB_TOKEN:-}" ]]; then
     echo "${GITHUB_TOKEN}"
   elif command_exists gh; then
-    # `--hostname` because a bare `gh auth token` returns the active host's
-    # token, which on a machine logged into GitHub Enterprise would be rejected
-    # by api.github.com. Prints nothing and exits non-zero when there's no
-    # github.com login, so we fall through to unauthenticated.
+    # Scoped, because a bare `gh auth token` returns the active host's token,
+    # and a GitHub Enterprise one is rejected by api.github.com
     gh auth token --hostname github.com 2>/dev/null || true
   fi
 }
 
-# Rate limiting has no `.assets`, so without this the caller's "couldn't find
-# the asset" error is indistinguishable from an upstream rename
+# A rate-limited response carries no `.assets`, which otherwise looks exactly
+# like an upstream asset rename
 report_api_failure() {
   local repo="$1"
   local rate_json reset remaining
@@ -121,8 +118,7 @@ report_api_failure() {
     echo_stderr "Error: GitHub API rate limit reached (resets $(date -d "@${reset}" '+%H:%M' 2>/dev/null || echo 'shortly'))."
     echo_stderr "Set GH_TOKEN, or run \`gh auth login\`, to raise the limit from 60/hour to 5000."
   elif [[ -z "${remaining}" ]] && [[ "${#GITHUB_API_CURL_ARGS[@]}" -gt 0 ]]; then
-    # Even /rate_limit refused us while sending a token, so the token is the
-    # likely culprit rather than the repo
+    # /rate_limit refused us too, while sending a token: blame the token
     echo_stderr "Error: GitHub API rejected the request for ${repo}."
     echo_stderr "The token in GH_TOKEN/GITHUB_TOKEN (or from \`gh auth token\`) may be expired."
   else
@@ -196,9 +192,9 @@ install_bin() {
 
   pushd "${download_dir}" >/dev/null
   echo -n "Downloading ${name} ... "
-  # Via a temp file, because `wget -O` truncates its target before the transfer
-  # starts: downloading straight to the install path would leave a 0-byte file
-  # with the exec bit still set, which `command_exists` reports as present
+  # Via a temp file: `wget -O` truncates its target before the transfer, so
+  # writing to the install path would leave a 0-byte binary that still looks
+  # installed to `command_exists`
   wget --quiet -O "${name}" "${url}"
   chmod 755 "${name}"
   mv "${name}" "${install_location}/${name}"
@@ -222,9 +218,8 @@ install_deb() {
   pushd "${download_dir}" >/dev/null
   wget --quiet -O "${name}.deb" "${url}"
   echo "Installing ${repo} (requires sudo) ... "
-  # `apt-get install` on the local file rather than `dpkg -i`, so dependencies
-  # resolve (gh needs git) instead of the package being left unconfigured. The
-  # `./` matters: apt reads a slashless argument as a package name.
+  # apt, not `dpkg -i`, so the deb's dependencies resolve. The `./` is
+  # required: apt reads a slashless argument as a package name.
   sudo apt-get install -qq --assume-yes --no-install-recommends "./${name}.deb"
   popd >/dev/null
   rm -rf "${download_dir}"
