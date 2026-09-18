@@ -378,9 +378,8 @@ use('https://github.com/neovim/nvim-lspconfig', function()
     vim.lsp.enable('pyright')
   end
 
-  -- TypeScript 7 ships the native compiler as plain `tsc`, which serves
-  -- `tsc --lsp`; the `tsgo` preview binary and lspconfig's `tsgo` config are
-  -- both deprecated in favour of it.
+  -- `tsc` is the language server, not just the compiler: TypeScript 7's native
+  -- build serves LSP over `tsc --lsp`.
   --
   -- lspconfig's `tsc` does its own Deno detection, comparing deno.json /
   -- deno.lock depth against the nearest package lockfile so a Deno module
