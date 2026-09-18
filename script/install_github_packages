@@ -101,7 +101,11 @@ github_api_token() {
   elif [[ -n "${GITHUB_TOKEN:-}" ]]; then
     echo "${GITHUB_TOKEN}"
   elif command_exists gh; then
-    gh auth token 2>/dev/null || true
+    # `--hostname` because a bare `gh auth token` returns the active host's
+    # token, which on a machine logged into GitHub Enterprise would be rejected
+    # by api.github.com. Prints nothing and exits non-zero when there's no
+    # github.com login, so we fall through to unauthenticated.
+    gh auth token --hostname github.com 2>/dev/null || true
   fi
 }
 
