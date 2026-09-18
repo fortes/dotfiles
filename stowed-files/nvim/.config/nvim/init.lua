@@ -19,8 +19,14 @@ end
 -- rather than clobbering whichever window happens to be current.
 local function set_foldexpr(bufnr, expr)
   for _, win in ipairs(vim.fn.win_findbuf(bufnr)) do
-    vim.wo[win][0].foldmethod = 'expr'
-    vim.wo[win][0].foldexpr = expr
+    -- Leave diff windows alone. `:diffthis`, `:Gdiffsplit` and `:DiffTool` set
+    -- foldmethod=diff to collapse unchanged regions, which is more useful than
+    -- either treesitter or LSP folding while a diff is up — and displaying the
+    -- buffer in a second window would otherwise clobber the diff window's folds.
+    if not vim.wo[win].diff then
+      vim.wo[win][0].foldmethod = 'expr'
+      vim.wo[win][0].foldexpr = expr
+    end
   end
 end
 
@@ -376,10 +382,24 @@ use('https://github.com/neovim/nvim-lspconfig', function()
 
   -- TypeScript 7 ships the native compiler as plain `tsc`, which serves
   -- `tsc --lsp`; the `tsgo` preview binary and lspconfig's `tsgo` config are
-  -- both deprecated in favour of it. No root_dir override here: lspconfig's
-  -- `tsc` config already does its own (more thorough) Deno detection, keyed on
-  -- package-manager lockfiles and deno.lock rather than just deno.json.
+  -- both deprecated in favour of it.
+  --
+  -- lspconfig's `tsc` does its own Deno detection, comparing deno.json /
+  -- deno.lock depth against the nearest package lockfile so a Deno module
+  -- inside a Node monorepo still works. But it can't know about ENABLE_DENO,
+  -- and it lets tsc attach inside a Deno project whenever a nested package
+  -- lockfile sits deeper than deno.json — where `denols` attaches too, putting
+  -- two TypeScript servers on one buffer. Gate on our own check first (same one
+  -- oxfmt and oxlint use, so the whole toolchain agrees on what "Deno" means),
+  -- then defer to theirs. Captured before the override so this isn't recursive.
   if vim.fn.executable('tsc') == 1 then
+    local tsc_root_dir = vim.lsp.config.tsc.root_dir
+    vim.lsp.config('tsc', {
+      root_dir = function(bufnr, on_dir)
+        if in_deno_project(bufnr) then return end
+        return tsc_root_dir(bufnr, on_dir)
+      end,
+    })
     vim.lsp.enable('tsc')
   end
 
