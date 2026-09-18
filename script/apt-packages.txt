@@ -25,8 +25,7 @@ ffmpeg
 file
 # Debian version ancient, get from `install_github_packages`
 # fzf
-# Trixie ships 2.46 (Jan 2025) against 2.101 upstream, so this is one of the
-# ancient ones too
+# Debian version ancient, get from `install_github_packages`
 # gh
 git
 git-crypt
@@ -45,12 +44,10 @@ info
 jq
 keychain
 less
-# marksman is a .NET binary and aborts at startup without ICU. Nothing else
-# here pulls it in. The version number tracks the Debian release, and every
-# package in this file goes through one `apt-get install`, so on the next
-# release this name won't resolve and the whole install will abort with
-# `E: Unable to locate package` — bump it then. (`libicu-dev` would be a stable
-# name, but drags in 51MB of headers and static libs for a runtime-only need.)
+# marksman is a .NET binary and aborts at startup without ICU; nothing else
+# here pulls it in. The version is part of the package name and tracks the
+# Debian release, so bump it on upgrade — everything in this file goes through
+# a single `apt-get install`, so a name that no longer resolves aborts the lot.
 libicu76
 locales
 lsb-release

@@ -12,7 +12,7 @@
 # - harper-ls
 # - hugo (latest)
 # - luals
-# - marksman (was a snap, which needs systemd and so never worked in Docker)
+# - marksman
 # - neovim (latest)
 # - pistol
 # - sad
@@ -406,9 +406,9 @@ install_pistol() {
 }
 
 install_marksman() {
-  # Bare binaries, and `x64` isn't one of the standard arch patterns. Use the
-  # glibc build: the musl ones can't run on Debian at all (no musl loader), and
-  # this needs `libicu76` from apt or .NET aborts before main().
+  # Bare binaries, and `x64` isn't one of the standard arch patterns. Must be
+  # the glibc build: the musl ones can't run on Debian (no musl loader). Needs
+  # `libicu76` from apt, or .NET aborts before main().
   case "$(get_current_arch)" in
     amd64) install_binary 'artempyanykh/marksman' 'marksman-linux-x64' 'marksman' ;;
     arm64) install_binary 'artempyanykh/marksman' 'marksman-linux-arm64' 'marksman' ;;

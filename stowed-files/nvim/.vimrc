@@ -652,8 +652,8 @@ if has('eval')
   nnoremap <silent> ]n :<C-U>call <SID>Context(0)<CR>
   " Only claim Visual mode if nothing else has it. Neovim 0.12 maps x-mode
   " [n/]n to treesitter incremental selection (|v_]n|), which is more valuable
-  " than conflict navigation and pairs with the [N/]N siblings; unimpaired
-  " deferred the same way. Vim has no such default, so it still gets these.
+  " than conflict navigation and pairs with its [N/]N siblings. Vim has no such
+  " default, so it still gets these.
   if empty(maparg('[n', 'x'))
     xnoremap <silent> [n :<C-U>exe 'normal! gv'<Bar>call <SID>Context(1)<CR>
   endif

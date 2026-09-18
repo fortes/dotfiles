@@ -14,9 +14,8 @@ local function map(mode, lhs, rhs, opts_or_bufnr)
 end
 
 -- Fold options are window-local, so apply them to every window showing the
--- buffer. A buffer can also be loaded while outside any window (nvim-bqf
--- `bufload`s quickfix entries to preview them), in which case this is a no-op
--- rather than clobbering whichever window happens to be current.
+-- buffer. A buffer can be loaded while outside any window (nvim-bqf `bufload`s
+-- quickfix entries to preview them), in which case this is a no-op.
 local function set_foldexpr(bufnr, expr)
   for _, win in ipairs(vim.fn.win_findbuf(bufnr)) do
     -- Leave diff windows alone. `:diffthis`, `:Gdiffsplit` and `:DiffTool` set
@@ -123,12 +122,8 @@ vim.api.nvim_create_autocmd('LspAttach', {
 })
 
 -- ============================================================================
--- `yo` option toggles, in the style of vim-unimpaired. Neovim 0.11 made the
--- part of that plugin we used built in ([q ]q, [l ]l, [t ]t, [a ]a, [b ]b,
--- [<Space> ]<Space>), so it wasn't worth carrying for the rest -- [e ]e, the
--- indent-adjusting puts, the encode/decode operators and the other ten `yo`
--- toggles all went with it. `[n`/`]n` were hand-ported into ~/.vimrc, as are
--- `yon` and `yos`, since plain option toggles work in Vim too.
+-- `yo` option toggles, in the style of vim-unimpaired. `yon` and `yos` live in
+-- ~/.vimrc, since plain option toggles work in Vim too.
 -- ============================================================================
 
 -- Hides every diagnostic display at once: inline text, the current-line
@@ -180,9 +175,9 @@ local treesitter_parsers = {
 }
 
 -- Build hooks must be registered before vim.pack.add() so that PackChanged
--- fires for the initial install. The augroup matters here beyond tidiness: a
--- duplicate hook (from re-sourcing this file) would run two parser builds at
--- once, racing each other over the same download cache.
+-- fires for the initial install. The augroup keeps re-sourcing this file from
+-- registering a duplicate hook, which would run two parser builds at once and
+-- race over the same download cache.
 vim.api.nvim_create_autocmd('PackChanged', {
   group = vim.api.nvim_create_augroup('pack_build', { clear = true }),
   desc = 'Build native plugin components after install/update',
@@ -479,11 +474,11 @@ use({ src = 'https://github.com/nvim-treesitter/nvim-treesitter', version = 'mai
 
   -- Folding is window-local, so buffers with neither an LSP folding provider
   -- nor a parser keep `foldmethod=marker` from ~/.vimrc. BufWinEnter as well as
-  -- FileType, to catch buffers that only get a window later: LspAttach can only
-  -- reach windows that exist when the server attaches, and nvim-bqf `bufload`s
-  -- quickfix entries to preview them, so an LSP often attaches while the buffer
-  -- has no window at all. This has to re-apply the LSP choice rather than bail
-  -- out on seeing a capable client, or such a buffer ends up with no folding.
+  -- FileType, to catch buffers that only get a window later: LspAttach reaches
+  -- only the windows that exist when the server attaches, and nvim-bqf
+  -- `bufload`s quickfix entries to preview them, so an LSP often attaches while
+  -- the buffer has no window at all. Hence this re-applies the LSP choice when
+  -- a capable client is attached, rather than leaving folding unset.
   vim.api.nvim_create_autocmd({ 'FileType', 'BufWinEnter' }, {
     group = group,
     desc = 'Enable LSP or treesitter folding',
