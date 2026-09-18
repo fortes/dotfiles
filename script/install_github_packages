@@ -48,7 +48,7 @@ AVAILABLE_PACKAGES=(
 )
 
 print_usage() {
-  echo "Usage: ${0} [-h|--help] [-s|--sole-package]"
+  echo "Usage: ${0} [-h|--help] [package_names...]"
   echo
   echo "Install packages directly from GitHub. Available packages:"
   echo
@@ -132,6 +132,7 @@ get_latest_release_url() {
 }
 
 install_bin() {
+  # For projects that publish a bare executable rather than an archive
   local repo="${1}"
   local match="${2}"
   local name="${3:-}"
@@ -144,9 +145,20 @@ install_bin() {
 
   local install_location="$HOME/.local/bin"
   mkdir -p "${install_location}"
+
+  local download_dir
+  download_dir="$(mktemp --directory --tmpdir "${name}".XXXXXX)"
+
+  pushd "${download_dir}" >/dev/null
   echo -n "Downloading ${name} ... "
-  wget --quiet -O "${install_location}/${name}" "${url}"
-  chmod 755 "${install_location}/${name}"
+  # Via a temp file, because `wget -O` truncates its target before the transfer
+  # starts: downloading straight to the install path would leave a 0-byte file
+  # with the exec bit still set, which `command_exists` reports as present
+  wget --quiet -O "${name}" "${url}"
+  chmod 755 "${name}"
+  mv "${name}" "${install_location}/${name}"
+  popd >/dev/null
+  rm -rf "${download_dir}"
   echo "${name} installed"
 }
 
@@ -161,7 +173,7 @@ install_deb() {
   local url
   url="$(get_latest_release_url "${repo}" "${match}")"
 
-  download_dir="$(mktemp --directory "${name}"XXX)"
+  download_dir="$(mktemp --directory --tmpdir "${name}".XXXXXX)"
   pushd "${download_dir}" >/dev/null
   wget --quiet -O "${name}.deb" "${url}"
   echo "Installing ${repo} (requires sudo) ... "
@@ -184,7 +196,7 @@ install_tarball() {
   local install_location="$HOME/.local/bin"
 
   local download_dir
-  download_dir="$(mktemp --directory "${name}"XXX)"
+  download_dir="$(mktemp --directory --tmpdir "${name}".XXXXXX)"
 
   pushd "${download_dir}" >/dev/null
   wget --quiet -O "${name}.tar.gz" "${url}"
@@ -210,38 +222,6 @@ install_tarball() {
   echo "${name} installed"
 }
 
-install_binary() {
-  # For projects that publish a bare executable rather than an archive
-  local repo="${1}"
-  local match="${2}"
-  local name="${3:-}"
-  if [[ -z "${name}" ]]; then
-    name="$(basename "${repo}")"
-  fi
-
-  local url
-  url="$(get_latest_release_url "${repo}" "${match}")"
-
-  local install_location="$HOME/.local/bin"
-  mkdir -p "${install_location}"
-
-  local download_dir
-  # `--tmpdir` because a bare template is relative, so the other install_*
-  # helpers here scatter their scratch dirs into whatever the cwd happened to be
-  download_dir="$(mktemp --directory --tmpdir "${name}".XXXXXX)"
-
-  pushd "${download_dir}" >/dev/null
-  echo -n "Downloading ${name} ... "
-  # Download to a temp dir first so a failed transfer can't leave a truncated
-  # binary at the install path
-  wget --quiet -O "${name}" "${url}"
-  chmod 755 "${name}"
-  mv "${name}" "${install_location}/${name}"
-  popd >/dev/null
-  rm -rf "${download_dir}"
-  echo "${name} installed"
-}
-
 install_zip() {
   local repo="${1}"
   local match="${2}"
@@ -255,7 +235,7 @@ install_zip() {
   mkdir -p "${install_location}"
 
   local download_dir
-  download_dir="$(mktemp --directory "${name}"XXX)"
+  download_dir="$(mktemp --directory --tmpdir "${name}".XXXXXX)"
 
   pushd "${download_dir}" >/dev/null
   wget --quiet -O "${name}.zip" "${url}"
@@ -336,7 +316,7 @@ install_lua_language_server() {
   mkdir -p "${install_location}"
 
   local download_dir
-  download_dir="$(mktemp --directory "${name}"XXX)"
+  download_dir="$(mktemp --directory --tmpdir "${name}".XXXXXX)"
 
   pushd "${download_dir}" >/dev/null
   wget --quiet -O "${name}.tar.gz" "${url}"
@@ -363,7 +343,7 @@ install_neovim_stable() {
   echo "Installing neovim stable ..."
   url="$(get_latest_release_url "neovim/neovim" "nvim-linux-{ARCH}.tar.gz")"
 
-  download_dir="$(mktemp --directory nvimXXX)"
+  download_dir="$(mktemp --directory --tmpdir nvim.XXXXXX)"
   pushd "${download_dir}" >/dev/null
   wget --quiet -O nvim.tar.gz "${url}"
   echo -n "Expanding neovim tarball ... "
@@ -410,8 +390,8 @@ install_marksman() {
   # the glibc build: the musl ones can't run on Debian (no musl loader). Needs
   # `libicu76` from apt, or .NET aborts before main().
   case "$(get_current_arch)" in
-    amd64) install_binary 'artempyanykh/marksman' 'marksman-linux-x64' 'marksman' ;;
-    arm64) install_binary 'artempyanykh/marksman' 'marksman-linux-arm64' 'marksman' ;;
+    amd64) install_bin 'artempyanykh/marksman' 'marksman-linux-x64' 'marksman' ;;
+    arm64) install_bin 'artempyanykh/marksman' 'marksman-linux-arm64' 'marksman' ;;
   esac
 }
 
@@ -429,9 +409,10 @@ install_yazi() {
 
   local bin_location="$HOME/.local/bin"
   local completion_location="$HOME/.local/completion.d/"
+  mkdir -p "${bin_location}" "${completion_location}"
 
   local download_dir
-  download_dir="$(mktemp --directory yaziXXX)"
+  download_dir="$(mktemp --directory --tmpdir yazi.XXXXXX)"
 
   pushd "${download_dir}" >/dev/null
   wget --quiet -O yazi.zip "${url}"
