@@ -26,8 +26,8 @@ set -euo pipefail
 IFS=$'\n\t'
 export DEBIAN_FRONTEND=noninteractive
 
-# Auth header for api.github.com, if a token is available
-GITHUB_API_CURL_ARGS=()
+# Token for api.github.com, if one is available
+GITHUB_API_TOKEN=''""
 
 AVAILABLE_PACKAGES=(
   bun
@@ -106,18 +106,35 @@ github_api_token() {
   fi
 }
 
+# The auth header goes in via a config file on stdin, not argv:
+# /proc/PID/cmdline is world-readable, so `--header "Authorization: ..."` hands
+# the token to any local user for the life of the request. `printf` is a shell
+# builtin, so it doesn't land in a process list either.
+github_api_get() {
+  local url="$1"
+  local -a args=(--silent --fail --retry 3 --retry-connrefused)
+  if [[ -n "${GITHUB_API_TOKEN}" ]]; then
+    printf 'header = "Authorization: Bearer %s"\n' "${GITHUB_API_TOKEN}" \
+      | curl "${args[@]}" --config - "${url}"
+  else
+    curl "${args[@]}" "${url}"
+  fi
+}
+
 # A rate-limited response carries no `.assets`, which otherwise looks exactly
 # like an upstream asset rename
 report_api_failure() {
   local repo="$1"
   local rate_json reset remaining
-  rate_json=$(curl --silent "${GITHUB_API_CURL_ARGS[@]}" 'https://api.github.com/rate_limit' 2>/dev/null || true)
+  # /rate_limit doesn't count against the limit, so it answers even when
+  # exhausted
+  rate_json=$(github_api_get 'https://api.github.com/rate_limit' 2>/dev/null || true)
   remaining=$(echo "${rate_json}" | jq -r '.resources.core.remaining // empty' 2>/dev/null)
   if [[ "${remaining}" == "0" ]]; then
     reset=$(echo "${rate_json}" | jq -r '.resources.core.reset // empty' 2>/dev/null)
     echo_stderr "Error: GitHub API rate limit reached (resets $(date -d "@${reset}" '+%H:%M' 2>/dev/null || echo 'shortly'))."
     echo_stderr "Set GH_TOKEN, or run \`gh auth login\`, to raise the limit from 60/hour to 5000."
-  elif [[ -z "${remaining}" ]] && [[ "${#GITHUB_API_CURL_ARGS[@]}" -gt 0 ]]; then
+  elif [[ -z "${remaining}" ]] && [[ -n "${GITHUB_API_TOKEN}" ]]; then
     # /rate_limit refused us too, while sending a token: blame the token
     echo_stderr "Error: GitHub API rejected the request for ${repo}."
     echo_stderr "The token in GH_TOKEN/GITHUB_TOKEN (or from \`gh auth token\`) may be expired."
@@ -134,10 +151,7 @@ get_latest_release_url() {
 
   local release_json_url="https://api.github.com/repos/${repo}/releases/latest"
   local release_json
-  # `--fail` so an HTTP error is an error rather than a body with no `.assets`
-  release_json=$(curl --silent --fail --retry 3 --retry-connrefused \
-    "${GITHUB_API_CURL_ARGS[@]}" "${release_json_url}") \
-    || report_api_failure "${repo}"
+  release_json=$(github_api_get "${release_json_url}") || report_api_failure "${repo}"
 
   # If template contains {ARCH}, try each architecture pattern
   if [[ "${match_template}" == *"{ARCH}"* ]]; then
@@ -479,11 +493,7 @@ install_harper_ls() {
 }
 
 init_github_api_auth() {
-  local token
-  token="$(github_api_token)"
-  if [[ -n "${token}" ]]; then
-    GITHUB_API_CURL_ARGS=(--header "Authorization: Bearer ${token}")
-  fi
+  GITHUB_API_TOKEN="$(github_api_token)"
 }
 
 install_github_packages() {
