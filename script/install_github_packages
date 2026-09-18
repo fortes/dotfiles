@@ -34,8 +34,7 @@ AVAILABLE_PACKAGES=(
   fnm
   fx
   fzf
-  # Trixie tracks recent version already, can use apt
-  # github-cli
+  github-cli
   harper-ls
   hugo
   luals

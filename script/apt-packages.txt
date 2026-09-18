@@ -25,7 +25,9 @@ ffmpeg
 file
 # Debian version ancient, get from `install_github_packages`
 # fzf
-gh
+# Trixie ships 2.46 (Jan 2025) against 2.101 upstream, so this is one of the
+# ancient ones too
+# gh
 git
 git-crypt
 git-extras
