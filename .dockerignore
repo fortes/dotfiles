@@ -3,7 +3,9 @@
 
 # Per-machine state, gitignored but `COPY .` doesn't honour .gitignore. Baking
 # in a stale lockfile makes the image install whatever plugins the builder
-# happened to have on disk -- including ones since removed from init.lua --
-# because vim.pack installs every plugin the lockfile lists, not just the ones
-# passed to vim.pack.add().
+# happened to have on disk, including ones since removed from init.lua:
+# vim.pack.add() calls lock_sync() first, which installs every name in the
+# lockfile that isn't on disk yet, using the lockfile's own `src` -- not just
+# the specs passed to add(). Measured 32 plugins with a stale lockfile present
+# vs 28 with it absent.
 stowed-files/nvim/.config/nvim/nvim-pack-lock.json

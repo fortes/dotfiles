@@ -618,10 +618,21 @@ if has('eval')
       -
     endif
     call search('^@@ .* @@\|^diff \|^[<=>|]\{7}[<=>|]\@!', 'bWc')
+    " The `end < 0` fallback belongs only to the two diff-header branches: for
+    " a conflict marker with nothing after it, `search()` returns 0 so `end`
+    " becomes -1, and both tests below then fail, which is the intended no-op.
+    " Extending to `line('$')` there would make `d]n` on a file's last
+    " `>>>>>>>` delete the rest of the file.
     if getline('.') =~# '^diff '
       let end = search('^diff ', 'Wn') - 1
+      if end < 0
+        let end = line('$')
+      endif
     elseif getline('.') =~# '^@@ '
       let end = search('^@@ .* @@\|^diff ', 'Wn') - 1
+      if end < 0
+        let end = line('$')
+      endif
     elseif getline('.') =~# '^=\{7\}'
       +
       let end = search('^>\{7}>\@!', 'Wnc')
@@ -629,9 +640,6 @@ if has('eval')
       let end = search('^[<=>|]\{7}[<=>|]\@!', 'Wn') - 1
     else
       return
-    endif
-    if end < 0
-      let end = line('$')
     endif
     if end > line('.')
       execute 'normal! V'.(end - line('.')).'j'
@@ -642,8 +650,16 @@ if has('eval')
 
   nnoremap <silent> [n :<C-U>call <SID>Context(1)<CR>
   nnoremap <silent> ]n :<C-U>call <SID>Context(0)<CR>
-  xnoremap <silent> [n :<C-U>exe 'normal! gv'<Bar>call <SID>Context(1)<CR>
-  xnoremap <silent> ]n :<C-U>exe 'normal! gv'<Bar>call <SID>Context(0)<CR>
+  " Only claim Visual mode if nothing else has it. Neovim 0.12 maps x-mode
+  " [n/]n to treesitter incremental selection (|v_]n|), which is more valuable
+  " than conflict navigation and pairs with the [N/]N siblings; unimpaired
+  " deferred the same way. Vim has no such default, so it still gets these.
+  if empty(maparg('[n', 'x'))
+    xnoremap <silent> [n :<C-U>exe 'normal! gv'<Bar>call <SID>Context(1)<CR>
+  endif
+  if empty(maparg(']n', 'x'))
+    xnoremap <silent> ]n :<C-U>exe 'normal! gv'<Bar>call <SID>Context(0)<CR>
+  endif
   onoremap <silent> [n :<C-U>call <SID>ContextMotion(1)<CR>
   onoremap <silent> ]n :<C-U>call <SID>ContextMotion(0)<CR>
 endif

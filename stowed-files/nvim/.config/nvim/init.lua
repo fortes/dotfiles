@@ -123,9 +123,12 @@ vim.api.nvim_create_autocmd('LspAttach', {
 })
 
 -- ============================================================================
--- `yo` option toggles, in the style of vim-unimpaired (whose [/] motions are
--- all built in as of Neovim 0.11, so the plugin isn't worth carrying). `yon`
--- and `yos` live in ~/.vimrc, since plain option toggles work in Vim too.
+-- `yo` option toggles, in the style of vim-unimpaired. Neovim 0.11 made the
+-- part of that plugin we used built in ([q ]q, [l ]l, [t ]t, [a ]a, [b ]b,
+-- [<Space> ]<Space>), so it wasn't worth carrying for the rest -- [e ]e, the
+-- indent-adjusting puts, the encode/decode operators and the other ten `yo`
+-- toggles all went with it. `[n`/`]n` were hand-ported into ~/.vimrc, as are
+-- `yon` and `yos`, since plain option toggles work in Vim too.
 -- ============================================================================
 
 -- Hides every diagnostic display at once: inline text, the current-line

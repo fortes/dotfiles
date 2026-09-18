@@ -228,7 +228,9 @@ install_binary() {
   mkdir -p "${install_location}"
 
   local download_dir
-  download_dir="$(mktemp --directory "${name}"XXX)"
+  # `--tmpdir` because a bare template is relative, so the other install_*
+  # helpers here scatter their scratch dirs into whatever the cwd happened to be
+  download_dir="$(mktemp --directory --tmpdir "${name}".XXXXXX)"
 
   pushd "${download_dir}" >/dev/null
   echo -n "Downloading ${name} ... "

@@ -116,7 +116,7 @@ The `script/stow` wrapper handles:
 - Uses built-in `vim.pack` for plugin management (run `:lua vim.pack.update()` to install/update)
 - LSP setup with special handling for:
   - `denols` - Only in projects with `deno.json`/`deno.jsonc`
-  - `oxfmt` / `oxlint` / `tsgo` - Disabled in Deno projects (deno owns formatting/linting/types there)
+  - `oxfmt` / `oxlint` / `tsc` - Disabled in Deno projects (deno owns formatting/linting/types there). `tsc` is TypeScript 7's native compiler serving `tsc --lsp`; the older `tsgo` preview binary is deprecated
   - Default Neovim 0.11+ LSP keymaps enabled (`grn`, `grr`, `gri`, `gO`, `gra`)
 - Diagnostic configuration with virtual text/lines
 
