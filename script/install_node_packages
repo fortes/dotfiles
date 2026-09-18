@@ -16,7 +16,6 @@ BUN_PACKAGES=(
   dockerfile-language-server-nodejs
   eslint
   fkill-cli
-  neovim
   npm-check-updates
   # opencode-ai
   oxfmt
@@ -30,11 +29,9 @@ BUN_PACKAGES=(
 )
 
 # Bun's hoisting fails to resolve nested peer-deps for these packages:
-# - copilot-language-server bundles its own language server binary
 # - qmd's better-sqlite3 install script cannot find its hoisted build tools
 # - yaml-language-server's ajv-draft-04 dep does `require('ajv/dist/core')`
 NPM_PACKAGES=(
-  @github/copilot-language-server
   @tobilu/qmd
   yaml-language-server
 )

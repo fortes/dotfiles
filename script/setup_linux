@@ -240,8 +240,6 @@ main() {
   setup_backports
   install_apt_packages
   "${dotfiles_root}/script/install_1password"
-  [[ -z "${IS_CROSTINI:-}" ]] && [[ -z "${IS_DOCKER:-}" ]] \
-    && "${dotfiles_root}/script/install_snap_packages"
   [[ -z "${IS_DOCKER:-}" ]] && "${dotfiles_root}/script/install_et"
   "${dotfiles_root}/script/install_github_packages"
 

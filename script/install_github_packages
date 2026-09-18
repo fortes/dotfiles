@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # Install some specific packages directly from GitHub. Specifically:
 #
-# - agg (asciinema gif generator)
 # - bun
 # - deno
 # - difftastic
@@ -10,8 +9,10 @@
 # - fx
 # - fzf (because older Debian versions are very old)
 # - github cli
+# - harper-ls
 # - hugo (latest)
 # - luals
+# - marksman
 # - neovim (latest)
 # - pistol
 # - sad
@@ -25,8 +26,10 @@ set -euo pipefail
 IFS=$'\n\t'
 export DEBIAN_FRONTEND=noninteractive
 
+# Token for api.github.com, if one is available
+GITHUB_API_TOKEN=''""
+
 AVAILABLE_PACKAGES=(
-  agg
   bun
   deno
   difftastic
@@ -34,11 +37,11 @@ AVAILABLE_PACKAGES=(
   fnm
   fx
   fzf
-  # Trixie tracks recent version already, can use apt
-  # github-cli
+  github-cli
   harper-ls
   hugo
   luals
+  marksman
   neovim
   pistol
   sad
@@ -48,7 +51,7 @@ AVAILABLE_PACKAGES=(
 )
 
 print_usage() {
-  echo "Usage: ${0} [-h|--help] [-s|--sole-package]"
+  echo "Usage: ${0} [-h|--help] [package_names...]"
   echo
   echo "Install packages directly from GitHub. Available packages:"
   echo
@@ -89,6 +92,58 @@ expand_arch_template() {
   echo "${template//\{ARCH\}/$arch}"
 }
 
+# One API request per package, against 60/hour per IP unauthenticated or
+# 5000 with a token
+github_api_token() {
+  if [[ -n "${GH_TOKEN:-}" ]]; then
+    echo "${GH_TOKEN}"
+  elif [[ -n "${GITHUB_TOKEN:-}" ]]; then
+    echo "${GITHUB_TOKEN}"
+  elif command_exists gh; then
+    # Scoped, because a bare `gh auth token` returns the active host's token,
+    # and a GitHub Enterprise one is rejected by api.github.com
+    gh auth token --hostname github.com 2>/dev/null || true
+  fi
+}
+
+# The auth header goes in via a config file on stdin, not argv:
+# /proc/PID/cmdline is world-readable, so `--header "Authorization: ..."` hands
+# the token to any local user for the life of the request. `printf` is a shell
+# builtin, so it doesn't land in a process list either.
+github_api_get() {
+  local url="$1"
+  local -a args=(--silent --fail --retry 3 --retry-connrefused)
+  if [[ -n "${GITHUB_API_TOKEN}" ]]; then
+    printf 'header = "Authorization: Bearer %s"\n' "${GITHUB_API_TOKEN}" \
+      | curl "${args[@]}" --config - "${url}"
+  else
+    curl "${args[@]}" "${url}"
+  fi
+}
+
+# A rate-limited response carries no `.assets`, which otherwise looks exactly
+# like an upstream asset rename
+report_api_failure() {
+  local repo="$1"
+  local rate_json reset remaining
+  # /rate_limit doesn't count against the limit, so it answers even when
+  # exhausted
+  rate_json=$(github_api_get 'https://api.github.com/rate_limit' 2>/dev/null || true)
+  remaining=$(echo "${rate_json}" | jq -r '.resources.core.remaining // empty' 2>/dev/null)
+  if [[ "${remaining}" == "0" ]]; then
+    reset=$(echo "${rate_json}" | jq -r '.resources.core.reset // empty' 2>/dev/null)
+    echo_stderr "Error: GitHub API rate limit reached (resets $(date -d "@${reset}" '+%H:%M' 2>/dev/null || echo 'shortly'))."
+    echo_stderr "Set GH_TOKEN, or run \`gh auth login\`, to raise the limit from 60/hour to 5000."
+  elif [[ -z "${remaining}" ]] && [[ -n "${GITHUB_API_TOKEN}" ]]; then
+    # /rate_limit refused us too, while sending a token: blame the token
+    echo_stderr "Error: GitHub API rejected the request for ${repo}."
+    echo_stderr "The token in GH_TOKEN/GITHUB_TOKEN (or from \`gh auth token\`) may be expired."
+  else
+    echo_stderr "Error: could not fetch the latest release for ${repo} from the GitHub API."
+  fi
+  exit 2
+}
+
 get_latest_release_url() {
   local repo="$1"
   local match_template="$2"
@@ -96,7 +151,7 @@ get_latest_release_url() {
 
   local release_json_url="https://api.github.com/repos/${repo}/releases/latest"
   local release_json
-  release_json=$(curl --silent "${release_json_url}")
+  release_json=$(github_api_get "${release_json_url}") || report_api_failure "${repo}"
 
   # If template contains {ARCH}, try each architecture pattern
   if [[ "${match_template}" == *"{ARCH}"* ]]; then
@@ -132,6 +187,7 @@ get_latest_release_url() {
 }
 
 install_bin() {
+  # For projects that publish a bare executable rather than an archive
   local repo="${1}"
   local match="${2}"
   local name="${3:-}"
@@ -144,9 +200,20 @@ install_bin() {
 
   local install_location="$HOME/.local/bin"
   mkdir -p "${install_location}"
+
+  local download_dir
+  download_dir="$(mktemp --directory --tmpdir "${name}".XXXXXX)"
+
+  pushd "${download_dir}" >/dev/null
   echo -n "Downloading ${name} ... "
-  wget --quiet -O "${install_location}/${name}" "${url}"
-  chmod 755 "${install_location}/${name}"
+  # Via a temp file: `wget -O` truncates its target before the transfer, so
+  # writing to the install path would leave a 0-byte binary that still looks
+  # installed to `command_exists`
+  wget --quiet -O "${name}" "${url}"
+  chmod 755 "${name}"
+  mv "${name}" "${install_location}/${name}"
+  popd >/dev/null
+  rm -rf "${download_dir}"
   echo "${name} installed"
 }
 
@@ -161,11 +228,13 @@ install_deb() {
   local url
   url="$(get_latest_release_url "${repo}" "${match}")"
 
-  download_dir="$(mktemp --directory "${name}"XXX)"
+  download_dir="$(mktemp --directory --tmpdir "${name}".XXXXXX)"
   pushd "${download_dir}" >/dev/null
   wget --quiet -O "${name}.deb" "${url}"
   echo "Installing ${repo} (requires sudo) ... "
-  sudo dpkg -i "${name}.deb"
+  # apt, not `dpkg -i`, so the deb's dependencies resolve. The `./` is
+  # required: apt reads a slashless argument as a package name.
+  sudo apt-get install -qq --assume-yes --no-install-recommends "./${name}.deb"
   popd >/dev/null
   rm -rf "${download_dir}"
 }
@@ -184,7 +253,7 @@ install_tarball() {
   local install_location="$HOME/.local/bin"
 
   local download_dir
-  download_dir="$(mktemp --directory "${name}"XXX)"
+  download_dir="$(mktemp --directory --tmpdir "${name}".XXXXXX)"
 
   pushd "${download_dir}" >/dev/null
   wget --quiet -O "${name}.tar.gz" "${url}"
@@ -223,7 +292,7 @@ install_zip() {
   mkdir -p "${install_location}"
 
   local download_dir
-  download_dir="$(mktemp --directory "${name}"XXX)"
+  download_dir="$(mktemp --directory --tmpdir "${name}".XXXXXX)"
 
   pushd "${download_dir}" >/dev/null
   wget --quiet -O "${name}.zip" "${url}"
@@ -245,14 +314,6 @@ install_zip() {
   popd >/dev/null
   rm -rf "${download_dir}"
   echo "${name} installed"
-}
-
-install_agg() {
-  if [[ "$(get_current_arch)" == "arm64" ]]; then
-    echo_stderr "Warning: agg is not available for ARM64 architecture"
-    return 0
-  fi
-  install_bin 'asciinema/agg' 'agg-{ARCH}-unknown-linux-musl'
 }
 
 install_bun() {
@@ -312,7 +373,7 @@ install_lua_language_server() {
   mkdir -p "${install_location}"
 
   local download_dir
-  download_dir="$(mktemp --directory "${name}"XXX)"
+  download_dir="$(mktemp --directory --tmpdir "${name}".XXXXXX)"
 
   pushd "${download_dir}" >/dev/null
   wget --quiet -O "${name}.tar.gz" "${url}"
@@ -339,7 +400,7 @@ install_neovim_stable() {
   echo "Installing neovim stable ..."
   url="$(get_latest_release_url "neovim/neovim" "nvim-linux-{ARCH}.tar.gz")"
 
-  download_dir="$(mktemp --directory nvimXXX)"
+  download_dir="$(mktemp --directory --tmpdir nvim.XXXXXX)"
   pushd "${download_dir}" >/dev/null
   wget --quiet -O nvim.tar.gz "${url}"
   echo -n "Expanding neovim tarball ... "
@@ -381,6 +442,16 @@ install_pistol() {
   install_bin 'doronbehar/pistol' 'pistol-static-linux-{ARCH}'
 }
 
+install_marksman() {
+  # Bare binaries, and `x64` isn't one of the standard arch patterns. Must be
+  # the glibc build: the musl ones can't run on Debian (no musl loader). Needs
+  # `libicu76` from apt, or .NET aborts before main().
+  case "$(get_current_arch)" in
+    amd64) install_bin 'artempyanykh/marksman' 'marksman-linux-x64' 'marksman' ;;
+    arm64) install_bin 'artempyanykh/marksman' 'marksman-linux-arm64' 'marksman' ;;
+  esac
+}
+
 install_tree_sitter_cli() {
   # tree-sitter uses x64/aarch64->arm64 naming instead of standard patterns
   case "$(get_current_arch)" in
@@ -391,14 +462,14 @@ install_tree_sitter_cli() {
 
 install_yazi() {
   local url
-  # musl version because older Debian versions don't have yazi's required glibc (2.39)
-  url="$(get_latest_release_url "sxyazi/yazi" "yazi-{ARCH}-unknown-linux-musl.zip")"
+  url="$(get_latest_release_url "sxyazi/yazi" "yazi-{ARCH}-unknown-linux-gnu.zip")"
 
   local bin_location="$HOME/.local/bin"
   local completion_location="$HOME/.local/completion.d/"
+  mkdir -p "${bin_location}" "${completion_location}"
 
   local download_dir
-  download_dir="$(mktemp --directory yaziXXX)"
+  download_dir="$(mktemp --directory --tmpdir yazi.XXXXXX)"
 
   pushd "${download_dir}" >/dev/null
   wget --quiet -O yazi.zip "${url}"
@@ -421,9 +492,16 @@ install_harper_ls() {
   install_tarball 'Automattic/harper' 'harper-ls-{ARCH}-unknown-linux-gnu.tar.gz' 'harper-ls'
 }
 
+init_github_api_auth() {
+  GITHUB_API_TOKEN="$(github_api_token)"
+}
+
 install_github_packages() {
   # shellcheck source=script/lib.sh
   . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+
+  # After lib.sh, since this needs command_exists
+  init_github_api_auth
 
   if ! command_exists apt-get; then
     echo_stderr "Only works on Debian-like systems"
@@ -456,9 +534,6 @@ install_github_packages() {
 
   for package in "${packages[@]}"; do
     case "${package}" in
-      agg)
-        install_agg
-        ;;
       bun)
         install_bun
         ;;
@@ -491,6 +566,9 @@ install_github_packages() {
         ;;
       luals)
         install_lua_language_server
+        ;;
+      marksman)
+        install_marksman
         ;;
       neovim)
         install_neovim_stable

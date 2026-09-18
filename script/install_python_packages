@@ -19,11 +19,12 @@ UVX_PACKAGES=(
   pyright
   ruff
   streamdown
-  vim-vint
 )
 
+# `pynvim`, not the `neovim` alias: PyPI calls that a transition package, and
+# depending on it pins an old pynvim
 VENV_LIBRARIES=(
-  neovim
+  pynvim
 )
 
 install_python_packages() {

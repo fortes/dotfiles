@@ -91,7 +91,15 @@ git update-index --no-skip-worktree ./symlinks/npmrc
 
 ### Neovim
 
-After setup, open `nvim` and run the following to install plugins, build native components (fzf sorter), and compile treesitter parsers:
+The very first `nvim` launch on a new machine installs the plugins itself:
+`vim.pack.add()` prompts to confirm, then downloads them and compiles the
+treesitter parsers (which blocks for a minute or two, with progress). They are
+usable straight away, but anything that already ran during that startup won't
+pick them up — the file you opened has had its `FileType` autocmds fire before
+any parser existed — so `:restart` once it finishes.
+
+Afterwards, to update plugins, rebuild native components (the fzf sorter) and
+refresh parsers:
 
 ```vim
 :lua vim.pack.update()
@@ -99,6 +107,13 @@ After setup, open `nvim` and run the following to install plugins, build native 
 ```
 
 Re-run this command whenever you pull updates that add or change plugins.
+
+Dropping a plugin from `init.lua` stops it loading but leaves it on disk. To
+clean those up:
+
+```vim
+:lua vim.pack.del(vim.iter(vim.pack.get()):filter(function(p) return not p.active end):map(function(p) return p.spec.name end):totable())
+```
 
 ### Firefox
 
@@ -248,7 +263,12 @@ docker run -it --rm --name dotfiles dotfiles
 Since you have to manually install packages from backports, can be tricky to know what is available. To find out, run the following:
 
 ```sh
-apt-cache policy $(dpkg --list | cut -d' ' -f3)
+# Installed packages with a newer version in backports
+sudo apt-get -s upgrade -t "$(. /etc/os-release && echo "$VERSION_CODENAME")-backports" \
+  | grep Backports
+
+# Or the full picture for one package
+apt-cache policy neovim
 ```
 
 This will list out all the packages installed, then need to search through to manually check which have backports available (pipe to `nvim -`).

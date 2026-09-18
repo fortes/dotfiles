@@ -12,9 +12,7 @@ if !has('nvim')
   set background=dark
   set backspace=indent,eol,start
   set belloff=all
-  " vint: -ProhibitSetNoCompatible
   set nocompatible
-  " vint: +ProhibitSetNoCompatible
   set comments+=fb:•
   " vim-only: cscope removed from nvim in 0.9
   set cscopeverbose
@@ -22,7 +20,7 @@ if !has('nvim')
   silent! set diffopt+=linematch:40      " requires internal diff engine
   silent! set diffopt+=indent-heuristic  " requires internal diff engine
   set encoding=utf-8
-  set fillchars="vert:│,fold:·"
+  set fillchars=vert:│,fold:·
   if exists('+foldsep')
     set fillchars+=foldsep:│
   endif
@@ -50,7 +48,7 @@ if !has('nvim')
     set maxsearchcount=999
   endif
   set nrformats=bin,hex
-  set path=".,,"
+  set path=.,,
   set ruler
   set sessionoptions-=options
   set sessionoptions+=unix,slash
@@ -63,7 +61,7 @@ if !has('nvim')
   set nostartofline
   set switchbuf=uselast
   set tabpagemax=50
-  set tags="./tags;,tags"
+  set tags=./tags;,tags
   set ttimeout
   set ttimeoutlen=50
   set ttyfast
@@ -120,6 +118,11 @@ set secure
 " in vim-tiny
 if has('eval')
   filetype plugin indent on
+
+  " Use space as leader. Set before any mapping, since `<leader>` is resolved
+  " when a mapping is defined, not when it runs
+  let mapleader=' '
+  let maplocalleader=' '
 endif
 
 " Don't redraw while executing macros, etc
@@ -176,7 +179,7 @@ endif
 
 augroup HighlightedYank
   autocmd!
-  autocmd TextYankPost * silent! lua vim.highlight.on_yank {on_visual=false}
+  autocmd TextYankPost * silent! lua vim.hl.on_yank {on_visual=false}
 augroup END
 
 " Let same document scroll differently in separate panes
@@ -493,17 +496,20 @@ if has('eval')
   command! Cmarks call s:Cmarks()
   nnoremap <m-m> :Cmarks<cr>
 
-  " Helper for visual search
-  function! s:VisualSetSearch(cmdtype)
-    let temp = @s
-    norm! gv"sy
-    let @/ = '\V' . substitute(escape(@s, a:cmdtype.'\'), '\n', '\\n', 'g')
-    let @s = temp
-  endfunction
+  " */# in visual mode searches for selected text, similar to normal mode.
+  " Built in to Neovim, see |v_star-default| / |v_#-default|.
+  if !has('nvim')
+    " Helper for visual search
+    function! s:VisualSetSearch(cmdtype)
+      let temp = @s
+      norm! gv"sy
+      let @/ = '\V' . substitute(escape(@s, a:cmdtype.'\'), '\n', '\\n', 'g')
+      let @s = temp
+    endfunction
 
-  " */# in visual mode searches for selected text, similar to normal mode
-  vnoremap * :<C-u>call <SID>VisualSetSearch('/')<cr>/<C-R>=@/<cr><cr>
-  vnoremap # :<C-u>call <SID>VisualSetSearch('#')<cr>/<C-R>=@/<cr><cr>
+    vnoremap * :<C-u>call <SID>VisualSetSearch('/')<cr>/<C-R>=@/<cr><cr>
+    vnoremap # :<C-u>call <SID>VisualSetSearch('#')<cr>/<C-R>=@/<cr><cr>
+  endif
 
   function! IsInsideGitRepo()
     let result=systemlist('git rev-parse --is-inside-work-tree')
@@ -549,9 +555,10 @@ if has('eval')
   endfunction
   command! GitRootCD :call GitRootCD()
 
-  " No Ex-mode, start project search instead, using word under the cursor
-  nnoremap Q :lgrep! "<C-R><C-W>" <C-R>=GetSearchPath()<CR>
-  vnoremap Q :<C-u>norm! gv"sy<cr>:lgrep! "<C-R>s" <C-R>=GetSearchPath()<CR>
+  " Project-wide counterpart to `*`, which searches the word under the cursor
+  " within the buffer. Not on `Q`: Neovim 0.13 makes that multiple-cursors.
+  nnoremap <leader>* :lgrep! "<C-R><C-W>" <C-R>=GetSearchPath()<CR>
+  vnoremap <leader>* :<C-u>norm! gv"sy<cr>:lgrep! "<C-R>s" <C-R>=GetSearchPath()<CR>
 endif
 
 " Automatically open quickfix/location list after grep/make
@@ -575,12 +582,6 @@ endif
 
 " Efficiency Shortcuts {{{
 
-if has('eval')
-  " Use space as leader
-  let mapleader=' '
-  let maplocalleader=' '
-endif
-
 " Use enter as colon for faster commands
 nnoremap <cr> :
 vnoremap <cr> :
@@ -603,16 +604,89 @@ augroup END
 nnoremap j gj
 nnoremap k gk
 
-" CTRL-U for undo in insert mode
-inoremap <C-U> <C-G>u<C-U>
+" [n / ]n to jump between conflict markers and diff hunk headers, ported from
+" vim-unimpaired. In operator-pending and Visual mode they select the whole
+" hunk, so `d]n` drops a conflict section. Git hunk motions are separate: [c
+" and ]c come from gitsigns in init.lua.
+if has('eval')
+  function! s:Context(reverse) abort
+    call search('^\%(@@ .* @@\|[<=>|]\{7}[<=>|]\@!\)', a:reverse ? 'bW' : 'W')
+  endfunction
+
+  function! s:ContextMotion(reverse) abort
+    if a:reverse
+      -
+    endif
+    call search('^@@ .* @@\|^diff \|^[<=>|]\{7}[<=>|]\@!', 'bWc')
+    " The `end < 0` fallback belongs only to the two diff-header branches: for
+    " a conflict marker with nothing after it, `search()` returns 0 so `end`
+    " becomes -1, and both tests below then fail, which is the intended no-op.
+    " Extending to `line('$')` there would make `d]n` on a file's last
+    " `>>>>>>>` delete the rest of the file.
+    if getline('.') =~# '^diff '
+      let end = search('^diff ', 'Wn') - 1
+      if end < 0
+        let end = line('$')
+      endif
+    elseif getline('.') =~# '^@@ '
+      let end = search('^@@ .* @@\|^diff ', 'Wn') - 1
+      if end < 0
+        let end = line('$')
+      endif
+    elseif getline('.') =~# '^=\{7\}'
+      +
+      let end = search('^>\{7}>\@!', 'Wnc')
+    elseif getline('.') =~# '^[<=>|]\{7\}'
+      let end = search('^[<=>|]\{7}[<=>|]\@!', 'Wn') - 1
+    else
+      return
+    endif
+    if end > line('.')
+      execute 'normal! V'.(end - line('.')).'j'
+    elseif end == line('.')
+      normal! V
+    endif
+  endfunction
+
+  nnoremap <silent> [n :<C-U>call <SID>Context(1)<CR>
+  nnoremap <silent> ]n :<C-U>call <SID>Context(0)<CR>
+  " Only claim Visual mode if nothing else has it. Neovim 0.12 maps x-mode
+  " [n/]n to treesitter incremental selection (|v_]n|), which is more valuable
+  " than conflict navigation and pairs with its [N/]N siblings. Vim has no such
+  " default, so it still gets these.
+  if empty(maparg('[n', 'x'))
+    xnoremap <silent> [n :<C-U>exe 'normal! gv'<Bar>call <SID>Context(1)<CR>
+  endif
+  if empty(maparg(']n', 'x'))
+    xnoremap <silent> ]n :<C-U>exe 'normal! gv'<Bar>call <SID>Context(0)<CR>
+  endif
+  onoremap <silent> [n :<C-U>call <SID>ContextMotion(1)<CR>
+  onoremap <silent> ]n :<C-U>call <SID>ContextMotion(0)<CR>
+endif
+
+" Option toggles, in the style of vim-unimpaired, which each echo the new state.
+" `yoe` (diagnostics) and `yog` (grammar) need Neovim, so they live in init.lua.
+nnoremap yon :setlocal number!<cr>:setlocal number?<cr>
+if has('spell')
+  nnoremap yos :setlocal spell!<cr>:setlocal spell?<cr>
+endif
 
 " Never use ZZ, too dangerous
 nnoremap ZZ <nop>
 
+" No Ex-mode, too easy to hit by accident. Only Vim needs this: Neovim has
+" repurposed `Q` (0.12 repeats the last recorded register, 0.13 adds a cursor)
+if !has('nvim')
+  nnoremap Q <nop>
+endif
+
 " Run `.` or macro over selected lines, taken from:
 " https://reddit.com/r/vim/comments/3y2mgt
 vnoremap . :normal .<CR>
-vnoremap @ :normal @
+if !has('nvim')
+  " Neovim maps this by default, see |v_@-default|
+  vnoremap @ :normal @
+endif
 
 " Change local directory to current file
 nnoremap <leader>lcd :tcd %:p:h<cr>
@@ -696,11 +770,6 @@ augroup filetype_tweaks
     autocmd FileType markdown,text setlocal makeprg=proselint\ %
   endif
 
-  " Linting for vimscript
-  if executable('vint')
-    autocmd FileType vim setlocal makeprg=vint\ --enable-neovim\ \-s\ %
-  endif
-
   if executable('shfmt')
     autocmd FileType sh setlocal formatprg=shfmt\ --indent\ 2
   endif
@@ -778,6 +847,10 @@ if has('spell')
 endif
 
 " Disable things we don't care about
+" Providers only exist to host remote plugins (|rplugin|), and nothing here is
+" one -- every plugin is Lua or Vimscript. Disabling stops :checkhealth asking
+" for the `neovim` npm/gem/cpan package for each of them.
+let g:loaded_node_provider = 0
 let g:loaded_perl_provider = 0
 let g:loaded_ruby_provider = 0
 

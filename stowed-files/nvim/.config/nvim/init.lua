@@ -13,6 +13,22 @@ local function map(mode, lhs, rhs, opts_or_bufnr)
   vim.keymap.set(mode, lhs, rhs, opts)
 end
 
+-- Fold options are window-local, so apply them to every window showing the
+-- buffer. A buffer can be loaded while outside any window (nvim-bqf `bufload`s
+-- quickfix entries to preview them), in which case this is a no-op.
+local function set_foldexpr(bufnr, expr)
+  for _, win in ipairs(vim.fn.win_findbuf(bufnr)) do
+    -- Leave diff windows alone. `:diffthis`, `:Gdiffsplit` and `:DiffTool` set
+    -- foldmethod=diff to collapse unchanged regions, which is more useful than
+    -- either treesitter or LSP folding while a diff is up — and displaying the
+    -- buffer in a second window would otherwise clobber the diff window's folds.
+    if not vim.wo[win].diff then
+      vim.wo[win][0].foldmethod = 'expr'
+      vim.wo[win][0].foldexpr = expr
+    end
+  end
+end
+
 -- Set up diagnostic configuration
 vim.diagnostic.config({
   virtual_text = true,
@@ -31,6 +47,7 @@ vim.diagnostic.config({
 -- `gra` for code actions
 -- `<C-S>` for signature help
 vim.api.nvim_create_autocmd('LspAttach', {
+  group = vim.api.nvim_create_augroup('lsp_attach', { clear = true }),
   desc = 'LSP actions',
   callback = function(event)
     local client = vim.lsp.get_client_by_id(event.data.client_id)
@@ -56,17 +73,6 @@ vim.api.nvim_create_autocmd('LspAttach', {
       buffer = bufnr,
       desc = 'Add buffer diagnostics to the location list',
     })
-    -- `yod` already used by unimpaired for `diff`, use `yoe` (error). Toggles
-    -- inline display only — diagnostics keep being collected so signs, the
-    -- location list, and `<leader>e` floats still work.
-    map('n', 'yoe', function()
-      local cfg = vim.diagnostic.config()
-      local on = not cfg.virtual_text
-      vim.diagnostic.config({
-        virtual_text = on,
-        virtual_lines = on and { current_line = true } or false,
-      })
-    end, { buffer = bufnr, desc = 'Toggle diagnostic display' })
 
     if client:supports_method('textDocument/completion') then
       vim.lsp.completion.enable(true, client.id, bufnr, { autotrigger = true })
@@ -90,8 +96,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
 
     if client:supports_method('textDocument/foldingRange') then
       -- Enable LSP folding when available (overrides treesitter folding)
-      vim.api.nvim_set_option_value('foldmethod', 'expr', { win = 0 })
-      vim.api.nvim_set_option_value('foldexpr', 'v:lua.vim.lsp.foldexpr()', { win = 0 })
+      set_foldexpr(bufnr, 'v:lua.vim.lsp.foldexpr()')
     end
 
     if client:supports_method('textDocument/references') then
@@ -116,12 +121,65 @@ vim.api.nvim_create_autocmd('LspAttach', {
   end,
 })
 
+-- ============================================================================
+-- `yo` option toggles, in the style of vim-unimpaired. `yon` and `yos` live in
+-- ~/.vimrc, since plain option toggles work in Vim too.
+-- ============================================================================
+
+-- Hides every diagnostic display at once: inline text, the current-line
+-- virtual lines, and the E/W/H gutter signs (which with `signcolumn=auto:1-3`
+-- from ~/.vimrc can claim three columns on a busy line). Diagnostics keep being
+-- collected either way, so `<leader>e` floats and `<leader>q` still work while
+-- everything is hidden.
+-- `signs` is captured rather than hardcoded to `true` so a future
+-- `signs = { ... }` table (custom text, severity filters) survives a round trip.
+local diagnostic_signs = vim.diagnostic.config().signs
+map('n', 'yoe', function()
+  local on = not vim.diagnostic.config().virtual_text
+  vim.diagnostic.config({
+    virtual_text = on,
+    virtual_lines = on and { current_line = true } or false,
+    signs = on and diagnostic_signs or false,
+  })
+end, { desc = 'Toggle diagnostic (error) display' })
+
+-- Harper is the grammar checker, and reports everything through its own
+-- diagnostic namespace (`nvim.lsp.harper_ls.<client id>`), so disabling those
+-- silences grammar hints without touching diagnostics from any other server.
+map('n', 'yog', function()
+  local found = false
+  for ns, info in pairs(vim.diagnostic.get_namespaces()) do
+    if vim.startswith(info.name, 'nvim.lsp.harper_ls.') then
+      found = true
+      vim.diagnostic.enable(not vim.diagnostic.is_enabled({ bufnr = 0, ns_id = ns }), {
+        bufnr = 0,
+        ns_id = ns,
+      })
+    end
+  end
+  if not found then
+    vim.notify('harper-ls is not attached to this buffer', vim.log.levels.WARN)
+  end
+end, { desc = 'Toggle grammar (harper) hints' })
+
 -- Plugin manager: vim.pack (built-in, nvim 0.12+).
 -- Run `:lua vim.pack.update()` to install/update plugins.
 
+-- Treesitter parsers to keep installed. Parser names aren't filetypes (`.tsx`
+-- is filetype `typescriptreact` but parser `tsx`, `.sh` is `sh` but parser
+-- `bash`); `vim.treesitter.language.get_lang()` does that mapping at runtime.
+local treesitter_parsers = {
+  'bash', 'css', 'diff', 'gotmpl', 'html', 'javascript',
+  'json', 'lua', 'markdown', 'markdown_inline', 'python',
+  'tsx', 'typescript', 'vim', 'yaml',
+}
+
 -- Build hooks must be registered before vim.pack.add() so that PackChanged
--- fires for the initial install
+-- fires for the initial install. The augroup keeps re-sourcing this file from
+-- registering a duplicate hook, which would run two parser builds at once and
+-- race over the same download cache.
 vim.api.nvim_create_autocmd('PackChanged', {
+  group = vim.api.nvim_create_augroup('pack_build', { clear = true }),
   desc = 'Build native plugin components after install/update',
   callback = function(ev)
     local spec = ev.data.spec
@@ -131,16 +189,33 @@ vim.api.nvim_create_autocmd('PackChanged', {
     local path = ev.data.path
 
     if spec.name == 'nvim-treesitter' then
-      -- PackChanged fires before pack_add adds the plugin to rtp, so prepend
-      -- manually to make `require('nvim-treesitter')` resolve
-      vim.schedule(function()
-        vim.opt.rtp:prepend(path)
-        require('nvim-treesitter').install({
-          'bash', 'css', 'diff', 'gotmpl', 'html', 'javascript',
-          'json', 'lua', 'markdown', 'markdown_inline', 'python',
-          'tsx', 'typescript', 'vim', 'yaml',
-        })
-      end)
+      -- On a fresh install PackChanged fires before the plugin is on
+      -- 'runtimepath', so load it before calling into its Lua API
+      if not ev.data.active then vim.cmd.packadd(spec.name) end
+      -- `force` on update because a parser's ABI and generated queries have to
+      -- match the plugin version, so existing parsers need rebuilding too --
+      -- plain `install` is a no-op for anything already on disk. `summary`
+      -- reports how many actually built: a compile failure is otherwise silent
+      -- and leaves the language with queries but no parser.
+      local task = require('nvim-treesitter').install(treesitter_parsers, {
+        force = kind == 'update',
+        summary = true,
+      })
+      -- Installing is async. Block on a fresh install, where highlighting,
+      -- folding and indentation stay broken until the parsers exist and quitting
+      -- mid-build leaves a language with queries but no parser. Updates can
+      -- finish in the background, since the old parsers still work meanwhile.
+      if kind == 'install' then
+        -- Wrapped in a closure so the pcall also covers the method lookup, and
+        -- a throw can't escape into vim.pack.add() and abort the plugin setups
+        local ok, built = pcall(function() return task:wait(300000) end)
+        if not ok or built == false then
+          vim.notify(
+            'nvim-treesitter: not all parsers built, see :TSLog',
+            vim.log.levels.ERROR
+          )
+        end
+      end
     end
 
     if spec.name == 'telescope-fzf-native.nvim' then
@@ -169,9 +244,6 @@ local function use(spec, setup_fn)
   if setup_fn then table.insert(_setups, setup_fn) end
 end
 
--- Variables shared across multiple plugin setups
-local copilot_enabled = os.getenv('ENABLE_GITHUB_COPILOT') == '1'
-
 -- Per-buffer Deno detection so opening a Deno file from a non-Deno cwd
 -- still routes to the right LSP/formatter
 local function in_deno_project(bufnr)
@@ -193,6 +265,20 @@ end)
 
 -- LSP server configurations
 use('https://github.com/neovim/nvim-lspconfig', function()
+  -- Pin every server to one position encoding. Neovim advertises
+  -- { 'utf-8', 'utf-16', 'utf-32' } and each server picks its favourite, so a
+  -- TypeScript buffer ends up with tsc on utf-8 and harper/oxfmt/oxlint on
+  -- utf-16 — column offsets that disagree on any line with multibyte
+  -- characters, which `:checkhealth vim.lsp` flags. utf-16 is the one encoding
+  -- the LSP spec requires every server to implement, so it's the safe common
+  -- denominator. `'*'` is the lowest-priority config, so per-server settings
+  -- below still win.
+  vim.lsp.config('*', {
+    capabilities = {
+      general = { positionEncodings = { 'utf-16' } },
+    },
+  })
+
   if vim.fn.executable('bash-language-server') == 1 then
     vim.lsp.enable('bashls')
   end
@@ -215,7 +301,7 @@ use('https://github.com/neovim/nvim-lspconfig', function()
     vim.lsp.enable('dockerls')
   end
 
-  -- root_dir returning nil prevents attachment, so oxfmt/oxlint/tsgo
+  -- root_dir returning nil prevents attachment, so oxfmt/oxlint
   -- skip Deno-managed buffers per-buffer (not just at startup)
   local function not_in_deno(extra_markers)
     return function(bufnr, on_dir)
@@ -281,6 +367,10 @@ use('https://github.com/neovim/nvim-lspconfig', function()
   end
 
   if vim.fn.executable('marksman') == 1 then
+    -- Same as yamlls below: `markdown.mdx` is a filetype Neovim never sets
+    -- (an .mdx file is detected as `conf`), so it only serves to make
+    -- `:checkhealth vim.lsp` report an unknown filetype
+    vim.lsp.config('marksman', { filetypes = { 'markdown' } })
     vim.lsp.enable('marksman')
   end
 
@@ -288,9 +378,26 @@ use('https://github.com/neovim/nvim-lspconfig', function()
     vim.lsp.enable('pyright')
   end
 
-  if vim.fn.executable('tsgo') == 1 then
-    vim.lsp.config('tsgo', { root_dir = not_in_deno({ 'tsconfig.json', 'package.json' }) })
-    vim.lsp.enable('tsgo')
+  -- `tsc` is the language server, not just the compiler: TypeScript 7's native
+  -- build serves LSP over `tsc --lsp`.
+  --
+  -- lspconfig's `tsc` does its own Deno detection, comparing deno.json /
+  -- deno.lock depth against the nearest package lockfile so a Deno module
+  -- inside a Node monorepo still works. But it can't know about ENABLE_DENO,
+  -- and it lets tsc attach inside a Deno project whenever a nested package
+  -- lockfile sits deeper than deno.json — where `denols` attaches too, putting
+  -- two TypeScript servers on one buffer. Gate on our own check first (same one
+  -- oxfmt and oxlint use, so the whole toolchain agrees on what "Deno" means),
+  -- then defer to theirs. Captured before the override so this isn't recursive.
+  if vim.fn.executable('tsc') == 1 then
+    local tsc_root_dir = vim.lsp.config.tsc.root_dir
+    vim.lsp.config('tsc', {
+      root_dir = function(bufnr, on_dir)
+        if in_deno_project(bufnr) then return end
+        return tsc_root_dir(bufnr, on_dir)
+      end,
+    })
+    vim.lsp.enable('tsc')
   end
 
   if vim.fn.executable('vim-language-server') == 1 then
@@ -298,113 +405,94 @@ use('https://github.com/neovim/nvim-lspconfig', function()
   end
 
   if vim.fn.executable('yaml-language-server') == 1 then
+    -- lspconfig also lists `yaml.docker-compose`, `yaml.gitlab` and
+    -- `yaml.helm-values`, which Neovim's filetype detection never produces --
+    -- they only exist if you `:set filetype=` them by hand, so they just make
+    -- `:checkhealth vim.lsp` complain about unknown filetypes. Dropping them
+    -- costs nothing: compose files are plain `yaml`, and yaml-language-server
+    -- picks their schema from SchemaStore by filename, not by filetype.
+    vim.lsp.config('yamlls', { filetypes = { 'yaml' } })
     vim.lsp.enable('yamlls')
   end
 end)
 
--- GitHub Copilot inline suggestions + NES (requires subscription + ENABLE_GITHUB_COPILOT=1)
-if copilot_enabled then
-  -- NES (next-edit suggestion) support; copilot.lua delegates NES to this plugin
-  use('https://github.com/copilotlsp-nvim/copilot-lsp')
-  use('https://github.com/zbirenbaum/copilot.lua', function()
-    require('copilot').setup({
-      -- Disable panel (we use inline suggestions only); clear its default
-      -- open = '<M-CR>' keymap to avoid conflict with NES accept_and_goto
-      panel = { enabled = false, keymap = { open = false } },
-      -- Suppress Copilot inside the Obsidian vault
-      should_attach = function(bufnr)
-        local file_path = vim.api.nvim_buf_get_name(bufnr)
-        if vim.startswith(file_path, vim.fn.expand('~/notes/')) then
-          return false
-        end
-        return true
-      end,
-      filetypes = {
-        markdown = true,
-        -- Disable in UI/picker buffers
-        TelescopePrompt = false,
-      },
-      suggestion = {
-        enabled = true,
-        auto_trigger = true,
-        keymap = {
-          -- Tab is handled manually below to integrate with popup-menu navigation
-          accept = false,
-          accept_word = '<M-w>',
-          next = '<M-]>',
-          prev = '<M-[>',
-          dismiss = '<C-]>',
-        },
-      },
-      -- Next-edit suggestion: predicts and jumps to the next edit location
-      -- NES keymaps are normal mode (valid fields: accept_and_goto, accept, dismiss)
-      nes = {
-        enabled = true,
-        keymap = {
-          accept_and_goto = '<M-CR>',
-        },
-      },
-    })
-  end)
-end
-
--- Tab / S-Tab: override the vimrc pumvisible mappings (last definition wins,
--- since init.lua sources .vimrc at the top). Adds copilot accept at the front
--- of the priority chain when the plugin is loaded; otherwise identical to the
--- vimrc behaviour.
-map('i', '<Tab>', function()
-  if package.loaded['copilot.suggestion'] and require('copilot.suggestion').is_visible() then
-    -- Undo point so `u` reverts just the accepted suggestion
-    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<C-g>u', true, false, true), 'n', false)
-    require('copilot.suggestion').accept()
-  elseif vim.fn.pumvisible() == 1 then
-    return '<C-n>'
-  else
-    return '<Tab>'
-  end
-end, { expr = true, desc = 'Copilot accept / completion next / tab' })
-map('i', '<S-Tab>', function()
-  return vim.fn.pumvisible() == 1 and '<C-p>' or '<S-Tab>'
-end, { expr = true, desc = 'Completion prev / S-Tab' })
-
--- Normal-mode Tab: accept NES when visible, else fall through. In terminals
--- that don't distinguish <Tab> from <C-i>, the fallthrough preserves the
--- default jumplist-forward behaviour; in terminals that do (kitty protocol),
--- <Tab> stays unmapped.
-if copilot_enabled then
-  map('n', '<Tab>', function()
-    if vim.b.nes_state then
-      local nes_api = require('copilot.nes.api')
-      if nes_api.nes_apply_pending_nes() then
-        nes_api.nes_walk_cursor_end_edit()
-        return ''
-      end
-    end
-    return '<Tab>'
-  end, { expr = true, desc = 'Copilot accept NES / Tab' })
-end
-
--- Treesitter: highlighting, indent, folding (use main branch for nvim 0.12 API)
--- Parsers are installed automatically via the PackChanged hook above
--- (requires tree-sitter-cli on PATH).
+-- Treesitter. The `main` branch only ships parsers and queries: highlighting
+-- and folding come from Neovim itself, indentation from the plugin. (`master`
+-- is frozen and doesn't support nvim 0.12.) Parsers are installed by the
+-- PackChanged hook above, which needs tree-sitter-cli on PATH.
 use({ src = 'https://github.com/nvim-treesitter/nvim-treesitter', version = 'main' }, function()
+  -- A buffer's parser, or nil when there isn't a usable one. `get_parser`
+  -- resolves the filetype to a parser name itself, and returns nil rather than
+  -- throwing when the parser is missing or fails to load — notably on an ABI
+  -- mismatch after a Neovim upgrade, until `:TSUpdate` runs.
+  local function buf_parser(bufnr)
+    -- When the filetype no longer maps to a language, `get_parser` falls back to
+    -- whatever parser the buffer already holds, so clearing `filetype` would
+    -- otherwise keep reporting the previous language
+    if vim.bo[bufnr].filetype == '' then return nil end
+    -- Second return value is an error message, deliberately dropped: "no parser
+    -- for X" is the normal case for most filetypes, and `vim.notify` doesn't
+    -- filter by level, so reporting it would fire on every plain-text buffer.
+    -- `:checkhealth nvim-treesitter` is where to look when a parser is missing.
+    local parser = vim.treesitter.get_parser(bufnr)
+    return parser
+  end
+
+  -- Created once and shared: a second `clear = true` call would wipe the
+  -- autocmd registered by the first
+  local group = vim.api.nvim_create_augroup('treesitter', { clear = true })
+
   vim.api.nvim_create_autocmd('FileType', {
+    group = group,
     desc = 'Enable treesitter highlighting and indentation',
-    pattern = {
-      'bash', 'css', 'diff', 'gotmpl', 'html', 'javascript', 'json',
-      'lua', 'markdown', 'markdown_inline', 'python', 'tsx',
-      'typescript', 'vim', 'yaml',
-    },
-    callback = function()
-      local ok = pcall(vim.treesitter.start)
-      if ok then
-        vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+    callback = function(ev)
+      local parser = buf_parser(ev.buf)
+      if not parser then return end
+
+      -- Loading the parser isn't enough. Both `start` (highlights) and
+      -- `query.get` (indents) compile a query, and compiling throws when the
+      -- query and the parser disagree on node types — e.g. mid-`:TSUpdate`,
+      -- when new queries are already on the runtimepath but the old parser is
+      -- still on disk. Unprotected, that error aborts every later FileType
+      -- handler for the buffer: autopairs, autotag, obsidian, dirvish,
+      -- fugitive. One pcall covers both, and degrades in the right order —
+      -- highlighting survives a broken `indents` query.
+      local ok, err = pcall(function()
+        vim.treesitter.start(ev.buf, parser:lang())
+        -- Without an `indents` query treesitter indents nothing at all, so
+        -- leave those languages (diff, vim, ...) to Neovim's own indent plugins
+        if vim.treesitter.query.get(parser:lang(), 'indents') then
+          vim.bo[ev.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+        end
+      end)
+      if not ok then
+        vim.notify_once(('treesitter: %s\nRun :TSUpdate'):format(err), vim.log.levels.WARN)
       end
     end,
   })
-  -- Treesitter folding (LSP overrides per-buffer in LspAttach above)
-  vim.opt.foldmethod = 'expr'
-  vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+
+  -- Folding is window-local, so buffers with neither an LSP folding provider
+  -- nor a parser keep `foldmethod=marker` from ~/.vimrc. BufWinEnter as well as
+  -- FileType, to catch buffers that only get a window later: LspAttach reaches
+  -- only the windows that exist when the server attaches, and nvim-bqf
+  -- `bufload`s quickfix entries to preview them, so an LSP often attaches while
+  -- the buffer has no window at all. Hence this re-applies the LSP choice when
+  -- a capable client is attached, rather than leaving folding unset.
+  vim.api.nvim_create_autocmd({ 'FileType', 'BufWinEnter' }, {
+    group = group,
+    desc = 'Enable LSP or treesitter folding',
+    callback = function(ev)
+      for _, client in ipairs(vim.lsp.get_clients({ bufnr = ev.buf })) do
+        if client:supports_method('textDocument/foldingRange') then
+          set_foldexpr(ev.buf, 'v:lua.vim.lsp.foldexpr()')
+          return
+        end
+      end
+      if buf_parser(ev.buf) then
+        set_foldexpr(ev.buf, 'v:lua.vim.treesitter.foldexpr()')
+      end
+    end,
+  })
 end)
 
 -- Autoclose / rename HTML/JSX/TSX tags
@@ -512,10 +600,10 @@ use('https://github.com/nvim-telescope/telescope.nvim', function()
   map('n', '<m-p>', builtin.oldfiles, { desc = 'Old files' })
   map('n', '<m-r>', builtin.registers, { desc = 'Registers' })
   -- Replace lgrep bindings from ~/.vimrc with live grepping and selection
-  map('n', 'Q', function()
+  map('n', '<leader>*', function()
     builtin.live_grep({ default_text = vim.fn.expand('<cword>') })
   end, { desc = 'Live grep current word' })
-  map('v', 'Q', function()
+  map('v', '<leader>*', function()
     -- Save current `s` register before overwriting
     local old_reg = vim.fn.getreg('s')
     local old_regtype = vim.fn.getregtype('s')
@@ -699,6 +787,7 @@ use('https://github.com/obsidian-nvim/obsidian.nvim', function()
   map('v', '<leader>ol', '<cmd>Obsidian link<cr>', { desc = 'Obsidian link selection' })
 
   vim.api.nvim_create_autocmd('BufEnter', {
+    group = vim.api.nvim_create_augroup('obsidian_notes', { clear = true }),
     pattern = '*.md',
     desc = 'Notes-specific buffer settings',
     callback = function()
@@ -723,8 +812,7 @@ use('https://github.com/obsidian-nvim/obsidian.nvim', function()
   })
 end)
 
--- Highlight :XXX command ranges in cmdline (cmd-parser is required by range-highlight)
-use('https://github.com/winston0410/cmd-parser.nvim')
+-- Highlight :XXX command ranges in cmdline
 use('https://github.com/winston0410/range-highlight.nvim', function()
   require('range-highlight').setup({})
 end)
@@ -830,9 +918,6 @@ use('https://github.com/kristijanhusak/vim-dirvish-git')
 use('https://github.com/kylechui/nvim-surround', function()
   require('nvim-surround').setup({})
 end)
-
--- [/] movements + `y` option toggles
-use('https://github.com/tpope/vim-unimpaired')
 
 -- Repeat plugin actions with `.`
 use('https://github.com/tpope/vim-repeat')

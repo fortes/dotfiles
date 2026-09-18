@@ -23,6 +23,13 @@ generate_completions() {
   echo -n "… Generating completions & man pages"
 
   if command_exists beet; then
+    # The first `beet` invocation after a schema change prints one-time DB
+    # migration notices ("Created database backup at: …") on stdout, which end
+    # up inside the completion file and make every new shell emit
+    # `Created: command not found`. Those lines parse as valid bash, so a
+    # syntax check won't catch them -- warm up first so the notices land here
+    # instead of in the generated file.
+    beet version >/dev/null 2>&1 || true
     beet completion >"${completion_dir}/beet_completion"
   fi
 

@@ -7,7 +7,6 @@ apt-file
 apt-transport-https
 apt-utils
 aptitude
-asciinema
 bash-completion
 bat
 # Codex sandbox requirement
@@ -26,7 +25,8 @@ ffmpeg
 file
 # Debian version ancient, get from `install_github_packages`
 # fzf
-gh
+# Debian version ancient, get from `install_github_packages`
+# gh
 git
 git-crypt
 git-extras
@@ -44,6 +44,11 @@ info
 jq
 keychain
 less
+# marksman is a .NET binary and aborts at startup without ICU; nothing else
+# here pulls it in. The version is part of the package name and tracks the
+# Debian release, so bump it on upgrade — everything in this file goes through
+# a single `apt-get install`, so a name that no longer resolves aborts the lot.
+libicu76
 locales
 lsb-release
 lsof
@@ -78,6 +83,8 @@ unzip
 wamerican
 wget
 yank
-yq/trixie-backports
+# Debian ships a different `yq` (a python jq wrapper with an incompatible
+# CLI), get mikefarah's from `install_github_packages`
+# yq
 yt-dlp/trixie-backports
 zoxide
