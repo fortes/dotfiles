@@ -44,6 +44,8 @@ info
 jq
 keychain
 less
+# marksman is a .NET binary and aborts at startup without ICU
+libicu76
 locales
 lsb-release
 lsof

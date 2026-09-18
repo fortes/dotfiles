@@ -12,6 +12,7 @@
 # - github cli
 # - hugo (latest)
 # - luals
+# - marksman (was a snap, which needs systemd and so never worked in Docker)
 # - neovim (latest)
 # - pistol
 # - sad
@@ -39,6 +40,7 @@ AVAILABLE_PACKAGES=(
   harper-ls
   hugo
   luals
+  marksman
   neovim
   pistol
   sad
@@ -205,6 +207,36 @@ install_tarball() {
     fi
   fi
   chmod 755 "${install_location}/${name}"
+  popd >/dev/null
+  rm -rf "${download_dir}"
+  echo "${name} installed"
+}
+
+install_binary() {
+  # For projects that publish a bare executable rather than an archive
+  local repo="${1}"
+  local match="${2}"
+  local name="${3:-}"
+  if [[ -z "${name}" ]]; then
+    name="$(basename "${repo}")"
+  fi
+
+  local url
+  url="$(get_latest_release_url "${repo}" "${match}")"
+
+  local install_location="$HOME/.local/bin"
+  mkdir -p "${install_location}"
+
+  local download_dir
+  download_dir="$(mktemp --directory "${name}"XXX)"
+
+  pushd "${download_dir}" >/dev/null
+  echo -n "Downloading ${name} ... "
+  # Download to a temp dir first so a failed transfer can't leave a truncated
+  # binary at the install path
+  wget --quiet -O "${name}" "${url}"
+  chmod 755 "${name}"
+  mv "${name}" "${install_location}/${name}"
   popd >/dev/null
   rm -rf "${download_dir}"
   echo "${name} installed"
@@ -381,6 +413,16 @@ install_pistol() {
   install_bin 'doronbehar/pistol' 'pistol-static-linux-{ARCH}'
 }
 
+install_marksman() {
+  # Bare binaries, and `x64` isn't one of the standard arch patterns. Use the
+  # glibc build: the musl ones can't run on Debian at all (no musl loader), and
+  # this needs `libicu76` from apt or .NET aborts before main().
+  case "$(get_current_arch)" in
+    amd64) install_binary 'artempyanykh/marksman' 'marksman-linux-x64' 'marksman' ;;
+    arm64) install_binary 'artempyanykh/marksman' 'marksman-linux-arm64' 'marksman' ;;
+  esac
+}
+
 install_tree_sitter_cli() {
   # tree-sitter uses x64/aarch64->arm64 naming instead of standard patterns
   case "$(get_current_arch)" in
@@ -491,6 +533,9 @@ install_github_packages() {
         ;;
       luals)
         install_lua_language_server
+        ;;
+      marksman)
+        install_marksman
         ;;
       neovim)
         install_neovim_stable
