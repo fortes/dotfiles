@@ -16,7 +16,6 @@ BUN_PACKAGES=(
   dockerfile-language-server-nodejs
   eslint
   fkill-cli
-  neovim
   npm-check-updates
   # opencode-ai
   oxfmt

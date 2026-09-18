@@ -831,6 +831,10 @@ if has('spell')
 endif
 
 " Disable things we don't care about
+" Providers only exist to host remote plugins (|rplugin|), and nothing here is
+" one -- every plugin is Lua or Vimscript. Disabling stops :checkhealth asking
+" for the `neovim` npm/gem/cpan package for each of them.
+let g:loaded_node_provider = 0
 let g:loaded_perl_provider = 0
 let g:loaded_ruby_provider = 0
 

@@ -342,6 +342,10 @@ use('https://github.com/neovim/nvim-lspconfig', function()
   end
 
   if vim.fn.executable('marksman') == 1 then
+    -- Same as yamlls below: `markdown.mdx` is a filetype Neovim never sets
+    -- (an .mdx file is detected as `conf`), so it only serves to make
+    -- `:checkhealth vim.lsp` report an unknown filetype
+    vim.lsp.config('marksman', { filetypes = { 'markdown' } })
     vim.lsp.enable('marksman')
   end
 
@@ -363,6 +367,13 @@ use('https://github.com/neovim/nvim-lspconfig', function()
   end
 
   if vim.fn.executable('yaml-language-server') == 1 then
+    -- lspconfig also lists `yaml.docker-compose`, `yaml.gitlab` and
+    -- `yaml.helm-values`, which Neovim's filetype detection never produces --
+    -- they only exist if you `:set filetype=` them by hand, so they just make
+    -- `:checkhealth vim.lsp` complain about unknown filetypes. Dropping them
+    -- costs nothing: compose files are plain `yaml`, and yaml-language-server
+    -- picks their schema from SchemaStore by filename, not by filetype.
+    vim.lsp.config('yamlls', { filetypes = { 'yaml' } })
     vim.lsp.enable('yamlls')
   end
 end)

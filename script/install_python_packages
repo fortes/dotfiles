@@ -21,8 +21,11 @@ UVX_PACKAGES=(
   streamdown
 )
 
+# `pynvim`, not the `neovim` alias: PyPI describes that as a "Transition
+# packgage for pynvim", it has been frozen at 0.3.1 for years, and depending on
+# it holds pynvim back (0.5.2 rather than 0.6.0)
 VENV_LIBRARIES=(
-  neovim
+  pynvim
 )
 
 install_python_packages() {
