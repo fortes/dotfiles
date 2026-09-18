@@ -261,6 +261,20 @@ end)
 
 -- LSP server configurations
 use('https://github.com/neovim/nvim-lspconfig', function()
+  -- Pin every server to one position encoding. Neovim advertises
+  -- { 'utf-8', 'utf-16', 'utf-32' } and each server picks its favourite, so a
+  -- TypeScript buffer ends up with tsc on utf-8 and harper/oxfmt/oxlint on
+  -- utf-16 — column offsets that disagree on any line with multibyte
+  -- characters, which `:checkhealth vim.lsp` flags. utf-16 is the one encoding
+  -- the LSP spec requires every server to implement, so it's the safe common
+  -- denominator. `'*'` is the lowest-priority config, so per-server settings
+  -- below still win.
+  vim.lsp.config('*', {
+    capabilities = {
+      general = { positionEncodings = { 'utf-16' } },
+    },
+  })
+
   if vim.fn.executable('bash-language-server') == 1 then
     vim.lsp.enable('bashls')
   end
