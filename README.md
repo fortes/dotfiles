@@ -100,6 +100,13 @@ After setup, open `nvim` and run the following to install plugins, build native 
 
 Re-run this command whenever you pull updates that add or change plugins.
 
+Dropping a plugin from `init.lua` stops it loading but leaves it on disk. To
+clean those up:
+
+```vim
+:lua vim.pack.del(vim.iter(vim.pack.get()):filter(function(p) return not p.active end):map(function(p) return p.spec.name end):totable())
+```
+
 ### Firefox
 
 - Log into sync accounts, extensions should automatically install

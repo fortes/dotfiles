@@ -22,7 +22,7 @@ if !has('nvim')
   silent! set diffopt+=linematch:40      " requires internal diff engine
   silent! set diffopt+=indent-heuristic  " requires internal diff engine
   set encoding=utf-8
-  set fillchars="vert:│,fold:·"
+  set fillchars=vert:│,fold:·
   if exists('+foldsep')
     set fillchars+=foldsep:│
   endif
@@ -120,6 +120,11 @@ set secure
 " in vim-tiny
 if has('eval')
   filetype plugin indent on
+
+  " Use space as leader. Set before any mapping, since `<leader>` is resolved
+  " when a mapping is defined, not when it runs
+  let mapleader=' '
+  let maplocalleader=' '
 endif
 
 " Don't redraw while executing macros, etc
@@ -176,7 +181,7 @@ endif
 
 augroup HighlightedYank
   autocmd!
-  autocmd TextYankPost * silent! lua vim.highlight.on_yank {on_visual=false}
+  autocmd TextYankPost * silent! lua vim.hl.on_yank {on_visual=false}
 augroup END
 
 " Let same document scroll differently in separate panes
@@ -493,17 +498,20 @@ if has('eval')
   command! Cmarks call s:Cmarks()
   nnoremap <m-m> :Cmarks<cr>
 
-  " Helper for visual search
-  function! s:VisualSetSearch(cmdtype)
-    let temp = @s
-    norm! gv"sy
-    let @/ = '\V' . substitute(escape(@s, a:cmdtype.'\'), '\n', '\\n', 'g')
-    let @s = temp
-  endfunction
+  " */# in visual mode searches for selected text, similar to normal mode.
+  " Built in to Neovim, see |v_star-default| / |v_#-default|.
+  if !has('nvim')
+    " Helper for visual search
+    function! s:VisualSetSearch(cmdtype)
+      let temp = @s
+      norm! gv"sy
+      let @/ = '\V' . substitute(escape(@s, a:cmdtype.'\'), '\n', '\\n', 'g')
+      let @s = temp
+    endfunction
 
-  " */# in visual mode searches for selected text, similar to normal mode
-  vnoremap * :<C-u>call <SID>VisualSetSearch('/')<cr>/<C-R>=@/<cr><cr>
-  vnoremap # :<C-u>call <SID>VisualSetSearch('#')<cr>/<C-R>=@/<cr><cr>
+    vnoremap * :<C-u>call <SID>VisualSetSearch('/')<cr>/<C-R>=@/<cr><cr>
+    vnoremap # :<C-u>call <SID>VisualSetSearch('#')<cr>/<C-R>=@/<cr><cr>
+  endif
 
   function! IsInsideGitRepo()
     let result=systemlist('git rev-parse --is-inside-work-tree')
@@ -549,9 +557,10 @@ if has('eval')
   endfunction
   command! GitRootCD :call GitRootCD()
 
-  " No Ex-mode, start project search instead, using word under the cursor
-  nnoremap Q :lgrep! "<C-R><C-W>" <C-R>=GetSearchPath()<CR>
-  vnoremap Q :<C-u>norm! gv"sy<cr>:lgrep! "<C-R>s" <C-R>=GetSearchPath()<CR>
+  " Project-wide counterpart to `*`, which searches the word under the cursor
+  " within the buffer. Not on `Q`: Neovim 0.13 makes that multiple-cursors.
+  nnoremap <leader>* :lgrep! "<C-R><C-W>" <C-R>=GetSearchPath()<CR>
+  vnoremap <leader>* :<C-u>norm! gv"sy<cr>:lgrep! "<C-R>s" <C-R>=GetSearchPath()<CR>
 endif
 
 " Automatically open quickfix/location list after grep/make
@@ -575,12 +584,6 @@ endif
 
 " Efficiency Shortcuts {{{
 
-if has('eval')
-  " Use space as leader
-  let mapleader=' '
-  let maplocalleader=' '
-endif
-
 " Use enter as colon for faster commands
 nnoremap <cr> :
 vnoremap <cr> :
@@ -603,8 +606,12 @@ augroup END
 nnoremap j gj
 nnoremap k gk
 
-" CTRL-U for undo in insert mode
-inoremap <C-U> <C-G>u<C-U>
+" Option toggles, in the style of vim-unimpaired, which each echo the new state.
+" `yoe` (diagnostics) and `yog` (grammar) need Neovim, so they live in init.lua.
+nnoremap yon :setlocal number!<cr>:setlocal number?<cr>
+if has('spell')
+  nnoremap yos :setlocal spell!<cr>:setlocal spell?<cr>
+endif
 
 " Never use ZZ, too dangerous
 nnoremap ZZ <nop>
@@ -612,7 +619,10 @@ nnoremap ZZ <nop>
 " Run `.` or macro over selected lines, taken from:
 " https://reddit.com/r/vim/comments/3y2mgt
 vnoremap . :normal .<CR>
-vnoremap @ :normal @
+if !has('nvim')
+  " Neovim maps this by default, see |v_@-default|
+  vnoremap @ :normal @
+endif
 
 " Change local directory to current file
 nnoremap <leader>lcd :tcd %:p:h<cr>
