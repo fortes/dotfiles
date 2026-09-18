@@ -263,7 +263,12 @@ docker run -it --rm --name dotfiles dotfiles
 Since you have to manually install packages from backports, can be tricky to know what is available. To find out, run the following:
 
 ```sh
-apt-cache policy $(dpkg --list | cut -d' ' -f3)
+# Installed packages with a newer version in backports
+sudo apt-get -s upgrade -t "$(. /etc/os-release && echo "$VERSION_CODENAME")-backports" \
+  | grep Backports
+
+# Or the full picture for one package
+apt-cache policy neovim
 ```
 
 This will list out all the packages installed, then need to search through to manually check which have backports available (pipe to `nvim -`).
