@@ -12,9 +12,7 @@ if !has('nvim')
   set background=dark
   set backspace=indent,eol,start
   set belloff=all
-  " vint: -ProhibitSetNoCompatible
   set nocompatible
-  " vint: +ProhibitSetNoCompatible
   set comments+=fb:•
   " vim-only: cscope removed from nvim in 0.9
   set cscopeverbose
@@ -754,11 +752,6 @@ augroup filetype_tweaks
   " Linting for prose
   if executable('proselint')
     autocmd FileType markdown,text setlocal makeprg=proselint\ %
-  endif
-
-  " Linting for vimscript
-  if executable('vint')
-    autocmd FileType vim setlocal makeprg=vint\ --enable-neovim\ \-s\ %
   endif
 
   if executable('shfmt')

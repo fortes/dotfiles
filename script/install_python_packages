@@ -19,7 +19,6 @@ UVX_PACKAGES=(
   pyright
   ruff
   streamdown
-  vim-vint
 )
 
 VENV_LIBRARIES=(
