@@ -27,6 +27,7 @@ BREW_PACKAGES=(
   bat
   oven-sh/bun/bun
   chafa
+  cloudflared
   cmus
   # For Docker
   colima

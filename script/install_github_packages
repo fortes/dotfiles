@@ -2,6 +2,7 @@
 # Install some specific packages directly from GitHub. Specifically:
 #
 # - bun
+# - cloudflared
 # - deno
 # - difftastic
 # - f2
@@ -31,6 +32,7 @@ GITHUB_API_TOKEN=''""
 
 AVAILABLE_PACKAGES=(
   bun
+  cloudflared
   deno
   difftastic
   f2
@@ -324,6 +326,10 @@ install_bun() {
   esac
 }
 
+install_cloudflared() {
+  install_deb 'cloudflare/cloudflared' 'cloudflared-linux-{ARCH}\.deb$'
+}
+
 install_deno() {
   install_zip 'denoland/deno' 'deno-{ARCH}-unknown-linux-gnu.zip'
 }
@@ -536,6 +542,9 @@ install_github_packages() {
     case "${package}" in
       bun)
         install_bun
+        ;;
+      cloudflared)
+        install_cloudflared
         ;;
       deno)
         install_deno
