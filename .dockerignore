@@ -1,2 +1,9 @@
 .git
 .github
+
+# Per-machine state, gitignored but `COPY .` doesn't honour .gitignore. Baking
+# in a stale lockfile makes the image install whatever plugins the builder
+# happened to have on disk -- including ones since removed from init.lua --
+# because vim.pack installs every plugin the lockfile lists, not just the ones
+# passed to vim.pack.add().
+stowed-files/nvim/.config/nvim/nvim-pack-lock.json

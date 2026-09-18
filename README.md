@@ -91,7 +91,14 @@ git update-index --no-skip-worktree ./symlinks/npmrc
 
 ### Neovim
 
-After setup, open `nvim` and run the following to install plugins, build native components (fzf sorter), and compile treesitter parsers:
+The very first `nvim` launch on a new machine installs the plugins itself:
+`vim.pack.add()` prompts to confirm, then downloads them and compiles the
+treesitter parsers (which blocks for a minute or two, with progress). Plugins
+aren't on the `runtimepath` until the next start, so `:restart` once it
+finishes.
+
+Afterwards, to update plugins, rebuild native components (the fzf sorter) and
+refresh parsers:
 
 ```vim
 :lua vim.pack.update()

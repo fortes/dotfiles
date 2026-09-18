@@ -194,7 +194,17 @@ vim.api.nvim_create_autocmd('PackChanged', {
       -- folding and indentation stay broken until the parsers exist and quitting
       -- mid-build leaves a language with queries but no parser. Updates can
       -- finish in the background, since the old parsers still work meanwhile.
-      if kind == 'install' then pcall(task.wait, task, 300000) end
+      if kind == 'install' then
+        -- Wrapped in a closure so the pcall also covers the method lookup, and
+        -- a throw can't escape into vim.pack.add() and abort the plugin setups
+        local ok, built = pcall(function() return task:wait(300000) end)
+        if not ok or built == false then
+          vim.notify(
+            'nvim-treesitter: not all parsers built, see :TSLog',
+            vim.log.levels.ERROR
+          )
+        end
+      end
     end
 
     if spec.name == 'telescope-fzf-native.nvim' then
@@ -266,7 +276,7 @@ use('https://github.com/neovim/nvim-lspconfig', function()
     vim.lsp.enable('dockerls')
   end
 
-  -- root_dir returning nil prevents attachment, so oxfmt/oxlint/tsgo
+  -- root_dir returning nil prevents attachment, so oxfmt/oxlint
   -- skip Deno-managed buffers per-buffer (not just at startup)
   local function not_in_deno(extra_markers)
     return function(bufnr, on_dir)
@@ -339,9 +349,13 @@ use('https://github.com/neovim/nvim-lspconfig', function()
     vim.lsp.enable('pyright')
   end
 
-  if vim.fn.executable('tsgo') == 1 then
-    vim.lsp.config('tsgo', { root_dir = not_in_deno({ 'tsconfig.json', 'package.json' }) })
-    vim.lsp.enable('tsgo')
+  -- TypeScript 7 ships the native compiler as plain `tsc`, which serves
+  -- `tsc --lsp`; the `tsgo` preview binary and lspconfig's `tsgo` config are
+  -- both deprecated in favour of it. No root_dir override here: lspconfig's
+  -- `tsc` config already does its own (more thorough) Deno detection, keyed on
+  -- package-manager lockfiles and deno.lock rather than just deno.json.
+  if vim.fn.executable('tsc') == 1 then
+    vim.lsp.enable('tsc')
   end
 
   if vim.fn.executable('vim-language-server') == 1 then
@@ -363,6 +377,14 @@ use({ src = 'https://github.com/nvim-treesitter/nvim-treesitter', version = 'mai
   -- throwing when the parser is missing or fails to load — notably on an ABI
   -- mismatch after a Neovim upgrade, until `:TSUpdate` runs.
   local function buf_parser(bufnr)
+    -- When the filetype no longer maps to a language, `get_parser` falls back to
+    -- whatever parser the buffer already holds, so clearing `filetype` would
+    -- otherwise keep reporting the previous language
+    if vim.bo[bufnr].filetype == '' then return nil end
+    -- Second return value is an error message, deliberately dropped: "no parser
+    -- for X" is the normal case for most filetypes, and `vim.notify` doesn't
+    -- filter by level, so reporting it would fire on every plain-text buffer.
+    -- `:checkhealth nvim-treesitter` is where to look when a parser is missing.
     local parser = vim.treesitter.get_parser(bufnr)
     return parser
   end
@@ -377,7 +399,18 @@ use({ src = 'https://github.com/nvim-treesitter/nvim-treesitter', version = 'mai
     callback = function(ev)
       local parser = buf_parser(ev.buf)
       if not parser then return end
-      vim.treesitter.start(ev.buf, parser:lang())
+
+      -- Loading the parser isn't enough: `start` also compiles the `highlights`
+      -- query, which throws when query and parser disagree on node types — e.g.
+      -- mid-`:TSUpdate`, when the new queries are already on the runtimepath but
+      -- the old parser is still on disk. Unprotected, that error aborts every
+      -- later FileType handler for the buffer (autopairs, autotag, obsidian,
+      -- dirvish, fugitive).
+      local ok, err = pcall(vim.treesitter.start, ev.buf, parser:lang())
+      if not ok then
+        vim.notify_once(('treesitter: %s\nRun :TSUpdate'):format(err), vim.log.levels.WARN)
+        return
+      end
 
       -- Without an `indents` query treesitter indents nothing at all, so leave
       -- those languages (diff, markdown_inline, vim, ...) to Neovim's own
@@ -388,19 +421,26 @@ use({ src = 'https://github.com/nvim-treesitter/nvim-treesitter', version = 'mai
     end,
   })
 
-  -- Folding is window-local, so buffers with no parser keep `foldmethod=marker`
-  -- from ~/.vimrc. BufWinEnter as well as FileType, to catch buffers that only
-  -- get a window after their filetype is set.
+  -- Folding is window-local, so buffers with neither an LSP folding provider
+  -- nor a parser keep `foldmethod=marker` from ~/.vimrc. BufWinEnter as well as
+  -- FileType, to catch buffers that only get a window later: LspAttach can only
+  -- reach windows that exist when the server attaches, and nvim-bqf `bufload`s
+  -- quickfix entries to preview them, so an LSP often attaches while the buffer
+  -- has no window at all. This has to re-apply the LSP choice rather than bail
+  -- out on seeing a capable client, or such a buffer ends up with no folding.
   vim.api.nvim_create_autocmd({ 'FileType', 'BufWinEnter' }, {
     group = group,
-    desc = 'Enable treesitter folding',
+    desc = 'Enable LSP or treesitter folding',
     callback = function(ev)
-      if not buf_parser(ev.buf) then return end
-      -- Don't clobber the LSP folding set up in LspAttach above
       for _, client in ipairs(vim.lsp.get_clients({ bufnr = ev.buf })) do
-        if client:supports_method('textDocument/foldingRange') then return end
+        if client:supports_method('textDocument/foldingRange') then
+          set_foldexpr(ev.buf, 'v:lua.vim.lsp.foldexpr()')
+          return
+        end
       end
-      set_foldexpr(ev.buf, 'v:lua.vim.treesitter.foldexpr()')
+      if buf_parser(ev.buf) then
+        set_foldexpr(ev.buf, 'v:lua.vim.treesitter.foldexpr()')
+      end
     end,
   })
 end)

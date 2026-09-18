@@ -50,7 +50,7 @@ if !has('nvim')
     set maxsearchcount=999
   endif
   set nrformats=bin,hex
-  set path=".,,"
+  set path=.,,
   set ruler
   set sessionoptions-=options
   set sessionoptions+=unix,slash
@@ -63,7 +63,7 @@ if !has('nvim')
   set nostartofline
   set switchbuf=uselast
   set tabpagemax=50
-  set tags="./tags;,tags"
+  set tags=./tags;,tags
   set ttimeout
   set ttimeoutlen=50
   set ttyfast
@@ -606,6 +606,50 @@ augroup END
 nnoremap j gj
 nnoremap k gk
 
+" [n / ]n to jump between conflict markers and diff hunk headers, ported from
+" vim-unimpaired. In operator-pending and Visual mode they select the whole
+" hunk, so `d]n` drops a conflict section. Git hunk motions are separate: [c
+" and ]c come from gitsigns in init.lua.
+if has('eval')
+  function! s:Context(reverse) abort
+    call search('^\%(@@ .* @@\|[<=>|]\{7}[<=>|]\@!\)', a:reverse ? 'bW' : 'W')
+  endfunction
+
+  function! s:ContextMotion(reverse) abort
+    if a:reverse
+      -
+    endif
+    call search('^@@ .* @@\|^diff \|^[<=>|]\{7}[<=>|]\@!', 'bWc')
+    if getline('.') =~# '^diff '
+      let end = search('^diff ', 'Wn') - 1
+    elseif getline('.') =~# '^@@ '
+      let end = search('^@@ .* @@\|^diff ', 'Wn') - 1
+    elseif getline('.') =~# '^=\{7\}'
+      +
+      let end = search('^>\{7}>\@!', 'Wnc')
+    elseif getline('.') =~# '^[<=>|]\{7\}'
+      let end = search('^[<=>|]\{7}[<=>|]\@!', 'Wn') - 1
+    else
+      return
+    endif
+    if end < 0
+      let end = line('$')
+    endif
+    if end > line('.')
+      execute 'normal! V'.(end - line('.')).'j'
+    elseif end == line('.')
+      normal! V
+    endif
+  endfunction
+
+  nnoremap <silent> [n :<C-U>call <SID>Context(1)<CR>
+  nnoremap <silent> ]n :<C-U>call <SID>Context(0)<CR>
+  xnoremap <silent> [n :<C-U>exe 'normal! gv'<Bar>call <SID>Context(1)<CR>
+  xnoremap <silent> ]n :<C-U>exe 'normal! gv'<Bar>call <SID>Context(0)<CR>
+  onoremap <silent> [n :<C-U>call <SID>ContextMotion(1)<CR>
+  onoremap <silent> ]n :<C-U>call <SID>ContextMotion(0)<CR>
+endif
+
 " Option toggles, in the style of vim-unimpaired, which each echo the new state.
 " `yoe` (diagnostics) and `yog` (grammar) need Neovim, so they live in init.lua.
 nnoremap yon :setlocal number!<cr>:setlocal number?<cr>
@@ -615,6 +659,12 @@ endif
 
 " Never use ZZ, too dangerous
 nnoremap ZZ <nop>
+
+" No Ex-mode, too easy to hit by accident. Only Vim needs this: Neovim has
+" repurposed `Q` (0.12 repeats the last recorded register, 0.13 adds a cursor)
+if !has('nvim')
+  nnoremap Q <nop>
+endif
 
 " Run `.` or macro over selected lines, taken from:
 " https://reddit.com/r/vim/comments/3y2mgt
