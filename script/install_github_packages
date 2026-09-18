@@ -435,8 +435,7 @@ install_tree_sitter_cli() {
 
 install_yazi() {
   local url
-  # musl version because older Debian versions don't have yazi's required glibc (2.39)
-  url="$(get_latest_release_url "sxyazi/yazi" "yazi-{ARCH}-unknown-linux-musl.zip")"
+  url="$(get_latest_release_url "sxyazi/yazi" "yazi-{ARCH}-unknown-linux-gnu.zip")"
 
   local bin_location="$HOME/.local/bin"
   local completion_location="$HOME/.local/completion.d/"
