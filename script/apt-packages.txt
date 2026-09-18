@@ -7,7 +7,6 @@ apt-file
 apt-transport-https
 apt-utils
 aptitude
-asciinema
 bash-completion
 bat
 # Codex sandbox requirement

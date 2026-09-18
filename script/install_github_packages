@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # Install some specific packages directly from GitHub. Specifically:
 #
-# - agg (asciinema gif generator)
 # - bun
 # - deno
 # - difftastic
@@ -10,6 +9,7 @@
 # - fx
 # - fzf (because older Debian versions are very old)
 # - github cli
+# - harper-ls
 # - hugo (latest)
 # - luals
 # - marksman (was a snap, which needs systemd and so never worked in Docker)
@@ -27,7 +27,6 @@ IFS=$'\n\t'
 export DEBIAN_FRONTEND=noninteractive
 
 AVAILABLE_PACKAGES=(
-  agg
   bun
   deno
   difftastic
@@ -281,14 +280,6 @@ install_zip() {
   echo "${name} installed"
 }
 
-install_agg() {
-  if [[ "$(get_current_arch)" == "arm64" ]]; then
-    echo_stderr "Warning: agg is not available for ARM64 architecture"
-    return 0
-  fi
-  install_bin 'asciinema/agg' 'agg-{ARCH}-unknown-linux-musl'
-}
-
 install_bun() {
   # bun uses x64/aarch64 naming instead of standard patterns
   case "$(get_current_arch)" in
@@ -499,9 +490,6 @@ install_github_packages() {
 
   for package in "${packages[@]}"; do
     case "${package}" in
-      agg)
-        install_agg
-        ;;
       bun)
         install_bun
         ;;
