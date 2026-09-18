@@ -455,23 +455,24 @@ use({ src = 'https://github.com/nvim-treesitter/nvim-treesitter', version = 'mai
       local parser = buf_parser(ev.buf)
       if not parser then return end
 
-      -- Loading the parser isn't enough: `start` also compiles the `highlights`
-      -- query, which throws when query and parser disagree on node types — e.g.
-      -- mid-`:TSUpdate`, when the new queries are already on the runtimepath but
-      -- the old parser is still on disk. Unprotected, that error aborts every
-      -- later FileType handler for the buffer (autopairs, autotag, obsidian,
-      -- dirvish, fugitive).
-      local ok, err = pcall(vim.treesitter.start, ev.buf, parser:lang())
+      -- Loading the parser isn't enough. Both `start` (highlights) and
+      -- `query.get` (indents) compile a query, and compiling throws when the
+      -- query and the parser disagree on node types — e.g. mid-`:TSUpdate`,
+      -- when new queries are already on the runtimepath but the old parser is
+      -- still on disk. Unprotected, that error aborts every later FileType
+      -- handler for the buffer: autopairs, autotag, obsidian, dirvish,
+      -- fugitive. One pcall covers both, and degrades in the right order —
+      -- highlighting survives a broken `indents` query.
+      local ok, err = pcall(function()
+        vim.treesitter.start(ev.buf, parser:lang())
+        -- Without an `indents` query treesitter indents nothing at all, so
+        -- leave those languages (diff, vim, ...) to Neovim's own indent plugins
+        if vim.treesitter.query.get(parser:lang(), 'indents') then
+          vim.bo[ev.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+        end
+      end)
       if not ok then
         vim.notify_once(('treesitter: %s\nRun :TSUpdate'):format(err), vim.log.levels.WARN)
-        return
-      end
-
-      -- Without an `indents` query treesitter indents nothing at all, so leave
-      -- those languages (diff, markdown_inline, vim, ...) to Neovim's own
-      -- indent plugins
-      if vim.treesitter.query.get(parser:lang(), 'indents') then
-        vim.bo[ev.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
       end
     end,
   })
