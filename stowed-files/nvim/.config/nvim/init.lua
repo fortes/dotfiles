@@ -122,8 +122,8 @@ vim.api.nvim_create_autocmd('LspAttach', {
 -- and `yos` live in ~/.vimrc, since plain option toggles work in Vim too.
 -- ============================================================================
 
--- Toggles inline display only — diagnostics keep being collected, so signs, the
--- location list, and `<leader>e` floats still work.
+-- Toggles inline display only — diagnostics keep being collected, so signs (see
+-- `yoE`), the location list, and `<leader>e` floats still work.
 map('n', 'yoe', function()
   local on = not vim.diagnostic.config().virtual_text
   vim.diagnostic.config({
@@ -131,6 +131,18 @@ map('n', 'yoe', function()
     virtual_lines = on and { current_line = true } or false,
   })
 end, { desc = 'Toggle diagnostic (error) display' })
+
+-- The gutter letters (E/W/H), which `yoe` deliberately leaves alone. With
+-- `signcolumn=auto:1-3` from ~/.vimrc a line carrying several sources claims
+-- three columns, which is a lot of gutter to give up. Uppercase because it's
+-- the other half of `yoe` rather than a separate concern.
+-- Captured rather than hardcoded to `true` so a future `signs = { ... }` table
+-- (custom text, severity filters) survives a round trip.
+local diagnostic_signs = vim.diagnostic.config().signs
+map('n', 'yoE', function()
+  local on = not vim.diagnostic.config().signs
+  vim.diagnostic.config({ signs = on and diagnostic_signs or false })
+end, { desc = 'Toggle diagnostic signs (gutter)' })
 
 -- Harper is the grammar checker, and reports everything through its own
 -- diagnostic namespace (`nvim.lsp.harper_ls.<client id>`), so disabling those
