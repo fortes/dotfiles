@@ -335,7 +335,7 @@ install_deno() {
 }
 
 install_difftastic() {
-  install_tarball 'wilfred/difftastic' 'difft-{ARCH}-unknown-linux-gnu.tar.gz' 'difft'
+  install_tarball 'wilfred/difftastic' 'difft-.*{ARCH}-unknown-linux-gnu\.tar\.gz$' 'difft'
 }
 
 install_github_cli() {
