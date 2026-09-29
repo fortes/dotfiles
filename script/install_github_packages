@@ -21,7 +21,7 @@
 # - yazi
 # - yq
 #
-# Usage `install_github_packages [package_names...]`
+# Usage `install_github_packages [--no-alternatives] [package_names...]`
 
 set -euo pipefail
 IFS=$'\n\t'
@@ -53,7 +53,7 @@ AVAILABLE_PACKAGES=(
 )
 
 print_usage() {
-  echo "Usage: ${0} [-h|--help] [package_names...]"
+  echo "Usage: ${0} [-h|--help] [--no-alternatives] [package_names...]"
   echo
   echo "Install packages directly from GitHub. Available packages:"
   echo
@@ -63,6 +63,7 @@ print_usage() {
   echo
   echo "Options:"
   echo "-h|--help: Show this message"
+  echo "--no-alternatives: Do not change system editor alternatives"
 }
 
 echo_stderr() {
@@ -260,7 +261,7 @@ install_tarball() {
   pushd "${download_dir}" >/dev/null
   wget --quiet -O "${name}.tar.gz" "${url}"
   echo -n "Expanding ${name}.tar.gz ... "
-  tar xvf "${name}.tar.gz" >/dev/null
+  tar --no-same-owner -xvf "${name}.tar.gz" >/dev/null
   if [[ -f "${name}" ]]; then
     mv "${name}" "${install_location}/${name}"
   else
@@ -384,7 +385,7 @@ install_lua_language_server() {
   pushd "${download_dir}" >/dev/null
   wget --quiet -O "${name}.tar.gz" "${url}"
   echo -n "Expanding ${name}.tar.gz ... "
-  tar xzvf "${name}.tar.gz" -C "${install_location}" >/dev/null
+  tar --no-same-owner -xzvf "${name}.tar.gz" -C "${install_location}" >/dev/null
 
   # Binary is symlinked via stow
 
@@ -411,7 +412,7 @@ install_neovim_stable() {
   wget --quiet -O nvim.tar.gz "${url}"
   echo -n "Expanding neovim tarball ... "
   mkdir -p "${install_prefix}"
-  tar xzf nvim.tar.gz --strip-components=1 -C "${install_prefix}"
+  tar --no-same-owner -xzf nvim.tar.gz --strip-components=1 -C "${install_prefix}"
   echo "done"
 
   popd >/dev/null
@@ -426,6 +427,10 @@ install_neovim_stable() {
   echo "neovim stable installed"
 
   echo "Run ':lua vim.pack.update()' in Neovim to install plugins"
+
+  if [[ "${skip_alternatives:-0}" == 1 ]]; then
+    return
+  fi
 
   # Don't try to set alternatives if not available
   if ! update-alternatives --query vim &>/dev/null; then
@@ -514,10 +519,8 @@ install_github_packages() {
     exit 1
   fi
 
-  local packages=("$@")
-  if [ "${#packages[@]}" -eq 0 ]; then
-    packages=("${AVAILABLE_PACKAGES[@]}")
-  fi
+  local packages=()
+  local skip_alternatives=0
 
   while (("$#")); do
     case "${1}" in
@@ -525,9 +528,19 @@ install_github_packages() {
         print_usage
         exit 0
         ;;
+      --no-alternatives)
+        skip_alternatives=1
+        ;;
+      *)
+        packages+=("${1}")
+        ;;
     esac
     shift
   done
+
+  if [ "${#packages[@]}" -eq 0 ]; then
+    packages=("${AVAILABLE_PACKAGES[@]}")
+  fi
 
   if [[ -f "${HOME}/.profile.local" ]]; then
     # shellcheck source=/dev/null
