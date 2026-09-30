@@ -122,19 +122,46 @@ update_neovim_colors() {
   done <<<"${sockets_output}"
 }
 
+# Usage: update_tmux_server THEME TMUX_COMMAND...
+update_tmux_server() {
+  local new_theme session
+  new_theme="${1:-}"
+  shift
+
+  # Skip servers that aren't running
+  if ! "$@" has-session 2>/dev/null; then
+    return
+  fi
+
+  # Set the theme globally and drop any per-session copy (left by older
+  # versions of this script), which would shadow the global value
+  "$@" set-environment -g COLOR_THEME "${new_theme}" || return 0
+  while IFS= read -r session; do
+    "$@" set-environment -t "${session}" -u COLOR_THEME
+  done < <("$@" list-sessions -F '#{session_id}')
+
+  # No client to refresh when targeting the main server from the console
+  "$@" source-file ~/.config/tmux/tmux.conf &&
+    "$@" refresh-client -S 2>/dev/null ||
+    true
+}
+
 update_tmux_colors() {
   local new_theme
   new_theme="${1:-}"
 
-  # Check if in a tmux session
-  if ! tmux info >/dev/null 2>&1; then
-    return
+  # Inside the console popup, TMUX points at the console server, so reach the
+  # main server through the default socket instead
+  if [[ "${TMUX:-}" == */console,* ]]; then
+    update_tmux_server "${new_theme}" env -u TMUX tmux
+  else
+    update_tmux_server "${new_theme}" tmux
   fi
 
-  tmux set-environment -g COLOR_THEME "${new_theme}" &&
-    tmux set-environment COLOR_THEME "${new_theme}" &&
-    tmux source-file ~/.config/tmux/tmux.conf &&
-    tmux refresh-client -S
+  # The console popup runs on its own long-lived server (see tmux.conf), which
+  # can outlive the main one, so update it too, otherwise new shells there keep
+  # the old theme
+  update_tmux_server "${new_theme}" tmux -L console
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then

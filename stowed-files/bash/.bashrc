@@ -115,8 +115,11 @@ else
   BASE_PROMPT="${BASE_PROMPT}${HOST_COLOR}\h:${YELLOW}\w${RESET}"
 fi
 JOB_COUNT="${BOLD}${BLUE}[\j]${RESET} "
-# Write out history after every command. Add job count if non-zero stopped
-export PROMPT_COMMAND="history -a; HAS_JOBS=\$(jobs -sp) "
+# Write out history after every command. Add job count if non-zero stopped.
+# Not exported, since it calls functions child shells may not have defined
+# (e.g. `bash --norc`). Un-export in case inherited from an older shell
+PROMPT_COMMAND="history -a; HAS_JOBS=\$(jobs -sp) "
+export -n PROMPT_COMMAND
 PS1="$BASE_PROMPT ""\${HAS_JOBS:+$JOB_COUNT}"
 
 git_prompt_location="/etc/bash_completion.d/git-prompt"
@@ -136,7 +139,20 @@ if [ -r "${git_prompt_location}" ]; then
   export GIT_PS1_HIDE_IF_PWD_IGNORED=1
   # shellcheck source=/dev/null
   source "${git_prompt_location}"
-  export PROMPT_COMMAND="$PROMPT_COMMAND; __git_ps1 \"$BASE_PROMPT\" \" \${HAS_JOBS:+$JOB_COUNT }\" \" %s$RESET\""
+  PROMPT_COMMAND="$PROMPT_COMMAND; __git_ps1 \"$BASE_PROMPT\" \" \${HAS_JOBS:+$JOB_COUNT }\" \" %s$RESET\""
+fi
+
+# Mark prompt and command output starts (OSC 133) so tmux can jump between
+# them in copy mode. Ghostty's shell integration handles this outside of tmux
+if [[ -n "${TMUX:-}" ]]; then
+  __osc133_prompt_start='\[\e]133;A\a\]'
+  # Added to PROMPT_COMMAND at the end of this file, so it runs after anything
+  # that rebuilds PS1 on every prompt (__git_ps1, hooks in .bashrc.local)
+  __osc133_mark_prompt() {
+    [[ "$PS1" == "$__osc133_prompt_start"* ]] ||
+      PS1="${__osc133_prompt_start}${PS1}"
+  }
+  [[ "${PS0:-}" == *'133;C'* ]] || PS0="${PS0:-}"'\e]133;C\a'
 fi
 
 if command_exists dircolors; then
@@ -208,3 +224,8 @@ source_if_exists "$HOME/.aliases"
 
 # Load local overrides
 source_if_exists "$HOME/.bashrc.local"
+
+# Mark prompt start last (see OSC 133 section above)
+if declare -F __osc133_mark_prompt > /dev/null; then
+  PROMPT_COMMAND="$PROMPT_COMMAND; __osc133_mark_prompt"
+fi
