@@ -282,31 +282,13 @@ install_sad() {
 
 install_neovim() {
   local vim_path="$HOME/.local/bin/nvim"
-  # Its own prefix, so an upgrade replaces the runtime wholesale. nvim finds
-  # its runtime from the resolved executable path, so the symlink in
-  # ~/.local/bin works.
-  local install_dir="$HOME/.local/opt/nvim"
   local file
   file="$(fetch_asset 'neovim/neovim' '/nvim-linux-{ARCH}\.tar\.gz$')"
-  unpack_dir "${file}" "${install_dir}" bin/nvim --strip-components=1
+  # Straight into ~/.local, so the man page and desktop file land where
+  # they're found. Rerun if interrupted
+  mkdir -p "$HOME/.local"
+  tar --no-same-owner -xzf "${file}" --strip-components=1 -C "$HOME/.local"
 
-  mkdir -p "$(dirname "${vim_path}")" "$HOME/.local/share/man/man1"
-  ln -sfn "${install_dir}/bin/nvim" "${vim_path}"
-  ln -sfn "${install_dir}/share/man/man1/nvim.1" "$HOME/.local/share/man/man1/nvim.1"
-
-  # TODO: Remove by 2026-10-04, once every machine has run this version
-  # Older versions of this script unpacked straight into ~/.local. Only after
-  # the links above, so an interrupted run never leaves the old binary without
-  # its runtime. nvim itself never creates this dir.
-  if [[ -d "$HOME/.local/share/nvim/runtime" ]]; then
-    echo "Removing neovim files from the old ~/.local install"
-    rm -rf "$HOME/.local/share/nvim/runtime" "$HOME/.local/lib/nvim" \
-      "$HOME/.local/share/applications/nvim.desktop" \
-      "$HOME/.local/share/icons/hicolor/128x128/apps/nvim.png"
-    # nvim exports VIMRUNTIME to its `:terminal` and `:!` shells, so those
-    # still point at the deleted runtime
-    echo_stderr "Restart any running nvim, and shells started from inside nvim"
-  fi
   echo "neovim stable installed"
 
   echo "Run ':lua vim.pack.update()' in Neovim to install plugins"

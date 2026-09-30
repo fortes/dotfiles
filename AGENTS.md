@@ -75,6 +75,8 @@ Four installation methods:
 * Packages installed from GitHub releases via `script/install_github_packages`. This is used for either packages that aren't in Debian repos or where the Debian version is too old (e.g., `neovim`)
 * Node.js from nodejs.org tarballs via `script/install_node` (Debian's version is too old)
 
+`script/setup_devbox` (what `script/setup` runs on Ubuntu, or anywhere with `DOTFILES_DEVBOX=1`) is a lightweight, safe-to-rerun subset for pre-provisioned Ubuntu/Debian devboxes and devcontainers: a short apt list, a few GitHub binaries, and stow. It leaves system config (apt sources, docker, locale, login shell) alone.
+
 ### Configuration with GNU Stow
 
 All user configuration files live in `stowed-files/` and are symlinked to `$HOME` using GNU Stow. Each subdirectory represents a "package" that can be independently stowed:

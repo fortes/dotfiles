@@ -185,8 +185,6 @@ main() {
   # shellcheck source=script/lib.sh
   . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
-  declare -r local_profile_path="$HOME/.profile.local"
-
   declare apt_only=''
 
   # Parse arguments
@@ -217,13 +215,10 @@ main() {
   setup_shell
   "${dotfiles_root}/script/set_dotfiles_remote"
 
-  if [[ ! -f "${local_profile_path}" ]]; then
-    echo "Generating ${local_profile_path}"
-    "${dotfiles_root}/script/create_local_profile" >"${local_profile_path}"
-  fi
+  ensure_local_profile
 
   # shellcheck source=/dev/null
-  . "${local_profile_path}"
+  . "${HOME}/.profile.local"
 
   setup_nonfree
   setup_backports
@@ -240,10 +235,7 @@ main() {
   fi
   "${dotfiles_root}/script/install_node"
 
-  # Remove default files before stowing, otherwise stow fails
-  "${dotfiles_root}/script/remove_default_dotfiles"
-  # Restowing also cleans up links to files since removed from the repo
-  "${dotfiles_root}/script/stow" -R
+  stow_with_backup
 
   pushd "${dotfiles_root}" >/dev/null
   "${dotfiles_root}/script/lock_local_files"

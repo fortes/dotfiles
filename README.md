@@ -17,6 +17,14 @@ git clone https://github.com/fortes/dotfiles.git
 ./dotfiles/script/setup
 ```
 
+On Ubuntu (like 24.04 Noble, which Coder devboxes and most devcontainers use), `script/setup` runs a lighter setup instead that only installs a few packages and links dotfiles, and is safe to run on every boot (requires root or sudo access). For the same on other pre-provisioned machines, like a Debian 13 (Trixie) devcontainer:
+
+```sh
+DOTFILES_DEVBOX=1 ./dotfiles/script/setup
+```
+
+Set `DOTFILES_SKIP_PACKAGES="bash ssh"` (for example) to leave stow packages alone, like `bash` to keep machine-provided shell startup files. Devbox setup never upgrades its GitHub binaries; run `script/install_github_packages fzf neovim yq` for that.
+
 ## Post-Setup
 
 Once you've run setup, you'll still have to do the following universal manual steps (see platform-specific sections for more):
