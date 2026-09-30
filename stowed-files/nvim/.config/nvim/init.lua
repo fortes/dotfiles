@@ -370,7 +370,13 @@ use('https://github.com/neovim/nvim-lspconfig', function()
     -- Same as yamlls below: `markdown.mdx` is a filetype Neovim never sets
     -- (an .mdx file is detected as `conf`), so it only serves to make
     -- `:checkhealth vim.lsp` report an unknown filetype
-    vim.lsp.config('marksman', { filetypes = { 'markdown' } })
+    vim.lsp.config('marksman', {
+      filetypes = { 'markdown' },
+      -- A .NET binary, which otherwise aborts at startup without ICU (not
+      -- installed on Debian by default). Invariant mode only drops
+      -- culture-aware casing and sorting, which Markdown doesn't need.
+      cmd_env = { DOTNET_SYSTEM_GLOBALIZATION_INVARIANT = '1' },
+    })
     vim.lsp.enable('marksman')
   end
 

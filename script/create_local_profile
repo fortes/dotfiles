@@ -30,6 +30,9 @@ export IS_MAC="${is_mac:-}"
 # Affects bash prompt, which hides unless this is the username
 # export DEFAULT_USERNAME=ffortes
 
+# Raises install_github_packages' GitHub API limit (else it asks gh)
+# export GH_TOKEN="xxxxxx"
+
 # Used for 'llm'
 # export ANTHROPIC_API_KEY="xxxxxx"
 # export GEMINI_API_KEY="xxxxxx"

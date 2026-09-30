@@ -81,13 +81,6 @@ is_package_installed() {
   fi
 }
 
-set_default_applications() {
-  if command_exists nvim && update-alternatives --query editor &>/dev/null && ! update-alternatives --query editor | grep ^Value | grep -q nvim; then
-    echo "Setting Neovim as default text editor (requires sudo)"
-    sudo update-alternatives --install /usr/bin/editor editor "$(command -v nvim)" 60
-  fi
-}
-
 setup_backports() {
   declare -r codename="$(lsb_release -cs | tail -n 1)"
 
@@ -237,7 +230,14 @@ main() {
   install_apt_packages
   "${dotfiles_root}/script/install_1password"
   [[ -z "${IS_DOCKER:-}" ]] && "${dotfiles_root}/script/install_et"
-  "${dotfiles_root}/script/install_github_packages"
+  # Carry on past a failure, so one upstream asset rename or a rate limit
+  # doesn't leave the machine without its dotfiles. Docker builds stay strict,
+  # so CI still catches it.
+  local github_packages_failed=""
+  if ! "${dotfiles_root}/script/install_github_packages"; then
+    [[ -n "${IS_DOCKER:-}" ]] && exit 1
+    github_packages_failed=1
+  fi
   "${dotfiles_root}/script/install_node"
 
   # Remove default files before stowing, otherwise stow fails
@@ -248,22 +248,29 @@ main() {
   pushd "${dotfiles_root}" >/dev/null
   "${dotfiles_root}/script/lock_local_files"
   popd >/dev/null
-  set_default_applications
   [[ -z "${IS_DOCKER:-}" ]] && setup_docker
   setup_locale
   [[ -z "${IS_DOCKER:-}" ]] && "${dotfiles_root}/script/set_default_browser"
 
   # Non-apt package managers
   "${dotfiles_root}/script/install_node_packages"
-  "${dotfiles_root}/script/install_claude_code"
+  # Skipped if GitHub packages failed, since they need bun and yazi from
+  # there, and would otherwise stop setup before the retry message below
+  [[ -z "${github_packages_failed}" ]] && "${dotfiles_root}/script/install_claude_code"
   "${dotfiles_root}/script/install_agy"
   "${dotfiles_root}/script/install_python_packages"
   "${dotfiles_root}/script/install_cargo_packages"
   "${dotfiles_root}/script/install_llm_plugins"
-  "${dotfiles_root}/script/install_yazi_plugins"
+  [[ -z "${github_packages_failed}" ]] && "${dotfiles_root}/script/install_yazi_plugins"
 
   "${dotfiles_root}/script/generate_completions"
 
+  # Last, so it isn't lost in the output above
+  if [[ -n "${github_packages_failed}" ]]; then
+    echo_stderr "Setup finished, but installing GitHub packages failed partway (see the error above)."
+    echo_stderr "Rerun script/install_github_packages to finish them, then script/setup_linux."
+    exit 1
+  fi
   echo "Setup complete!"
 }
 

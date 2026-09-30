@@ -23,7 +23,8 @@ fd-find
 ffmpeg
 # Required for `yazi`
 file
-# Debian version ancient, get from `install_github_packages`
+# Trixie's 0.60 predates `--ghost` (0.61), which .fzf-default-options uses,
+# so every fzf call errors. Get it from `install_github_packages`
 # fzf
 # Debian version ancient, get from `install_github_packages`
 # gh
@@ -46,11 +47,6 @@ keychain
 less
 # Official Node.js binaries (script/install_node) link against it
 libatomic1
-# marksman is a .NET binary and aborts at startup without ICU; nothing else
-# here pulls it in. The version is part of the package name and tracks the
-# Debian release, so bump it on upgrade — everything in this file goes through
-# a single `apt-get install`, so a name that no longer resolves aborts the lot.
-libicu76
 locales
 lsb-release
 lsof
@@ -59,7 +55,8 @@ moreutils
 ncal
 ncdu
 ncurses-term
-# Installed via `install_github_packages`
+# Trixie's 0.10 predates `vim.pack` (0.12), which init.lua uses. Get it from
+# `install_github_packages`
 # neovim
 pipx
 python3

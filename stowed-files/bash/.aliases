@@ -27,7 +27,7 @@ fi
 
 if command_exists ctop; then
   # Doesn't work well in tmux https://github.com/bcicen/ctop/issues/263
-  alias ctop='TERM="${TERM/#tmux/screen}" sudo ~/.local/bin/ctop'
+  alias ctop='TERM="${TERM/#tmux/screen}" ctop'
 fi
 
 if command_exists eza; then
@@ -62,6 +62,13 @@ if command_exists fd; then
 fi
 if command_exists bat; then
   alias batcat='bat'
+fi
+
+# Just for typing: tools that open an editor use $VISUAL/$EDITOR instead.
+# Not ex/view/vimdiff, since nvim ignores the name it's run as.
+if command_exists nvim; then
+  alias vi='nvim'
+  alias vim='nvim'
 fi
 
 # Load local file if present

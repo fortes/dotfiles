@@ -1,33 +1,28 @@
 #!/usr/bin/env bash
-# Install some specific packages directly from GitHub. Specifically:
+# Install packages directly from GitHub, for ones Debian doesn't ship or ships
+# too old. `--help` lists them.
 #
-# - bun
-# - cloudflared
-# - deno
-# - difftastic
-# - f2
-# - fx
-# - fzf (because older Debian versions are very old)
-# - github cli
-# - harper-ls
-# - hugo (latest)
-# - luals
-# - marksman
-# - neovim (latest)
-# - pistol
-# - sad
-# - tree-sitter-cli (Trixie's apt version is too old for nvim-treesitter)
-# - yazi
-# - yq
-#
-# Usage `install_github_packages [--no-alternatives] [package_names...]`
+# Usage `install_github_packages [package_names...]`
 
 set -euo pipefail
+# So a failure inside `$(...)`, like a bad download in `fetch_asset`, stops the
+# script instead of handing back an empty result
+shopt -s inherit_errexit
 IFS=$'\n\t'
 export DEBIAN_FRONTEND=noninteractive
 
 # Token for api.github.com, if one is available
-GITHUB_API_TOKEN=''""
+GITHUB_API_TOKEN=''
+
+# What `{ARCH}` in an asset pattern matches, set at startup. Upstreams
+# disagree on naming, so each arch covers every spelling in use.
+ARCH_PATTERN=''
+
+# Private temp dir for downloads, removed on exit so failed installs don't
+# leak temp files. Under ~/.cache rather than /tmp, so it's on the same
+# filesystem as the install locations and moving a download into place is a
+# rename: an interrupted run can't leave a truncated binary installed.
+DOWNLOAD_ROOT=''
 
 AVAILABLE_PACKAGES=(
   bun
@@ -43,50 +38,32 @@ AVAILABLE_PACKAGES=(
   luals
   marksman
   neovim
-  pistol
   sad
   tree-sitter-cli
   yazi
   yq
 )
 
+is_available_package() {
+  local available
+  for available in "${AVAILABLE_PACKAGES[@]}"; do
+    [[ "${available}" == "$1" ]] && return 0
+  done
+  return 1
+}
+
 print_usage() {
-  echo "Usage: ${0} [-h|--help] [--no-alternatives] [package_names...]"
+  echo "Usage: ${0} [-h|--help] [package_names...]"
   echo
   echo "Install packages directly from GitHub. Available packages:"
   echo
+  local package
   for package in "${AVAILABLE_PACKAGES[@]}"; do
     echo "- ${package}"
   done
   echo
   echo "Options:"
   echo "-h|--help: Show this message"
-  echo "--no-alternatives: Do not change system editor alternatives"
-}
-
-get_current_arch() {
-  case "$(uname -m)" in
-    x86_64) echo "amd64" ;;  # Standardize to amd64 as primary
-    aarch64) echo "arm64" ;; # Standardize to arm64 as primary
-    *)
-      echo_stderr "Error: Unsupported architecture: $(uname -m)"
-      echo_stderr "Supported architectures: x86_64, aarch64"
-      exit 1
-      ;;
-  esac
-}
-
-get_arch_patterns() {
-  case "$(get_current_arch)" in
-    amd64) printf "amd64\nx86_64\n" ;;  # Try amd64 first, fallback to x86_64
-    arm64) printf "arm64\naarch64\n" ;; # Try arm64 first, fallback to aarch64
-  esac
-}
-
-expand_arch_template() {
-  local template="$1"
-  local arch="$2"
-  echo "${template//\{ARCH\}/$arch}"
 }
 
 # One API request per package, against 60/hour per IP unauthenticated or
@@ -109,7 +86,8 @@ github_api_token() {
 # builtin, so it doesn't land in a process list either.
 github_api_get() {
   local url="$1"
-  local -a args=(--silent --fail --retry 3 --retry-connrefused)
+  # --fail-with-body keeps GitHub's error JSON for report_api_failure
+  local -a args=(--silent --show-error --fail-with-body --retry 3 --retry-connrefused)
   if [[ -n "${GITHUB_API_TOKEN}" ]]; then
     printf 'header = "Authorization: Bearer %s"\n' "${GITHUB_API_TOKEN}" \
       | curl "${args[@]}" --config - "${url}"
@@ -118,404 +96,280 @@ github_api_get() {
   fi
 }
 
-# A rate-limited response carries no `.assets`, which otherwise looks exactly
-# like an upstream asset rename
+# Response `$2`, if it's GitHub's error JSON, says why, e.g. "API rate limit
+# exceeded" or "Bad credentials"
 report_api_failure() {
-  local repo="$1"
-  local rate_json reset remaining
-  # /rate_limit doesn't count against the limit, so it answers even when
-  # exhausted
-  rate_json=$(github_api_get 'https://api.github.com/rate_limit' 2>/dev/null || true)
-  remaining=$(echo "${rate_json}" | jq -r '.resources.core.remaining // empty' 2>/dev/null)
-  if [[ "${remaining}" == "0" ]]; then
-    reset=$(echo "${rate_json}" | jq -r '.resources.core.reset // empty' 2>/dev/null)
-    echo_stderr "Error: GitHub API rate limit reached (resets $(date -d "@${reset}" '+%H:%M' 2>/dev/null || echo 'shortly'))."
-    echo_stderr "Set GH_TOKEN, or run \`gh auth login\`, to raise the limit from 60/hour to 5000."
-  elif [[ -z "${remaining}" ]] && [[ -n "${GITHUB_API_TOKEN}" ]]; then
-    # /rate_limit refused us too, while sending a token: blame the token
-    echo_stderr "Error: GitHub API rejected the request for ${repo}."
-    echo_stderr "The token in GH_TOKEN/GITHUB_TOKEN (or from \`gh auth token\`) may be expired."
-  else
-    echo_stderr "Error: could not fetch the latest release for ${repo} from the GitHub API."
+  local message
+  message=$(jq -r '.message // empty' <<<"$2" 2>/dev/null || true)
+  echo_stderr "Error: could not fetch the latest release of $1 from the GitHub API${message:+: ${message}}"
+  if [[ -z "${GITHUB_API_TOKEN}" ]]; then
+    echo_stderr "If rate limited, set GH_TOKEN or run \`gh auth login\` to raise the limit from 60/hour to 5000."
   fi
   exit 2
 }
 
-get_latest_release_url() {
+# Prints the URL and GitHub-computed digest, tab-separated, of the first
+# asset in the latest release whose URL matches the regex `$2`
+get_latest_release_asset() {
   local repo="$1"
-  local match_template="$2"
-  local urls
+  local pattern="${2//\{ARCH\}/${ARCH_PATTERN}}"
+  local release_json asset
+  release_json=$(github_api_get "https://api.github.com/repos/${repo}/releases/latest") \
+    || report_api_failure "${repo}" "${release_json}"
 
-  local release_json_url="https://api.github.com/repos/${repo}/releases/latest"
-  local release_json
-  release_json=$(github_api_get "${release_json_url}") || report_api_failure "${repo}"
-
-  # If template contains {ARCH}, try each architecture pattern
-  if [[ "${match_template}" == *"{ARCH}"* ]]; then
-    local tried_patterns=()
-    while IFS= read -r arch; do
-      local match_pattern
-      match_pattern=$(expand_arch_template "${match_template}" "${arch}")
-      tried_patterns+=("${match_pattern}")
-      urls=$(echo "${release_json}" | jq -r '.assets[]?.browser_download_url' | grep "${match_pattern}")
-      if [[ -n "${urls}" ]]; then
-        echo "${urls}" | head -n 1
-        return 0
-      fi
-    done < <(get_arch_patterns)
-    echo_stderr "Error: Could not find url for ${repo} matching any of:"
-    for pattern in "${tried_patterns[@]}"; do
-      echo_stderr "  - ${pattern}"
-    done
+  # jq fails on a non-JSON 200, like a captive portal's page
+  asset=$(echo "${release_json}" | jq -r --arg re "${pattern}" \
+    'first(.assets[]? | select(.browser_download_url | test($re)))
+      | [.browser_download_url, .digest // ""] | @tsv' 2>/dev/null) \
+    || report_api_failure "${repo}" ""
+  if [[ -z "${asset}" ]]; then
+    echo_stderr "Error: Could not find an asset for ${repo} matching ${pattern}"
     echo_stderr "Available assets:"
-    while read -r url; do
-      echo_stderr "  - $(basename "$url")"
-    done < <(echo "${release_json}" | jq -r '.assets[]?.browser_download_url')
+    echo "${release_json}" | jq -r '.assets[]?.name | "  - " + .' >&2
     exit 2
-  else
-    # Original behavior for non-templated patterns
-    urls=$(echo "${release_json}" | jq -r '.assets[]?.browser_download_url' | grep "${match_template}")
-    if [[ -z "${urls}" ]]; then
-      echo_stderr "Error: Could not find url for ${repo} matching ${match_template}"
-      exit 2
-    fi
-    echo "${urls}" | head -n 1
   fi
+  echo "${asset}"
 }
 
-install_bin() {
-  # For projects that publish a bare executable rather than an archive
-  local repo="${1}"
-  local match="${2}"
-  local name="${3:-}"
-  if [[ -z "${name}" ]]; then
-    name="$(basename "${repo}")"
+# Download the latest release asset of repo `$1` matching `$2`, and print its
+# path. It's checked against the sha256 GitHub records at upload, which
+# catches corruption and tampering in transit, not a compromised upstream.
+# Releases older than mid-2025 have no digest, so those only get a warning.
+#
+# Each download gets the dir to itself, replacing the last, so install_bin's
+# `find` only sees that package.
+fetch_asset() {
+  local asset url digest file
+  # Set at startup, so unset only when the script is sourced. Guards the
+  # `rm -rf` below.
+  : "${DOWNLOAD_ROOT:?not set, run install_github_packages first}"
+  asset="$(get_latest_release_asset "$1" "$2")"
+  url="${asset%%$'\t'*}"
+  digest="${asset#*$'\t'}"
+
+  rm -rf "${DOWNLOAD_ROOT}/asset"
+  mkdir "${DOWNLOAD_ROOT}/asset"
+  file="${DOWNLOAD_ROOT}/asset/$(basename "${url}")"
+  # stderr, since stdout is the path for the caller
+  echo_stderr "Downloading $(basename "${url}") ..."
+  wget --quiet -O "${file}" "${url}"
+
+  if [[ "${digest}" != sha256:* ]]; then
+    echo_stderr "Warning: no checksum published for $(basename "${url}"), not verified"
+  elif ! echo "${digest#sha256:}  ${file}" | sha256sum --check --status -; then
+    echo_stderr "Error: checksum mismatch for $(basename "${url}")"
+    exit 2
   fi
+  echo "${file}"
+}
 
-  local url
-  url="$(get_latest_release_url "${repo}" "${match}")"
+install_executable() {
+  local src="$1"
+  local dest="$2"
+  chmod 755 "${src}"
+  mkdir -p "$(dirname "${dest}")"
+  mv -f "${src}" "${dest}"
+}
 
-  local install_location="$HOME/.local/bin"
-  mkdir -p "${install_location}"
+# For a whole directory: unpack tarball `$1` beside dir `$2`, and only if the
+# new copy has executable `$3`, replace the old one with it, so a bad download
+# can't break a working install and files upstream deleted don't linger. Any
+# further args go to tar.
+unpack_dir() {
+  local file="$1"
+  local dest="$2"
+  local required="$3"
+  shift 3
+  local staging="${dest}.new"
+  rm -rf "${staging}"
+  mkdir -p "${staging}"
+  if ! tar --no-same-owner -xzf "${file}" -C "${staging}" "$@" \
+    || [[ ! -x "${staging}/${required}" ]]; then
+    echo_stderr "Error: Could not unpack ${required} from $(basename "${file}")"
+    rm -rf "${staging}"
+    exit 2
+  fi
+  rm -rf "${dest}"
+  mv "${staging}" "${dest}"
+}
 
-  local download_dir
-  download_dir="$(mktemp --directory --tmpdir "${name}".XXXXXX)"
+# Install executable `$3` (default: the repo name) from a release asset that's
+# the bare executable, a .tar.gz, or a .zip
+install_bin() {
+  local repo="$1"
+  local name="${3:-${repo#*/}}"
+  local file dir executable
+  file="$(fetch_asset "${repo}" "$2")"
+  dir="$(dirname "${file}")"
 
-  pushd "${download_dir}" >/dev/null
-  echo -n "Downloading ${name} ... "
-  # Via a temp file: `wget -O` truncates its target before the transfer, so
-  # writing to the install path would leave a 0-byte binary that still looks
-  # installed to `command_exists`
-  wget --quiet -O "${name}" "${url}"
-  chmod 755 "${name}"
-  mv "${name}" "${install_location}/${name}"
-  popd >/dev/null
-  rm -rf "${download_dir}"
+  case "${file}" in
+    *.tar.gz) tar --no-same-owner -xzf "${file}" -C "${dir}" ;;
+    *.zip) unzip -q "${file}" -d "${dir}" ;;
+    *) mv "${file}" "${dir}/${name}" ;;
+  esac
+
+  executable="$(find "${dir}" -type f -name "${name}" -print -quit)"
+  if [[ -z "${executable}" ]]; then
+    echo_stderr "Error: Could not find ${name} in $(basename "${file}"), which has:"
+    find "${dir}" -type f >&2
+    exit 2
+  fi
+  install_executable "${executable}" "$HOME/.local/bin/${name}"
   echo "${name} installed"
 }
 
 install_deb() {
-  local repo="${1}"
-  local match="${2}"
-  local name
-  local download_dir
-
-  name="$(basename "${repo}")"
-
-  local url
-  url="$(get_latest_release_url "${repo}" "${match}")"
-
-  download_dir="$(mktemp --directory --tmpdir "${name}".XXXXXX)"
-  pushd "${download_dir}" >/dev/null
-  wget --quiet -O "${name}.deb" "${url}"
-  echo "Installing ${repo} (requires sudo) ... "
-  # apt, not `dpkg -i`, so the deb's dependencies resolve. The `./` is
-  # required: apt reads a slashless argument as a package name.
-  sudo apt-get install -qq --assume-yes --no-install-recommends "./${name}.deb"
-  popd >/dev/null
-  rm -rf "${download_dir}"
-}
-
-install_tarball() {
-  local repo="${1}"
-  local match="${2}"
-  local name="${3:-}"
-  if [[ -z "${name}" ]]; then
-    name="$(basename "${repo}")"
-  fi
-
-  local url
-  url="$(get_latest_release_url "${repo}" "${match}")"
-
-  local install_location="$HOME/.local/bin"
-
-  local download_dir
-  download_dir="$(mktemp --directory --tmpdir "${name}".XXXXXX)"
-
-  pushd "${download_dir}" >/dev/null
-  wget --quiet -O "${name}.tar.gz" "${url}"
-  echo -n "Expanding ${name}.tar.gz ... "
-  tar --no-same-owner -xvf "${name}.tar.gz" >/dev/null
-  if [[ -f "${name}" ]]; then
-    mv "${name}" "${install_location}/${name}"
-  else
-    local file_path
-    # File wasn't in the root of the tarball, find matching name to move
-    file_path="$(find . -type f -name "${name}")"
-    if [[ -n "${file_path}" ]]; then
-      mv "${file_path}" "${install_location}/${name}"
-    else
-      echo_stderr "Error: Could not find ${name} in ${download_dir}"
-      find "${download_dir}" -type f
-      exit 2
-    fi
-  fi
-  chmod 755 "${install_location}/${name}"
-  popd >/dev/null
-  rm -rf "${download_dir}"
-  echo "${name} installed"
-}
-
-install_zip() {
-  local repo="${1}"
-  local match="${2}"
-  local name
-  name="$(basename "${repo}")"
-
-  local url
-  url="$(get_latest_release_url "${repo}" "${match}")"
-
-  local install_location="$HOME/.local/bin"
-  mkdir -p "${install_location}"
-
-  local download_dir
-  download_dir="$(mktemp --directory --tmpdir "${name}".XXXXXX)"
-
-  pushd "${download_dir}" >/dev/null
-  wget --quiet -O "${name}.zip" "${url}"
-  echo -n "Unzipping ${name}.zip ... "
-  unzip -q -o -j -d . "${name}.zip"
-
-  if [[ -f "${name}" ]]; then
-    mv "${name}" "${install_location}/${name}"
-    chmod 755 "${install_location}/${name}"
-  else
-    echo_stderr "Error: Could not find ${name} in ${download_dir}"
-    echo_stderr "Available files:"
-    find "${download_dir}" -type f -exec basename {} \;
-    popd >/dev/null
-    rm -rf "${download_dir}"
-    exit 2
-  fi
-
-  popd >/dev/null
-  rm -rf "${download_dir}"
-  echo "${name} installed"
+  local file
+  file="$(fetch_asset "$1" "$2")"
+  echo "Installing $1 (requires sudo) ... "
+  # apt, not `dpkg -i`, so the deb's dependencies resolve. apt reads an
+  # argument without a slash as a package name, so it needs the full path.
+  sudo apt-get install -qq --assume-yes --no-install-recommends "${file}"
 }
 
 install_bun() {
-  # bun uses x64/aarch64 naming instead of standard patterns
-  case "$(get_current_arch)" in
-    amd64) install_zip 'oven-sh/bun' 'bun-linux-x64.zip' ;;
-    arm64) install_zip 'oven-sh/bun' 'bun-linux-aarch64.zip' ;;
-  esac
+  install_bin 'oven-sh/bun' '/bun-linux-{ARCH}\.zip$'
 }
 
 install_cloudflared() {
-  install_deb 'cloudflare/cloudflared' 'cloudflared-linux-{ARCH}\.deb$'
+  install_deb 'cloudflare/cloudflared' '/cloudflared-linux-{ARCH}\.deb$'
 }
 
 install_deno() {
-  install_zip 'denoland/deno' 'deno-{ARCH}-unknown-linux-gnu.zip'
+  install_bin 'denoland/deno' '/deno-{ARCH}-unknown-linux-gnu\.zip$'
 }
 
 install_difftastic() {
-  install_tarball 'wilfred/difftastic' 'difft-.*{ARCH}-unknown-linux-gnu\.tar\.gz$' 'difft'
+  install_bin 'wilfred/difftastic' '/difft-[^/]*{ARCH}-unknown-linux-gnu\.tar\.gz$' 'difft'
 }
 
 install_github_cli() {
-  install_deb 'cli/cli' 'gh_.*_linux_{ARCH}.deb'
+  install_deb 'cli/cli' '/gh_[^/]*_linux_{ARCH}\.deb$'
 }
 
 install_f2() {
-  install_deb 'ayoisaiah/f2' 'f2_.*_linux_{ARCH}.deb'
+  install_deb 'ayoisaiah/f2' '/f2_[^/]*_linux_{ARCH}\.deb$'
 }
 
 install_fx() {
-  install_bin 'antonmedv/fx' 'fx_linux_{ARCH}'
+  install_bin 'antonmedv/fx' '/fx_linux_{ARCH}$'
 }
 
 install_fzf() {
-  install_tarball 'junegunn/fzf' 'fzf-.*-linux_{ARCH}.tar.gz'
+  # Trixie's 0.60 predates `--ghost`, which .fzf-default-options uses
+  install_bin 'junegunn/fzf' '/fzf-[^/]*-linux_{ARCH}\.tar\.gz$'
 }
 
 install_hugo() {
-  install_deb 'gohugoio/hugo' 'hugo_extended_.*_linux-{ARCH}.deb'
+  # The version is digits and dots, which keeps out `hugo_extended_withdeploy_`
+  install_deb 'gohugoio/hugo' '/hugo_extended_[0-9.]*_linux-{ARCH}\.deb$'
 }
 
-install_lua_language_server() {
-  local url
-  # lua-language-server uses x64/arm64 naming instead of standard patterns
-  case "$(get_current_arch)" in
-    amd64) url="$(get_latest_release_url 'LuaLS/lua-language-server' 'lua-language-server-.*-linux-x64.tar.gz')" ;;
-    arm64) url="$(get_latest_release_url 'LuaLS/lua-language-server' 'lua-language-server-.*-linux-arm64.tar.gz')" ;;
-  esac
-  local name="lua-language-server"
-
-  local install_location="$HOME/.local/share/lua-language-server"
-  mkdir -p "${install_location}"
-
-  local download_dir
-  download_dir="$(mktemp --directory --tmpdir "${name}".XXXXXX)"
-
-  pushd "${download_dir}" >/dev/null
-  wget --quiet -O "${name}.tar.gz" "${url}"
-  echo -n "Expanding ${name}.tar.gz ... "
-  tar --no-same-owner -xzvf "${name}.tar.gz" -C "${install_location}" >/dev/null
-
-  # Binary is symlinked via stow
-
-  popd >/dev/null
-  rm -rf "${download_dir}"
-  echo "${name} installed"
+install_luals() {
+  local file
+  file="$(fetch_asset 'LuaLS/lua-language-server' '/lua-language-server-[^/]*-linux-{ARCH}\.tar\.gz$')"
+  # Run through a symlink, which it resolves to find its own files
+  unpack_dir "${file}" "$HOME/.local/share/lua-language-server" bin/lua-language-server
+  mkdir -p "$HOME/.local/bin"
+  ln -sfn "$HOME/.local/share/lua-language-server/bin/lua-language-server" \
+    "$HOME/.local/bin/lua-language-server"
+  echo "lua-language-server installed"
 }
 
 install_sad() {
-  install_deb 'ms-jpq/sad' '{ARCH}-unknown-linux-gnu.deb'
+  install_deb 'ms-jpq/sad' '/{ARCH}-unknown-linux-gnu\.deb$'
 }
 
-install_neovim_stable() {
-  local url
+install_neovim() {
   local vim_path="$HOME/.local/bin/nvim"
-  local download_dir
-  local install_prefix="$HOME/.local"
+  # Its own prefix, so an upgrade replaces the runtime wholesale. nvim finds
+  # its runtime from the resolved executable path, so the symlink in
+  # ~/.local/bin works.
+  local install_dir="$HOME/.local/opt/nvim"
+  local file
+  file="$(fetch_asset 'neovim/neovim' '/nvim-linux-{ARCH}\.tar\.gz$')"
+  unpack_dir "${file}" "${install_dir}" bin/nvim --strip-components=1
 
-  echo "Installing neovim stable ..."
-  url="$(get_latest_release_url "neovim/neovim" "nvim-linux-{ARCH}.tar.gz")"
+  mkdir -p "$(dirname "${vim_path}")" "$HOME/.local/share/man/man1"
+  ln -sfn "${install_dir}/bin/nvim" "${vim_path}"
+  ln -sfn "${install_dir}/share/man/man1/nvim.1" "$HOME/.local/share/man/man1/nvim.1"
 
-  download_dir="$(mktemp --directory --tmpdir nvim.XXXXXX)"
-  pushd "${download_dir}" >/dev/null
-  wget --quiet -O nvim.tar.gz "${url}"
-  echo -n "Expanding neovim tarball ... "
-  mkdir -p "${install_prefix}"
-  tar --no-same-owner -xzf nvim.tar.gz --strip-components=1 -C "${install_prefix}"
-  echo "done"
-
-  popd >/dev/null
-  rm -rf "${download_dir}"
-
-  if [[ ! -f "${vim_path}" ]]; then
-    echo_stderr "Error: Failed to install Neovim binary at ${vim_path}"
-    exit 2
+  # TODO: Remove by 2026-10-04, once every machine has run this version
+  # Older versions of this script unpacked straight into ~/.local. Only after
+  # the links above, so an interrupted run never leaves the old binary without
+  # its runtime. nvim itself never creates this dir.
+  if [[ -d "$HOME/.local/share/nvim/runtime" ]]; then
+    echo "Removing neovim files from the old ~/.local install"
+    rm -rf "$HOME/.local/share/nvim/runtime" "$HOME/.local/lib/nvim" \
+      "$HOME/.local/share/applications/nvim.desktop" \
+      "$HOME/.local/share/icons/hicolor/128x128/apps/nvim.png"
+    # nvim exports VIMRUNTIME to its `:terminal` and `:!` shells, so those
+    # still point at the deleted runtime
+    echo_stderr "Restart any running nvim, and shells started from inside nvim"
   fi
-
-  chmod 755 "${vim_path}"
   echo "neovim stable installed"
 
   echo "Run ':lua vim.pack.update()' in Neovim to install plugins"
 
-  if [[ "${skip_alternatives:-0}" == 1 ]]; then
-    return
+  # TODO: Remove by 2026-10-04, once every machine has run this version
+  # Older versions of this script pointed system alternatives here. A root
+  # `vi` shouldn't run a binary this user can overwrite. For this user,
+  # $EDITOR/$VISUAL and the `vi`/`vim` aliases already mean nvim.
+  if command_exists update-alternatives; then
+    local link
+    for link in editor ex vi view vim vimdiff; do
+      # Not a pipe: under pipefail, `grep -q` exiting early can fail the test
+      if grep -qxF "${vim_path}" <<<"$(update-alternatives --list "${link}" 2>/dev/null || true)"; then
+        echo "Removing neovim as system ${link} (requires sudo)"
+        sudo update-alternatives --remove "${link}" "${vim_path}"
+      fi
+    done
   fi
-
-  # Don't try to set alternatives if not available
-  if ! update-alternatives --query vim &>/dev/null; then
-    >&2 echo "update-alternatives not available for vim, skipping"
-    return
-  fi
-
-  # Assume if it's already set for `vim`, then it's set for the others
-  if update-alternatives --list vim | head -n1 | grep -qv "${vim_path}"; then
-    echo "Setting neovim as default editor (requires sudo)"
-    sudo update-alternatives --install /usr/bin/ex ex "${vim_path}" 110
-    sudo update-alternatives --install /usr/bin/vi vi "${vim_path}" 110
-    sudo update-alternatives --install /usr/bin/view view "${vim_path}" 110
-    sudo update-alternatives --install /usr/bin/vim vim "${vim_path}" 110
-    sudo update-alternatives --install /usr/bin/vimdiff vimdiff "${vim_path}" 110
-  fi
-}
-
-install_pistol() {
-  install_bin 'doronbehar/pistol' 'pistol-static-linux-{ARCH}'
 }
 
 install_marksman() {
-  # Bare binaries, and `x64` isn't one of the standard arch patterns. Must be
-  # the glibc build: the musl ones can't run on Debian (no musl loader). Needs
-  # `libicu76` from apt, or .NET aborts before main().
-  case "$(get_current_arch)" in
-    amd64) install_bin 'artempyanykh/marksman' 'marksman-linux-x64' 'marksman' ;;
-    arm64) install_bin 'artempyanykh/marksman' 'marksman-linux-arm64' 'marksman' ;;
-  esac
+  # Must be the glibc build: the musl ones can't run on Debian (no musl
+  # loader). init.lua runs it in .NET's invariant mode, so it doesn't need ICU.
+  install_bin 'artempyanykh/marksman' '/marksman-linux-{ARCH}$'
 }
 
 install_tree_sitter_cli() {
-  # tree-sitter uses x64/aarch64->arm64 naming instead of standard patterns
-  case "$(get_current_arch)" in
-    amd64) install_zip 'tree-sitter/tree-sitter' 'tree-sitter-cli-linux-x64.zip' ;;
-    arm64) install_zip 'tree-sitter/tree-sitter' 'tree-sitter-cli-linux-arm64.zip' ;;
-  esac
+  # Trixie's is too old for nvim-treesitter
+  install_bin 'tree-sitter/tree-sitter' '/tree-sitter-cli-linux-{ARCH}\.zip$'
 }
 
 install_yazi() {
-  local url
-  url="$(get_latest_release_url "sxyazi/yazi" "yazi-{ARCH}-unknown-linux-gnu.zip")"
+  local file dir
+  file="$(fetch_asset 'sxyazi/yazi' '/yazi-{ARCH}-unknown-linux-gnu\.zip$')"
+  dir="$(dirname "${file}")"
+  unzip -q -j "${file}" -d "${dir}"
 
-  local bin_location="$HOME/.local/bin"
-  local completion_location="$HOME/.local/completion.d/"
-  mkdir -p "${bin_location}" "${completion_location}"
-
-  local download_dir
-  download_dir="$(mktemp --directory --tmpdir yazi.XXXXXX)"
-
-  pushd "${download_dir}" >/dev/null
-  wget --quiet -O yazi.zip "${url}"
-  echo -n "Unzipping yazi.zip ... "
-  unzip -q -o -j -d . yazi.zip
-
-  mv -t "${bin_location}" {ya,yazi}
-  chmod 755 "${bin_location}"/{ya,yazi}
-  mv -t "${completion_location}" yazi.bash
-  popd >/dev/null
-  rm -rf "${download_dir}"
+  install_executable "${dir}/ya" "$HOME/.local/bin/ya"
+  install_executable "${dir}/yazi" "$HOME/.local/bin/yazi"
+  mkdir -p "$HOME/.local/completion.d"
+  mv -f "${dir}/ya.bash" "${dir}/yazi.bash" "$HOME/.local/completion.d/"
   echo "yazi installed"
 }
 
 install_yq() {
-  install_bin 'mikefarah/yq' 'yq_linux_{ARCH}'
+  install_bin 'mikefarah/yq' '/yq_linux_{ARCH}$'
 }
 
 install_harper_ls() {
-  install_tarball 'Automattic/harper' 'harper-ls-{ARCH}-unknown-linux-gnu.tar.gz' 'harper-ls'
-}
-
-init_github_api_auth() {
-  GITHUB_API_TOKEN="$(github_api_token)"
+  install_bin 'Automattic/harper' '/harper-ls-{ARCH}-unknown-linux-gnu\.tar\.gz$' 'harper-ls'
 }
 
 install_github_packages() {
   # shellcheck source=script/lib.sh
   . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
-  # After lib.sh, since this needs command_exists
-  init_github_api_auth
-
-  if ! command_exists apt-get; then
-    echo_stderr "Only works on Debian-like systems"
-    exit 1
-  fi
-
   local packages=()
-  local skip_alternatives=0
 
   while (("$#")); do
     case "${1}" in
       -h | --help)
         print_usage
         exit 0
-        ;;
-      --no-alternatives)
-        skip_alternatives=1
         ;;
       *)
         packages+=("${1}")
@@ -528,76 +382,43 @@ install_github_packages() {
     packages=("${AVAILABLE_PACKAGES[@]}")
   fi
 
-  if [[ -f "${HOME}/.profile.local" ]]; then
-    # shellcheck source=/dev/null
-    . "${HOME}/.profile.local"
+  # Up front, so a typo doesn't stop the run partway through
+  local package
+  for package in "${packages[@]}"; do
+    if ! is_available_package "${package}"; then
+      echo_stderr "Error: Unrecognized package: ${package}"
+      exit 1
+    fi
+  done
+
+  if ! command_exists apt-get; then
+    echo_stderr "Only works on Debian-like systems"
+    exit 1
   fi
+
+  case "$(uname -m)" in
+    x86_64) ARCH_PATTERN='(amd64|x86_64|x64)' ;;
+    aarch64) ARCH_PATTERN='(arm64|aarch64)' ;;
+    *)
+      echo_stderr "Error: Unsupported architecture: $(uname -m)"
+      exit 1
+      ;;
+  esac
+
+  # GH_TOKEN, if set in ~/.profile.local, arrives via the environment:
+  # setup_linux sources it, and so does ~/.profile for login shells
+  GITHUB_API_TOKEN="$(github_api_token)"
+
+  mkdir -p "${XDG_CACHE_HOME:-$HOME/.cache}"
+  DOWNLOAD_ROOT="$(mktemp --directory -p "${XDG_CACHE_HOME:-$HOME/.cache}" install_github_packages.XXXXXX)"
+  trap 'rm -rf "${DOWNLOAD_ROOT}"' EXIT
 
   echo -n "Installing GitHub packages:"
   printf " %s" "${packages[@]}"
   echo
 
   for package in "${packages[@]}"; do
-    case "${package}" in
-      bun)
-        install_bun
-        ;;
-      cloudflared)
-        install_cloudflared
-        ;;
-      deno)
-        install_deno
-        ;;
-      difftastic)
-        install_difftastic
-        ;;
-      github-cli)
-        install_github_cli
-        ;;
-      f2)
-        install_f2
-        ;;
-      fx)
-        install_fx
-        ;;
-      fzf)
-        install_fzf
-        ;;
-      harper-ls)
-        install_harper_ls
-        ;;
-      hugo)
-        install_hugo
-        ;;
-      luals)
-        install_lua_language_server
-        ;;
-      marksman)
-        install_marksman
-        ;;
-      neovim)
-        install_neovim_stable
-        ;;
-      pistol)
-        install_pistol
-        ;;
-      sad)
-        install_sad
-        ;;
-      tree-sitter-cli)
-        install_tree_sitter_cli
-        ;;
-      yazi)
-        install_yazi
-        ;;
-      yq)
-        install_yq
-        ;;
-      *)
-        echo_stderr "Error: Unrecognized package: ${package}"
-        exit 1
-        ;;
-    esac
+    "install_${package//-/_}"
   done
 
   echo "GitHub packages installed!"
