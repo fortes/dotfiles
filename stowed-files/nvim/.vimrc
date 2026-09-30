@@ -139,10 +139,8 @@ set timeoutlen=600
 set ttimeout
 set ttimeoutlen=200
 
-if isdirectory(expand('~/.local/venv'))
-  " Always use python3 from env that has `neovim` package
-  let g:python3_host_prog = '~/.local/venv/bin/python3'
-endif
+" Neovim 0.12+ finds `pynvim-python` (from `uv tool install pynvim`) on $PATH
+" automatically; no need to set g:python3_host_prog.
 " }}}
 
 " UI {{{

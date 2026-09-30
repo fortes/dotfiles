@@ -857,6 +857,13 @@ use('https://github.com/justinmk/vim-dirvish', function()
     group = vim.api.nvim_create_augroup('dirvish_bindings', { clear = true }),
     pattern = 'dirvish',
     callback = function()
+      -- `.vimrc`'s `nnoremap <cr> <cr>` for filetype=dirvish (undoing the
+      -- global <leader>-less <cr> remap) fires after Dirvish's own ftplugin
+      -- mapping and clobbers it back to plain line-down. Restore it here,
+      -- since this autocmd group is registered last.
+      map('n', '<cr>', function()
+        vim.cmd('call dirvish#open("edit", 0)')
+      end, { buffer = 0, desc = 'Open file' })
       map('n', '<leader>T', function()
         vim.cmd('call dirvish#open("tabedit", 0)')
       end, { buffer = 0, desc = 'Open file in new tab' })

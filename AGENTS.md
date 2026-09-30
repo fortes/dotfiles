@@ -124,7 +124,7 @@ The `script/stow` wrapper handles:
 - LSP setup with special handling for:
   - `denols` - Only in projects with `deno.json`/`deno.jsonc`
   - `oxfmt` / `oxlint` / `tsc` - Disabled in Deno projects (deno owns formatting/linting/types there). `tsc` is the TypeScript language server, served by the native compiler via `tsc --lsp`
-  - Default Neovim 0.11+ LSP keymaps enabled (`grn`, `grr`, `gri`, `gO`, `gra`)
+  - Default Neovim 0.11+ LSP keymaps enabled (`grn`, `grr`, `gri`, `gO`, `gra`, plus `grt`/`grx` added in 0.12)
 - Diagnostic configuration with virtual text/lines
 
 ### Platform Detection
