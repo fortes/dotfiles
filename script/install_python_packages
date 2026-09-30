@@ -16,20 +16,16 @@ UVX_PACKAGES=(
   epy-reader
   files-to-prompt
   llm
+  # `pynvim`, not the `neovim` alias: PyPI calls that a transition package, and
+  # depending on it pins an old pynvim. Neovim 0.12+ finds it automatically
+  # without needing `g:python3_host_prog`.
+  pynvim
   pyright
   ruff
   streamdown
 )
 
-# `pynvim`, not the `neovim` alias: PyPI calls that a transition package, and
-# depending on it pins an old pynvim
-VENV_LIBRARIES=(
-  pynvim
-)
-
 install_python_packages() {
-  declare -r venv_path="$HOME/.local/venv"
-
   if ! command_exists pipx; then
     >&2 echo "⨯ pipx not installed!"
     exit 1
@@ -47,19 +43,6 @@ install_python_packages() {
     eval "uv tool install --quiet --force --refresh ${package}"
   done
   echo "uvx packages installed!"
-
-  if [[ ! -d "${venv_path}" ]]; then
-    echo "Creating default venv …"
-    python3 -m venv "${venv_path}"
-    echo "Default venv created!"
-  fi
-
-  # shellcheck source=/dev/null
-  . "${venv_path}/bin/activate"
-
-  echo "Installing venv libraries …"
-  "${venv_path}/bin/python" -m pip install --quiet --upgrade pip "${VENV_LIBRARIES[@]}"
-  echo "venv libraries installed!"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then

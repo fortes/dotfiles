@@ -139,10 +139,8 @@ set timeoutlen=600
 set ttimeout
 set ttimeoutlen=200
 
-if isdirectory(expand('~/.local/venv'))
-  " Always use python3 from env that has `neovim` package
-  let g:python3_host_prog = '~/.local/venv/bin/python3'
-endif
+" Neovim 0.12+ finds `pynvim-python` (from `uv tool install pynvim`) on $PATH
+" automatically; no need to set g:python3_host_prog.
 " }}}
 
 " UI {{{
@@ -238,7 +236,9 @@ augroup END
 
 " File Handling {{{
 " Automatically change directory to that of current file
-set autochdir
+if !has('nvim')
+  set autochdir
+endif
 
 " Automatically write files on :next, :make, etc
 set autowriteall
@@ -557,8 +557,10 @@ if has('eval')
 
   " Project-wide counterpart to `*`, which searches the word under the cursor
   " within the buffer. Not on `Q`: Neovim 0.13 makes that multiple-cursors.
-  nnoremap <leader>* :lgrep! "<C-R><C-W>" <C-R>=GetSearchPath()<CR>
-  vnoremap <leader>* :<C-u>norm! gv"sy<cr>:lgrep! "<C-R>s" <C-R>=GetSearchPath()<CR>
+  if !has('nvim')
+    nnoremap <leader>* :lgrep! "<C-R><C-W>" <C-R>=GetSearchPath()<CR>
+    vnoremap <leader>* :<C-u>norm! gv"sy<cr>:lgrep! "<C-R>s" <C-R>=GetSearchPath()<CR>
+  endif
 endif
 
 " Automatically open quickfix/location list after grep/make
@@ -778,8 +780,10 @@ augroup filetype_tweaks
   if executable('oxfmt')
     autocmd FileType javascript,javascriptreact,typescript,typescriptreact,json,css,less,html,markdown,yaml setlocal formatprg=oxfmt\ --stdin-filepath\ %
 
-    " Use `formatprg` for `formatexpr` wherever we use `oxfmt`
-    autocmd FileType javascript,javascriptreact,typescript,typescriptreact,json,css,less,html,markdown,yaml setlocal formatexpr=
+    " Use `formatprg` for `formatexpr` wherever we use `oxfmt` (in Neovim, conform.nvim owns formatexpr)
+    if !has('nvim')
+      autocmd FileType javascript,javascriptreact,typescript,typescriptreact,json,css,less,html,markdown,yaml setlocal formatexpr=
+    endif
   endif
 
   if executable('ruff')

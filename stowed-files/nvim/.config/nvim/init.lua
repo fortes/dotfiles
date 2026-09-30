@@ -3,13 +3,8 @@
 vim.cmd('source ~/.vimrc')
 
 -- Helper for keymaps
-local function map(mode, lhs, rhs, opts_or_bufnr)
-  local opts = { noremap = true, silent = true }
-  if type(opts_or_bufnr) == 'number' then
-    opts.buffer = opts_or_bufnr
-  elseif type(opts_or_bufnr) == 'table' then
-    opts = vim.tbl_extend('force', opts, opts_or_bufnr)
-  end
+local function map(mode, lhs, rhs, opts)
+  opts = vim.tbl_extend('force', { silent = true }, opts or {})
   vim.keymap.set(mode, lhs, rhs, opts)
 end
 
@@ -23,8 +18,8 @@ local function set_foldexpr(bufnr, expr)
     -- either treesitter or LSP folding while a diff is up — and displaying the
     -- buffer in a second window would otherwise clobber the diff window's folds.
     if not vim.wo[win].diff then
-      vim.wo[win][0].foldmethod = 'expr'
-      vim.wo[win][0].foldexpr = expr
+      vim.api.nvim_set_option_value('foldmethod', 'expr', { win = win })
+      vim.api.nvim_set_option_value('foldexpr', expr, { win = win })
     end
   end
 end
@@ -279,12 +274,19 @@ use('https://github.com/neovim/nvim-lspconfig', function()
     },
   })
 
-  if vim.fn.executable('bash-language-server') == 1 then
-    vim.lsp.enable('bashls')
-  end
-
-  if vim.fn.executable('vscode-css-language-server') == 1 then
-    vim.lsp.enable('cssls')
+  local simple_servers = {
+    bashls = 'bash-language-server',
+    cssls = 'vscode-css-language-server',
+    dockerls = 'docker-langserver',
+    html = 'vscode-html-language-server',
+    jsonls = 'vscode-json-language-server',
+    pyright = 'pyright-langserver',
+    vimls = 'vim-language-server',
+  }
+  for server, bin in pairs(simple_servers) do
+    if vim.fn.executable(bin) == 1 then
+      vim.lsp.enable(server)
+    end
   end
 
   -- Deno: root_markers gate attachment to buffers actually inside a Deno
@@ -295,10 +297,6 @@ use('https://github.com/neovim/nvim-lspconfig', function()
       single_file_support = false,
     })
     vim.lsp.enable('denols')
-  end
-
-  if vim.fn.executable('docker-langserver') == 1 then
-    vim.lsp.enable('dockerls')
   end
 
   -- root_dir returning nil prevents attachment, so oxfmt/oxlint
@@ -337,14 +335,6 @@ use('https://github.com/neovim/nvim-lspconfig', function()
     vim.lsp.enable('harper_ls')
   end
 
-  if vim.fn.executable('vscode-html-language-server') == 1 then
-    vim.lsp.enable('html')
-  end
-
-  if vim.fn.executable('vscode-json-language-server') == 1 then
-    vim.lsp.enable('jsonls')
-  end
-
   if vim.fn.executable('lua-language-server') == 1 then
     vim.lsp.config('lua_ls', {
       settings = {
@@ -380,10 +370,6 @@ use('https://github.com/neovim/nvim-lspconfig', function()
     vim.lsp.enable('marksman')
   end
 
-  if vim.fn.executable('pyright-langserver') == 1 then
-    vim.lsp.enable('pyright')
-  end
-
   -- `tsc` is the language server, not just the compiler: TypeScript 7's native
   -- build serves LSP over `tsc --lsp`.
   --
@@ -404,10 +390,6 @@ use('https://github.com/neovim/nvim-lspconfig', function()
       end,
     })
     vim.lsp.enable('tsc')
-  end
-
-  if vim.fn.executable('vim-language-server') == 1 then
-    vim.lsp.enable('vimls')
   end
 
   if vim.fn.executable('yaml-language-server') == 1 then
@@ -610,13 +592,11 @@ use('https://github.com/nvim-telescope/telescope.nvim', function()
     builtin.live_grep({ default_text = vim.fn.expand('<cword>') })
   end, { desc = 'Live grep current word' })
   map('v', '<leader>*', function()
-    -- Save current `s` register before overwriting
-    local old_reg = vim.fn.getreg('s')
-    local old_regtype = vim.fn.getregtype('s')
-    vim.cmd('normal! "sy')
-    local selection = vim.fn.getreg('s')
-    vim.fn.setreg('s', old_reg, old_regtype)
-    builtin.live_grep({ default_text = selection })
+    local text = table.concat(
+      vim.fn.getregion(vim.fn.getpos('v'), vim.fn.getpos('.'), { type = vim.fn.mode() }),
+      '\n'
+    )
+    builtin.live_grep({ default_text = text })
   end, { desc = 'Live grep selection' })
 end)
 
@@ -625,16 +605,6 @@ use('https://github.com/nvim-telescope/telescope-fzf-native.nvim')
 
 -- Use telescope for vim.ui.select prompts
 use('https://github.com/nvim-telescope/telescope-ui-select.nvim')
-
--- Clipboard history via telescope (<leader>cl)
-use('https://github.com/AckslD/nvim-neoclip.lua', function()
-  require('neoclip').setup({})
-  -- Must load after telescope is set up
-  require('telescope').load_extension('neoclip')
-  map('n', '<leader>cl', function()
-    require('telescope').extensions.neoclip.default()
-  end, { desc = 'Clipboard history' })
-end)
 
 -- Formatting (<leader>f for buffer, gq for selection)
 use('https://github.com/stevearc/conform.nvim', function()
@@ -818,10 +788,6 @@ use('https://github.com/obsidian-nvim/obsidian.nvim', function()
   })
 end)
 
--- Highlight :XXX command ranges in cmdline
-use('https://github.com/winston0410/range-highlight.nvim', function()
-  require('range-highlight').setup({})
-end)
 
 -- Show available keybindings, marks, registers (<leader>?)
 use('https://github.com/folke/which-key.nvim', function()
@@ -831,10 +797,6 @@ use('https://github.com/folke/which-key.nvim', function()
   end, { desc = 'Buffer Local Keymaps (which-key)' })
 end)
 
--- Preview line number before jumping with :NNN
-use('https://github.com/nacro90/numb.nvim', function()
-  require('numb').setup()
-end)
 
 -- Git signs in gutter, blame, hunk navigation
 -- `[c` / `]c` to jump between hunks
@@ -891,16 +853,14 @@ use('https://github.com/tpope/vim-fugitive')
 use('https://github.com/justinmk/vim-dirvish', function()
   vim.o.autochdir = false
   vim.g['loaded_netrwPlugin'] = 1
-  vim.api.nvim_create_user_command('Explore', 'Dirvish <args>', { nargs = '?', complete = 'dir' })
-  vim.api.nvim_create_user_command('Sexplore', 'belowright split | silent Dirvish <args>', { nargs = '?', complete = 'dir' })
-  vim.api.nvim_create_user_command('Vexplore', 'leftabove vsplit | silent Dirvish <args>', { nargs = '?', complete = 'dir' })
-  vim.api.nvim_create_user_command('Lexplore', 'topleft vsplit | silent Dirvish <args>', { nargs = '?', complete = 'dir' })
-  vim.api.nvim_create_user_command('Texplore', 'tabnew | silent Dirvish <args>', { nargs = '?', complete = 'dir' })
-  vim.api.nvim_create_augroup('dirvish_bindings', { clear = true })
   vim.api.nvim_create_autocmd('FileType', {
-    group = 'dirvish_bindings',
+    group = vim.api.nvim_create_augroup('dirvish_bindings', { clear = true }),
     pattern = 'dirvish',
     callback = function()
+      -- `.vimrc`'s `nnoremap <cr> <cr>` for filetype=dirvish (undoing the
+      -- global <leader>-less <cr> remap) fires after Dirvish's own ftplugin
+      -- mapping and clobbers it back to plain line-down. Restore it here,
+      -- since this autocmd group is registered last.
       map('n', '<cr>', function()
         vim.cmd('call dirvish#open("edit", 0)')
       end, { buffer = 0, desc = 'Open file' })
@@ -924,9 +884,6 @@ use('https://github.com/kristijanhusak/vim-dirvish-git')
 use('https://github.com/kylechui/nvim-surround', function()
   require('nvim-surround').setup({})
 end)
-
--- Repeat plugin actions with `.`
-use('https://github.com/tpope/vim-repeat')
 
 -- Readline-like bindings in insert/command mode
 use('https://github.com/tpope/vim-rsi')
