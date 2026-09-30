@@ -65,15 +65,17 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # `context: git` labels the checked-out commit, not the default branch
-      # HEAD that workflow_run's github.sha points to
+      # Label the checked-out commit, not the default branch HEAD that
+      # workflow_run's github.sha points to (`context: git` can't infer a ref
+      # from the detached checkout)
       - name: Extract metadata (labels)
         id: meta
         uses: docker/metadata-action@v6
         with:
-          context: git
           images: ${{ env.IMAGE }}
           tags: ${{ env.METADATA_TAGS }}
+          labels: |
+            org.opencontainers.image.revision=${{ github.event.workflow_run.head_sha || github.sha }}
 
       # Push by digest only; the merge job tags the multi-platform manifest
       - name: Build and push Docker image
