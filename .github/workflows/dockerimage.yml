@@ -88,6 +88,10 @@ jobs:
           outputs: type=image,name=${{ env.IMAGE }},push-by-digest=true,name-canonical=true,push=${{ env.PUSH }}
           cache-from: type=gha,scope=${{ env.PLATFORM_PAIR }}
           cache-to: type=gha,mode=max,scope=${{ env.PLATFORM_PAIR }}
+          # Authenticated GitHub API calls, so release lookups in setup don't hit
+          # the shared runner IP's unauthenticated rate limit
+          secrets: |
+            GH_TOKEN=${{ secrets.GITHUB_TOKEN }}
 
       - name: Export digest
         if: ${{ env.PUSH == 'true' }}

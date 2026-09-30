@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 # Modify these to suit your needs
 FROM debian:trixie
 
@@ -65,8 +66,11 @@ ENV IS_DOCKER=1 \
     SKIP_INITIAL_APT_INSTALL=1 \
     CLAUDE_CONFIG_DIR=/workspaces/.claude-container
 
-# Install all packages and clean up in same layer to reduce image size
-RUN ./dotfiles/script/setup && \
+# Install all packages and clean up in same layer to reduce image size. The
+# optional GH_TOKEN secret lifts install_github_packages past the 60/hour
+# unauthenticated API limit without baking the token into a layer:
+#   docker build --secret id=GH_TOKEN,env=GH_TOKEN -t dotfiles .
+RUN --mount=type=secret,id=GH_TOKEN,env=GH_TOKEN ./dotfiles/script/setup && \
   sudo apt-get clean && \
   sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
