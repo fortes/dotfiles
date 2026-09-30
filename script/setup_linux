@@ -235,6 +235,8 @@ main() {
   fi
   "${dotfiles_root}/script/install_node"
 
+  # No args stows all packages (shellcheck 0.9 flags this, fixed in newer)
+  # shellcheck disable=SC2119
   stow_with_backup
 
   pushd "${dotfiles_root}" >/dev/null

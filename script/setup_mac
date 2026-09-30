@@ -232,6 +232,8 @@ main() {
   install_homebrew_packages
   install_homebrew_casks
 
+  # No args stows all packages (shellcheck 0.9 flags this, fixed in newer)
+  # shellcheck disable=SC2119
   stow_with_backup
 
   setup_shell
