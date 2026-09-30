@@ -18,8 +18,8 @@ local function set_foldexpr(bufnr, expr)
     -- either treesitter or LSP folding while a diff is up — and displaying the
     -- buffer in a second window would otherwise clobber the diff window's folds.
     if not vim.wo[win].diff then
-      vim.api.nvim_set_option_value('foldmethod', 'expr', { win = win })
-      vim.api.nvim_set_option_value('foldexpr', expr, { win = win })
+      vim.wo[win][0].foldmethod = 'expr'
+      vim.wo[win][0].foldexpr = expr
     end
   end
 end
@@ -788,7 +788,6 @@ use('https://github.com/obsidian-nvim/obsidian.nvim', function()
   })
 end)
 
-
 -- Show available keybindings, marks, registers (<leader>?)
 use('https://github.com/folke/which-key.nvim', function()
   require('which-key').setup({})
@@ -796,7 +795,6 @@ use('https://github.com/folke/which-key.nvim', function()
     require('which-key').show({ global = false })
   end, { desc = 'Buffer Local Keymaps (which-key)' })
 end)
-
 
 -- Git signs in gutter, blame, hunk navigation
 -- `[c` / `]c` to jump between hunks
