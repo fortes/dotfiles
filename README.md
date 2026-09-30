@@ -77,6 +77,12 @@ find ~ -maxdepth 5 -type l 2>/dev/null \
     done
 ```
 
+## Node package managers
+
+`./script/install_node_packages` installs and updates Corepack through npm and enables its pnpm and Yarn shims in `~/.local/bin`. These select the package-manager version declared by each project. Node and npm come from Homebrew on macOS or `./script/install_node` on Linux; Corepack does not manage the Node version.
+
+Native addons in npm globals are built for one Node major version. `script/install_node` rebuilds them on major upgrades, but Homebrew doesn't, so on macOS run `./script/install_node_packages --rebuild` after `brew upgrade` moves `node` to a new major version.
+
 ## Ignoring changes to a file
 
 ```sh

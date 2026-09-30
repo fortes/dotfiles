@@ -1,0 +1,147 @@
+#!/usr/bin/env bash
+# Install the latest Node.js release from nodejs.org into ~/.local, checking
+# the tarball against the release's SHASUMS256.txt
+#
+# Usage: install_node
+
+set -euo pipefail
+IFS=$'\n\t'
+
+# shellcheck source=script/lib.sh
+. "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+
+DIST_URL="https://nodejs.org/dist"
+INSTALL_ROOT="${HOME}/.local/lib/nodejs"
+BIN_DIR="${HOME}/.local/bin"
+# Retry transient failures, and abort connections or transfers that stall
+CURL_ARGS=(
+  --silent
+  --show-error
+  --fail
+  --retry 3
+  --connect-timeout 15
+  --speed-limit 1024
+  --speed-time 30
+)
+# Set once the staging directory exists, for the EXIT trap
+WORK_DIR=""
+
+node_arch() {
+  case "$(uname -m)" in
+    x86_64) echo "x64" ;;
+    aarch64 | arm64) echo "arm64" ;;
+    *)
+      >&2 echo "⨯ Unsupported architecture: $(uname -m)"
+      exit 1
+      ;;
+  esac
+}
+
+# Version of the `current` install (e.g. v26.10.0), empty if there isn't one
+# for this architecture (e.g. a home directory moved from another machine)
+installed_version() {
+  local target
+  target="$(readlink "${INSTALL_ROOT}/current" 2>/dev/null)" || return 0
+  [[ "${target}" == node-v*-linux-"$(node_arch)" ]] || return 0
+  [[ -x "${INSTALL_ROOT}/${target}/bin/node" ]] || return 0
+  target="${target#node-}"
+  echo "${target%%-*}"
+}
+
+major() {
+  local version="${1#v}"
+  echo "${version%%.*}"
+}
+
+# Download and check a release in WORK_DIR, then move it into place. WORK_DIR
+# is next to the final location, so the last step is a rename and an
+# interrupted run never leaves a partial install that looks complete
+download_release() {
+  local version="$1" dist="$2"
+
+  curl "${CURL_ARGS[@]}" --output "${WORK_DIR}/SHASUMS256.txt" \
+    "${DIST_URL}/${version}/SHASUMS256.txt"
+  curl "${CURL_ARGS[@]}" --output "${WORK_DIR}/${dist}.tar.gz" \
+    "${DIST_URL}/${version}/${dist}.tar.gz"
+  (
+    cd "${WORK_DIR}"
+    awk -v file="${dist}.tar.gz" '$2 == file' SHASUMS256.txt \
+      | sha256sum --check --status
+  ) || {
+    >&2 echo "⨯ Checksum mismatch for ${dist}.tar.gz"
+    exit 1
+  }
+
+  # Don't keep the tarball's owner when running as root
+  tar --extract --gzip --no-same-owner \
+    --file "${WORK_DIR}/${dist}.tar.gz" --directory "${WORK_DIR}"
+  # Catches missing shared libraries (libatomic1) or a mismatched userland
+  if ! "${WORK_DIR}/${dist}/bin/node" --version >/dev/null; then
+    >&2 echo "⨯ Node ${version} does not run on this system"
+    exit 1
+  fi
+  rm --recursive --force -- "${INSTALL_ROOT:?}/${dist}"
+  mv --no-target-directory "${WORK_DIR}/${dist}" "${INSTALL_ROOT}/${dist}"
+}
+
+install_node() {
+  if [[ "$#" -gt 0 ]]; then
+    >&2 echo "Usage: $(basename "$0")"
+    exit 1
+  fi
+
+  if [[ "$(uname -s)" != "Linux" ]]; then
+    >&2 echo "⨯ install_node is for Linux; use Homebrew on macOS"
+    exit 1
+  fi
+
+  mkdir --parents "${INSTALL_ROOT}" "${BIN_DIR}"
+
+  local arch current version
+  arch="$(node_arch)"
+  current="$(installed_version)"
+  version="$(curl "${CURL_ARGS[@]}" "${DIST_URL}/index.json" | jq --raw-output '.[0].version')"
+  if [[ ! "${version}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    >&2 echo "⨯ Unexpected Node version in release index: ${version}"
+    exit 1
+  fi
+
+  local dist="node-${version}-linux-${arch}"
+  if [[ "${version}" == "${current}" ]]; then
+    echo "✓ Node ${version} already installed"
+  else
+    echo "Installing Node ${version} …"
+    WORK_DIR="$(mktemp --directory "${INSTALL_ROOT}/.staging.XXXXXX")"
+    trap 'rm --recursive --force -- "${WORK_DIR}"' EXIT
+    download_release "${version}" "${dist}"
+    echo "✓ Node ${version} installed"
+  fi
+
+  # Swap `current` with a rename so it never disappears mid-switch, then make
+  # sure the ~/.local/bin links exist (they go through `current`)
+  ln --symbolic --force --no-dereference "${dist}" "${INSTALL_ROOT}/.current.tmp"
+  mv --no-target-directory "${INSTALL_ROOT}/.current.tmp" "${INSTALL_ROOT}/current"
+  local command
+  for command in node npm npx; do
+    ln --symbolic --force "${INSTALL_ROOT}/current/bin/${command}" "${BIN_DIR}/${command}"
+  done
+
+  # Remove older versions and leftovers from interrupted runs
+  local old
+  for old in "${INSTALL_ROOT}"/node-v* "${INSTALL_ROOT}"/.staging.*; do
+    if [[ -e "${old}" && "${old##*/}" != "${dist}" ]]; then
+      rm --recursive --force -- "${old}"
+    fi
+  done
+
+  # npm globals' native addons are built for one major version. Without a
+  # previous install (e.g. coming from fnm), the globals' Node version is
+  # unknown, so rebuild them too
+  if [[ "$(major "${current:-v0}")" != "$(major "${version}")" ]]; then
+    "$(dirname "${BASH_SOURCE[0]}")/install_node_packages" --rebuild
+  fi
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  install_node "${@}"
+fi

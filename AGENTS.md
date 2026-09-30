@@ -20,6 +20,9 @@ git clone https://github.com/fortes/dotfiles.git
 # (Debian-only) Update packages installed from GitHub
 ./script/install_github_packages [package-name ...]
 
+# (Debian-only) Update Node.js to the latest release
+./script/install_node
+
 # Update node packages
 ./script/install_node_packages
 
@@ -65,11 +68,12 @@ Package installation is generally all done via homebrew in `script/setup_mac`
 
 #### Debian
 
-Three installation methods:
+Four installation methods:
 
 * Debian-distributed packages via `apt-get` in `script/setup_linux` (including backports)
 * Apt packages from third-party repos (1Password, etc.)
 * Packages installed from GitHub releases via `script/install_github_packages`. This is used for either packages that aren't in Debian repos or where the Debian version is too old (e.g., `neovim`)
+* Node.js from nodejs.org tarballs via `script/install_node` (Debian's version is too old)
 
 ### Configuration with GNU Stow
 
@@ -98,7 +102,6 @@ The `script/stow` wrapper handles:
    - Defines helper functions: `add_to_path()`, `source_if_exists()`, `command_exists()`
    - Sets `$EDITOR` and `$VISUAL` (prefers Neovim)
    - Loads Homebrew environment (macOS)
-   - Sets up fnm for Node version management
    - Configures environment variables
 
 2. **`.bashrc`** - Interactive shell setup

@@ -58,7 +58,10 @@ RUN sudo mkdir -p /workspaces && sudo chown $USER_NAME:$USER_NAME /workspaces
 # Copy only scripts needed for package installation (heavy layer, rarely changes)
 COPY --chown=$USER_NAME:$USER_NAME script/ /home/$USER_NAME/dotfiles/script/
 
+# ~/.local/bin (node, npm globals, etc.) for shells that skip ~/.profile, like
+# `docker exec dotfiles node`
 ENV IS_DOCKER=1 \
+    PATH=/home/$USER_NAME/.local/bin:$PATH \
     SKIP_INITIAL_APT_INSTALL=1 \
     CLAUDE_CONFIG_DIR=/workspaces/.claude-container
 

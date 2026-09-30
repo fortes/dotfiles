@@ -6,7 +6,6 @@
 # - deno
 # - difftastic
 # - f2
-# - fnm
 # - fx
 # - fzf (because older Debian versions are very old)
 # - github cli
@@ -36,7 +35,6 @@ AVAILABLE_PACKAGES=(
   deno
   difftastic
   f2
-  fnm
   fx
   fzf
   github-cli
@@ -343,14 +341,6 @@ install_f2() {
   install_deb 'ayoisaiah/f2' 'f2_.*_linux_{ARCH}.deb'
 }
 
-install_fnm() {
-  # fnm uses different naming: x64 for amd64, arm64 for arm64
-  case "$(get_current_arch)" in
-    amd64) install_zip 'Schniz/fnm' 'fnm-linux.zip' ;;
-    arm64) install_zip 'Schniz/fnm' 'fnm-arm64.zip' ;;
-  esac
-}
-
 install_fx() {
   install_bin 'antonmedv/fx' 'fx_linux_{ARCH}'
 }
@@ -566,9 +556,6 @@ install_github_packages() {
         ;;
       f2)
         install_f2
-        ;;
-      fnm)
-        install_fnm
         ;;
       fx)
         install_fx

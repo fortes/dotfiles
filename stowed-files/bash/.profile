@@ -47,18 +47,13 @@ source_if_exists "$HOME/.profile.brew"
 # Locally-installed packages belong in path
 add_to_path "$HOME/.local/bin"
 
-# Node versions
-if command_exists fnm; then
-  eval "$(fnm env)"
-fi
-
 export PNPM_HOME="${HOME}/.local/share/pnpm"
 
 export CARGO_HOME="${HOME}/.local/share/cargo"
 # Cargo packages install to ~/.local/bin
 export CARGO_INSTALL_ROOT="${HOME}/.local"
 
-# Bun packages install to ~/.local/bin
+# Keep bun's cache and any globals under ~/.local
 export BUN_INSTALL="${HOME}/.local"
 
 # Use NeoVim as man pager, when available

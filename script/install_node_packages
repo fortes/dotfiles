@@ -1,23 +1,23 @@
 #!/usr/bin/env bash
-# Set node to LTS and install global packages
+# Install global npm packages, or rebuild their native addons after a Node
+# major upgrade
 #
-# Usage: install_node_packages
+# Usage: install_node_packages [--rebuild]
 
 set -euo pipefail
 IFS=$'\n\t'
-BUN_PACKAGES=(
-  # @google/jules
-  # @mariozechner/pi-coding-agent
+NPM_PACKAGES=(
   @openai/codex
   @playwright/mcp
+  @tobilu/qmd
   agent-browser
   bash-language-server
+  corepack
   cssmodules-language-server
   dockerfile-language-server-nodejs
   eslint
   fkill-cli
   npm-check-updates
-  # opencode-ai
   oxfmt
   oxlint
   prettier
@@ -26,15 +26,16 @@ BUN_PACKAGES=(
   typescript-language-server
   vim-language-server
   vscode-langservers-extracted
-)
-
-# Bun's hoisting fails to resolve nested peer-deps for these packages:
-# - qmd's better-sqlite3 install script cannot find its hoisted build tools
-# - yaml-language-server's ajv-draft-04 dep does `require('ajv/dist/core')`
-NPM_PACKAGES=(
-  @tobilu/qmd
   yaml-language-server
 )
+
+# npm global packages whose install scripts may run (npm 11 warns about the
+# rest, npm 12 blocks them). Only pass this with --global: npm rejects
+# --allow-scripts in project installs, so it can't live in ~/.npmrc (npm
+# exports config to lifecycle scripts, which would break nested installs).
+# These are qmd's native deps, which build from source when no prebuild
+# matches (node-llama-cpp would otherwise do it on first use anyway)
+NPM_GLOBAL_ALLOW_SCRIPTS="better-sqlite3,node-llama-cpp,tree-sitter-go,tree-sitter-javascript,tree-sitter-python,tree-sitter-rust,tree-sitter-typescript"
 
 # shellcheck source=script/lib.sh
 . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
@@ -43,23 +44,126 @@ print_usage() {
   cat <<EOF
 Usage: $(basename "$0") [OPTIONS]
 
-Set node to LTS and install global packages
+Install global npm packages
 
 Options:
-  -p, --packages-only   Only install packages, skip Node.js installation
-                        (useful for updating packages without changing Node version)
+  --rebuild            Only rebuild native addons, e.g. after a Node major
+                       upgrade (install_node does this, Homebrew doesn't)
   -h, --help           Show this help message
 EOF
 }
 
-install_node_packages() {
-  # Parse arguments
-  local packages_only=0
+# Native addons in npm globals (e.g. better-sqlite3) are built for one Node
+# major version's ABI
+rebuild_globals() {
+  [[ -d "$HOME/.local/lib/node_modules" ]] || return 0
 
+  echo "Rebuilding global npm packages for Node $(node --version) …"
+  npm rebuild --global --allow-scripts="${NPM_GLOBAL_ALLOW_SCRIPTS}" \
+    || >&2 echo "⚠ Rebuild failed, run: $(basename "$0") --rebuild"
+}
+
+# Globals used to be installed with `bun install --global`, whose links in
+# ~/.local/bin would make npm fail with EEXIST. Remove them once, then can
+# remove this code once all machines are updated
+remove_bun_globals() {
+  local bun_global="$HOME/.local/install/global"
+  [[ -d "${bun_global}" ]] || return 0
+
+  echo "Removing old bun global packages …"
+  local link
+  for link in "$HOME"/.local/bin/*; do
+    if [[ -L "${link}" && "$(readlink "${link}")" == *install/global/* ]]; then
+      rm -- "${link}"
+    fi
+  done
+  rm -rf -- "${bun_global}"
+}
+
+# Node used to come from fnm. Remove it and everything it left behind once
+# something else provides node, then can remove this code once all machines
+# are updated
+remove_fnm() {
+  local brew_fnm=false path paths=()
+  if [[ "$(uname -s)" == Darwin ]] && command_exists brew \
+    && brew list --formula fnm &>/dev/null; then
+    brew_fnm=true
+  fi
+
+  # Binary, completions, installed Node versions, and per-shell symlinks
+  # (location varies by fnm version and platform)
+  for path in \
+    "$HOME/.local/bin/fnm" \
+    "$HOME/.local/completion.d/fnm_completion" \
+    "$HOME/.fnm" \
+    "$HOME/.local/share/fnm" \
+    "$HOME/.local/state/fnm_multishells" \
+    "${XDG_RUNTIME_DIR:-/nonexistent}/fnm_multishells" \
+    "$HOME/Library/Application Support/fnm" \
+    "$HOME/Library/Caches/fnm_multishells"; do
+    if [[ -e "${path}" || -L "${path}" ]]; then
+      paths+=("${path}")
+    fi
+  done
+  if ! "${brew_fnm}" && [[ ${#paths[@]} -eq 0 ]]; then
+    return 0
+  fi
+
+  local path_without_fnm
+  path_without_fnm="$(tr ':' '\n' <<<"${PATH}" | grep -v fnm | paste -s -d : - || true)"
+  if ! PATH="${path_without_fnm}" command_exists node; then
+    >&2 echo "⚠ Keeping fnm until Node is installed (via brew or script/install_node)"
+    return 0
+  fi
+
+  echo "Removing fnm …"
+  if "${brew_fnm}"; then
+    brew uninstall --quiet fnm
+  fi
+  if [[ ${#paths[@]} -gt 0 ]]; then
+    rm -rf -- "${paths[@]}"
+  fi
+  echo "Removed fnm, open a new shell to drop it from PATH"
+  # Forget any cached path to fnm's node/npm
+  hash -r
+
+  # npm globals were built for fnm's Node. On Linux, install_node already
+  # rebuilt them
+  if [[ "$(uname -s)" == Darwin ]]; then
+    rebuild_globals
+  fi
+}
+
+# An old `npm install --global npm` shadows the npm that comes with Node.
+# Remove it once, then can remove this code once all machines are updated
+remove_global_npm() {
+  local npm_global="$HOME/.local/lib/node_modules/npm"
+  [[ -d "${npm_global}" ]] || return 0
+
+  echo "Removing globally installed npm (Node provides npm) …"
+  local link
+  for link in "$HOME/.local/bin/npm" "$HOME/.local/bin/npx"; do
+    if [[ -L "${link}" && "$(readlink "${link}")" == *lib/node_modules/npm/* ]]; then
+      rm -- "${link}"
+    fi
+  done
+  rm -rf -- "${npm_global}"
+  hash -r
+}
+
+require_node() {
+  if ! command_exists node || ! command_exists npm; then
+    >&2 echo "⨯ Node.js and npm must be on PATH (install via brew or script/install_node)"
+    exit 1
+  fi
+}
+
+install_node_packages() {
+  local rebuild=false
   while [[ "$#" -gt 0 ]]; do
     case "${1}" in
-      -p | --packages-only)
-        packages_only=1
+      --rebuild)
+        rebuild=true
         shift
         ;;
       -h | --help)
@@ -74,72 +178,41 @@ install_node_packages() {
     esac
   done
 
-  if ! command_exists fnm; then
-    >&2 echo "⨯ fnm not installed"
-    exit 1
-  fi
-
-  if [[ "${packages_only}" -eq 0 ]]; then
-    echo "Installing node LTS …"
-
-    # Use --arch arm64 when running on aarch64, otherwise fnm doesn't
-    # auto-detect (happens on Docker on MacOS)
-    if [[ "$(uname -m)" == "aarch64" ]]; then
-      fnm install --lts --arch "arm64"
-    else
-      fnm install --lts
-    fi
-
-    echo "Setting node version to LTS …"
-    fnm default "lts-latest"
-  else
-    echo "Only installing packages (--packages-only flag provided)"
-  fi
-
-  # Make sure to pick up necessary env vars
-  eval "$(fnm env)"
-
-  if ! command_exists node; then
-    >&2 echo "⨯ Node.js not found on PATH after fnm env"
-    exit 1
-  fi
-
-  if ! command_exists corepack; then
-    >&2 echo "⨯ corepack not found (should be included with Node.js)"
-    exit 1
-  fi
-
-  echo "Using Node $(node --version)"
-
+  # .profile / .npmrc may not be stowed yet during the docker build
   if [[ -f "$HOME/.profile" ]]; then
     # shellcheck source=/dev/null
     . "$HOME/.profile"
-  else
-    # .profile / .npmrc may not be stowed yet during the docker build
-    export BUN_INSTALL="$HOME/.local"
   fi
 
   # npm prefix lives in stowed .npmrc, but we may run before stow. Set it
-  # here so npm globals always land in ~/.local/bin (alongside bun globals).
+  # here so npm globals always land in ~/.local/bin.
   export NPM_CONFIG_PREFIX="$HOME/.local"
 
-  # Make pnpm/yarn available on demand for project-local work
-  corepack enable
+  # Check after loading the profile, which sets up Homebrew on macOS.
+  require_node
 
-  if ! command_exists bun; then
-    >&2 echo "⨯ bun not installed (expected on PATH from install_github_packages or brew)"
-    exit 1
+  if "${rebuild}"; then
+    rebuild_globals
+    return
   fi
 
-  echo "Installing global bun packages …"
-  bun install --global --silent "${BUN_PACKAGES[@]/%/@latest}"
-  echo "Bun packages installed!"
+  remove_global_npm
+  remove_fnm
+  remove_bun_globals
+  # The cleanups may have removed what node or npm resolved to
+  require_node
 
-  if [[ ${#NPM_PACKAGES[@]} -gt 0 ]]; then
-    echo "Installing global npm packages …"
-    npm install --global --silent --no-fund --no-audit "${NPM_PACKAGES[@]/%/@latest}"
-    echo "Npm packages installed!"
-  fi
+  echo "Using Node $(node --version)"
+
+  echo "Installing global npm packages …"
+  npm install --global --silent --no-fund --no-audit \
+    --allow-scripts="${NPM_GLOBAL_ALLOW_SCRIPTS}" "${NPM_PACKAGES[@]/%/@latest}"
+  echo "Npm packages installed!"
+
+  # Keep project package-manager shims in the user prefix across Node
+  # upgrades. Leave npm itself supplied by Node/Homebrew.
+  echo "Enabling pnpm and Yarn via Corepack …"
+  "$HOME/.local/bin/corepack" enable --install-directory "$HOME/.local/bin" pnpm yarn
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then

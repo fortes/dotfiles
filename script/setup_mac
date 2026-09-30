@@ -44,7 +44,6 @@ BREW_PACKAGES=(
   fd
   # For yazi
   ffmpeg
-  fnm
   fx
   fzf
   gh
@@ -69,6 +68,7 @@ BREW_PACKAGES=(
   music-decoy
   ncdu
   neovim
+  node
   ollama
   pipx
   ripgrep

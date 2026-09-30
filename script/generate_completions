@@ -15,11 +15,6 @@ generate_completions() {
   mkdir -p "${completion_dir}"
   mkdir -p "${man_dir_path}"
 
-  # `npm completion` needs node on PATH; fnm's env is per-shell
-  if command_exists fnm; then
-    eval "$(fnm env)"
-  fi
-
   echo -n "… Generating completions & man pages"
 
   if command_exists beet; then
@@ -49,10 +44,6 @@ generate_completions() {
     deno completions bash >"${completion_dir}/deno_completion"
   fi
 
-  if command_exists fnm; then
-    fnm completions >"${completion_dir}/fnm_completion"
-  fi
-
   if command_exists gh; then
     gh completion -s bash >"${completion_dir}/gh_completion"
   fi
@@ -66,7 +57,6 @@ generate_completions() {
     jules completion bash >"${completion_dir}/jules_completion"
   fi
 
-  # TODO: This fails to find node in some cases
   if command_exists npm; then
     npm completion >"${completion_dir}/npm_completion"
   fi
