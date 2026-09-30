@@ -63,94 +63,6 @@ rebuild_globals() {
     || >&2 echo "⚠ Rebuild failed, run: $(basename "$0") --rebuild"
 }
 
-# Globals used to be installed with `bun install --global`, whose links in
-# ~/.local/bin would make npm fail with EEXIST. Remove them once, then can
-# remove this code once all machines are updated
-remove_bun_globals() {
-  local bun_global="$HOME/.local/install/global"
-  [[ -d "${bun_global}" ]] || return 0
-
-  echo "Removing old bun global packages …"
-  local link
-  for link in "$HOME"/.local/bin/*; do
-    if [[ -L "${link}" && "$(readlink "${link}")" == *install/global/* ]]; then
-      rm -- "${link}"
-    fi
-  done
-  rm -rf -- "${bun_global}"
-}
-
-# Node used to come from fnm. Remove it and everything it left behind once
-# something else provides node, then can remove this code once all machines
-# are updated
-remove_fnm() {
-  local brew_fnm=false path paths=()
-  if [[ "$(uname -s)" == Darwin ]] && command_exists brew \
-    && brew list --formula fnm &>/dev/null; then
-    brew_fnm=true
-  fi
-
-  # Binary, completions, installed Node versions, and per-shell symlinks
-  # (location varies by fnm version and platform)
-  for path in \
-    "$HOME/.local/bin/fnm" \
-    "$HOME/.local/completion.d/fnm_completion" \
-    "$HOME/.fnm" \
-    "$HOME/.local/share/fnm" \
-    "$HOME/.local/state/fnm_multishells" \
-    "${XDG_RUNTIME_DIR:-/nonexistent}/fnm_multishells" \
-    "$HOME/Library/Application Support/fnm" \
-    "$HOME/Library/Caches/fnm_multishells"; do
-    if [[ -e "${path}" || -L "${path}" ]]; then
-      paths+=("${path}")
-    fi
-  done
-  if ! "${brew_fnm}" && [[ ${#paths[@]} -eq 0 ]]; then
-    return 0
-  fi
-
-  local path_without_fnm
-  path_without_fnm="$(tr ':' '\n' <<<"${PATH}" | grep -v fnm | paste -s -d : - || true)"
-  if ! PATH="${path_without_fnm}" command_exists node; then
-    >&2 echo "⚠ Keeping fnm until Node is installed (via brew or script/install_node)"
-    return 0
-  fi
-
-  echo "Removing fnm …"
-  if "${brew_fnm}"; then
-    brew uninstall --quiet fnm
-  fi
-  if [[ ${#paths[@]} -gt 0 ]]; then
-    rm -rf -- "${paths[@]}"
-  fi
-  echo "Removed fnm, open a new shell to drop it from PATH"
-  # Forget any cached path to fnm's node/npm
-  hash -r
-
-  # npm globals were built for fnm's Node. On Linux, install_node already
-  # rebuilt them
-  if [[ "$(uname -s)" == Darwin ]]; then
-    rebuild_globals
-  fi
-}
-
-# An old `npm install --global npm` shadows the npm that comes with Node.
-# Remove it once, then can remove this code once all machines are updated
-remove_global_npm() {
-  local npm_global="$HOME/.local/lib/node_modules/npm"
-  [[ -d "${npm_global}" ]] || return 0
-
-  echo "Removing globally installed npm (Node provides npm) …"
-  local link
-  for link in "$HOME/.local/bin/npm" "$HOME/.local/bin/npx"; do
-    if [[ -L "${link}" && "$(readlink "${link}")" == *lib/node_modules/npm/* ]]; then
-      rm -- "${link}"
-    fi
-  done
-  rm -rf -- "${npm_global}"
-  hash -r
-}
-
 require_node() {
   if ! command_exists node || ! command_exists npm; then
     >&2 echo "⨯ Node.js and npm must be on PATH (install via brew or script/install_node)"
@@ -195,12 +107,6 @@ install_node_packages() {
     rebuild_globals
     return
   fi
-
-  remove_global_npm
-  remove_fnm
-  remove_bun_globals
-  # The cleanups may have removed what node or npm resolved to
-  require_node
 
   echo "Using Node $(node --version)"
 

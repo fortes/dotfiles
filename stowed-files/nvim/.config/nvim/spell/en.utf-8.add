@@ -77,7 +77,6 @@ vim
 vimrc
 virtualization
 corepack
-fnm
 env
 pnpm
 shellcheck

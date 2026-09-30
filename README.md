@@ -68,7 +68,7 @@ Once you've run setup, you'll still have to do the following universal manual st
    # Launch codex CLI to log in
    codex
 
-   # Launch Antigravity CLI agent (replaces deprecated Gemini CLI)
+   # Launch Antigravity CLI agent
    agy
    ```
 
@@ -292,10 +292,6 @@ This will list out all the packages installed, then need to search through to ma
 ### Mac
 
 - Firefox cask gets ornery and no longer updates via brew, currently installed once via script, but updates have to happen manually. Need to investigate further.
-
-## Linux GUI and Windows WSL2 Support
-
-This repository previously supported Linux GUI environments (using sway/i3) and Windows WSL2. These configurations have been removed as they are no longer actively used. If you need these configurations, check the git history for older implementations.
 
 ## License
 

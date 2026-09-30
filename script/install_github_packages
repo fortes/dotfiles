@@ -281,7 +281,6 @@ install_sad() {
 }
 
 install_neovim() {
-  local vim_path="$HOME/.local/bin/nvim"
   local file
   file="$(fetch_asset 'neovim/neovim' '/nvim-linux-{ARCH}\.tar\.gz$')"
   # Straight into ~/.local, so the man page and desktop file land where
@@ -290,23 +289,7 @@ install_neovim() {
   tar --no-same-owner -xzf "${file}" --strip-components=1 -C "$HOME/.local"
 
   echo "neovim stable installed"
-
   echo "Run ':lua vim.pack.update()' in Neovim to install plugins"
-
-  # TODO: Remove by 2026-10-04, once every machine has run this version
-  # Older versions of this script pointed system alternatives here. A root
-  # `vi` shouldn't run a binary this user can overwrite. For this user,
-  # $EDITOR/$VISUAL and the `vi`/`vim` aliases already mean nvim.
-  if command_exists update-alternatives; then
-    local link
-    for link in editor ex vi view vim vimdiff; do
-      # Not a pipe: under pipefail, `grep -q` exiting early can fail the test
-      if grep -qxF "${vim_path}" <<<"$(update-alternatives --list "${link}" 2>/dev/null || true)"; then
-        echo "Removing neovim as system ${link} (requires sudo)"
-        sudo update-alternatives --remove "${link}" "${vim_path}"
-      fi
-    done
-  fi
 }
 
 install_marksman() {

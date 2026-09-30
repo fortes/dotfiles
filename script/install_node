@@ -135,8 +135,7 @@ install_node() {
   done
 
   # npm globals' native addons are built for one major version. Without a
-  # previous install (e.g. coming from fnm), the globals' Node version is
-  # unknown, so rebuild them too
+  # previous install, the globals' Node version is unknown, so rebuild them too
   if [[ "$(major "${current:-v0}")" != "$(major "${version}")" ]]; then
     "$(dirname "${BASH_SOURCE[0]}")/install_node_packages" --rebuild
   fi
