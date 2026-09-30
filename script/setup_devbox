@@ -26,8 +26,8 @@ dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 export DEBIAN_FRONTEND=noninteractive
 
-# Only names that exist in both Debian Trixie and Ubuntu Noble, without
-# pinning to a suite
+# Names from Debian Trixie and Ubuntu Noble, without pinning to a suite. Older
+# releases skip whatever they lack
 declare -r DEVBOX_APT_PACKAGES=(
   bat
   ca-certificates
@@ -110,9 +110,27 @@ install_apt_packages() {
   log "Installing apt packages: ${missing[*]}"
   # Keep going if a third-party source fails to update
   as_root apt-get update -qq || log_error "apt-get update failed, continuing"
+
+  # One unknown name makes apt-get install nothing at all, so drop the ones
+  # this release doesn't have (e.g. eza and git-delta before Ubuntu 24.04)
+  local available=() unavailable=() package
+  for package in "${missing[@]}"; do
+    if apt-cache show "${package}" &>/dev/null; then
+      available+=("${package}")
+    else
+      unavailable+=("${package}")
+    fi
+  done
+  if [[ ${#unavailable[@]} -gt 0 ]]; then
+    log "Not available on this release, skipping: ${unavailable[*]}"
+  fi
+  if [[ ${#available[@]} -eq 0 ]]; then
+    return
+  fi
+
   # Waits out a boot-time unattended-upgrades holding the dpkg lock
   as_root apt-get install -qq --assume-yes --no-install-recommends \
-    -o=Dpkg::Use-Pty=0 -o=DPkg::Lock::Timeout=120 "${missing[@]}"
+    -o=Dpkg::Use-Pty=0 -o=DPkg::Lock::Timeout=120 "${available[@]}"
 }
 
 install_github_packages() {
