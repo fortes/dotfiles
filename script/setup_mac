@@ -18,6 +18,9 @@ if [[ "$(uname -m)" != "arm64" ]]; then
 fi
 
 declare -r brew_prefix="/opt/homebrew"
+# Homebrew 7 defaults to "ask mode", which blocks on a confirmation prompt
+# whenever the install plan includes dependencies
+export HOMEBREW_NO_ASK=1
 declare dotfiles_root
 dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
