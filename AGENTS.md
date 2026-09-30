@@ -83,11 +83,13 @@ stowed-files/
 ├── tmux/          # Tmux configuration
 ├── ghostty/       # Ghostty terminal emulator config
 ├── yazi/          # File manager config
-└── [14 other packages]
+└── [13 other packages]
 ```
 
 The `script/stow` wrapper handles:
-- Stowing all packages to `$HOME`
+- Stowing all packages to `$HOME`, or just the ones named. Only takes `-n`, `-v`, and one of `-D`/`-R`; call `stow` directly for anything else
+- Skipping packages listed in the space-separated `DOTFILES_SKIP_PACKAGES`
+- Creating the directories programs write into (`REAL_DIRS`, e.g. `~/.ssh`) first, so stow doesn't fold them into symlinks into the repo
 - Uses `.stow-local-ignore` files to prevent certain files from being stowed
 
 ### Shell Configuration Flow

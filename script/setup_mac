@@ -240,7 +240,8 @@ main() {
 
   # Remove default files before stowing, otherwise stow fails
   "${dotfiles_root}/script/remove_default_dotfiles"
-  "${dotfiles_root}/script/stow"
+  # Restowing also cleans up links to files since removed from the repo
+  "${dotfiles_root}/script/stow" -R
 
   setup_shell
 

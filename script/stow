@@ -4,41 +4,101 @@
 # Should be able to run with `-R` to delete stale files, otherwise can do
 # `find -L ~/.config -type l [-delete]` to find/remove stale links
 #
-# Usage: stow [-nv]
+# Usage: stow [-n] [-v] [-D | -R] [package ...]
+#
+# Stows every package when none are given, minus any listed in the
+# space-separated DOTFILES_SKIP_PACKAGES. For other stow options, call stow
+# directly.
 
 set -euo pipefail
 IFS=$'\n\t'
+
+# Directories that programs write into (keys, binaries, plugins, units), so
+# they must stay real instead of getting folded into a symlink into the repo.
+# Stow never folds a directory that already exists, so create them before
+# stowing. Dry runs skip this, so `-n` may show folds a real run won't do
+declare -r REAL_DIRS=(
+  .ssh
+  .config/cmus
+  .config/systemd/user
+  .config/yazi
+  .local/bin
+)
 
 main() {
   local dotfiles_root
   dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
   local stowed_files_path="${dotfiles_root}/stowed-files"
-  local target_dir="${HOME}"
 
-  if ! command -v stow >/dev/null 2>&1; then
-    >&2 echo "Error: stow command not found. Please install GNU Stow first."
+  # shellcheck source=script/lib.sh
+  . "${dotfiles_root}/script/lib.sh"
+
+  if ! command_exists stow; then
+    echo_stderr "Error: stow command not found. Please install GNU Stow first."
     return 1
   fi
 
   if [[ ! -d "${stowed_files_path}" ]]; then
-    >&2 echo "Warning: stowed-files directory not found at ${stowed_files_path}, skipping stow"
+    echo_stderr "Warning: stowed-files directory not found at ${stowed_files_path}, skipping stow"
     return 0
   fi
 
-  local packages=()
-  local package_path
-  for package_path in "${stowed_files_path}"/*; do
-    [[ -d "${package_path}" ]] || continue
-    packages+=("$(basename "${package_path}")")
+  local options=() packages=() action="" simulate=0 arg
+  for arg in "$@"; do
+    case "${arg}" in
+      -n) simulate=1 ;;
+      -v) ;;
+      -D | -R)
+        if [[ -n "${action}" ]]; then
+          echo_stderr "Error: pass only one of -D or -R."
+          return 1
+        fi
+        action="${arg}"
+        ;;
+      -*)
+        echo_stderr "Error: unsupported option ${arg}; call stow directly."
+        return 1
+        ;;
+      *)
+        packages+=("${arg}")
+        continue
+        ;;
+    esac
+    options+=("${arg}")
   done
 
   if [[ ${#packages[@]} -eq 0 ]]; then
-    >&2 echo "Warning: no packages found in ${stowed_files_path}, nothing to stow"
-    return 0
+    # No mapfile, since macOS ships Bash 3.2
+    local package
+    while IFS= read -r package; do
+      packages+=("${package}")
+    done < <(list_stow_packages "${stowed_files_path}")
+    if [[ ${#packages[@]} -eq 0 ]]; then
+      echo_stderr "Warning: no packages found in ${stowed_files_path}, nothing to stow"
+      return 0
+    fi
   fi
 
-  stow --dir="${stowed_files_path}/" --target="${target_dir}" \
-    "${packages[@]}" "$@"
+  if [[ "${action}" == -D ]]; then
+    # Otherwise a partial delete can refold a writable directory into a
+    # remaining package
+    options+=(--no-folding)
+  elif [[ ${simulate} -eq 0 ]]; then
+    local dir
+    for dir in "${REAL_DIRS[@]}"; do
+      dir="${HOME}/${dir}"
+      [[ -e "${dir}" || -L "${dir}" ]] && continue
+      mkdir -p "${dir}"
+      # Private, since it holds keys
+      if [[ "${dir}" == "${HOME}/.ssh" ]]; then
+        chmod 700 "${dir}"
+      fi
+    done
+  fi
+
+  stow --dir="${stowed_files_path}/" --target="${HOME}" \
+    ${options[@]+"${options[@]}"} "${packages[@]}"
 }
 
-main "${@}"
+# Bash 3.2 treats an empty "$@" as unset under `set -u`
+main ${@+"$@"}

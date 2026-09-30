@@ -66,10 +66,6 @@ print_usage() {
   echo "--no-alternatives: Do not change system editor alternatives"
 }
 
-echo_stderr() {
-  >&2 echo "${@}"
-}
-
 get_current_arch() {
   case "$(uname -m)" in
     x86_64) echo "amd64" ;;  # Standardize to amd64 as primary

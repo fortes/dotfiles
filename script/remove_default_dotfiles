@@ -1,28 +1,45 @@
 #!/usr/bin/env bash
 # Remove the default OS-provided dotfiles so stow can use their location
 #
-# Usage: remote_default_dotfiles
+# Usage: remove_default_dotfiles
 
 set -euo pipefail
 IFS=$'\n\t'
 
 remove_default_dotfile() {
   declare -r filename=$1
-  if [[ -f "$HOME/$filename" && ! -L "$HOME/$filename" ]]; then
-    echo "Moving default $filename"
-    mv "$HOME/$filename" "$HOME/original$filename"
+  if [[ -L "$HOME/$filename" ]]; then
+    # Leave links stowed by this or any other checkout, even dangling ones.
+    # Moving them could leave startup files missing if the stow conflicts
+    [[ "$(readlink "$HOME/$filename")" == *stowed-files/* ]] && return 0
+    # Machine-provided symlinks conflict with stow just like regular files
+  elif [[ ! -f "$HOME/$filename" ]]; then
+    return 0
   fi
+
+  declare backup="$HOME/original$filename"
+  # Never clobber an earlier backup
+  if [[ -e "$backup" || -L "$backup" ]]; then
+    backup="$(mktemp "${backup}.XXXXXX")" || return 1
+  fi
+  echo "Moving default $filename to $backup"
+  mv "$HOME/$filename" "$backup"
 }
 
 remove_default_dotfiles() {
+  # Nothing would replace the startup files when stow skips bash
+  if [[ " ${DOTFILES_SKIP_PACKAGES:-} " == *" bash "* ]]; then
+    return 0
+  fi
+
   # Debian has these two by default
-  remove_default_dotfile .bashrc
-  remove_default_dotfile .profile
+  remove_default_dotfile .bashrc || return 1
+  remove_default_dotfile .profile || return 1
 
   # MacOS has this one by default
   remove_default_dotfile .bash_profile
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-  remove_default_dotfiles "${@}"
+  remove_default_dotfiles
 fi
