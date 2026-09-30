@@ -167,13 +167,31 @@ install_homebrew_packages() {
 install_homebrew_casks() {
   echo "Installing homebrew casks"
 
+  local missing_casks=()
   local casks_to_install=()
+  local cask app cask_info
 
   for cask in "${CASK_PACKAGES[@]}"; do
     if ! "${brew_prefix}/bin/brew" list --cask "$cask" &>/dev/null; then
-      casks_to_install+=("${cask}")
+      missing_casks+=("${cask}")
     fi
   done
+
+  # `brew install` refuses to overwrite an app installed outside of Homebrew
+  # (manual download, MDM, etc.), so leave those alone
+  if [[ ${#missing_casks[@]} -gt 0 ]]; then
+    # Capture first, since `set -e` can't see failures in process substitution
+    cask_info=$("${brew_prefix}/bin/brew" info --cask --json=v2 "${missing_casks[@]}" |
+      "${brew_prefix}/bin/jq" -r '.casks[] | [.token, (first(.artifacts[] | select(has("app")) | .target) // "")] | @tsv')
+
+    while IFS=$'\t' read -r cask app; do
+      if [[ -n "${app}" ]] && [[ -e "${app}" ]]; then
+        echo "Skipping ${cask}: ${app} not managed by Homebrew"
+      else
+        casks_to_install+=("${cask}")
+      fi
+    done <<<"${cask_info}"
+  fi
 
   if [[ ${#casks_to_install[@]} -gt 0 ]]; then
     echo "Installing cask packages: ${casks_to_install[*]}"
