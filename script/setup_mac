@@ -181,8 +181,8 @@ install_homebrew_casks() {
   # (manual download, MDM, etc.), so leave those alone
   if [[ ${#missing_casks[@]} -gt 0 ]]; then
     # Capture first, since `set -e` can't see failures in process substitution
-    cask_info=$("${brew_prefix}/bin/brew" info --cask --json=v2 "${missing_casks[@]}" |
-      "${brew_prefix}/bin/jq" -r '.casks[] | [.token, (first(.artifacts[] | select(has("app")) | .target) // "")] | @tsv')
+    cask_info=$("${brew_prefix}/bin/brew" info --cask --json=v2 "${missing_casks[@]}" \
+      | "${brew_prefix}/bin/jq" -r '.casks[] | [.token, (first(.artifacts[] | select(has("app")) | .target) // "")] | @tsv')
 
     while IFS=$'\t' read -r cask app; do
       if [[ -n "${app}" ]] && [[ -e "${app}" ]]; then
