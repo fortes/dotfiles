@@ -571,10 +571,12 @@ augroup auto_quickfix
   autocmd QuickFixCmdPost grep,make cwindow|redraw!
 augroup END
 
-" Use ag instead of grep, if available
+" Use rg instead of grep, if available
 if executable('rg')
-  " Print every match on its own line with filename, line, and column numbers
+  " Print every match on its own line with filename, line, and column numbers.
+  " Unlike nvim's default (`rg --vimgrep -uu`), this respects .gitignore
   set grepprg=rg\ --vimgrep
+  set grepformat=%f:%l:%c:%m
 else
   " Mimic rg settings (literal, recursive, ignore common directories)
   set grepprg=grep\ --with-filename\ --fixed-strings\ --binary-files=without-match\ --ignore-case\ --line-number\ --recursive\ --exclude-dir=socket\ --exclude-dir=.git\ --exclude-dir=node_modules\ $*\ /dev/null
