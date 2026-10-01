@@ -795,11 +795,9 @@ augroup filetype_tweaks
   " Don't wrap in commit messages
   autocmd FileType gitcommit setlocal nowrap textwidth=0
 
-  " Makefiles use tabs
-  autocmd FileType make setlocal noexpandtab shiftwidth=4
-
-  " Python uses 4 spaces
-  autocmd FileType python setlocal shiftwidth=4
+  " Show Makefile tabs 4 wide. The ftplugin already indents with tabs, and
+  " Python's with 4 spaces
+  autocmd FileType make setlocal tabstop=4
 
   " Don't wrap in quickfix, and don't show in buffer list
   autocmd FileType qf setlocal nowrap textwidth=0 nobuflisted
