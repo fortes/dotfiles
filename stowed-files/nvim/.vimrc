@@ -719,7 +719,7 @@ augroup filetype_tweaks
   if executable('stylelint')
     autocmd FileType css setlocal makeprg=stylelint\ %\ --no-color\ --fix\ --cache
     " Push/pop filename on stack with %P%f
-    autocmd FileType css setlocal errorformat+=%P%f,%*[\ ]%l:%c%*[\ ]✖%*[\ ]%m
+    autocmd FileType css setlocal errorformat=%P%f,%*[\ ]%l:%c%*[\ ]✖%*[\ ]%m
     " Ignore unmatched lines
     autocmd FileType css setlocal errorformat+=%-G%.%#
   endif
