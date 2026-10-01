@@ -497,53 +497,33 @@ if has('eval')
     xnoremap # :<C-u>call <SID>VisualSetSearch('#')<cr>/<C-R>=@/<cr><cr>
   endif
 
-  function! IsInsideGitRepo()
-    let result=systemlist('git rev-parse --is-inside-work-tree')
-    if v:shell_error
-      return 0
-    else
-      return 1
-    endif
-  endfunction
-
-  function! FindGitRootCD()
-    let root = systemlist('git -C ' . expand('%:p:h') . ' rev-parse --show-toplevel')[0]
-    if v:shell_error
-      return ''
-    else
-      return {'dir': root}
-    endif
-  endfunction
-
-  function! GetSearchPath()
-    let result = FindGitRootCD()
-    if type(result) == type({})
-      let repo_root = result['dir']
-      if getcwd() == repo_root
-        return '.'
-      else
-        return fnamemodify(repo_root, ':~:.')
-      endif
-    else
-      return '.'
-    endif
+  " Git root of the current file's directory, or '' outside a repo
+  function! s:GitRoot() abort
+    let root = systemlist('git -C ' . shellescape(expand('%:p:h')) . ' rev-parse --show-toplevel')
+    return v:shell_error ? '' : root[0]
   endfunction
 
   " Change to git root of current file (if in a repo)
-  function! GitRootCD()
-    let result = FindGitRootCD()
-    if type(result) == type({})
-      execute 'tcd' fnameescape(result['dir'])
-      echo 'Now in '.fnamemodify(result['dir'], ':~:.')
-    else
+  function! s:GitRootCD() abort
+    let root = s:GitRoot()
+    if root ==# ''
       echo 'Not in git repo!'
+    else
+      execute 'tcd' fnameescape(root)
+      echo 'Now in '.fnamemodify(root, ':~:.')
     endif
   endfunction
-  command! GitRootCD :call GitRootCD()
+  command! GitRootCD call s:GitRootCD()
 
   " Project-wide counterpart to `*`, which searches the word under the cursor
   " within the buffer. Not on `Q`: Neovim 0.13 makes that multiple-cursors.
   if !has('nvim')
+    " Where to grep: the current file's repo, relative to cwd when possible
+    function! GetSearchPath() abort
+      let root = s:GitRoot()
+      return root ==# '' || root ==# getcwd() ? '.' : fnamemodify(root, ':~:.')
+    endfunction
+
     nnoremap <leader>* :lgrep! "<C-R><C-W>" <C-R>=GetSearchPath()<CR>
     xnoremap <leader>* :<C-u>norm! gv"sy<cr>:lgrep! "<C-R>s" <C-R>=GetSearchPath()<CR>
   endif
