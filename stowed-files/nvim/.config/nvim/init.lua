@@ -2,6 +2,14 @@
 -- Load all base / legacy options from ~/.vimrc
 vim.cmd('source ~/.vimrc')
 
+-- Load local config, if present. Last, so it can override plugin setup
+local function source_local_config()
+  local local_config_path = vim.fn.expand('~/.nvimrc.local')
+  if vim.fn.filereadable(local_config_path) == 1 then
+    vim.cmd('source ' .. local_config_path)
+  end
+end
+
 -- Everything below assumes nvim 0.12+ (`vim.pack`, `tsc --lsp`, ...). Older
 -- builds, like the ones distros ship, keep the plugin-free ~/.vimrc setup
 if vim.fn.has('nvim-0.12') == 0 then
@@ -9,6 +17,7 @@ if vim.fn.has('nvim-0.12') == 0 then
     'init.lua needs Neovim 0.12+, skipping plugins and LSP (~/.vimrc still applies)',
     vim.log.levels.WARN
   )
+  source_local_config()
   return
 end
 
@@ -940,8 +949,4 @@ for _, setup_fn in ipairs(_setups) do
   setup_fn()
 end
 
--- Load local config, if present
-local local_config_path = vim.fn.expand('~/.nvimrc.local')
-if vim.fn.filereadable(local_config_path) == 1 then
-  vim.cmd('source ' .. local_config_path)
-end
+source_local_config()
