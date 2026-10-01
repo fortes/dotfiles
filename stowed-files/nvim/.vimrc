@@ -831,25 +831,9 @@ endif
 
 if has('spell')
   set spell
+  " Missing spell files are offered for download by nvim's built-in
+  " spellfile plugin and Vim's spellfile.vim
   set spelllang=en_us,pt_pt
-
-  let s:spell_dir = fnamemodify($MYVIMRC, ':h').'/spell'
-  let s:spell_file = (s:spell_dir).'/pt.utf-8.spl'
-  let s:spell_url = 'https://ftp.nluug.nl/vim/runtime/spell/pt.utf-8.spl'
-
-  " nvim 0.12+: package-spellfile built-in auto-downloads missing spell files
-  if !has('nvim-0.12')
-    " Download Portuguese dictionary if not present, but only if the directory
-    " is already present, else we might be using a temporary config file anyway
-    if isdirectory(s:spell_dir) && !filereadable(s:spell_file)
-      echo "Portuguese spell file not found. Downloading..."
-      if executable('curl')
-        execute '!curl -fLo ' . s:spell_file . ' ' . s:spell_url
-      elseif executable('wget')
-        execute '!wget -O ' . s:spell_file . ' ' . s:spell_url
-      endif
-    endif
-  endif
 
   " Re-generate spelling files if modified
   for d in glob(fnamemodify($MYVIMRC, ':h').'/spell/*.add', 1, 1)
