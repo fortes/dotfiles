@@ -5,10 +5,6 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-# Make sure to load `command_exists` helper
-# shellcheck source=/dev/null
-. ~/.profile
-
 cmus_status() {
   local cmus_status
   cmus_status=$(cmus-remote -Q 2>&1 || echo)
@@ -42,7 +38,7 @@ cmus_status() {
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-  if command_exists cmus-remote; then
+  if command -v cmus-remote >/dev/null 2>&1; then
     cmus_status "${@}"
   fi
 fi
