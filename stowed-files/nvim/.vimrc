@@ -12,7 +12,6 @@ if !has('nvim')
   set background=dark
   set backspace=indent,eol,start
   set belloff=all
-  set nocompatible
   set comments+=fb:•
   " vim-only: cscope removed from nvim in 0.9
   set cscopeverbose
@@ -184,18 +183,11 @@ elseif has('packages')
   silent! packadd hlyank
 endif
 
-" Let same document scroll differently in separate panes
-set noscrollbind
-
 " Hide default mode text (i.e. INSERT below status line)
 set noshowmode
 
 " Use 5 characters for number well
 set numberwidth=5
-
-" Disable visual bell
-set noerrorbells
-set visualbell t_vb=
 
 " Keep lines in view at edges of screen
 set scrolloff=5
@@ -227,9 +219,6 @@ endif
 if exists('+tabclose')
   set tabclose=left
 endif
-
-" Reasonable tab completion
-set wildmode=full
 
 " Resize splits when the window is resized
 augroup on_vim_resized
