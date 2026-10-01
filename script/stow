@@ -20,6 +20,7 @@ IFS=$'\n\t'
 declare -r REAL_DIRS=(
   .ssh
   .config/cmus
+  .config/tmux
   .config/systemd/user
   .config/yazi
   .local/bin
