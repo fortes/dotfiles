@@ -580,9 +580,14 @@ augroup easy_close
 augroup END
 
 " Make j/k move screen visible lines, not file lines, unless given a count so
-" relative line numbers still line up
-nnoremap <expr> j v:count ? 'j' : 'gj'
-nnoremap <expr> k v:count ? 'k' : 'gk'
+" relative line numbers still line up. vim.tiny (no `<expr>`, and it skips `if`
+" blocks) keeps the plain versions
+nnoremap j gj
+nnoremap k gk
+if has('eval')
+  nnoremap <expr> j v:count ? 'j' : 'gj'
+  nnoremap <expr> k v:count ? 'k' : 'gk'
+endif
 
 " [n / ]n to jump between conflict markers and diff hunk headers, ported from
 " vim-unimpaired. In operator-pending and Visual mode they select the whole
