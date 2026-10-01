@@ -25,10 +25,7 @@ if !has('nvim')
   silent! set diffopt+=linematch:40      " requires internal diff engine
   silent! set diffopt+=indent-heuristic  " requires internal diff engine
   set encoding=utf-8
-  set fillchars=vert:│,fold:·
-  if exists('+foldsep')
-    set fillchars+=foldsep:│
-  endif
+  set fillchars=vert:│,fold:·,foldsep:│
   set formatoptions=tcq
   if v:version >= 704
     set formatoptions+=j
