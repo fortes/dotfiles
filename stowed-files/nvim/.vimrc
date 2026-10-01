@@ -308,7 +308,7 @@ if has('statusline')
   let g:quickfixStatusLine.='%=%-15(%l,%c%V%) %P'
 
   " Default status line
-  let statusline=g:activeStatusLine
+  let &statusline=g:activeStatusLine
 
   " Use different status line for active vs. inactive buffers
   function! UpdateStatusLine(status)
