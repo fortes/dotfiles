@@ -26,10 +26,7 @@ if !has('nvim')
   silent! set diffopt+=indent-heuristic  " requires internal diff engine
   set encoding=utf-8
   set fillchars=vert:│,fold:·,foldsep:│
-  set formatoptions=tcq
-  if v:version >= 704
-    set formatoptions+=j
-  endif
+  set formatoptions=tcqj
   set nofsync
   set hidden
   set history=10000
@@ -77,9 +74,7 @@ if !has('nvim')
   inoremap <C-W> <C-G>u<C-W>
 
   " Enable syntax highlighting by default
-  if has('syntax')
-    syntax enable
-  endif
+  syntax enable
 endif
 " }}}
 
@@ -99,12 +94,8 @@ if has('packages')
 endif
 
 " Core Behavior {{{
-if exists('+modelineexpr')
-  set nomodelineexpr
-else
-  " Disable for security reasons when `modelineexpr` does not exist
-  set nomodeline
-endif
+" Don't let modelines run expressions
+set nomodelineexpr
 
 " Read project-local config (.nvim.lua, .nvimrc, .exrc) from current and
 " parent dirs. In nvim 0.12+: no (a)llow prompt — must (v)iew then :trust.
@@ -142,9 +133,7 @@ set timeoutlen=600
 
 " UI {{{
 " Maintain indent when wrapping
-if exists('+breakindent')
-  set breakindent
-endif
+set breakindent
 
 " Highlight textwidth column
 set colorcolumn=+1
@@ -179,7 +168,7 @@ if has('nvim')
     " `vim.hl` was `vim.highlight` before nvim 0.11
     autocmd TextYankPost * lua (vim.hl or vim.highlight).on_yank {on_visual=false}
   augroup END
-elseif has('packages')
+else
   " Ships with recent Vim 9.1 patches
   silent! packadd hlyank
 endif
@@ -428,11 +417,9 @@ if !exists('g:colors_name')
   silent! colorscheme desert
 endif
 
-if has('termguicolors')
-  " Mac doesn't ship with tmux terminfo
-  if $COLORTERM == 'truecolor' || $TERM =~ '^\(xterm\|tmux\)-256'
-    set termguicolors
-  endif
+" Mac doesn't ship with tmux terminfo
+if $COLORTERM == 'truecolor' || $TERM =~ '^\(xterm\|tmux\)-256'
+  set termguicolors
 endif
 
 " Only highlight first 500 chars for better performance
@@ -651,9 +638,7 @@ endif
 " Option toggles, in the style of vim-unimpaired, which each echo the new state.
 " `yoe` (diagnostics) and `yog` (grammar) need Neovim, so they live in init.lua.
 nnoremap yon :setlocal number!<cr>:setlocal number?<cr>
-if has('spell')
-  nnoremap yos :setlocal spell!<cr>:setlocal spell?<cr>
-endif
+nnoremap yos :setlocal spell!<cr>:setlocal spell?<cr>
 
 " Never use ZZ, too dangerous
 nnoremap ZZ <nop>
