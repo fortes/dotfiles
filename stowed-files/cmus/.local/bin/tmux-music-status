@@ -19,11 +19,20 @@ cmus_status() {
   local artist
   local title
   local album
+  local albumArtist
 
-  artist=$(echo "${cmus_status}" | grep -i '^tag artist ' | cut -d ' ' -f 3-)
-  title=$(echo "${cmus_status}" | grep -i '^tag title ' | cut -d ' ' -f 3-)
-  album=$(echo "${cmus_status}" | grep -i '^tag album ' | cut -d ' ' -f 3-)
-  albumArtist=$(echo "${cmus_status}" | grep -i '^tag albumartist ' | cut -d ' ' -f 3-)
+  # A missing tag must not abort the script (set -e + pipefail), so tolerate no
+  # match and treat the tag as empty
+  artist=$(echo "${cmus_status}" | grep -i '^tag artist ' | cut -d ' ' -f 3- || true)
+  title=$(echo "${cmus_status}" | grep -i '^tag title ' | cut -d ' ' -f 3- || true)
+  album=$(echo "${cmus_status}" | grep -i '^tag album ' | cut -d ' ' -f 3- || true)
+  albumArtist=$(echo "${cmus_status}" | grep -i '^tag albumartist ' | cut -d ' ' -f 3- || true)
+
+  # Nothing to show (e.g. a file with no tags): stay blank rather than print a
+  # bare separator
+  if [ -z "${artist}${title}${albumArtist}${album}" ]; then
+    return
+  fi
 
   if echo "${cmus_status}" | grep -qi "status playing"; then
     echo "${artist} ▸ ${title}  "
