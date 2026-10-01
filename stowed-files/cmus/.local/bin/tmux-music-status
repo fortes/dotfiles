@@ -24,15 +24,13 @@ cmus_status() {
   album=$(echo "${cmus_status}" | grep -i '^tag album ' | cut -d ' ' -f 3- || true)
   albumArtist=$(echo "${cmus_status}" | grep -i '^tag albumartist ' | cut -d ' ' -f 3- || true)
 
-  # Nothing to show (e.g. a file with no tags): stay blank rather than print a
-  # bare separator
-  if [ -z "${artist}${title}${albumArtist}${album}" ]; then
-    return
-  fi
-
+  # Stay blank rather than print a bare separator when the tags a branch needs
+  # are missing (e.g. a file with no tags at all)
   if echo "${cmus_status}" | grep -qi "status playing"; then
-    echo "${artist} ▸ ${title}  "
-  else
+    if [ -n "${artist}${title}" ]; then
+      echo "${artist} ▸ ${title}  "
+    fi
+  elif [ -n "${albumArtist}${album}" ]; then
     echo "${albumArtist} ♪ ${album}  "
   fi
 }
