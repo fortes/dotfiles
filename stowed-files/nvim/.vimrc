@@ -175,10 +175,16 @@ if exists('&inccommand')
   set inccommand=split
 endif
 
-augroup HighlightedYank
-  autocmd!
-  autocmd TextYankPost * silent! lua vim.hl.on_yank {on_visual=false}
-augroup END
+" Briefly highlight yanked text
+if has('nvim')
+  augroup HighlightedYank
+    autocmd!
+    autocmd TextYankPost * lua vim.hl.on_yank {on_visual=false}
+  augroup END
+elseif has('packages')
+  " Ships with recent Vim 9.1 patches
+  silent! packadd hlyank
+endif
 
 " Let same document scroll differently in separate panes
 set noscrollbind
