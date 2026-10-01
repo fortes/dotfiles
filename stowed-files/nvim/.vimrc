@@ -367,17 +367,19 @@ if filereadable('/usr/share/dict/words')
   set dictionary+=/usr/share/dict/words
 endif
 
-" Make completion work a bit more like traditional IDEs w/o losing useful keys
+" Make completion work a bit more like traditional IDEs w/o losing useful keys.
+" `<expr>` maps need +eval: vim.tiny would map the literal keys `<expr>`
+if has('eval')
+  inoremap <silent><expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+  inoremap <silent><expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 
-inoremap <silent><expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
-inoremap <silent><expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+  " Enter to confirm completion item
+  inoremap <silent><expr> <CR> pumvisible() ? "\<C-y>" : "\<CR>"
 
-" Enter to confirm completion item
-inoremap <silent><expr> <CR> pumvisible() ? "\<C-y>" : "\<CR>"
-
-" PageUp/PageDown doesn't select item by default
-inoremap <silent><expr> <PageDown> pumvisible() ? "\<PageDown>\<C-p>\<C-n>" : "\<PageDown>"
-inoremap <silent><expr> <PageUp> pumvisible() ? "\<PageUp>\<C-p>\<C-n>" : "\<PageUp>"
+  " PageUp/PageDown doesn't select item by default
+  inoremap <silent><expr> <PageDown> pumvisible() ? "\<PageDown>\<C-p>\<C-n>" : "\<PageDown>"
+  inoremap <silent><expr> <PageUp> pumvisible() ? "\<PageUp>\<C-p>\<C-n>" : "\<PageUp>"
+endif
 " }}}
 
 " Default formatoptions (as of neovim): tcqj
