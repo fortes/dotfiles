@@ -216,7 +216,8 @@ if exists('+winborder')
   set winborder=rounded
 endif
 if exists('+pumborder')
-  set pumborder=rounded
+  " Vim spells it `round`
+  let &pumborder = has('nvim') ? 'rounded' : 'round'
 endif
 
 " When closing a tab, focus the previous (left) tab rather than the right
