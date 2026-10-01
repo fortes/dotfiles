@@ -701,13 +701,6 @@ nnoremap <leader>cd :GitRootCD<cr>
 " Filetype configuration {{{
 augroup filetype_tweaks
   autocmd!
-  if !has('nvim')
-    " nvim has built-in detection for these extensions
-    autocmd BufNewFile,BufReadPost *.ts set filetype=typescript
-    autocmd BufNewFile,BufReadPost *.tsx set filetype=typescriptreact
-    " .md is markdown, not modula
-    autocmd BufNewFile,BufReadPost *.md set filetype=markdown
-  endif
   " README/TODO without extension: not auto-detected as markdown in either editor
   autocmd BufNewFile,BufReadPost README,TODO set filetype=markdown
 
