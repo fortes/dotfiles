@@ -2,6 +2,11 @@
 
 " Configuration for vanilla (neo)vim, with no plugins
 
+" Before any non-ASCII character in this file, and outside any `if` so
+" vim.tiny gets it too. `scriptencoding` has to follow `set encoding`
+set encoding=utf-8
+scriptencoding utf-8
+
 " Neovim-vim deltas {{{
 if !has('nvim')
   " Mirror Neovim defaults in Vim (see :help vim-differences). Best-effort:
@@ -24,7 +29,6 @@ if !has('nvim')
   set display=lastline
   silent! set diffopt+=linematch:40      " requires internal diff engine
   silent! set diffopt+=indent-heuristic  " requires internal diff engine
-  set encoding=utf-8
   set fillchars=vert:│,fold:·,foldsep:│
   set formatoptions=tcqj
   set nofsync
@@ -79,8 +83,6 @@ endif
 " }}}
 
 " Base Configuration {{{
-
-scriptencoding utf-8
 
 if has('packages')
   " Load matchit.vim for vim (nvim ships it enabled by default)
