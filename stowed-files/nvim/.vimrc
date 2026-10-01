@@ -674,10 +674,10 @@ augroup filetype_tweaks
   autocmd BufNewFile,BufReadPost README,TODO set filetype=markdown
 
   " Not all files should wrap automatically
-  autocmd BufNewFile,BufReadPost *.txt,*.md,*.json,*.conf,*.ini,*.pug setlocal textwidth=0
+  autocmd BufNewFile,BufReadPost *.txt,*.md,*.markdown,*.json,*.conf,*.ini,*.pug setlocal textwidth=0
 
-  " Enable spell checking & linebreaking at words in some filetypes
-  autocmd BufNewFile,BufReadPost *.txt,*.md,*.markdown,COMMIT_EDITMSG setlocal spell linebreak
+  " Soft wrap prose at word boundaries (spell is on globally)
+  autocmd FileType markdown,text setlocal linebreak
 
   " Disable spell checking on unmodifiable files (what's the point?)
   autocmd BufReadPost * if !&modifiable | setlocal nospell | endif
