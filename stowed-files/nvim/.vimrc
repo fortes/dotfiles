@@ -134,10 +134,8 @@ endif
 " Wait just under a second before CursorHold is fired
 set updatetime=750
 
-" Mapping & keycode timeouts
+" Mapping timeout. Keycodes keep nvim's 50ms `ttimeoutlen`, mirrored above
 set timeoutlen=600
-set ttimeout
-set ttimeoutlen=200
 
 " Neovim 0.12+ finds `pynvim-python` (from `uv tool install pynvim`) on $PATH
 " automatically; no need to set g:python3_host_prog.
