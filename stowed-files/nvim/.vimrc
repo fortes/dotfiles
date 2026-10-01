@@ -34,9 +34,6 @@ if !has('nvim')
   set include=
   set incsearch
   set nojoinspaces
-  if exists('+jumpoptions')
-    silent! set jumpoptions=clean  " 'clean' value requires Vim 9.1+
-  endif
   if exists('+langnoremap')
     set langnoremap
   endif
