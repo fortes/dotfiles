@@ -87,14 +87,14 @@ endif
 
 scriptencoding utf-8
 
-" Load matchit.vim for vim (nvim ships it enabled by default)
-if !has('nvim') && !exists('g:loaded_matchit') && findfile('plugin/matchit.vim', &runtimepath) ==# ''
-  runtime! macros/matchit.vim
-endif
-
-" Use `:Cfilter` / `:Lfilter` to filter quickfix / location lists
-" Useful with `:colder` and `:cnewer` to restore previous lists
 if has('packages')
+  " Load matchit.vim for vim (nvim ships it enabled by default)
+  if !has('nvim')
+    packadd! matchit
+  endif
+
+  " Use `:Cfilter` / `:Lfilter` to filter quickfix / location lists
+  " Useful with `:colder` and `:cnewer` to restore previous lists
   packadd cfilter
 endif
 
