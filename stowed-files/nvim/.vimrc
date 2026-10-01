@@ -292,7 +292,7 @@ if has('statusline')
       " Shitty unicode character w/o patched fonts
       return '‡'.FugitiveHead()
     else
-      return fnamemodify(getwinvar(0, 'getcwd', getcwd()), ':t')
+      return fnamemodify(getcwd(), ':t')
     endif
   endfunction
 
