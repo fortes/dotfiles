@@ -286,13 +286,13 @@ if has('statusline')
   let g:activeStatusLine.='%<%f '
   " Exclamation mark if not modifiable, + if modified
   let g:activeStatusLine.="%{&readonly ? \"! \" : &modified ? '+ ' : ''}"
-  " Start left align; nvim 0.12+: diagnostic summary (e.g. "E:2 W:1")
+  " Start left align; nvim: diagnostic summary (e.g. "E:2 W:1")
   let g:activeStatusLine.='%= %{DiagStatus()}'
   " Filetype and position
   let g:activeStatusLine.="%{&filetype == '' ? 'none' : &filetype} "
   let g:activeStatusLine.='%l:%2c '
   function! DiagStatus() abort
-    if !has('nvim-0.12')
+    if !has('nvim')
       return ''
     endif
     let s = v:lua.vim.diagnostic.status()
@@ -354,23 +354,16 @@ set shiftround
 " Keyword completion brings in the dictionary if spell check is enabled.
 " Also included files
 set complete+=kspell,i
-if has('nvim-0.10')
-  " Also include buffer names, if supported
+if has('nvim')
+  " Also include buffer names (not supported by Vim)
   set complete+=f
 endif
 
-" Show menu even when only one match, don't autoselect
-set completeopt=menuone,noselect
-" popup shows match info in a floating window (nvim 0.10+, vim 9.1+)
-silent! set completeopt+=popup
-if has('nvim-0.11')
-  " Fuzzy completion added in 0.11
-  set completeopt+=fuzzy
-endif
-if has('nvim-0.12')
-  " Sort matches by distance to cursor, added in 0.12
-  set completeopt+=nearest
-endif
+" Show menu even when only one match, don't autoselect, show match info in a
+" popup, and match fuzzily
+set completeopt=menuone,noselect,popup,fuzzy
+" Sort matches by distance to cursor (nvim 0.12+, recent Vim 9.1)
+silent! set completeopt+=nearest
 
 " Make sure there's a default dictionary for completion
 if filereadable('/usr/share/dict/words')
@@ -407,8 +400,8 @@ set listchars=trail:·,tab:→-,nbsp:␣
 set listchars+=extends:»,precedes:«
 " Indent guides
 set listchars+=multispace:\ ·,leadmultispace:\┊\ ,
-if has('nvim-0.12')
-  " Indent guide for leading tabs (added in 0.12)
+if has('nvim')
+  " Indent guide for leading tabs (not supported by Vim)
   set listchars+=leadtab:\┊\ ,
 endif
 
