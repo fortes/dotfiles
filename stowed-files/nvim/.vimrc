@@ -523,10 +523,11 @@ if has('eval')
   " Project-wide counterpart to `*`, which searches the word under the cursor
   " within the buffer. Not on `Q`: Neovim 0.13 makes that multiple-cursors.
   if !has('nvim')
-    " Where to grep: the current file's repo, relative to cwd when possible
+    " Where to grep: the current file's repo, relative to cwd when possible.
+    " Escaped, since it's typed into the :lgrep command line
     function! GetSearchPath() abort
       let root = s:GitRoot()
-      return root ==# '' || root ==# getcwd() ? '.' : fnamemodify(root, ':~:.')
+      return root ==# '' || root ==# getcwd() ? '.' : fnameescape(fnamemodify(root, ':~:.'))
     endfunction
 
     nnoremap <leader>* :lgrep! "<C-R><C-W>" <C-R>=GetSearchPath()<CR>
