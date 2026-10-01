@@ -657,7 +657,7 @@ use('https://github.com/stevearc/conform.nvim', function()
     },
   })
 
-  map('', '<leader>f', function()
+  map({ 'n', 'x' }, '<leader>f', function()
     require('conform').format({ async = true })
   end, { desc = 'Format buffer' })
 end)
