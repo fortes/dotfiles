@@ -346,9 +346,11 @@ if has('nvim')
 endif
 
 " Show menu even when only one match, don't autoselect, show match info in a
-" popup, and match fuzzily
-set completeopt=menuone,noselect,popup,fuzzy
-" Sort matches by distance to cursor (nvim 0.12+, recent Vim 9.1)
+" popup
+set completeopt=menuone,noselect,popup
+" Match fuzzily (Vim 9.1.0463+), and sort matches by distance to cursor (nvim
+" 0.12+, recent Vim 9.1). Separate lines, since one rejected value fails the set
+silent! set completeopt+=fuzzy
 silent! set completeopt+=nearest
 
 " Make sure there's a default dictionary for completion
