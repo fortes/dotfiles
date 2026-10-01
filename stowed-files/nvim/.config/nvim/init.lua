@@ -591,7 +591,7 @@ use('https://github.com/nvim-telescope/telescope.nvim', function()
   map('n', '<leader>*', function()
     builtin.live_grep({ default_text = vim.fn.expand('<cword>') })
   end, { desc = 'Live grep current word' })
-  map('v', '<leader>*', function()
+  map('x', '<leader>*', function()
     local text = table.concat(
       vim.fn.getregion(vim.fn.getpos('v'), vim.fn.getpos('.'), { type = vim.fn.mode() }),
       '\n'
@@ -760,7 +760,7 @@ use('https://github.com/obsidian-nvim/obsidian.nvim', function()
   map('n', '<leader>on', '<cmd>Obsidian new<cr>', { desc = 'Obsidian new note' })
   map('n', '<leader>or', '<cmd>Obsidian rename<cr>', { desc = 'Obsidian rename' })
   map('n', '<leader>oc', '<cmd>Obsidian toc<cr>', { desc = 'Obsidian table of contents' })
-  map('v', '<leader>ol', '<cmd>Obsidian link<cr>', { desc = 'Obsidian link selection' })
+  map('x', '<leader>ol', '<cmd>Obsidian link<cr>', { desc = 'Obsidian link selection' })
 
   vim.api.nvim_create_autocmd('BufEnter', {
     group = vim.api.nvim_create_augroup('obsidian_notes', { clear = true }),
@@ -817,14 +817,14 @@ use('https://github.com/lewis6991/gitsigns.nvim', function()
       end, { buffer = bufnr, desc = 'Previous hunk' })
 
       map('n', '<leader>hs', ':Gitsigns stage_hunk<CR>', { buffer = bufnr, desc = 'Stage hunk' })
-      map('v', '<leader>hs', function()
+      map('x', '<leader>hs', function()
         gitsigns.stage_hunk({ vim.fn.line('.'), vim.fn.line('v') })
       end, { buffer = bufnr, desc = 'Stage hunk' })
       map('n', '<leader>hS', ':Gitsigns undo_stage_hunk<CR>', { buffer = bufnr, desc = 'Unstage hunk' })
       map('n', '<leader>hp', ':Gitsigns preview_hunk<CR>', { buffer = bufnr, desc = 'Preview hunk' })
       map('n', '<leader>hi', ':Gitsigns preview_hunk_inline<CR>', { buffer = bufnr, desc = 'Preview hunk inline' })
       map('n', '<leader>hr', ':Gitsigns reset_hunk<CR>', { buffer = bufnr, desc = 'Reset hunk' })
-      map('v', '<leader>hr', function()
+      map('x', '<leader>hr', function()
         gitsigns.reset_hunk({ vim.fn.line('.'), vim.fn.line('v') })
       end, { buffer = bufnr, desc = 'Reset hunk' })
 

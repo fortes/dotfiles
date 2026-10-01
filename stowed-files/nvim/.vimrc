@@ -507,8 +507,8 @@ if has('eval')
       let @s = temp
     endfunction
 
-    vnoremap * :<C-u>call <SID>VisualSetSearch('/')<cr>/<C-R>=@/<cr><cr>
-    vnoremap # :<C-u>call <SID>VisualSetSearch('#')<cr>/<C-R>=@/<cr><cr>
+    xnoremap * :<C-u>call <SID>VisualSetSearch('/')<cr>/<C-R>=@/<cr><cr>
+    xnoremap # :<C-u>call <SID>VisualSetSearch('#')<cr>/<C-R>=@/<cr><cr>
   endif
 
   function! IsInsideGitRepo()
@@ -559,7 +559,7 @@ if has('eval')
   " within the buffer. Not on `Q`: Neovim 0.13 makes that multiple-cursors.
   if !has('nvim')
     nnoremap <leader>* :lgrep! "<C-R><C-W>" <C-R>=GetSearchPath()<CR>
-    vnoremap <leader>* :<C-u>norm! gv"sy<cr>:lgrep! "<C-R>s" <C-R>=GetSearchPath()<CR>
+    xnoremap <leader>* :<C-u>norm! gv"sy<cr>:lgrep! "<C-R>s" <C-R>=GetSearchPath()<CR>
   endif
 endif
 
@@ -586,10 +586,10 @@ endif
 
 " Use enter as colon for faster commands
 nnoremap <cr> :
-vnoremap <cr> :
+xnoremap <cr> :
 " Meta-enter in case you need an actual <cr>
 nnoremap <M-cr> <cr>
-vnoremap <M-cr> <cr>
+xnoremap <M-cr> <cr>
 
 " Close quickfix & help with q, Escape, or Control-C
 " Also, keep default <cr> binding
@@ -684,10 +684,10 @@ endif
 
 " Run `.` or macro over selected lines, taken from:
 " https://reddit.com/r/vim/comments/3y2mgt
-vnoremap . :normal .<CR>
+xnoremap . :normal .<CR>
 if !has('nvim')
   " Neovim maps this by default, see |v_@-default|
-  vnoremap @ :normal @
+  xnoremap @ :normal @
 endif
 
 " Change local directory to current file
