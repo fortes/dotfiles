@@ -691,7 +691,7 @@ augroup filetype_tweaks
   autocmd BufNewFile,BufReadPost README,TODO set filetype=markdown
 
   " Not all files should wrap automatically
-  autocmd BufNewFile,BufReadPost *.txt,*.md,*.markdown,*.json,*.conf,*.ini,*.pug setlocal textwidth=0
+  autocmd BufNewFile,BufReadPost *.txt,*.md,*.markdown,*.json,*.conf,*.ini setlocal textwidth=0
 
   " Soft wrap prose at word boundaries (spell is on globally)
   autocmd FileType markdown,text setlocal linebreak
@@ -723,23 +723,6 @@ augroup filetype_tweaks
     autocmd FileType typescript setlocal errorformat+=%-G%.%#
   endif
 
-  " Linting for LESS
-  if executable('lessc')
-    autocmd FileType less setlocal makeprg=lessc\ --lint\ --no-color\ %
-    autocmd FileType less setlocal errorformat=%E%.%#Error:\ %m\ in\ %f\ on\ line\ %l\\,\ column\ %c:
-    " Ignore unmatched lines
-    autocmd FileType less setlocal errorformat+=%-G%.%#
-  endif
-
-  " CSS linting
-  if executable('stylelint')
-    autocmd FileType css setlocal makeprg=stylelint\ %\ --no-color\ --fix\ --cache
-    " Push/pop filename on stack with %P%f
-    autocmd FileType css setlocal errorformat=%P%f,%*[\ ]%l:%c%*[\ ]✖%*[\ ]%m
-    " Ignore unmatched lines
-    autocmd FileType css setlocal errorformat+=%-G%.%#
-  endif
-
   " Linting for shell scripts
   if executable('shellcheck')
     autocmd FileType sh setlocal makeprg=shellcheck\ -x\ -f\ gcc\ %
@@ -756,11 +739,11 @@ augroup filetype_tweaks
 
   " Use oxfmt to autoformat (gq in Visual mode)
   if executable('oxfmt')
-    autocmd FileType javascript,javascriptreact,typescript,typescriptreact,json,css,less,html,markdown,yaml setlocal formatprg=oxfmt\ --stdin-filepath\ %
+    autocmd FileType javascript,javascriptreact,typescript,typescriptreact,json,css,html,markdown,yaml setlocal formatprg=oxfmt\ --stdin-filepath\ %
 
     " Use `formatprg` for `formatexpr` wherever we use `oxfmt` (in Neovim, conform.nvim owns formatexpr)
     if !has('nvim')
-      autocmd FileType javascript,javascriptreact,typescript,typescriptreact,json,css,less,html,markdown,yaml setlocal formatexpr=
+      autocmd FileType javascript,javascriptreact,typescript,typescriptreact,json,css,html,markdown,yaml setlocal formatexpr=
     endif
   endif
 
@@ -775,8 +758,8 @@ augroup filetype_tweaks
 
   autocmd FileType markdown setlocal suffixesadd=.md
 
-  " Consider '-' part of a world when tab completion, etc in css/less
-  autocmd FileType css,less setlocal iskeyword+=-
+  " Consider '-' part of a word when tab completing, etc in css
+  autocmd FileType css setlocal iskeyword+=-
 
   " Don't wrap in commit messages
   autocmd FileType gitcommit setlocal nowrap textwidth=0
@@ -793,7 +776,7 @@ augroup END
 " Markdown config {{{
 if has('syntax')
   " Syntax highlight within fenced code blocks
-  let g:markdown_fenced_languages = ['bash=sh', 'css', 'html', 'js=javascript', 'less', 'ts=typescript', 'python', 'sh']
+  let g:markdown_fenced_languages = ['bash=sh', 'css', 'html', 'js=javascript', 'ts=typescript', 'python', 'sh']
 endif
 " }}}
 
