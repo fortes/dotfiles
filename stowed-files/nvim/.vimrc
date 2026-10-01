@@ -740,11 +740,6 @@ augroup filetype_tweaks
   " Use oxfmt to autoformat (gq in Visual mode)
   if executable('oxfmt')
     autocmd FileType javascript,javascriptreact,typescript,typescriptreact,json,css,html,markdown,yaml setlocal formatprg=oxfmt\ --stdin-filepath\ %
-
-    " Use `formatprg` for `formatexpr` wherever we use `oxfmt` (in Neovim, conform.nvim owns formatexpr)
-    if !has('nvim')
-      autocmd FileType javascript,javascriptreact,typescript,typescriptreact,json,css,html,markdown,yaml setlocal formatexpr=
-    endif
   endif
 
   if executable('ruff')
