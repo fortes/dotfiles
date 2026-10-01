@@ -7,6 +7,12 @@ if !has('nvim')
   " Mirror Neovim defaults in Vim (see :help vim-differences). Best-effort:
   " some options require a Vim build/version that supports them.
 
+  " Implied when Vim finds ~/.vimrc itself, but not with `vim -u ~/.vimrc`.
+  " First, since it resets other options
+  if &compatible
+    set nocompatible
+  endif
+
   set autoindent
   set autoread
   set background=dark
