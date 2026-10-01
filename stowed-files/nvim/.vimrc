@@ -735,7 +735,7 @@ augroup filetype_tweaks
   endif
 
   if executable('shfmt')
-    autocmd FileType sh setlocal formatprg=shfmt\ --indent\ 2
+    autocmd FileType sh setlocal formatprg=shfmt\ -i\ 2\ -ci\ -bn
   endif
 
   " Use oxfmt to autoformat (gq in Visual mode)
