@@ -790,11 +790,12 @@ augroup filetype_tweaks
     autocmd FileType python setlocal formatprg=ruff\ format\ --stdin-filename\ %\ -
   endif
 
-  " Find .js files when using `gf` (useful with require)
-  autocmd FileType javascript setlocal suffixesadd=.js,.json,index.js
-  autocmd FileType typescript setlocal suffixesadd=.ts,.tsx,.js,.jsx,.json,index.js,index.ts
+  " Find extensionless imports when using `gf`. No `index.*` entries: `gf` on
+  " `./dir` opens the directory itself before trying any suffix
+  autocmd FileType javascript,javascriptreact setlocal suffixesadd=.js,.jsx,.json
+  autocmd FileType typescript,typescriptreact setlocal suffixesadd=.ts,.tsx,.js,.jsx,.json
 
-  autocmd FileType markdown setlocal suffixesadd=.md,index.md
+  autocmd FileType markdown setlocal suffixesadd=.md
 
   " Consider '-' part of a world when tab completion, etc in css/less
   autocmd FileType css,less setlocal iskeyword+=-
