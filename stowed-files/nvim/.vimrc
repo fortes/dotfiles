@@ -249,8 +249,9 @@ augroup auto_save
   autocmd BufEnter,BufWinEnter,CursorHold,FocusGained * silent! checktime
 augroup END
 
-" Support mac files
-set fileformats+=mac
+" Support mac files. Set in full, since Debian's `vi` (vim.tiny) runs in
+" compatible mode, where the default is empty and `+=mac` would leave only mac
+set fileformats=unix,dos,mac
 
 " Don't use backup files, we have Git for that
 set nobackup
