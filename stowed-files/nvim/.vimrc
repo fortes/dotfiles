@@ -567,7 +567,7 @@ augroup easy_close
   autocmd FileType help,qf,checkhealth,dirvish nnoremap <buffer> <Esc> :q<cr>
   autocmd FileType help,qf,checkhealth,dirvish nnoremap <buffer> <C-c> :q<cr>
   " Undo <cr> -> : shortcut
-  autocmd FileType help,qf,checkhealth,dirvish nnoremap <buffer> <cr> <cr>
+  autocmd FileType help,qf,checkhealth nnoremap <buffer> <cr> <cr>
 augroup END
 
 " Make j/k move screen visible lines, not file lines
