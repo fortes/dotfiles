@@ -642,7 +642,6 @@ use('https://github.com/stevearc/conform.nvim', function()
       },
     },
     formatters_by_ft = {
-      bash = { 'shfmt' },
       css = { 'oxfmt' },
       html = { 'oxfmt' },
       javascript = deno_or_oxfmt,
@@ -651,6 +650,7 @@ use('https://github.com/stevearc/conform.nvim', function()
       jsonc = deno_or_oxfmt,
       markdown = deno_or_oxfmt,
       python = { 'ruff' },
+      sh = { 'shfmt' },
       typescript = deno_or_oxfmt,
       typescriptreact = deno_or_oxfmt,
       yaml = { 'oxfmt' },
