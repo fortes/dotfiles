@@ -570,9 +570,10 @@ augroup easy_close
   autocmd FileType help,qf,checkhealth nnoremap <buffer> <cr> <cr>
 augroup END
 
-" Make j/k move screen visible lines, not file lines
-nnoremap j gj
-nnoremap k gk
+" Make j/k move screen visible lines, not file lines, unless given a count so
+" relative line numbers still line up
+nnoremap <expr> j v:count ? 'j' : 'gj'
+nnoremap <expr> k v:count ? 'k' : 'gk'
 
 " [n / ]n to jump between conflict markers and diff hunk headers, ported from
 " vim-unimpaired. In operator-pending and Visual mode they select the whole
