@@ -2,6 +2,16 @@
 -- Load all base / legacy options from ~/.vimrc
 vim.cmd('source ~/.vimrc')
 
+-- Everything below assumes nvim 0.12+ (`vim.pack`, `tsc --lsp`, ...). Older
+-- builds, like the ones distros ship, keep the plugin-free ~/.vimrc setup
+if vim.fn.has('nvim-0.12') == 0 then
+  vim.notify(
+    'init.lua needs Neovim 0.12+, skipping plugins and LSP (~/.vimrc still applies)',
+    vim.log.levels.WARN
+  )
+  return
+end
+
 -- Helper for keymaps
 local function map(mode, lhs, rhs, opts)
   opts = vim.tbl_extend('force', { silent = true }, opts or {})

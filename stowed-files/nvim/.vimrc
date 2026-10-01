@@ -179,7 +179,8 @@ endif
 if has('nvim')
   augroup HighlightedYank
     autocmd!
-    autocmd TextYankPost * lua vim.hl.on_yank {on_visual=false}
+    " `vim.hl` was `vim.highlight` before nvim 0.11
+    autocmd TextYankPost * lua (vim.hl or vim.highlight).on_yank {on_visual=false}
   augroup END
 elseif has('packages')
   " Ships with recent Vim 9.1 patches
@@ -278,13 +279,13 @@ if has('statusline')
   let g:activeStatusLine.='%<%f '
   " Exclamation mark if not modifiable, + if modified
   let g:activeStatusLine.="%{&readonly ? \"! \" : &modified ? '+ ' : ''}"
-  " Start left align; nvim: diagnostic summary (e.g. "E:2 W:1")
+  " Start left align; nvim 0.12+: diagnostic summary (e.g. "E:2 W:1")
   let g:activeStatusLine.='%= %{DiagStatus()}'
   " Filetype and position
   let g:activeStatusLine.="%{&filetype == '' ? 'none' : &filetype} "
   let g:activeStatusLine.='%l:%2c '
   function! DiagStatus() abort
-    if !has('nvim')
+    if !has('nvim-0.12')
       return ''
     endif
     let s = v:lua.vim.diagnostic.status()
@@ -394,8 +395,8 @@ set listchars=trail:·,tab:→-,nbsp:␣
 set listchars+=extends:»,precedes:«
 " Indent guides
 set listchars+=multispace:\ ·,leadmultispace:\┊\ ,
-if has('nvim')
-  " Indent guide for leading tabs (not supported by Vim)
+if has('nvim-0.12')
+  " Indent guide for leading tabs (not supported by Vim or older nvim)
   set listchars+=leadtab:\┊\ ,
 endif
 
