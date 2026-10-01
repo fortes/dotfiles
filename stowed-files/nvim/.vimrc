@@ -471,7 +471,7 @@ if has('eval')
       let [buffer, line, col, _] = mark.pos
       let text = readfile(filename)[line - 1]
 
-      call add(items, { 'filename': filename, 'buffer': buffer, 'text': name..' | '..text, 'lnum': line, 'col': col || 1 })
+      call add(items, { 'filename': filename, 'buffer': buffer, 'text': name..' | '..text, 'lnum': line, 'col': max([col, 1]) })
     endfor
 
     call setqflist([], 'r', {'title': 'Marks', 'items': items})
