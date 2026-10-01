@@ -63,7 +63,7 @@ display_menu() {
     "" \
     "Previous" "z" "run-shell -b '${previous_command}'" \
     "${verb}" "c" "run-shell -b '${toggle_command}'" \
-    "Stop" "v" "run-shell -b '${toggle_command}'" \
+    "Stop" "v" "run-shell -b '${stop_command}'" \
     "Next" "b" "run-shell -b '${next_command}'" \
     "" \
     "Close" "q" ""
