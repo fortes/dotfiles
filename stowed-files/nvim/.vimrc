@@ -22,7 +22,6 @@ if !has('nvim')
   set autoread
   set background=dark
   set backspace=indent,eol,start
-  set belloff=all
   set comments+=fb:•
   " vim-only: cscope removed from nvim in 0.9
   set cscopeverbose
@@ -62,8 +61,6 @@ if !has('nvim')
   set switchbuf=uselast
   set tabpagemax=50
   set tags=./tags;,tags
-  set ttimeout
-  set ttimeoutlen=50
   set ttyfast
   set viewoptions+=unix,slash
   set viewoptions-=options
@@ -126,7 +123,13 @@ endif
 " Wait just under a second before CursorHold is fired
 set updatetime=750
 
-" Mapping timeout. Keycodes keep nvim's 50ms `ttimeoutlen`, mirrored above
+" No bells, and nvim's 50ms keycode timeout. Top-level rather than in the Vim
+" block above so vim.tiny, which skips `if` blocks, gets them too
+set belloff=all
+set ttimeout
+set ttimeoutlen=50
+
+" Mapping timeout
 set timeoutlen=600
 
 " Neovim 0.12+ finds `pynvim-python` (from `uv tool install pynvim`) on $PATH
