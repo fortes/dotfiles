@@ -290,17 +290,14 @@ if has('statusline')
     endif
   endfunction
 
-  let g:quickfixStatusLine='%t (%l of %L)'
-  let g:quickfixStatusLine.='%{exists("w:quickfix_title")? " ".w:quickfix_title : ""}'
-  let g:quickfixStatusLine.='%=%-15(%l,%c%V%) %P'
-
   " Default status line
   let &statusline=g:activeStatusLine
 
-  " Use different status line for active vs. inactive buffers
+  " Use different status line for active vs. inactive buffers. Quickfix keeps
+  " the one its ftplugin sets
   function! UpdateStatusLine(status)
     if &filetype==?'qf'
-      let &l:statusline=g:quickfixStatusLine
+      return
     elseif &filetype==?'help' || &filetype==?'netrw'
       let &l:statusline=&filetype
     elseif a:status
