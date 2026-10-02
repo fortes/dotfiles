@@ -5,12 +5,7 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-# Make sure to load `command_exists` helper
-# shellcheck source=/dev/null
-. ~/.profile
-
 cmus_menu() {
-  local play_status
   local title
   local artist
   local album
@@ -72,7 +67,7 @@ display_menu() {
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-  if command_exists cmus-remote; then
+  if command -v cmus-remote >/dev/null 2>&1; then
     cmus_menu "${@}"
   fi
 fi
