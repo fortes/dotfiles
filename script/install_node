@@ -31,7 +31,7 @@ node_arch() {
     x86_64) echo "x64" ;;
     aarch64 | arm64) echo "arm64" ;;
     *)
-      >&2 echo "⨯ Unsupported architecture: $(uname -m)"
+      echo >&2 "⨯ Unsupported architecture: $(uname -m)"
       exit 1
       ;;
   esac
@@ -68,7 +68,7 @@ download_release() {
     awk -v file="${dist}.tar.gz" '$2 == file' SHASUMS256.txt \
       | sha256sum --check --status
   ) || {
-    >&2 echo "⨯ Checksum mismatch for ${dist}.tar.gz"
+    echo >&2 "⨯ Checksum mismatch for ${dist}.tar.gz"
     exit 1
   }
 
@@ -77,7 +77,7 @@ download_release() {
     --file "${WORK_DIR}/${dist}.tar.gz" --directory "${WORK_DIR}"
   # Catches missing shared libraries (libatomic1) or a mismatched userland
   if ! "${WORK_DIR}/${dist}/bin/node" --version >/dev/null; then
-    >&2 echo "⨯ Node ${version} does not run on this system"
+    echo >&2 "⨯ Node ${version} does not run on this system"
     exit 1
   fi
   rm --recursive --force -- "${INSTALL_ROOT:?}/${dist}"
@@ -86,12 +86,12 @@ download_release() {
 
 install_node() {
   if [[ "$#" -gt 0 ]]; then
-    >&2 echo "Usage: $(basename "$0")"
+    echo >&2 "Usage: $(basename "$0")"
     exit 1
   fi
 
   if [[ "$(uname -s)" != "Linux" ]]; then
-    >&2 echo "⨯ install_node is for Linux; use Homebrew on macOS"
+    echo >&2 "⨯ install_node is for Linux; use Homebrew on macOS"
     exit 1
   fi
 
@@ -102,7 +102,7 @@ install_node() {
   current="$(installed_version)"
   version="$(curl "${CURL_ARGS[@]}" "${DIST_URL}/index.json" | jq --raw-output '.[0].version')"
   if [[ ! "${version}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-    >&2 echo "⨯ Unexpected Node version in release index: ${version}"
+    echo >&2 "⨯ Unexpected Node version in release index: ${version}"
     exit 1
   fi
 

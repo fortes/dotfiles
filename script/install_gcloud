@@ -14,7 +14,7 @@ install_gcloud_mac() {
   declare -r brew_prefix="/opt/homebrew"
 
   if ! command_exists brew; then
-    >&2 echo "Homebrew not installed"
+    echo >&2 "Homebrew not installed"
     exit 1
   fi
 

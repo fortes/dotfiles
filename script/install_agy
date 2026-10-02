@@ -22,7 +22,7 @@ detect_platform() {
     x86_64 | amd64) arch="amd64" ;;
     arm64 | aarch64) arch="arm64" ;;
     *)
-      >&2 echo "⨯ Unsupported architecture: $(uname -m)"
+      echo >&2 "⨯ Unsupported architecture: $(uname -m)"
       exit 1
       ;;
   esac
@@ -52,7 +52,7 @@ install_agy() {
   fi
 
   if ! command_exists curl; then
-    >&2 echo "⨯ curl is required"
+    echo >&2 "⨯ curl is required"
     exit 1
   fi
 
@@ -63,7 +63,7 @@ install_agy() {
   local manifest_url="${DOWNLOAD_BASE_URL}/manifests/${platform}.json"
   local manifest_json
   if ! manifest_json="$(curl -fsSL "${manifest_url}")" || [[ -z "${manifest_json}" ]]; then
-    >&2 echo "⨯ Failed to fetch release manifest from ${manifest_url}"
+    echo >&2 "⨯ Failed to fetch release manifest from ${manifest_url}"
     exit 1
   fi
 
@@ -73,7 +73,7 @@ install_agy() {
   sha512="$(parse_json_key "${manifest_json}" sha512)"
 
   if [[ -z "${url}" || -z "${sha512}" ]]; then
-    >&2 echo "⨯ Malformed release manifest"
+    echo >&2 "⨯ Malformed release manifest"
     exit 1
   fi
 
@@ -97,7 +97,7 @@ install_agy() {
   echo -n "Downloading release package ... "
   if ! curl -fsSL -o "${staging_payload}" "${url}"; then
     echo
-    >&2 echo "⨯ Failed to download from ${url}"
+    echo >&2 "⨯ Failed to download from ${url}"
     exit 1
   fi
   echo "done"
@@ -105,7 +105,7 @@ install_agy() {
   local actual_hash
   actual_hash="$(sha512sum "${staging_payload}" | cut -d' ' -f1)"
   if [[ "${actual_hash}" != "${sha512}" ]]; then
-    >&2 echo "⨯ Checksum mismatch: downloaded payload may be corrupted or tampered with"
+    echo >&2 "⨯ Checksum mismatch: downloaded payload may be corrupted or tampered with"
     exit 1
   fi
 
@@ -113,7 +113,7 @@ install_agy() {
     echo -n "Extracting binary ... "
     if ! tar -xzf "${staging_payload}" -C "${STAGING_DIR}" antigravity; then
       echo
-      >&2 echo "⨯ Failed to extract release archive"
+      echo >&2 "⨯ Failed to extract release archive"
       exit 1
     fi
     echo "done"
@@ -130,7 +130,7 @@ install_agy() {
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   if ! command_exists apt-get; then
-    >&2 echo "⨯ install_agy is Linux-only; use the antigravity-cli brew cask on macOS"
+    echo >&2 "⨯ install_agy is Linux-only; use the antigravity-cli brew cask on macOS"
     exit 1
   fi
   install_agy "${@}"

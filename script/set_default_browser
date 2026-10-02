@@ -14,7 +14,7 @@ set_default_browser() {
   . "${HOME}/.profile"
 
   if ! command_exists update-alternatives; then
-    >&2 echo "update-alternatives not found, skipping"
+    echo >&2 "update-alternatives not found, skipping"
     exit 1
   fi
 
@@ -24,14 +24,14 @@ set_default_browser() {
   fi
 
   if [[ -z "${desired_browser_path:-}" ]]; then
-    >&2 echo "No desired browser found, skipping"
+    echo >&2 "No desired browser found, skipping"
     exit
   fi
 
   # Bail if `update-alternatives` isn't set up for x-www-browser, may want to
   # manually install options at some point, but for now ignore
   if ! update-alternatives --query x-www-browser &>/dev/null; then
-    >&2 echo "update-alternatives not set for x-www-browser, skipping"
+    echo >&2 "update-alternatives not set for x-www-browser, skipping"
     exit
   fi
 

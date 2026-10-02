@@ -15,7 +15,7 @@ PLUGINS=(
 
 install_yazi_plugins() {
   if ! command_exists ya; then
-    >&2 echo "⨯ yazi not installed!"
+    echo >&2 "⨯ yazi not installed!"
     exit 1
   fi
 

@@ -16,6 +16,6 @@ elif uname -s | grep -q Darwin; then
 elif command -v apt >/dev/null 2>&1; then
   exec "${script_dir}/setup_linux" "$@"
 else
-  >&2 echo 'Unsupported OS'
+  echo >&2 'Unsupported OS'
   exit 1
 fi

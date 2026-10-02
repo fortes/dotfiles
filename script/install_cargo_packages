@@ -33,7 +33,7 @@ install_cargo_packages() {
         exit 0
         ;;
       *)
-        >&2 echo "Unknown option: ${1}"
+        echo >&2 "Unknown option: ${1}"
         print_usage
         exit 1
         ;;
@@ -41,7 +41,7 @@ install_cargo_packages() {
   done
 
   if ! command_exists cargo; then
-    >&2 echo "⨯ cargo not installed"
+    echo >&2 "⨯ cargo not installed"
     exit 1
   fi
 

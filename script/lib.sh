@@ -15,7 +15,7 @@ command_exists() {
 }
 
 echo_stderr() {
-  >&2 echo "${@}"
+  echo >&2 "${@}"
 }
 
 # Whether a stow package is listed in the space-separated
