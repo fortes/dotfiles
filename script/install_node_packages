@@ -12,6 +12,7 @@ NPM_PACKAGES=(
   @tobilu/qmd
   agent-browser
   bash-language-server
+  cf
   corepack
   cssmodules-language-server
   dockerfile-language-server-nodejs
