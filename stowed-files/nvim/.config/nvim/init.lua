@@ -13,10 +13,8 @@ end
 -- Everything below assumes nvim 0.12+ (`vim.pack`, `tsc --lsp`, ...). Older
 -- builds, like the ones distros ship, keep the plugin-free ~/.vimrc setup
 if vim.fn.has('nvim-0.12') == 0 then
-  vim.notify(
-    'init.lua needs Neovim 0.12+, skipping plugins and LSP (~/.vimrc still applies)',
-    vim.log.levels.WARN
-  )
+  -- Short enough to not trigger a hit-enter prompt in an 80-column terminal
+  vim.notify('nvim < 0.12: ~/.vimrc only, no plugins/LSP', vim.log.levels.WARN)
   source_local_config()
   return
 end
