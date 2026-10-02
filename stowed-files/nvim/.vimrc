@@ -640,7 +640,10 @@ endif
 " Option toggles, in the style of vim-unimpaired, which each echo the new state.
 " `yoe` (diagnostics) and `yog` (grammar) need Neovim, so they live in init.lua.
 nnoremap yon :setlocal number!<cr>:setlocal number?<cr>
-nnoremap yos :setlocal spell!<cr>:setlocal spell?<cr>
+" vim.tiny has no spell support, so it skips this
+if has('spell')
+  nnoremap yos :setlocal spell!<cr>:setlocal spell?<cr>
+endif
 
 " Never use ZZ, too dangerous
 nnoremap ZZ <nop>
