@@ -2,6 +2,23 @@
 -- Load all base / legacy options from ~/.vimrc
 vim.cmd('source ~/.vimrc')
 
+-- Load local config, if present. Last, so it can override plugin setup
+local function source_local_config()
+  local local_config_path = vim.fn.expand('~/.nvimrc.local')
+  if vim.fn.filereadable(local_config_path) == 1 then
+    vim.cmd('source ' .. local_config_path)
+  end
+end
+
+-- Everything below assumes nvim 0.12+ (`vim.pack`, `tsc --lsp`, ...). Older
+-- builds, like the ones distros ship, keep the plugin-free ~/.vimrc setup
+if vim.fn.has('nvim-0.12') == 0 then
+  -- Short enough to not trigger a hit-enter prompt in an 80-column terminal
+  vim.notify('nvim < 0.12: ~/.vimrc only, no plugins/LSP', vim.log.levels.WARN)
+  source_local_config()
+  return
+end
+
 -- Helper for keymaps
 local function map(mode, lhs, rhs, opts)
   opts = vim.tbl_extend('force', { silent = true }, opts or {})
@@ -591,7 +608,7 @@ use('https://github.com/nvim-telescope/telescope.nvim', function()
   map('n', '<leader>*', function()
     builtin.live_grep({ default_text = vim.fn.expand('<cword>') })
   end, { desc = 'Live grep current word' })
-  map('v', '<leader>*', function()
+  map('x', '<leader>*', function()
     local text = table.concat(
       vim.fn.getregion(vim.fn.getpos('v'), vim.fn.getpos('.'), { type = vim.fn.mode() }),
       '\n'
@@ -642,7 +659,6 @@ use('https://github.com/stevearc/conform.nvim', function()
       },
     },
     formatters_by_ft = {
-      bash = { 'shfmt' },
       css = { 'oxfmt' },
       html = { 'oxfmt' },
       javascript = deno_or_oxfmt,
@@ -651,13 +667,14 @@ use('https://github.com/stevearc/conform.nvim', function()
       jsonc = deno_or_oxfmt,
       markdown = deno_or_oxfmt,
       python = { 'ruff' },
+      sh = { 'shfmt' },
       typescript = deno_or_oxfmt,
       typescriptreact = deno_or_oxfmt,
       yaml = { 'oxfmt' },
     },
   })
 
-  map('', '<leader>f', function()
+  map({ 'n', 'x' }, '<leader>f', function()
     require('conform').format({ async = true })
   end, { desc = 'Format buffer' })
 end)
@@ -760,7 +777,7 @@ use('https://github.com/obsidian-nvim/obsidian.nvim', function()
   map('n', '<leader>on', '<cmd>Obsidian new<cr>', { desc = 'Obsidian new note' })
   map('n', '<leader>or', '<cmd>Obsidian rename<cr>', { desc = 'Obsidian rename' })
   map('n', '<leader>oc', '<cmd>Obsidian toc<cr>', { desc = 'Obsidian table of contents' })
-  map('v', '<leader>ol', '<cmd>Obsidian link<cr>', { desc = 'Obsidian link selection' })
+  map('x', '<leader>ol', '<cmd>Obsidian link<cr>', { desc = 'Obsidian link selection' })
 
   vim.api.nvim_create_autocmd('BufEnter', {
     group = vim.api.nvim_create_augroup('obsidian_notes', { clear = true }),
@@ -817,14 +834,14 @@ use('https://github.com/lewis6991/gitsigns.nvim', function()
       end, { buffer = bufnr, desc = 'Previous hunk' })
 
       map('n', '<leader>hs', ':Gitsigns stage_hunk<CR>', { buffer = bufnr, desc = 'Stage hunk' })
-      map('v', '<leader>hs', function()
+      map('x', '<leader>hs', function()
         gitsigns.stage_hunk({ vim.fn.line('.'), vim.fn.line('v') })
       end, { buffer = bufnr, desc = 'Stage hunk' })
       map('n', '<leader>hS', ':Gitsigns undo_stage_hunk<CR>', { buffer = bufnr, desc = 'Unstage hunk' })
       map('n', '<leader>hp', ':Gitsigns preview_hunk<CR>', { buffer = bufnr, desc = 'Preview hunk' })
       map('n', '<leader>hi', ':Gitsigns preview_hunk_inline<CR>', { buffer = bufnr, desc = 'Preview hunk inline' })
       map('n', '<leader>hr', ':Gitsigns reset_hunk<CR>', { buffer = bufnr, desc = 'Reset hunk' })
-      map('v', '<leader>hr', function()
+      map('x', '<leader>hr', function()
         gitsigns.reset_hunk({ vim.fn.line('.'), vim.fn.line('v') })
       end, { buffer = bufnr, desc = 'Reset hunk' })
 
@@ -855,13 +872,6 @@ use('https://github.com/justinmk/vim-dirvish', function()
     group = vim.api.nvim_create_augroup('dirvish_bindings', { clear = true }),
     pattern = 'dirvish',
     callback = function()
-      -- `.vimrc`'s `nnoremap <cr> <cr>` for filetype=dirvish (undoing the
-      -- global <leader>-less <cr> remap) fires after Dirvish's own ftplugin
-      -- mapping and clobbers it back to plain line-down. Restore it here,
-      -- since this autocmd group is registered last.
-      map('n', '<cr>', function()
-        vim.cmd('call dirvish#open("edit", 0)')
-      end, { buffer = 0, desc = 'Open file' })
       map('n', '<leader>T', function()
         vim.cmd('call dirvish#open("tabedit", 0)')
       end, { buffer = 0, desc = 'Open file in new tab' })
@@ -937,8 +947,4 @@ for _, setup_fn in ipairs(_setups) do
   setup_fn()
 end
 
--- Load local config, if present
-local local_config_path = vim.fn.expand('~/.nvimrc.local')
-if vim.fn.filereadable(local_config_path) == 1 then
-  vim.cmd('source ' .. local_config_path)
-end
+source_local_config()

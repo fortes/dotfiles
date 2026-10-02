@@ -2,32 +2,34 @@
 
 " Configuration for vanilla (neo)vim, with no plugins
 
+" Before any non-ASCII character in this file, and outside any `if` so
+" vim.tiny gets it too. `scriptencoding` has to follow `set encoding`
+set encoding=utf-8
+scriptencoding utf-8
+
 " Neovim-vim deltas {{{
 if !has('nvim')
   " Mirror Neovim defaults in Vim (see :help vim-differences). Best-effort:
   " some options require a Vim build/version that supports them.
 
+  " Implied when Vim finds ~/.vimrc itself, but not with `vim -u ~/.vimrc`.
+  " First, since it resets other options
+  if &compatible
+    set nocompatible
+  endif
+
   set autoindent
   set autoread
   set background=dark
   set backspace=indent,eol,start
-  set belloff=all
-  set nocompatible
   set comments+=fb:•
   " vim-only: cscope removed from nvim in 0.9
   set cscopeverbose
   set display=lastline
   silent! set diffopt+=linematch:40      " requires internal diff engine
   silent! set diffopt+=indent-heuristic  " requires internal diff engine
-  set encoding=utf-8
-  set fillchars=vert:│,fold:·
-  if exists('+foldsep')
-    set fillchars+=foldsep:│
-  endif
-  set formatoptions=tcq
-  if v:version >= 704
-    set formatoptions+=j
-  endif
+  set fillchars=vert:│,fold:·,foldsep:│
+  set formatoptions=tcqj
   set nofsync
   set hidden
   set history=10000
@@ -35,9 +37,6 @@ if !has('nvim')
   set include=
   set incsearch
   set nojoinspaces
-  if exists('+jumpoptions')
-    silent! set jumpoptions=clean  " 'clean' value requires Vim 9.1+
-  endif
   if exists('+langnoremap')
     set langnoremap
   endif
@@ -62,8 +61,6 @@ if !has('nvim')
   set switchbuf=uselast
   set tabpagemax=50
   set tags=./tags;,tags
-  set ttimeout
-  set ttimeoutlen=50
   set ttyfast
   set viewoptions+=unix,slash
   set viewoptions-=options
@@ -78,34 +75,26 @@ if !has('nvim')
   inoremap <C-W> <C-G>u<C-W>
 
   " Enable syntax highlighting by default
-  if has('syntax')
-    syntax enable
-  endif
+  syntax enable
 endif
 " }}}
 
 " Base Configuration {{{
 
-scriptencoding utf-8
-
-" Load matchit.vim for vim (nvim ships it enabled by default)
-if !has('nvim') && !exists('g:loaded_matchit') && findfile('plugin/matchit.vim', &runtimepath) ==# ''
-  runtime! macros/matchit.vim
-endif
-
-" Use `:Cfilter` / `:Lfilter` to filter quickfix / location lists
-" Useful with `:colder` and `:cnewer` to restore previous lists
 if has('packages')
+  " Load matchit.vim for vim (nvim ships it enabled by default)
+  if !has('nvim')
+    packadd! matchit
+  endif
+
+  " Use `:Cfilter` / `:Lfilter` to filter quickfix / location lists
+  " Useful with `:colder` and `:cnewer` to restore previous lists
   packadd cfilter
 endif
 
 " Core Behavior {{{
-if exists('+modelineexpr')
-  set nomodelineexpr
-else
-  " Disable for security reasons when `modelineexpr` does not exist
-  set nomodeline
-endif
+" Don't let modelines run expressions
+set nomodelineexpr
 
 " Read project-local config (.nvim.lua, .nvimrc, .exrc) from current and
 " parent dirs. In nvim 0.12+: no (a)llow prompt — must (v)iew then :trust.
@@ -134,10 +123,14 @@ endif
 " Wait just under a second before CursorHold is fired
 set updatetime=750
 
-" Mapping & keycode timeouts
-set timeoutlen=600
+" No bells, and nvim's 50ms keycode timeout. Top-level rather than in the Vim
+" block above so vim.tiny, which skips `if` blocks, gets them too
+set belloff=all
 set ttimeout
-set ttimeoutlen=200
+set ttimeoutlen=50
+
+" Mapping timeout
+set timeoutlen=600
 
 " Neovim 0.12+ finds `pynvim-python` (from `uv tool install pynvim`) on $PATH
 " automatically; no need to set g:python3_host_prog.
@@ -145,9 +138,7 @@ set ttimeoutlen=200
 
 " UI {{{
 " Maintain indent when wrapping
-if exists('+breakindent')
-  set breakindent
-endif
+set breakindent
 
 " Highlight textwidth column
 set colorcolumn=+1
@@ -175,23 +166,23 @@ if exists('&inccommand')
   set inccommand=split
 endif
 
-augroup HighlightedYank
-  autocmd!
-  autocmd TextYankPost * silent! lua vim.hl.on_yank {on_visual=false}
-augroup END
-
-" Let same document scroll differently in separate panes
-set noscrollbind
+" Briefly highlight yanked text
+if has('nvim')
+  augroup HighlightedYank
+    autocmd!
+    " `vim.hl` was `vim.highlight` before nvim 0.11
+    autocmd TextYankPost * lua (vim.hl or vim.highlight).on_yank {on_visual=false}
+  augroup END
+else
+  " Ships with recent Vim 9.1 patches
+  silent! packadd hlyank
+endif
 
 " Hide default mode text (i.e. INSERT below status line)
 set noshowmode
 
 " Use 5 characters for number well
 set numberwidth=5
-
-" Disable visual bell
-set noerrorbells
-set visualbell t_vb=
 
 " Keep lines in view at edges of screen
 set scrolloff=5
@@ -216,16 +207,14 @@ if exists('+winborder')
   set winborder=rounded
 endif
 if exists('+pumborder')
-  set pumborder=rounded
+  " Vim spells it `round`
+  let &pumborder = has('nvim') ? 'rounded' : 'round'
 endif
 
 " When closing a tab, focus the previous (left) tab rather than the right
 if exists('+tabclose')
   set tabclose=left
 endif
-
-" Reasonable tab completion
-set wildmode=full
 
 " Resize splits when the window is resized
 augroup on_vim_resized
@@ -252,8 +241,9 @@ augroup auto_save
   autocmd BufEnter,BufWinEnter,CursorHold,FocusGained * silent! checktime
 augroup END
 
-" Support mac files
-set fileformats+=mac
+" Support mac files. Set in full, since Debian's `vi` (vim.tiny) runs in
+" compatible mode, where the default is empty and `+=mac` would leave only mac
+set fileformats=unix,dos,mac
 
 " Don't use backup files, we have Git for that
 set nobackup
@@ -283,7 +273,7 @@ if has('statusline')
   " Exclamation mark if not modifiable, + if modified
   let g:activeStatusLine.="%{&readonly ? \"! \" : &modified ? '+ ' : ''}"
   " Start left align; nvim 0.12+: diagnostic summary (e.g. "E:2 W:1")
-  let g:activeStatusLine.='%= %{DiagStatus()}'
+  let g:activeStatusLine.='%= %{%DiagStatus()%}'
   " Filetype and position
   let g:activeStatusLine.="%{&filetype == '' ? 'none' : &filetype} "
   let g:activeStatusLine.='%l:%2c '
@@ -299,21 +289,18 @@ if has('statusline')
       " Shitty unicode character w/o patched fonts
       return '‡'.FugitiveHead()
     else
-      return fnamemodify(getwinvar(0, 'getcwd', getcwd()), ':t')
+      return fnamemodify(getcwd(), ':t')
     endif
   endfunction
 
-  let g:quickfixStatusLine='%t (%l of %L)'
-  let g:quickfixStatusLine.='%{exists("w:quickfix_title")? " ".w:quickfix_title : ""}'
-  let g:quickfixStatusLine.='%=%-15(%l,%c%V%) %P'
-
   " Default status line
-  let statusline=g:activeStatusLine
+  let &statusline=g:activeStatusLine
 
-  " Use different status line for active vs. inactive buffers
+  " Use different status line for active vs. inactive buffers. Quickfix keeps
+  " the one its ftplugin sets
   function! UpdateStatusLine(status)
     if &filetype==?'qf'
-      let &l:statusline=g:quickfixStatusLine
+      return
     elseif &filetype==?'help' || &filetype==?'netrw'
       let &l:statusline=&filetype
     elseif a:status
@@ -350,40 +337,37 @@ set shiftround
 " Keyword completion brings in the dictionary if spell check is enabled.
 " Also included files
 set complete+=kspell,i
-if has('nvim-0.10')
-  " Also include buffer names, if supported
+if has('nvim')
+  " Also include buffer names (not supported by Vim)
   set complete+=f
 endif
 
-" Show menu even when only one match, don't autoselect
-set completeopt=menuone,noselect
-" popup shows match info in a floating window (nvim 0.10+, vim 9.1+)
-silent! set completeopt+=popup
-if has('nvim-0.11')
-  " Fuzzy completion added in 0.11
-  set completeopt+=fuzzy
-endif
-if has('nvim-0.12')
-  " Sort matches by distance to cursor, added in 0.12
-  set completeopt+=nearest
-endif
+" Show menu even when only one match, don't autoselect, show match info in a
+" popup
+set completeopt=menuone,noselect,popup
+" Match fuzzily (Vim 9.1.0463+), and sort matches by distance to cursor (nvim
+" 0.12+, recent Vim 9.1). Separate lines, since one rejected value fails the set
+silent! set completeopt+=fuzzy
+silent! set completeopt+=nearest
 
 " Make sure there's a default dictionary for completion
 if filereadable('/usr/share/dict/words')
   set dictionary+=/usr/share/dict/words
 endif
 
-" Make completion work a bit more like traditional IDEs w/o losing useful keys
+" Make completion work a bit more like traditional IDEs w/o losing useful keys.
+" `<expr>` maps need +eval: vim.tiny would map the literal keys `<expr>`
+if has('eval')
+  inoremap <silent><expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+  inoremap <silent><expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 
-inoremap <silent><expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
-inoremap <silent><expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+  " Enter to confirm completion item
+  inoremap <silent><expr> <CR> pumvisible() ? "\<C-y>" : "\<CR>"
 
-" Enter to confirm completion item
-inoremap <silent><expr> <CR> pumvisible() ? "\<C-y>" : "\<CR>"
-
-" PageUp/PageDown doesn't select item by default
-inoremap <silent><expr> <PageDown> pumvisible() ? "\<PageDown>\<C-p>\<C-n>" : "\<PageDown>"
-inoremap <silent><expr> <PageUp> pumvisible() ? "\<PageUp>\<C-p>\<C-n>" : "\<PageUp>"
+  " PageUp/PageDown doesn't select item by default
+  inoremap <silent><expr> <PageDown> pumvisible() ? "\<PageDown>\<C-p>\<C-n>" : "\<PageDown>"
+  inoremap <silent><expr> <PageUp> pumvisible() ? "\<PageUp>\<C-p>\<C-n>" : "\<PageUp>"
+endif
 " }}}
 
 " Default formatoptions (as of neovim): tcqj
@@ -404,7 +388,7 @@ set listchars+=extends:»,precedes:«
 " Indent guides
 set listchars+=multispace:\ ·,leadmultispace:\┊\ ,
 if has('nvim-0.12')
-  " Indent guide for leading tabs (added in 0.12)
+  " Indent guide for leading tabs (not supported by Vim or older nvim)
   set listchars+=leadtab:\┊\ ,
 endif
 
@@ -435,11 +419,9 @@ if !exists('g:colors_name')
   silent! colorscheme desert
 endif
 
-if has('termguicolors')
-  " Mac doesn't ship with tmux terminfo
-  if $COLORTERM == 'truecolor' || $TERM =~ '^\(xterm\|tmux\)-256'
-    set termguicolors
-  endif
+" Mac doesn't ship with tmux terminfo
+if $COLORTERM == 'truecolor' || $TERM =~ '^\(xterm\|tmux\)-256'
+  set termguicolors
 endif
 
 " Only highlight first 500 chars for better performance
@@ -485,7 +467,7 @@ if has('eval')
       let [buffer, line, col, _] = mark.pos
       let text = readfile(filename)[line - 1]
 
-      call add(items, { 'filename': filename, 'buffer': buffer, 'text': name..' | '..text, 'lnum': line, 'col': col || 1 })
+      call add(items, { 'filename': filename, 'buffer': buffer, 'text': name..' | '..text, 'lnum': line, 'col': max([col, 1]) })
     endfor
 
     call setqflist([], 'r', {'title': 'Marks', 'items': items})
@@ -507,59 +489,40 @@ if has('eval')
       let @s = temp
     endfunction
 
-    vnoremap * :<C-u>call <SID>VisualSetSearch('/')<cr>/<C-R>=@/<cr><cr>
-    vnoremap # :<C-u>call <SID>VisualSetSearch('#')<cr>/<C-R>=@/<cr><cr>
+    xnoremap * :<C-u>call <SID>VisualSetSearch('/')<cr>/<C-R>=@/<cr><cr>
+    xnoremap # :<C-u>call <SID>VisualSetSearch('#')<cr>/<C-R>=@/<cr><cr>
   endif
 
-  function! IsInsideGitRepo()
-    let result=systemlist('git rev-parse --is-inside-work-tree')
-    if v:shell_error
-      return 0
-    else
-      return 1
-    endif
-  endfunction
-
-  function! FindGitRootCD()
-    let root = systemlist('git -C ' . expand('%:p:h') . ' rev-parse --show-toplevel')[0]
-    if v:shell_error
-      return ''
-    else
-      return {'dir': root}
-    endif
-  endfunction
-
-  function! GetSearchPath()
-    let result = FindGitRootCD()
-    if type(result) == type({})
-      let repo_root = result['dir']
-      if getcwd() == repo_root
-        return '.'
-      else
-        return fnamemodify(repo_root, ':~:.')
-      endif
-    else
-      return '.'
-    endif
+  " Git root of the current file's directory, or '' outside a repo
+  function! s:GitRoot() abort
+    let root = systemlist('git -C ' . shellescape(expand('%:p:h')) . ' rev-parse --show-toplevel')
+    return v:shell_error ? '' : root[0]
   endfunction
 
   " Change to git root of current file (if in a repo)
-  function! GitRootCD()
-    let result = FindGitRootCD()
-    if type(result) == type({})
-      execute 'tcd' fnameescape(result['dir'])
-      echo 'Now in '.fnamemodify(result['dir'], ':~:.')
-    else
+  function! s:GitRootCD() abort
+    let root = s:GitRoot()
+    if root ==# ''
       echo 'Not in git repo!'
+    else
+      execute 'tcd' fnameescape(root)
+      echo 'Now in '.fnamemodify(root, ':~:.')
     endif
   endfunction
-  command! GitRootCD :call GitRootCD()
+  command! GitRootCD call s:GitRootCD()
 
   " Project-wide counterpart to `*`, which searches the word under the cursor
   " within the buffer. Not on `Q`: Neovim 0.13 makes that multiple-cursors.
   if !has('nvim')
+    " Where to grep: the current file's repo, relative to cwd when possible.
+    " Escaped, since it's typed into the :lgrep command line
+    function! GetSearchPath() abort
+      let root = s:GitRoot()
+      return root ==# '' || root ==# getcwd() ? '.' : fnameescape(fnamemodify(root, ':~:.'))
+    endfunction
+
     nnoremap <leader>* :lgrep! "<C-R><C-W>" <C-R>=GetSearchPath()<CR>
-    vnoremap <leader>* :<C-u>norm! gv"sy<cr>:lgrep! "<C-R>s" <C-R>=GetSearchPath()<CR>
+    xnoremap <leader>* :<C-u>norm! gv"sy<cr>:lgrep! "<C-R>s" <C-R>=GetSearchPath()<CR>
   endif
 endif
 
@@ -571,10 +534,12 @@ augroup auto_quickfix
   autocmd QuickFixCmdPost grep,make cwindow|redraw!
 augroup END
 
-" Use ag instead of grep, if available
+" Use rg instead of grep, if available
 if executable('rg')
-  " Print every match on its own line with filename, line, and column numbers
+  " Print every match on its own line with filename, line, and column numbers.
+  " Unlike nvim's default (`rg --vimgrep -uu`), this respects .gitignore
   set grepprg=rg\ --vimgrep
+  set grepformat=%f:%l:%c:%m
 else
   " Mimic rg settings (literal, recursive, ignore common directories)
   set grepprg=grep\ --with-filename\ --fixed-strings\ --binary-files=without-match\ --ignore-case\ --line-number\ --recursive\ --exclude-dir=socket\ --exclude-dir=.git\ --exclude-dir=node_modules\ $*\ /dev/null
@@ -586,10 +551,10 @@ endif
 
 " Use enter as colon for faster commands
 nnoremap <cr> :
-vnoremap <cr> :
+xnoremap <cr> :
 " Meta-enter in case you need an actual <cr>
 nnoremap <M-cr> <cr>
-vnoremap <M-cr> <cr>
+xnoremap <M-cr> <cr>
 
 " Close quickfix & help with q, Escape, or Control-C
 " Also, keep default <cr> binding
@@ -599,12 +564,18 @@ augroup easy_close
   autocmd FileType help,qf,checkhealth,dirvish nnoremap <buffer> <Esc> :q<cr>
   autocmd FileType help,qf,checkhealth,dirvish nnoremap <buffer> <C-c> :q<cr>
   " Undo <cr> -> : shortcut
-  autocmd FileType help,qf,checkhealth,dirvish nnoremap <buffer> <cr> <cr>
+  autocmd FileType help,qf,checkhealth nnoremap <buffer> <cr> <cr>
 augroup END
 
-" Make j/k move screen visible lines, not file lines
+" Make j/k move screen visible lines, not file lines, unless given a count so
+" relative line numbers still line up. vim.tiny (no `<expr>`, and it skips `if`
+" blocks) keeps the plain versions
 nnoremap j gj
 nnoremap k gk
+if has('eval')
+  nnoremap <expr> j v:count ? 'j' : 'gj'
+  nnoremap <expr> k v:count ? 'k' : 'gk'
+endif
 
 " [n / ]n to jump between conflict markers and diff hunk headers, ported from
 " vim-unimpaired. In operator-pending and Visual mode they select the whole
@@ -669,6 +640,7 @@ endif
 " Option toggles, in the style of vim-unimpaired, which each echo the new state.
 " `yoe` (diagnostics) and `yog` (grammar) need Neovim, so they live in init.lua.
 nnoremap yon :setlocal number!<cr>:setlocal number?<cr>
+" vim.tiny has no spell support, so it skips this
 if has('spell')
   nnoremap yos :setlocal spell!<cr>:setlocal spell?<cr>
 endif
@@ -684,10 +656,10 @@ endif
 
 " Run `.` or macro over selected lines, taken from:
 " https://reddit.com/r/vim/comments/3y2mgt
-vnoremap . :normal .<CR>
+xnoremap . :normal .<CR>
 if !has('nvim')
   " Neovim maps this by default, see |v_@-default|
-  vnoremap @ :normal @
+  xnoremap @ :normal @
 endif
 
 " Change local directory to current file
@@ -702,21 +674,14 @@ nnoremap <leader>cd :GitRootCD<cr>
 " Filetype configuration {{{
 augroup filetype_tweaks
   autocmd!
-  if !has('nvim')
-    " nvim has built-in detection for these extensions
-    autocmd BufNewFile,BufReadPost *.ts set filetype=typescript
-    autocmd BufNewFile,BufReadPost *.tsx set filetype=typescriptreact
-    " .md is markdown, not modula
-    autocmd BufNewFile,BufReadPost *.md set filetype=markdown
-  endif
   " README/TODO without extension: not auto-detected as markdown in either editor
   autocmd BufNewFile,BufReadPost README,TODO set filetype=markdown
 
   " Not all files should wrap automatically
-  autocmd BufNewFile,BufReadPost *.txt,*.md,*.json,*.conf,*.ini,*.pug setlocal textwidth=0
+  autocmd BufNewFile,BufReadPost *.txt,*.md,*.markdown,*.json,*.conf,*.ini setlocal textwidth=0
 
-  " Enable spell checking & linebreaking at words in some filetypes
-  autocmd BufNewFile,BufReadPost *.txt,*.md,*.markdown,COMMIT_EDITMSG setlocal spell linebreak
+  " Soft wrap prose at word boundaries (spell is on globally)
+  autocmd FileType markdown,text setlocal linebreak
 
   " Disable spell checking on unmodifiable files (what's the point?)
   autocmd BufReadPost * if !&modifiable | setlocal nospell | endif
@@ -745,23 +710,6 @@ augroup filetype_tweaks
     autocmd FileType typescript setlocal errorformat+=%-G%.%#
   endif
 
-  " Linting for LESS
-  if executable('lessc')
-    autocmd FileType less setlocal makeprg=lessc\ --lint\ --no-color\ %
-    autocmd FileType less setlocal errorformat=%E%.%#Error:\ %m\ in\ %f\ on\ line\ %l\\,\ column\ %c:
-    " Ignore unmatched lines
-    autocmd FileType less setlocal errorformat+=%-G%.%#
-  endif
-
-  " CSS linting
-  if executable('stylelint')
-    autocmd FileType css setlocal makeprg=stylelint\ %\ --no-color\ --fix\ --cache
-    " Push/pop filename on stack with %P%f
-    autocmd FileType css setlocal errorformat+=%P%f,%*[\ ]%l:%c%*[\ ]✖%*[\ ]%m
-    " Ignore unmatched lines
-    autocmd FileType css setlocal errorformat+=%-G%.%#
-  endif
-
   " Linting for shell scripts
   if executable('shellcheck')
     autocmd FileType sh setlocal makeprg=shellcheck\ -x\ -f\ gcc\ %
@@ -773,40 +721,34 @@ augroup filetype_tweaks
   endif
 
   if executable('shfmt')
-    autocmd FileType sh setlocal formatprg=shfmt\ --indent\ 2
+    autocmd FileType sh setlocal formatprg=shfmt\ -i\ 2\ -ci\ -bn
   endif
 
   " Use oxfmt to autoformat (gq in Visual mode)
   if executable('oxfmt')
-    autocmd FileType javascript,javascriptreact,typescript,typescriptreact,json,css,less,html,markdown,yaml setlocal formatprg=oxfmt\ --stdin-filepath\ %
-
-    " Use `formatprg` for `formatexpr` wherever we use `oxfmt` (in Neovim, conform.nvim owns formatexpr)
-    if !has('nvim')
-      autocmd FileType javascript,javascriptreact,typescript,typescriptreact,json,css,less,html,markdown,yaml setlocal formatexpr=
-    endif
+    autocmd FileType javascript,javascriptreact,typescript,typescriptreact,json,css,html,markdown,yaml setlocal formatprg=oxfmt\ --stdin-filepath\ %
   endif
 
   if executable('ruff')
     autocmd FileType python setlocal formatprg=ruff\ format\ --stdin-filename\ %\ -
   endif
 
-  " Find .js files when using `gf` (useful with require)
-  autocmd FileType javascript setlocal suffixesadd=.js,.json,index.js
-  autocmd FileType typescript setlocal suffixesadd=.ts,.tsx,.js,.jsx,.json,index.js,index.ts
+  " Find extensionless imports when using `gf`. No `index.*` entries: `gf` on
+  " `./dir` opens the directory itself before trying any suffix
+  autocmd FileType javascript,javascriptreact setlocal suffixesadd=.js,.jsx,.json
+  autocmd FileType typescript,typescriptreact setlocal suffixesadd=.ts,.tsx,.js,.jsx,.json
 
-  autocmd FileType markdown setlocal suffixesadd=.md,index.md
+  autocmd FileType markdown setlocal suffixesadd=.md
 
-  " Consider '-' part of a world when tab completion, etc in css/less
-  autocmd FileType css,less setlocal iskeyword+=-
+  " Consider '-' part of a word when tab completing, etc in css
+  autocmd FileType css setlocal iskeyword+=-
 
   " Don't wrap in commit messages
   autocmd FileType gitcommit setlocal nowrap textwidth=0
 
-  " Makefiles use tabs
-  autocmd FileType make setlocal noexpandtab shiftwidth=4
-
-  " Python uses 4 spaces
-  autocmd FileType python setlocal shiftwidth=4
+  " Show Makefile tabs 4 wide. The ftplugin already indents with tabs, and
+  " Python's with 4 spaces
+  autocmd FileType make setlocal tabstop=4
 
   " Don't wrap in quickfix, and don't show in buffer list
   autocmd FileType qf setlocal nowrap textwidth=0 nobuflisted
@@ -816,31 +758,15 @@ augroup END
 " Markdown config {{{
 if has('syntax')
   " Syntax highlight within fenced code blocks
-  let g:markdown_fenced_languages = ['bash=sh', 'css', 'html', 'js=javascript', 'less', 'ts=typescript', 'python', 'sh']
+  let g:markdown_fenced_languages = ['bash=sh', 'css', 'html', 'js=javascript', 'ts=typescript', 'python', 'sh']
 endif
 " }}}
 
 if has('spell')
   set spell
+  " Missing spell files are offered for download by nvim's built-in
+  " spellfile plugin and Vim's spellfile.vim
   set spelllang=en_us,pt_pt
-
-  let s:spell_dir = fnamemodify($MYVIMRC, ':h').'/spell'
-  let s:spell_file = (s:spell_dir).'/pt.utf-8.spl'
-  let s:spell_url = 'https://ftp.nluug.nl/vim/runtime/spell/pt.utf-8.spl'
-
-  " nvim 0.12+: package-spellfile built-in auto-downloads missing spell files
-  if !has('nvim-0.12')
-    " Download Portuguese dictionary if not present, but only if the directory
-    " is already present, else we might be using a temporary config file anyway
-    if isdirectory(s:spell_dir) && !filereadable(s:spell_file)
-      echo "Portuguese spell file not found. Downloading..."
-      if executable('curl')
-        execute '!curl -fLo ' . s:spell_file . ' ' . s:spell_url
-      elseif executable('wget')
-        execute '!wget -O ' . s:spell_file . ' ' . s:spell_url
-      endif
-    endif
-  endif
 
   " Re-generate spelling files if modified
   for d in glob(fnamemodify($MYVIMRC, ':h').'/spell/*.add', 1, 1)
@@ -853,10 +779,13 @@ endif
 " Disable things we don't care about
 " Providers only exist to host remote plugins (|rplugin|), and nothing here is
 " one -- every plugin is Lua or Vimscript. Disabling stops :checkhealth asking
-" for the `neovim` npm/gem/cpan package for each of them.
-let g:loaded_node_provider = 0
-let g:loaded_perl_provider = 0
-let g:loaded_ruby_provider = 0
+" for the `neovim` npm/gem/cpan package for each of them. Inside `if` since
+" vim.tiny has no `:let` (it skips `if` blocks entirely)
+if has('nvim')
+  let g:loaded_node_provider = 0
+  let g:loaded_perl_provider = 0
+  let g:loaded_ruby_provider = 0
+endif
 
 " Local Settings {{{
 if filereadable(expand('~/.vimrc.local'))
