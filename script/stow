@@ -20,6 +20,7 @@ IFS=$'\n\t'
 declare -r REAL_DIRS=(
   .ssh
   .config/cmus
+  .config/tmux
   .config/systemd/user
   .config/yazi
   .local/bin
@@ -84,9 +85,21 @@ main() {
     # remaining package
     options+=(--no-folding)
   elif [[ ${simulate} -eq 0 ]]; then
-    local dir
+    local dir real_stowed_path package
+    real_stowed_path="$(cd "${stowed_files_path}" && pwd -P)"
     for dir in "${REAL_DIRS[@]}"; do
       dir="${HOME}/${dir}"
+      # Unfold a directory an earlier run already folded into the repo, so
+      # stow relinks its contents one by one. Only when it belongs to a package
+      # being stowed, since nothing else would relink the contents
+      if [[ -L "${dir}" ]]; then
+        for package in "${packages[@]}"; do
+          if [[ "$(cd "${dir}" 2>/dev/null && pwd -P)" == "${real_stowed_path}/${package}/"* ]]; then
+            rm "${dir}"
+            break
+          fi
+        done
+      fi
       [[ -e "${dir}" || -L "${dir}" ]] && continue
       mkdir -p "${dir}"
       # Private, since it holds keys

@@ -19,7 +19,7 @@ PLUGINS=(
 
 install_llm_plugins() {
   if ! command_exists llm; then
-    >&2 echo "⨯ llm not installed!"
+    echo >&2 "⨯ llm not installed!"
     exit 1
   fi
 

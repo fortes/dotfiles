@@ -27,12 +27,12 @@ UVX_PACKAGES=(
 
 install_python_packages() {
   if ! command_exists pipx; then
-    >&2 echo "⨯ pipx not installed!"
+    echo >&2 "⨯ pipx not installed!"
     exit 1
   fi
 
   if ! command_exists uv; then
-    >&2 echo "⨯ uv not installed, installing"
+    echo >&2 "⨯ uv not installed, installing"
     pipx install --quiet --force uv
   fi
 

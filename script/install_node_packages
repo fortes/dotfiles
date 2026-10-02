@@ -60,12 +60,12 @@ rebuild_globals() {
 
   echo "Rebuilding global npm packages for Node $(node --version) …"
   npm rebuild --global --allow-scripts="${NPM_GLOBAL_ALLOW_SCRIPTS}" \
-    || >&2 echo "⚠ Rebuild failed, run: $(basename "$0") --rebuild"
+    || echo >&2 "⚠ Rebuild failed, run: $(basename "$0") --rebuild"
 }
 
 require_node() {
   if ! command_exists node || ! command_exists npm; then
-    >&2 echo "⨯ Node.js and npm must be on PATH (install via brew or script/install_node)"
+    echo >&2 "⨯ Node.js and npm must be on PATH (install via brew or script/install_node)"
     exit 1
   fi
 }
@@ -83,7 +83,7 @@ install_node_packages() {
         exit 0
         ;;
       *)
-        >&2 echo "Unknown option: ${1}"
+        echo >&2 "Unknown option: ${1}"
         print_usage
         exit 1
         ;;

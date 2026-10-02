@@ -12,8 +12,8 @@ set -euo pipefail
 IFS=$'\n\t'
 
 if [[ "$(uname -m)" != "arm64" ]]; then
-  >&2 echo "⨯ This dotfiles setup only supports Apple Silicon Macs."
-  >&2 echo "  Detected architecture: $(uname -m)"
+  echo >&2 "⨯ This dotfiles setup only supports Apple Silicon Macs."
+  echo >&2 "  Detected architecture: $(uname -m)"
   exit 1
 fi
 
@@ -203,7 +203,7 @@ install_homebrew_casks() {
 
 main() {
   if ! uname -s | grep -q Darwin; then
-    >&2 echo "Only works on Mac!"
+    echo >&2 "Only works on Mac!"
     exit 1
   fi
 
@@ -226,7 +226,7 @@ main() {
         exit 0
         ;;
       *)
-        >&2 echo "Unknown argument: $1"
+        echo >&2 "Unknown argument: $1"
         usage
         exit 1
         ;;

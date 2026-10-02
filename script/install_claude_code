@@ -16,7 +16,7 @@ install_claude_code() {
   fi
 
   if ! command_exists bun; then
-    >&2 echo "⨯ bun not installed"
+    echo >&2 "⨯ bun not installed"
     exit 1
   fi
 

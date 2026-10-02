@@ -5,12 +5,7 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-# Make sure to load `command_exists` helper
-# shellcheck source=/dev/null
-. ~/.profile
-
 cmus_menu() {
-  local play_status
   local title
   local artist
   local album
@@ -26,10 +21,12 @@ cmus_menu() {
     return
   fi
 
-  artist=$(echo "${cmus_status}" | grep -i '^tag artist ' | cut -d ' ' -f 3-)
-  title=$(echo "${cmus_status}" | grep -i '^tag title ' | cut -d ' ' -f 3-)
-  album=$(echo "${cmus_status}" | grep -i '^tag album ' | cut -d ' ' -f 3-)
-  genre=$(echo "${cmus_status}" | grep -i '^tag genre ' | cut -d ' ' -f 3-)
+  # A missing tag must not abort the script (set -e + pipefail), so tolerate no
+  # match and treat the tag as empty
+  artist=$(echo "${cmus_status}" | grep -i '^tag artist ' | cut -d ' ' -f 3- || true)
+  title=$(echo "${cmus_status}" | grep -i '^tag title ' | cut -d ' ' -f 3- || true)
+  album=$(echo "${cmus_status}" | grep -i '^tag album ' | cut -d ' ' -f 3- || true)
+  genre=$(echo "${cmus_status}" | grep -i '^tag genre ' | cut -d ' ' -f 3- || true)
 
   previous_command="cmus-remote --prev"
   toggle_command="cmus-remote --pause"
@@ -63,14 +60,14 @@ display_menu() {
     "" \
     "Previous" "z" "run-shell -b '${previous_command}'" \
     "${verb}" "c" "run-shell -b '${toggle_command}'" \
-    "Stop" "v" "run-shell -b '${toggle_command}'" \
+    "Stop" "v" "run-shell -b '${stop_command}'" \
     "Next" "b" "run-shell -b '${next_command}'" \
     "" \
     "Close" "q" ""
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-  if command_exists cmus-remote; then
+  if command -v cmus-remote >/dev/null 2>&1; then
     cmus_menu "${@}"
   fi
 fi
