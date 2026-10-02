@@ -270,7 +270,7 @@ if has('statusline')
   " Exclamation mark if not modifiable, + if modified
   let g:activeStatusLine.="%{&readonly ? \"! \" : &modified ? '+ ' : ''}"
   " Start left align; nvim 0.12+: diagnostic summary (e.g. "E:2 W:1")
-  let g:activeStatusLine.='%= %{DiagStatus()}'
+  let g:activeStatusLine.='%= %{%DiagStatus()%}'
   " Filetype and position
   let g:activeStatusLine.="%{&filetype == '' ? 'none' : &filetype} "
   let g:activeStatusLine.='%l:%2c '
