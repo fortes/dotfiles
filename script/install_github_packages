@@ -370,8 +370,7 @@ install_github_packages() {
       ;;
   esac
 
-  # GH_TOKEN, if set in ~/.profile.local, arrives via the environment:
-  # setup_linux sources it, and so does ~/.profile for login shells
+  # GH_TOKEN, if set in ~/.profile.local, arrives via ~/.profile
   GITHUB_API_TOKEN="$(github_api_token)"
 
   mkdir -p "${XDG_CACHE_HOME:-$HOME/.cache}"

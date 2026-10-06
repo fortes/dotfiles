@@ -23,9 +23,6 @@ CURL_ARGS=(
   --speed-limit 1024
   --speed-time 30
 )
-# Set once the staging directory exists, for the EXIT trap
-WORK_DIR=""
-
 node_arch() {
   case "$(uname -m)" in
     x86_64) echo "x64" ;;
@@ -37,51 +34,29 @@ node_arch() {
   esac
 }
 
-# Version of the `current` install (e.g. v26.10.0), empty if there isn't one
-# for this architecture (e.g. a home directory moved from another machine)
-installed_version() {
-  local target
-  target="$(readlink "${INSTALL_ROOT}/current" 2>/dev/null)" || return 0
-  [[ "${target}" == node-v*-linux-"$(node_arch)" ]] || return 0
-  [[ -x "${INSTALL_ROOT}/${target}/bin/node" ]] || return 0
-  target="${target#node-}"
-  echo "${target%%-*}"
-}
-
 major() {
   local version="${1#v}"
   echo "${version%%.*}"
 }
 
-# Download and check a release in WORK_DIR, then move it into place. WORK_DIR
-# is next to the final location, so the last step is a rename and an
-# interrupted run never leaves a partial install that looks complete
+# Download and verify before extracting. Interrupted installs can be rerun.
 download_release() {
   local version="$1" dist="$2"
-
-  curl "${CURL_ARGS[@]}" --output "${WORK_DIR}/SHASUMS256.txt" \
+  curl "${CURL_ARGS[@]}" --output "${INSTALL_ROOT}/SHASUMS256.txt" \
     "${DIST_URL}/${version}/SHASUMS256.txt"
-  curl "${CURL_ARGS[@]}" --output "${WORK_DIR}/${dist}.tar.gz" \
+  curl "${CURL_ARGS[@]}" --output "${INSTALL_ROOT}/${dist}.tar.gz" \
     "${DIST_URL}/${version}/${dist}.tar.gz"
   (
-    cd "${WORK_DIR}"
-    awk -v file="${dist}.tar.gz" '$2 == file' SHASUMS256.txt \
-      | sha256sum --check --status
+    cd "${INSTALL_ROOT}"
+    awk -v file="${dist}.tar.gz" '$2 == file' SHASUMS256.txt | sha256sum --check --status
   ) || {
     echo >&2 "⨯ Checksum mismatch for ${dist}.tar.gz"
     exit 1
   }
-
-  # Don't keep the tarball's owner when running as root
   tar --extract --gzip --no-same-owner \
-    --file "${WORK_DIR}/${dist}.tar.gz" --directory "${WORK_DIR}"
-  # Catches missing shared libraries (libatomic1) or a mismatched userland
-  if ! "${WORK_DIR}/${dist}/bin/node" --version >/dev/null; then
-    echo >&2 "⨯ Node ${version} does not run on this system"
-    exit 1
-  fi
-  rm --recursive --force -- "${INSTALL_ROOT:?}/${dist}"
-  mv --no-target-directory "${WORK_DIR}/${dist}" "${INSTALL_ROOT}/${dist}"
+    --file "${INSTALL_ROOT}/${dist}.tar.gz" --directory "${INSTALL_ROOT}"
+  "${INSTALL_ROOT}/${dist}/bin/node" --version >/dev/null
+  rm "${INSTALL_ROOT}/SHASUMS256.txt" "${INSTALL_ROOT}/${dist}.tar.gz"
 }
 
 install_node() {
@@ -99,7 +74,7 @@ install_node() {
 
   local arch current version
   arch="$(node_arch)"
-  current="$(installed_version)"
+  current="$("${INSTALL_ROOT}/current/bin/node" --version 2>/dev/null || true)"
   version="$(curl "${CURL_ARGS[@]}" "${DIST_URL}/index.json" | jq --raw-output '.[0].version')"
   if [[ ! "${version}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
     echo >&2 "⨯ Unexpected Node version in release index: ${version}"
@@ -111,24 +86,19 @@ install_node() {
     echo "✓ Node ${version} already installed"
   else
     echo "Installing Node ${version} …"
-    WORK_DIR="$(mktemp --directory "${INSTALL_ROOT}/.staging.XXXXXX")"
-    trap 'rm --recursive --force -- "${WORK_DIR}"' EXIT
     download_release "${version}" "${dist}"
     echo "✓ Node ${version} installed"
   fi
 
-  # Swap `current` with a rename so it never disappears mid-switch, then make
-  # sure the ~/.local/bin links exist (they go through `current`)
-  ln --symbolic --force --no-dereference "${dist}" "${INSTALL_ROOT}/.current.tmp"
-  mv --no-target-directory "${INSTALL_ROOT}/.current.tmp" "${INSTALL_ROOT}/current"
+  ln --symbolic --force --no-dereference "${dist}" "${INSTALL_ROOT}/current"
   local command
   for command in node npm npx; do
     ln --symbolic --force "${INSTALL_ROOT}/current/bin/${command}" "${BIN_DIR}/${command}"
   done
 
-  # Remove older versions and leftovers from interrupted runs
+  # Remove older versions
   local old
-  for old in "${INSTALL_ROOT}"/node-v* "${INSTALL_ROOT}"/.staging.*; do
+  for old in "${INSTALL_ROOT}"/node-v*; do
     if [[ -e "${old}" && "${old##*/}" != "${dist}" ]]; then
       rm --recursive --force -- "${old}"
     fi

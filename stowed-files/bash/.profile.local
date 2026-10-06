@@ -1,31 +1,5 @@
-#!/usr/bin/env bash
-#
-# Generate variable declarations based on machine attributes / settings
-#
-# Usage: create_local_profile > ~/.profile.local
-
-set -euo pipefail
-IFS=$'\n\t'
-
-main() {
-  local is_crostini
-  local is_mac
-  local is_docker
-
-  is_crostini=""
-  is_mac=""
-  is_docker=""
-
-  # TODO: Update to use deb822 format when Crostini supports it
-  [[ -f /etc/apt/sources.list.d/cros.list ]] && is_crostini=1
-  [[ ${OSTYPE:-} == 'darwin'* ]] && is_mac=1
-  [[ -n "${IS_DOCKER:-}" || -f /.dockerenv ]] && is_docker=1
-
-  cat <<PROFILE_TEMPLATE
-# Generated $(date +%F)
-export IS_CROSTINI="${is_crostini:-}"
-export IS_DOCKER="${is_docker:-}"
-export IS_MAC="${is_mac:-}"
+# Machine-specific settings, sourced last by ~/.profile. Edits stay local:
+# script/lock_local_files marks this file skip-worktree.
 
 # Affects bash prompt, which hides unless this is the username
 # export DEFAULT_USERNAME=ffortes
@@ -36,7 +10,7 @@ export IS_MAC="${is_mac:-}"
 # Used for 'llm'
 # export ANTHROPIC_API_KEY="xxxxxx"
 # export GEMINI_API_KEY="xxxxxx"
-# export LLM_GEMINI_KEY="\${GEMINI_API_KEY}"
+# export LLM_GEMINI_KEY="${GEMINI_API_KEY}"
 # export LLM_MISTRAL_KEY="xxxxxx"
 # export OPENAI_API_KEY="xxxxxx"
 # export OPENROUTER_API_KEY="xxxxxx"
@@ -55,12 +29,3 @@ export IS_MAC="${is_mac:-}"
 # Add machine-specific items below
 # export BEETSDIR=/data/media/music/beets
 # export LOCAL_ALBUM_DIR="$HOME/music"
-PROFILE_TEMPLATE
-}
-
-if [[ "${BASH_VERSINFO:-0}" -ge 4 ]]; then
-  main "${@}"
-else
-  # Ancient Mac Bash version does not support `@`
-  main
-fi

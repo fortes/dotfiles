@@ -7,9 +7,10 @@
 
 # Get script directory
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=script/lib.sh
+. "${script_dir}/lib.sh"
 
-if [[ "${DOTFILES_DEVBOX:-}" == 1 ]] \
-  || grep -qE '^ID="?ubuntu"?$' /etc/os-release 2>/dev/null; then
+if is_devbox; then
   exec "${script_dir}/setup_devbox" "$@"
 elif uname -s | grep -q Darwin; then
   exec "${script_dir}/setup_mac" "$@"

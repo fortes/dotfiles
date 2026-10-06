@@ -1,5 +1,7 @@
 name: Bash Syntax Check & Lint
 
+# Config-only changes don't trigger this (or the Docker build that follows it).
+# Stowed shell files are checked out so they're linted whenever this runs.
 on:
   push:
     paths:
@@ -11,15 +13,16 @@ jobs:
   bash-syntax:
     runs-on: ubuntu-latest
     steps:
-      - name: Sparse checkout (script/ and Makefile only)
+      - name: Sparse checkout (script/, stowed-files/ and Makefile only)
         uses: actions/checkout@v6
         with:
           sparse-checkout: |
             script
+            stowed-files
             Makefile
       - name: Install shellcheck and shfmt
         run: |
           sudo apt-get update && sudo apt-get install -y shellcheck shfmt
-      - name: Run all checks (syntax + lint + format)
+      - name: Run all checks (lint + format)
         run: |
           make test

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Make your machine usable
 #
-# Usage: setup_linux [--apt-only]
+# Usage: setup_linux
 
 set -euo pipefail
 IFS=$'\n\t'
@@ -29,10 +29,6 @@ mapfile -t APT_PACKAGES < <(awk 'NF && $1 !~ /^#/' "${APT_PACKAGES_FILE}")
 
 has_updated=""
 
-usage() {
-  echo "Usage: setup_machine [--apt-only]"
-}
-
 # Avoid running multiple times
 apt_update_once() {
   if [[ -z "$has_updated" ]]; then
@@ -48,14 +44,9 @@ check_prerequisites() {
     exit 1
   fi
 
-  if ! command_exists lsb_release; then
-    echo "Installing lsb-release (requires sudo)"
-    apt_update_once
-    sudo -E apt-get install "${APT_ARGS[@]}" \
-      lsb-release
-  fi
-
-  if ! lsb_release -ds | tail -n 1 | grep -iq debian; then
+  # shellcheck source=/dev/null
+  . /etc/os-release
+  if [[ "${ID}" != debian ]]; then
     echo_stderr "Warning: Things might break outside of Debian"
   fi
 }
@@ -82,7 +73,7 @@ is_package_installed() {
 }
 
 setup_backports() {
-  declare -r codename="$(lsb_release -cs | tail -n 1)"
+  declare -r codename="${VERSION_CODENAME}"
 
   if grep -q "${codename}-backports" /etc/apt/sources.list{,.d/*} 2>/dev/null; then
     echo "Backports already in sources.list"
@@ -122,14 +113,6 @@ setup_docker() {
 
 setup_locale() {
   declare -r locale="en_US.UTF-8"
-
-  if ! is_package_installed locales; then
-    apt_update_once
-
-    echo "Installing locales package (requires sudo)"
-    sudo -E apt-get install "${APT_ARGS[@]}" \
-      locales
-  fi
 
   if ! locale | grep -q "LANG=${locale}"; then
     echo "Generating locale ${locale} (requires sudo)"
@@ -185,86 +168,29 @@ main() {
   # shellcheck source=script/lib.sh
   . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
-  declare apt_only=''
-
-  # Parse arguments
-  while [[ $# -gt 0 ]]; do
-    case "$1" in
-      --apt-only)
-        apt_only=1
-        ;;
-      --help | -h)
-        usage
-        exit 0
-        ;;
-      *)
-        echo_stderr "Unknown argument: $1"
-        usage
-        exit 1
-        ;;
-    esac
-    shift
-  done
-
-  if [[ -n "${apt_only}" ]]; then
-    install_apt_packages
-    exit 0
-  fi
+  [[ $# -eq 0 ]] || {
+    echo >&2 'Usage: setup_linux (no arguments)'
+    return 1
+  }
 
   check_prerequisites
   setup_shell
+
   "${dotfiles_root}/script/set_dotfiles_remote"
-
-  ensure_local_profile
-
-  # shellcheck source=/dev/null
-  . "${HOME}/.profile.local"
 
   setup_nonfree
   setup_backports
   install_apt_packages
   "${dotfiles_root}/script/install_1password"
   [[ -z "${IS_DOCKER:-}" ]] && "${dotfiles_root}/script/install_et"
-  # Carry on past a failure, so one upstream asset rename or a rate limit
-  # doesn't leave the machine without its dotfiles. Docker builds stay strict,
-  # so CI still catches it.
-  local github_packages_failed=""
-  if ! "${dotfiles_root}/script/install_github_packages"; then
-    [[ -n "${IS_DOCKER:-}" ]] && exit 1
-    github_packages_failed=1
-  fi
-  "${dotfiles_root}/script/install_node"
-
-  # No args stows all packages (shellcheck 0.9 flags this, fixed in newer)
-  # shellcheck disable=SC2119
   stow_with_backup
 
-  pushd "${dotfiles_root}" >/dev/null
   "${dotfiles_root}/script/lock_local_files"
-  popd >/dev/null
   [[ -z "${IS_DOCKER:-}" ]] && setup_docker
   setup_locale
-  [[ -z "${IS_DOCKER:-}" ]] && "${dotfiles_root}/script/set_default_browser"
 
-  # Non-apt package managers
-  "${dotfiles_root}/script/install_node_packages"
-  # Skipped if GitHub packages failed, since they need bun and yazi from
-  # there, and would otherwise stop setup before the retry message below
-  [[ -z "${github_packages_failed}" ]] && "${dotfiles_root}/script/install_claude_code"
-  "${dotfiles_root}/script/install_agy"
-  "${dotfiles_root}/script/install_python_packages"
-  "${dotfiles_root}/script/install_cargo_packages"
-  "${dotfiles_root}/script/install_llm_plugins"
-  [[ -z "${github_packages_failed}" ]] && "${dotfiles_root}/script/install_yazi_plugins"
+  "${dotfiles_root}/script/update"
 
-  "${dotfiles_root}/script/generate_completions"
-
-  # Last, so it isn't lost in the output above
-  if [[ -n "${github_packages_failed}" ]]; then
-    echo_stderr "Setup finished, but installing GitHub packages failed partway (see the error above)."
-    echo_stderr "Rerun script/install_github_packages to finish them, then script/setup_linux."
-    exit 1
-  fi
   echo "Setup complete!"
 }
 

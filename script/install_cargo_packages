@@ -13,32 +13,11 @@ CARGO_PACKAGES=(
 # shellcheck source=script/lib.sh
 . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
-print_usage() {
-  cat <<EOF
-Usage: $(basename "$0") [OPTIONS]
-
-Install cargo packages
-
-Options:
-  -h, --help           Show this help message
-EOF
-}
-
 install_cargo_packages() {
-  # Parse arguments
-  while [[ "$#" -gt 0 ]]; do
-    case "${1}" in
-      -h | --help)
-        print_usage
-        exit 0
-        ;;
-      *)
-        echo >&2 "Unknown option: ${1}"
-        print_usage
-        exit 1
-        ;;
-    esac
-  done
+  [[ $# -eq 0 ]] || {
+    echo >&2 'Usage: install_cargo_packages (no arguments)'
+    return 1
+  }
 
   if ! command_exists cargo; then
     echo >&2 "⨯ cargo not installed"

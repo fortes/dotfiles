@@ -1,4 +1,4 @@
-.PHONY: format format-check syntax-check lint test
+.PHONY: format format-check lint test
 
 format:
 	@echo "Formatting shell scripts in script/..."
@@ -8,24 +8,13 @@ format-check:
 	@echo "Checking shell script formatting..."
 	@shfmt -d -i 2 -ci -bn script/
 
-syntax-check:
-	@echo "Checking bash syntax..."
-	@for file in script/*; do \
-		if [ -f "$$file" ] && [ -x "$$file" ]; then \
-			echo "  Checking $$file"; \
-			bash -n "$$file" || exit 1; \
-		fi \
-	done
-	@echo "All scripts have valid bash syntax!"
-
+# Stowed helpers and startup files get error-level checks only
 lint:
 	@echo "Linting shell scripts..."
-	@for file in script/*; do \
-		if [ -f "$$file" ] && [ -x "$$file" ]; then \
-			echo "  Checking $$file"; \
-			shellcheck -x "$$file" || exit 1; \
-		fi \
-	done
-	@echo "All scripts passed shellcheck!"
+	@shellcheck -x $$(grep -lE '^#!.*(bash|/sh)' script/*)
+	@shellcheck -x --severity=error --shell=bash \
+		stowed-files/bash/.profile stowed-files/bash/.bashrc \
+		stowed-files/bash/.bash_profile stowed-files/bash/.aliases \
+		$$(grep -rlE '^#!.*(bash|/sh)' stowed-files)
 
-test: syntax-check lint format-check
+test: lint format-check

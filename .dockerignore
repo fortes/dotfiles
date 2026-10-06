@@ -1,2 +1,5 @@
 .git
 .github
+# Per-machine settings may hold secrets; both are optional at runtime
+stowed-files/bash/.profile.local
+stowed-files/git/.gitconfig.local

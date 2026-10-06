@@ -48,7 +48,6 @@ less
 # Official Node.js binaries (script/install_node) link against it
 libatomic1
 locales
-lsb-release
 lsof
 man-db
 moreutils

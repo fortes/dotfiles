@@ -1,12 +1,5 @@
 #!/usr/bin/env bash
-# Work in progress setup for the Mac
-#
-# TODO:
-# - Use `/bin/sh` instead of bash, since will eventually go away
-#   - Or maybe `dash`?
-# - Move over to zsh
-#
-# Usage: setup_mac
+# Set up an Apple Silicon Mac.
 
 set -euo pipefail
 IFS=$'\n\t'
@@ -112,14 +105,9 @@ CASK_PACKAGES=(
   signal
 )
 
-usage() {
-  echo "Usage: setup_mac [--brew-only] [--cask-only]"
-}
-
 setup_shell() {
   local homebrew_bash_path="${brew_prefix}/bin/bash"
 
-  # TODO: Should really just move to zsh since Mac will probably ditch bash
   if [[ -x "${homebrew_bash_path}" ]] && [[ "${SHELL:-}" != "${homebrew_bash_path}" ]]; then
     if ! grep -q "${homebrew_bash_path}" /etc/shells; then
       echo "Adding ${homebrew_bash_path} to shell list (requires sudo)"
@@ -202,59 +190,19 @@ install_homebrew_casks() {
 }
 
 main() {
-  if ! uname -s | grep -q Darwin; then
-    echo >&2 "Only works on Mac!"
-    exit 1
-  fi
-
   # shellcheck source=script/lib.sh
   . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
-  declare brew_only=''
-  declare cask_only=''
-  # Parse arguments
-  while [[ $# -gt 0 ]]; do
-    case "$1" in
-      --homebrew-only | --brew-only)
-        brew_only=1
-        ;;
-      --cask-only)
-        cask_only=1
-        ;;
-      --help | -h)
-        usage
-        exit 0
-        ;;
-      *)
-        echo >&2 "Unknown argument: $1"
-        usage
-        exit 1
-        ;;
-    esac
-    shift
-  done
-
-  if [[ -n "${brew_only}" ]]; then
-    install_homebrew_packages
-    exit 0
-  fi
-
-  if [[ -n "${cask_only}" ]]; then
-    install_homebrew_casks
-    exit 0
-  fi
-
-  ensure_local_profile
-  # shellcheck source=/dev/null
-  . "$HOME/.profile.local"
+  [[ $# -eq 0 ]] || {
+    echo >&2 'Usage: setup_mac (no arguments)'
+    return 1
+  }
 
   install_command_line_tools
   install_homebrew
   install_homebrew_packages
   install_homebrew_casks
 
-  # No args stows all packages (shellcheck 0.9 flags this, fixed in newer)
-  # shellcheck disable=SC2119
   stow_with_backup
 
   setup_shell
@@ -262,26 +210,11 @@ main() {
   "${dotfiles_root}/script/lock_local_files"
   "${dotfiles_root}/script/set_dotfiles_remote"
 
-  # Non-brew package managers
-  "${dotfiles_root}/script/install_node_packages"
-  "${dotfiles_root}/script/install_claude_code"
-  "${dotfiles_root}/script/install_python_packages"
-  "${dotfiles_root}/script/install_cargo_packages"
-  "${dotfiles_root}/script/install_llm_plugins"
-  "${dotfiles_root}/script/install_yazi_plugins"
-
-  "${dotfiles_root}/script/generate_completions"
-
-  # TODO: Neovim plugin install?
+  "${dotfiles_root}/script/update"
 
   echo "Setup complete!"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-  if [[ "${BASH_VERSINFO:-0}" -ge 4 ]]; then
-    main "${@}"
-  else
-    # Ancient Mac Bash version does not support `@`
-    main
-  fi
+  main ${@+"$@"}
 fi

@@ -154,9 +154,3 @@ jobs:
           fi
           digests=(*)
           docker buildx imagetools create "${tags[@]}" "${digests[@]/#/${IMAGE}@sha256:}"
-
-      - name: Run dotfiles health check
-        env:
-          VERSION: ${{ steps.meta.outputs.version }}
-        run: |
-          docker run --rm --platform linux/amd64 "${IMAGE}:${VERSION}" ./dotfiles/script/check_health

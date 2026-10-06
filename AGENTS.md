@@ -1,136 +1,36 @@
 # Repository Overview
 
-Personal dotfiles repository for managing development environment configuration across macOS, Debian Trixie (server/SSH), and Crostini (Chromebook). Heavily terminal-focused using Ghostty, Bash, Tmux, Neovim, and FZF/fd/ripgrep.
+Personal dotfiles for macOS, Debian Trixie (headless servers, Docker image), Ubuntu devboxes and Crostini. Terminal-focused: Ghostty, Bash, tmux, Neovim, fzf/fd/ripgrep. See README.md for user-facing setup and Docker usage.
 
-## Key Commands
-
-### Installation
+## Commands
 
 ```bash
-# Clone and setup (works on macOS and Debian-like systems)
-git clone https://github.com/fortes/dotfiles.git
-./dotfiles/script/setup
+./script/setup    # Provision the platform, stow dotfiles, then run script/update
+./script/stow     # Relink dotfiles only (-n dry run, -v verbose, -D/-R)
+./script/update   # Install/update user tools; OS packages stay with apt/brew
+make test         # shellcheck + shfmt (also what CI runs)
 ```
 
-### Common Operations
-```bash
-# Run all steps (idempotent)
-./script/setup
+`script/setup` runs `setup_mac`, `setup_linux` (Debian), or `setup_devbox` (Ubuntu, or `DOTFILES_DEVBOX=1`). `setup_devbox` is a light, run-on-every-boot subset that leaves system config alone.
 
-# (Debian-only) Update packages installed from GitHub
-./script/install_github_packages [package-name ...]
+## Where things go
 
-# (Debian-only) Update Node.js to the latest release
-./script/install_node
+- **macOS packages:** `BREW_PACKAGES` / `CASK_PACKAGES` in `script/setup_mac`
+- **Debian packages:** `script/apt-packages.txt`; third-party apt repos get their own `script/install_*`
+- **Binaries missing or too old in Debian:** Either use backports or via `script/install_github_packages`
+- **npm / uv / cargo globals:** `script/install_{node,python,cargo}_packages`
+- **Config files:** `stowed-files/<package>/`, mirroring `$HOME`. Each directory is a stow package; `DOTFILES_SKIP_PACKAGES` (space-separated) skips some. Directories programs write into (`REAL_DIRS` in `script/stow`, e.g. `~/.ssh`) are created first so stow doesn't fold them into the repo.
+- **Machine-specific settings:** tracked `*.local` templates (`.profile.local`, `.gitconfig.local`) are stowed and marked skip-worktree by `script/lock_local_files`, so per-machine edits stay out of git. `~/.bashrc.local` and `~/.vimrc.local` are untracked.
 
-# Update node packages
-./script/install_node_packages
+Shell startup: `.profile` (environment, PATH, helpers, `IS_DOCKER`; sources `.profile.local` last) → `.bashrc` (interactive; sources `.profile`) → `.aliases`.
 
-# Update python packages
-./script/install_python_packages
+Neovim: `init.lua` sources `~/.vimrc`, and plugins use the built-in `vim.pack`.
 
-# Re-link dotfiles when new ones are added
-./script/stow
+## Conventions
 
-# Check health (currently a placeholder)
-./script/check_health
-
-# Ignore changes to a tracked file
-git update-index --skip-worktree ./path/to/file
-git update-index --no-skip-worktree ./path/to/file  # To undo
-```
-
-### Docker
-
-**Build locally:**
-```bash
-docker build -t dotfiles .
-```
-
-**Direct usage (for SSH/tmux development):**
-```bash
-# Run container with shared src directory (maps ~/src to /workspaces in container)
-docker run -it --rm --name dotfiles -v ~/src:/workspaces dotfiles
-
-# In another terminal, attach to tmux session
-docker exec -it dotfiles tmux attach
-
-# Claude Code credentials persist in /workspaces/.claude-container (survives container restarts)
-```
-
-## Architecture
-
-### Package Installation
-
-#### MacOS
-
-Package installation is generally all done via homebrew in `script/setup_mac`
-
-#### Debian
-
-Four installation methods:
-
-* Debian-distributed packages via `apt-get` in `script/setup_linux` (including backports)
-* Apt packages from third-party repos (1Password, etc.)
-* Packages installed from GitHub releases via `script/install_github_packages`. This is used for either packages that aren't in Debian repos or where the Debian version is too old (e.g., `neovim`)
-* Node.js from nodejs.org tarballs via `script/install_node` (Debian's version is too old)
-
-`script/setup_devbox` (what `script/setup` runs on Ubuntu, or anywhere with `DOTFILES_DEVBOX=1`) is a lightweight, safe-to-rerun subset for pre-provisioned Ubuntu/Debian devboxes and devcontainers: a short apt list, a few GitHub binaries, and stow. It leaves system config (apt sources, docker, locale, login shell) alone.
-
-### Configuration with GNU Stow
-
-All user configuration files live in `stowed-files/` and are symlinked to `$HOME` using GNU Stow. Each subdirectory represents a "package" that can be independently stowed:
-
-```
-stowed-files/
-├── bash/          # Shell config (.bashrc, .profile, .aliases, etc.)
-├── nvim/          # Neovim config (init.lua + legacy .vimrc)
-├── git/           # Git configuration
-├── tmux/          # Tmux configuration
-├── ghostty/       # Ghostty terminal emulator config
-├── yazi/          # File manager config
-└── [11 other packages]
-```
-
-The `script/stow` wrapper handles:
-- Stowing all packages to `$HOME`, or just the ones named. Only takes `-n`, `-v`, and one of `-D`/`-R`; call `stow` directly for anything else
-- Skipping packages listed in the space-separated `DOTFILES_SKIP_PACKAGES`
-- Creating the directories programs write into (`REAL_DIRS`, e.g. `~/.ssh`) first (unfolding any an earlier run folded), so stow doesn't fold them into symlinks into the repo
-- Uses `.stow-local-ignore` files to prevent certain files from being stowed
-
-### Shell Configuration Flow
-
-1. **`.profile`** - Non-interactive setup, always loaded first
-   - Defines helper functions: `add_to_path()`, `source_if_exists()`, `command_exists()`
-   - Sets `$EDITOR` and `$VISUAL` (prefers Neovim)
-   - Loads Homebrew environment (macOS)
-   - Configures environment variables
-
-2. **`.bashrc`** - Interactive shell setup
-   - Sources `.profile` first to ensure it's loaded
-   - Sets history options (unlimited history)
-   - Configures bash options (globstar, autocd, etc.)
-   - Sets up prompt with git branch info
-   - Loads completions and aliases
-
-3. **`.aliases`** - Command aliases and shortcuts
-
-4. **`.profile.local`** / **`.bashrc.local`** - Machine-specific overrides (not in repo)
-
-### Neovim Configuration
-
-- **`init.lua`** - Main Neovim config, sources legacy `.vimrc`
-- Uses built-in `vim.pack` for plugin management (run `:lua vim.pack.update()` to install/update)
-- LSP setup with special handling for:
-  - `denols` - Only in projects with `deno.json`/`deno.jsonc`
-  - `oxfmt` / `oxlint` / `tsc` - Disabled in Deno projects (deno owns formatting/linting/types there). `tsc` is the TypeScript language server, served by the native compiler via `tsc --lsp`
-  - Default Neovim 0.11+ LSP keymaps enabled (`grn`, `grr`, `gri`, `gO`, `gra`, plus `grt`/`grx` added in 0.12)
-- Diagnostic configuration with virtual text/lines
-
-### Platform Detection
-
-Scripts detect the environment via:
-- `IS_HEADLESS` - No GUI packages
-- `IS_DOCKER` - Running in Docker
-- `IS_CROSTINI` - Chromebook Linux container
-- Platform check: `uname -s` for macOS vs Linux
+- **Keep it simple.** Scripts are idempotent, so a loud failure plus a rerun is the recovery plan. Don't add retries, traps, fallbacks, marker files or migration code for rare cases. A one-time manual step is fine.
+- **No test harnesses.** `make test`, the Docker image build and running setup on the Mac are the tests.
+- **CI cost:** `.github/workflows/bash-syntax.yml` has narrow path triggers, and the Docker image build chains off it. Don't widen the triggers; add directories to its sparse checkout instead.
+- **Bash 3.2:** `setup_mac` and `script/lib.sh` run under macOS's `/bin/bash` before Homebrew bash exists, so avoid Bash 4 features and GNU-only flags there.
+- **`~/.vimrc` stays self-contained.** It's also used via `nvim -u ~/.vimrc` and copied to servers, so it must load without errors on distro Vim/Neovim and `vim.tiny`.
+- Use `uname -s` for macOS vs Linux and `IS_DOCKER` for containers.

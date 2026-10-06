@@ -162,49 +162,6 @@ install_ghostty_terminfo() {
   tic -x -o "${HOME}/.terminfo" "${dotfiles_root}/script/xterm-ghostty.terminfo"
 }
 
-# Try all packages in one stow first, since that's a single quick call on every
-# boot. If a pre-existing file conflicts, fall back to stowing one package at a
-# time so the conflict only skips that package.
-stow_packages() {
-  if ! command_exists stow; then
-    log_error "stow not installed, skipping dotfiles"
-    return 1
-  fi
-
-  if [[ -n "${DOTFILES_SKIP_PACKAGES:-}" ]]; then
-    log "Skipping DOTFILES_SKIP_PACKAGES: ${DOTFILES_SKIP_PACKAGES}"
-  fi
-
-  if stow_with_backup; then
-    log "Dotfiles stowed"
-    return
-  fi
-  log_error "Could not stow all packages together, retrying one at a time"
-
-  local packages=()
-  mapfile -t packages < <(list_stow_packages "${dotfiles_root}/stowed-files")
-
-  local failed=0
-  local package
-  for package in "${packages[@]}"; do
-    if ! stow_with_backup "${package}"; then
-      log_error "Could not stow ${package} (conflicting files?), try: script/stow -n -v ${package}"
-      failed=1
-    fi
-  done
-
-  if [[ ${failed} -ne 0 ]]; then
-    return 1
-  fi
-  log "Dotfiles stowed"
-}
-
-# Keep machine-specific edits to tracked *.local files (like ~/.gitconfig.local)
-# from dirtying the checkout and blocking `git pull`
-lock_local_files() {
-  (cd "${dotfiles_root}" && "${dotfiles_root}/script/lock_local_files" >/dev/null)
-}
-
 main() {
   # shellcheck source=script/lib.sh
   . "${dotfiles_root}/script/lib.sh"
@@ -215,8 +172,8 @@ main() {
   fi
 
   local failed=0 step
-  for step in ensure_local_profile install_apt_packages install_github_packages \
-    install_ghostty_terminfo stow_packages lock_local_files; do
+  for step in install_apt_packages install_github_packages \
+    install_ghostty_terminfo stow_with_backup "${dotfiles_root}/script/lock_local_files"; do
     run_step "${step}" || failed=1
   done
 

@@ -98,5 +98,5 @@ if [ -z "${SSH_AUTH_SOCK:-}" ] && command_exists keychain; then
   fi
 fi
 
-# Local overrides
+[ ! -f /.dockerenv ] || export IS_DOCKER=1
 source_if_exists "$HOME/.profile.local"

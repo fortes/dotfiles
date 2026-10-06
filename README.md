@@ -23,7 +23,17 @@ On Ubuntu (like 24.04 Noble, which Coder devboxes and most devcontainers use), `
 DOTFILES_DEVBOX=1 ./dotfiles/script/setup
 ```
 
-Set `DOTFILES_SKIP_PACKAGES="bash ssh"` (for example) to leave stow packages alone, like `bash` to keep machine-provided shell startup files. Devbox setup never upgrades its GitHub binaries; run `script/install_github_packages fzf neovim yq` for that.
+Set `DOTFILES_SKIP_PACKAGES="bash ssh"` (for example) to leave stow packages alone, like `bash` to keep machine-provided shell startup files. Devbox setup never upgrades its GitHub binaries; run `script/update` for that.
+
+## Setup and updates
+
+| Command | Behavior |
+| --- | --- |
+| `script/setup` | Provision the platform, install/update tools, and link configuration. |
+| `script/stow` | Relink configuration without package installs. |
+| `script/update` | Update user tools without linking or changing OS configuration. |
+
+Run `make test` for shell checks and `docker build -t dotfiles .` to test Debian setup.
 
 ## Post-Setup
 
@@ -89,7 +99,7 @@ find ~ -maxdepth 5 -type l 2>/dev/null \
 
 `./script/install_node_packages` installs and updates Corepack through npm and enables its pnpm and Yarn shims in `~/.local/bin`. These select the package-manager version declared by each project. Node and npm come from Homebrew on macOS or `./script/install_node` on Linux; Corepack does not manage the Node version.
 
-Native addons in npm globals are built for one Node major version. `script/install_node` rebuilds them on major upgrades, but Homebrew doesn't, so on macOS run `./script/install_node_packages --rebuild` after `brew upgrade` moves `node` to a new major version.
+Native addons in npm globals are built for one Node major version. Debian's `script/install_node` rebuilds them on major upgrades. On macOS, run `script/install_node_packages --rebuild` after Homebrew upgrades Node to a new major.
 
 ## Ignoring changes to a file
 
@@ -205,8 +215,8 @@ clean those up:
 
 - All the steps from `Chrome` section above
 - Set up "Night Light" if it didn't automatically sync
-- Enable Linux, choose a larger disk size (20GB fine?). Double check which debian version it is via `lsb_release -a` (should be `trixie`)
-- Run `setup_machine`
+- Enable Linux, choose a larger disk size (20GB fine?). Double check which debian version it is via `grep VERSION_CODENAME /etc/os-release` (should be `trixie`)
+- Run `script/setup`
 - Share `Downloads` folder with Linux, then symlink via `ln -s /mnt/chromeos/MyFiles/Downloads ~/downloads`
 - Change terminal font by going to `chrome-untrusted://terminal/html/nassh_preferences_editor.html`
   - Add `'DejaVu Sans Mono Nerd'` to the beginning of "Text Font Family"

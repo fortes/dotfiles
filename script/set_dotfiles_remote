@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Make your machine usable
+# Switch the dotfiles remote from HTTPS to SSH
 #
 # Usage: set_dotfiles_remote
 

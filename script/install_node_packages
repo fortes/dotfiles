@@ -40,19 +40,6 @@ NPM_GLOBAL_ALLOW_SCRIPTS="better-sqlite3,node-llama-cpp,tree-sitter-go,tree-sitt
 # shellcheck source=script/lib.sh
 . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
-print_usage() {
-  cat <<EOF
-Usage: $(basename "$0") [OPTIONS]
-
-Install global npm packages
-
-Options:
-  --rebuild            Only rebuild native addons, e.g. after a Node major
-                       upgrade (install_node does this, Homebrew doesn't)
-  -h, --help           Show this help message
-EOF
-}
-
 # Native addons in npm globals (e.g. better-sqlite3) are built for one Node
 # major version's ABI
 rebuild_globals() {
@@ -71,39 +58,16 @@ require_node() {
 }
 
 install_node_packages() {
-  local rebuild=false
-  while [[ "$#" -gt 0 ]]; do
-    case "${1}" in
-      --rebuild)
-        rebuild=true
-        shift
-        ;;
-      -h | --help)
-        print_usage
-        exit 0
-        ;;
-      *)
-        echo >&2 "Unknown option: ${1}"
-        print_usage
-        exit 1
-        ;;
-    esac
-  done
+  [[ $# -le 1 && ("${1:-}" == '' || "${1:-}" == --rebuild) ]] \
+    || {
+      echo >&2 'Usage: install_node_packages [--rebuild]'
+      return 1
+    }
 
-  # .profile / .npmrc may not be stowed yet during the docker build
-  if [[ -f "$HOME/.profile" ]]; then
-    # shellcheck source=/dev/null
-    . "$HOME/.profile"
-  fi
-
-  # npm prefix lives in stowed .npmrc, but we may run before stow. Set it
-  # here so npm globals always land in ~/.local/bin.
-  export NPM_CONFIG_PREFIX="$HOME/.local"
-
-  # Check after loading the profile, which sets up Homebrew on macOS.
+  # lib.sh supplies installer paths, including Homebrew before stow.
   require_node
 
-  if "${rebuild}"; then
+  if [[ "${1:-}" == --rebuild ]]; then
     rebuild_globals
     return
   fi

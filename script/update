@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# Deliberately update user tools; does not relink dotfiles or reconfigure the OS.
+# Use apt/Homebrew separately to upgrade system packages and macOS apps.
+set -euo pipefail
+[[ $# -eq 0 ]] || {
+  echo >&2 'Usage: update (no arguments)'
+  exit 1
+}
+# shellcheck source=script/lib.sh
+. "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+
+# Match setup's lightweight path, rather than installing the full workstation
+# toolset on a devbox that only opted into three GitHub binaries.
+if is_devbox; then
+  exec "${dotfiles_script_dir}/install_github_packages" fzf neovim yq
+fi
+
+if [[ "$(uname -s)" == Linux ]]; then
+  "${dotfiles_script_dir}/install_github_packages"
+  "${dotfiles_script_dir}/install_node"
+  "${dotfiles_script_dir}/install_agy"
+fi
+for step in install_node_packages install_claude_code install_python_packages \
+  install_cargo_packages install_llm_plugins install_yazi_plugins generate_completions; do
+  "${dotfiles_script_dir}/${step}"
+done

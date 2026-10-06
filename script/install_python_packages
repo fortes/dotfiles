@@ -11,8 +11,6 @@ IFS=$'\n\t'
 
 UVX_PACKAGES=(
   argcomplete
-  # Requires additional dependencies due to plugins
-  "beets --with requests --with pylast --with beets[embedart,fetchart,lyrics,lastgenre,plexupdate]"
   epy-reader
   files-to-prompt
   llm
@@ -37,11 +35,12 @@ install_python_packages() {
   fi
 
   echo "Installing global uvx packages …"
+  local package
   for package in "${UVX_PACKAGES[@]}"; do
-    # Use eval to properly handle quoted arguments and multiple flags
-    # shellcheck disable=SC2086
-    eval "uv tool install --quiet --force --refresh ${package}"
+    uv tool install --quiet --force --refresh "${package}"
   done
+  uv tool install --quiet --force --refresh beets --with requests --with pylast \
+    --with 'beets[embedart,fetchart,lyrics,lastgenre,plexupdate]'
   echo "uvx packages installed!"
 }
 

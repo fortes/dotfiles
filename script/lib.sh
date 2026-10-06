@@ -9,6 +9,19 @@ dotfiles_script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Ensure ~/.local/bin is in PATH for locally-installed tools
 export PATH="$HOME/.local/bin:$PATH"
 
+# Installers must work before stow and from shells that never read .profile.
+[[ ! -x /opt/homebrew/bin/brew ]] || export PATH="/opt/homebrew/bin:$PATH"
+export NPM_CONFIG_PREFIX="$HOME/.local"
+export CARGO_HOME="$HOME/.local/share/cargo"
+export CARGO_INSTALL_ROOT="$HOME/.local"
+export BUN_INSTALL="$HOME/.local"
+
+# Shared by setup and update so they select the same scope.
+is_devbox() {
+  [[ "${DOTFILES_DEVBOX:-}" == 1 ]] \
+    || grep -qE '^ID="?ubuntu"?$' /etc/os-release 2>/dev/null
+}
+
 # Helper function to check if command exists
 command_exists() {
   command -v "$1" &>/dev/null
@@ -51,70 +64,19 @@ is_default_dotfile() {
   fi
 }
 
-# Restow every package, or just the given one. Machine-provided startup files
-# conflict with the bash package, so they're moved into a unique
-# ~/.dotfiles-backup.* dir first and put back if stow fails. Rerunning
-# recovers from anything else, like an interruption
+# Back up machine-provided startup files before stowing. If stow fails,
+# fix the conflict and rerun, or restore the files from the printed directory.
 stow_with_backup() {
-  local -r package="${1:-}"
   local filename backup_dir=''
-  # No package means all of them, minus the same skip list script/stow uses
-  if [[ "${package}" == bash ]] || { [[ -z "${package}" ]] && ! is_skipped_package bash; }; then
+  if ! is_skipped_package bash; then
     for filename in "${DEFAULT_DOTFILES[@]}"; do
       is_default_dotfile "${filename}" || continue
-      # Only made once there's something to move
       if [[ -z "${backup_dir}" ]]; then
-        backup_dir="$(mktemp -d "${HOME}/.dotfiles-backup.XXXXXX")" || return 1
+        backup_dir="$(mktemp -d "$HOME/.dotfiles-backup.XXXXXX")" || return 1
+        echo "Startup-file backup: ${backup_dir} (restore manually if needed)"
       fi
-      echo "Moving default ${filename} to ${backup_dir}"
-      if ! mv "${HOME}/${filename}" "${backup_dir}/original${filename}"; then
-        restore_default_dotfiles "${backup_dir}"
-        return 1
-      fi
+      mv "$HOME/${filename}" "${backup_dir}/original${filename}" || return 1
     done
   fi
-
-  if ! "${dotfiles_script_dir}/stow" -R ${package:+"${package}"}; then
-    if [[ -n "${backup_dir}" ]]; then
-      restore_default_dotfiles "${backup_dir}"
-    fi
-    return 1
-  fi
-  if [[ -n "${backup_dir}" ]]; then
-    echo "Original startup files saved in ${backup_dir}"
-  fi
-}
-
-# Move startup files from a failed stow_with_backup back into any spots stow
-# left empty, then drop the dir if nothing is left in it
-restore_default_dotfiles() {
-  local -r backup_dir=$1
-  local filename backup status=0
-  for filename in "${DEFAULT_DOTFILES[@]}"; do
-    backup="${backup_dir}/original${filename}"
-    if [[ ! -e "${HOME}/${filename}" && ! -L "${HOME}/${filename}" ]] \
-      && [[ -e "${backup}" || -L "${backup}" ]]; then
-      echo_stderr "Restoring original ${filename}"
-      # Keep going, so one failure doesn't leave the other files missing too
-      mv "${backup}" "${HOME}/${filename}" || status=1
-    fi
-  done
-  if ! rmdir "${backup_dir}" 2>/dev/null; then
-    echo "Original startup files saved in ${backup_dir}"
-  fi
-  return "${status}"
-}
-
-# Generate ~/.profile.local unless it already exists, via a temp file so a
-# failure doesn't leave a partial file behind
-ensure_local_profile() {
-  local -r local_profile_path="${HOME}/.profile.local"
-  [[ -f "${local_profile_path}" ]] && return 0
-
-  echo "Generating ${local_profile_path}"
-  if ! "${dotfiles_script_dir}/create_local_profile" >"${local_profile_path}.tmp"; then
-    rm -f "${local_profile_path}.tmp"
-    return 1
-  fi
-  mv "${local_profile_path}.tmp" "${local_profile_path}"
+  "${dotfiles_script_dir}/stow" -R
 }

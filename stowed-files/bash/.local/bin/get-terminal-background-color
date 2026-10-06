@@ -26,14 +26,12 @@ main() {
   # Send the escape sequence to query the background color
   printf '\e]11;?\a' >&3
 
-  # Read the response from the terminal
-  IFS=$'\a' read -d $'\a' -r -u 3 response
-
-  # Re-enable terminal echoing
+  # Bound the query and restore echo even when the terminal does not answer.
+  local status=0
+  IFS=$'\a' read -t 2 -d $'\a' -r -u 3 response || status=$?
   stty echo <&3
-
-  # Close the file descriptor
   exec 3<&-
+  [[ ${status} -eq 0 ]] || return 1
 
   # Remove everything up to and including '<ESC>]11;'
   color=${response#*$'\e]11;'}

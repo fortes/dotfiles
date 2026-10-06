@@ -9,7 +9,7 @@ set -euo pipefail
 IFS=$'\n\t'
 
 isWithinTmux() {
-  if [ -n "$TMUX" ]; then
+  if [ -n "${TMUX:-}" ]; then
     return 0
   else
     return 1
@@ -54,7 +54,7 @@ main() {
     output=$(get_osc52 "$buf")
     if isWithinTmux; then
       # Escape to bypass tmux
-      output="\033Ptmux;\033$output\033\\"
+      output=$'\033Ptmux;\033'"${output}"$'\033\\'
     fi
 
     len=${#output}
