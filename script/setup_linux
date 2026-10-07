@@ -65,7 +65,7 @@ install_apt_packages() {
 }
 
 is_package_installed() {
-  if dpkg-query -l "$1" | grep -q "^ii"; then
+  if dpkg-query -l "$1" 2>/dev/null | grep -q "^ii"; then
     return 0
   else
     return 1
@@ -95,19 +95,17 @@ EOF
   has_updated=""
 }
 
-setup_docker() {
-  if ! is_package_installed docker.io; then
+setup_podman() {
+  # Plus recommends rootless needs (skipped by --no-install-recommends):
+  # networking, UID mapping, user bus, and an init for pods and --init
+  declare -a missing=()
+  for package in podman passt uidmap dbus-user-session catatonit; do
+    is_package_installed "${package}" || missing+=("${package}")
+  done
+  if [[ ${#missing[@]} -gt 0 ]]; then
     apt_update_once
-    echo "Installing docker (requires sudo)"
-    sudo -E apt-get install "${APT_ARGS[@]}" \
-      docker.io docker-buildx docker-clean docker-cli docker-compose
-  fi
-
-  declare -r user="$(whoami)"
-  if ! groups | grep -qw docker; then
-    echo "Adding $user to docker group (requires sudo)"
-    sudo usermod -aG docker "${user}"
-    echo "$user now in docker group, must log back in to take effect"
+    echo "Installing" "${missing[@]}" "(requires sudo)"
+    sudo -E apt-get install "${APT_ARGS[@]}" "${missing[@]}"
   fi
 }
 
@@ -186,7 +184,9 @@ main() {
   stow_with_backup
 
   "${dotfiles_root}/script/lock_local_files"
-  [[ -z "${IS_DOCKER:-}" ]] && setup_docker
+  # Crostini is already a container, on a modest machine
+  [[ -z "${IS_DOCKER:-}" ]] && ! compgen -G "/etc/apt/sources.list.d/cros.*" >/dev/null \
+    && setup_podman
   setup_locale
 
   "${dotfiles_root}/script/update"

@@ -54,6 +54,13 @@ cleanup_docker() {
   fi
 }
 
+cleanup_podman() {
+  if command -v podman >/dev/null 2>&1 && podman info >/dev/null 2>&1; then
+    echo "Cleaning up Podman..."
+    podman system prune -af --volumes
+  fi
+}
+
 cleanup_bun() {
   if command -v bun >/dev/null 2>&1; then
     echo "Cleaning up bun cache..."
@@ -95,6 +102,7 @@ main() {
   cleanup_apt
   cleanup_brew
   cleanup_docker
+  cleanup_podman
   cleanup_bun
   cleanup_npx
   cleanup_pnpm

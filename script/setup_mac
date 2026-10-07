@@ -25,7 +25,7 @@ BREW_PACKAGES=(
   chafa
   cloudflared
   cmus
-  # For Docker
+  # Docker fallback for projects that need it, alongside podman
   colima
   container
   delta
@@ -67,6 +67,7 @@ BREW_PACKAGES=(
   node
   ollama
   pipx
+  podman
   ripgrep
   rust
   sad

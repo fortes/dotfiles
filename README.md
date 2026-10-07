@@ -33,7 +33,7 @@ Set `DOTFILES_SKIP_PACKAGES="bash ssh"` (for example) to leave stow packages alo
 | `script/stow` | Relink configuration without package installs. |
 | `script/update` | Update user tools without linking or changing OS configuration. |
 
-Run `make test` for shell checks and `docker build -t dotfiles .` to test Debian setup.
+Run `make test` for shell checks and `podman build -t dotfiles .` to test Debian setup.
 
 ## Post-Setup
 
@@ -178,13 +178,8 @@ clean those up:
 - `terminal.app` sucks with colors, switch to Ghostty and pin it in the dock
 - Make sure `Rectangle.app` starts on login
 - Install the 1Password extension in Safari (others should sync automatically)
-- If planning on using Docker a lot, can have Colima auto-start on login by running the following:
-
-  ```sh
-  brew services start colima
-  ```
-
-  Otherwise, just run `colima start` manually when needed.
+- Create the Podman VM once with `podman machine init`. Add `--now` to also start it; after that, run `podman machine start` when needed.
+- Colima stays installed for projects that still need Docker. Run `colima start` when needed (avoid `brew services start colima` so it doesn't run on login). Skip `podman-mac-helper`, which takes `/var/run/docker.sock` from Colima.
 
 - If gaming, install battle.net/Steam via brew:
 
@@ -216,7 +211,7 @@ clean those up:
 - All the steps from `Chrome` section above
 - Set up "Night Light" if it didn't automatically sync
 - Enable Linux, choose a larger disk size (20GB fine?). Double check which debian version it is via `grep VERSION_CODENAME /etc/os-release` (should be `trixie`)
-- Run `script/setup`
+- Run `script/setup` (skips podman: Crostini is already a container)
 - Share `Downloads` folder with Linux, then symlink via `ln -s /mnt/chromeos/MyFiles/Downloads ~/downloads`
 - Change terminal font by going to `chrome-untrusted://terminal/html/nassh_preferences_editor.html`
   - Add `'DejaVu Sans Mono Nerd'` to the beginning of "Text Font Family"
@@ -230,22 +225,27 @@ clean those up:
     }
     ```
 
-### Docker
+### Containers
 
-Images are built with some frequency, via CI.
+Images are built with some frequency, via CI. Podman runs them rootless. On Linux, `--userns=keep-id` maps your user to the image's `fortes` user (UID 1000), so files written to `/workspaces` belong to you on the host. macOS's `podman machine` already maps mounted files to your user, so the flag is harmless there.
+
+Docker works too: swap `podman` for `docker` and drop the `--userns=…` flag, since rootful Docker already maps UID 1000 straight through. On Debian, `script/install_docker` installs Docker (not run by setup, and skips the docker group, so use `sudo docker`).
+
+On Debian, rootless containers stop when you log out. Run `sudo loginctl enable-linger "$USER"` to keep a long-running container alive.
 
 ### Long-running container
 
 ```sh
 # Start container in background
-docker-compose up -d
+podman run -d -it --name dotfiles --userns=keep-id:uid=1000,gid=1000 \
+  -v ~/src:/workspaces ghcr.io/fortes/dotfiles:latest tmux new-session -s main
 
 # Connect to tmux session
-docker-compose exec dotfiles tmux attach -t main
+podman exec -it dotfiles tmux attach -t main
 
 # Stop/restart as needed
-docker-compose stop
-docker-compose start
+podman stop dotfiles
+podman start dotfiles
 ```
 
 ### One-off ephemeral session
@@ -253,7 +253,8 @@ docker-compose start
 Gets deleted when you exit.
 
 ```sh
-docker run -it --rm --name dotfiles -v ~/src:/workspaces ghcr.io/fortes/dotfiles:latest
+podman run -it --rm --name dotfiles --userns=keep-id:uid=1000,gid=1000 \
+  -v ~/src:/workspaces ghcr.io/fortes/dotfiles:latest
 ```
 
 ### Persistent container
@@ -262,22 +263,23 @@ Preserves state, but not always running
 
 ```sh
 # First time
-docker run -it --name dotfiles -v ~/src:/workspaces ghcr.io/fortes/dotfiles:latest
+podman run -it --name dotfiles --userns=keep-id:uid=1000,gid=1000 \
+  -v ~/src:/workspaces ghcr.io/fortes/dotfiles:latest
 
 # Later sessions
-docker start -ai dotfiles
+podman start -ai dotfiles
 ```
 
 ### Building locally
 
 ```sh
-docker build -t dotfiles .
+podman build -t dotfiles .
 ```
 
 Then follow normal pattern, just use the local image name like so:
 
 ```sh
-docker run -it --rm --name dotfiles dotfiles
+podman run -it --rm --name dotfiles --userns=keep-id:uid=1000,gid=1000 dotfiles
 ```
 
 ## Other Notes

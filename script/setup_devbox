@@ -2,7 +2,7 @@
 # Set up terminal tools and dotfiles on Ubuntu or Debian devboxes/devcontainers that
 # already come with a base toolchain: a handful of apt packages, a few GitHub
 # binaries, and the dotfiles themselves. Skips everything in `setup_linux` that
-# changes system config (apt sources, docker, locale, login shell, etc).
+# changes system config (apt sources, podman, locale, login shell, etc).
 #
 # Safe to run on every boot: each step is a quick no-op when already done.
 # Failures are logged immediately and reported after the remaining steps run.
@@ -59,7 +59,7 @@ declare -rA DEVBOX_GITHUB_PACKAGES=(
 )
 
 log() {
-  echo "[dotfiles] ${*}"
+  echo "[dotfiles]" "${@}"
 }
 
 log_error() {
@@ -107,7 +107,7 @@ install_apt_packages() {
   fi
 
   local IFS=' '
-  log "Installing apt packages: ${missing[*]}"
+  log "Installing apt packages:" "${missing[@]}"
   # Keep going if a third-party source fails to update
   as_root apt-get update -qq || log_error "apt-get update failed, continuing"
 

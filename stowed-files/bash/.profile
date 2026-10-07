@@ -98,5 +98,7 @@ if [ -z "${SSH_AUTH_SOCK:-}" ] && command_exists keychain; then
   fi
 fi
 
-[ ! -f /.dockerenv ] || export IS_DOCKER=1
+if [ -f /.dockerenv ] || [ -f /run/.containerenv ]; then
+  export IS_DOCKER=1
+fi
 source_if_exists "$HOME/.profile.local"

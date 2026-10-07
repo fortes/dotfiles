@@ -1,6 +1,6 @@
 # Repository Overview
 
-Personal dotfiles for macOS, Debian Trixie (headless servers, Docker image), Ubuntu devboxes and Crostini. Terminal-focused: Ghostty, Bash, tmux, Neovim, fzf/fd/ripgrep. See README.md for user-facing setup and Docker usage.
+Personal dotfiles for macOS, Debian Trixie (headless servers, Docker image), Ubuntu devboxes and Crostini. Terminal-focused: Ghostty, Bash, tmux, Neovim, fzf/fd/ripgrep. See README.md for user-facing setup and container usage.
 
 ## Commands
 

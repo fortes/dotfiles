@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Install Docker on Debian, for projects not yet ported to podman. Not run by
+# setup. Skips the docker group (effectively root), so use `sudo docker`.
+#
+# Usage: install_docker
+
+set -euo pipefail
+IFS=$'\n\t'
+export DEBIAN_FRONTEND=noninteractive
+
+install_docker() {
+  echo "Installing docker (requires sudo)"
+  sudo -E apt-get update -qq
+  sudo -E apt-get install -qq -o=Dpkg::Use-Pty=0 --assume-yes \
+    --fix-broken --no-install-recommends \
+    docker.io docker-buildx docker-cli docker-compose
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  install_docker "${@}"
+fi

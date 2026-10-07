@@ -42,7 +42,7 @@ RUN set -eux; \
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
 
 # Don't require password for `sudo` use
-RUN echo "ALL ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/10-docker-nopasswd
+RUN echo "ALL ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/10-nopasswd
 
 RUN groupadd --gid $GROUP_ID $USER_NAME && \
   useradd --uid $USER_ID --gid $GROUP_ID \
@@ -60,7 +60,7 @@ RUN sudo mkdir -p /workspaces && sudo chown $USER_NAME:$USER_NAME /workspaces
 COPY --chown=$USER_NAME:$USER_NAME script/ /home/$USER_NAME/dotfiles/script/
 
 # ~/.local/bin (node, npm globals, etc.) for shells that skip ~/.profile, like
-# `docker exec dotfiles node`
+# `podman exec dotfiles node`
 ENV IS_DOCKER=1 \
     PATH=/home/$USER_NAME/.local/bin:$PATH \
     SKIP_INITIAL_APT_INSTALL=1 \
@@ -68,9 +68,11 @@ ENV IS_DOCKER=1 \
 
 # Install all packages and clean up in same layer to reduce image size. The
 # optional GH_TOKEN secret lifts install_github_packages past the 60/hour
-# unauthenticated API limit without baking the token into a layer:
-#   docker build --secret id=GH_TOKEN,env=GH_TOKEN -t dotfiles .
-RUN --mount=type=secret,id=GH_TOKEN,env=GH_TOKEN ./dotfiles/script/setup && \
+# unauthenticated API limit without baking the token into a layer. Read as a
+# file, since Debian's podman predates `env=` secret mounts:
+#   podman build --secret id=GH_TOKEN,env=GH_TOKEN -t dotfiles .
+RUN --mount=type=secret,id=GH_TOKEN,mode=0444 \
+  GH_TOKEN="$(cat /run/secrets/GH_TOKEN 2>/dev/null)" ./dotfiles/script/setup && \
   sudo apt-get clean && \
   sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
@@ -80,5 +82,4 @@ COPY --chown=$USER_NAME:$USER_NAME . /home/$USER_NAME/dotfiles/
 # Re-run stow to pick up any config changes (fast)
 RUN ./dotfiles/script/stow
 
-SHELL ["/bin/bash", "-c"]
 CMD ["/bin/bash"]
