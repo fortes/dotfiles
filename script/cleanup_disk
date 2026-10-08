@@ -10,6 +10,8 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+PRUNE_VOLUMES=0
+
 usage() {
   cat <<EOF
 Usage: $(basename "$0") [OPTIONS]
@@ -17,11 +19,13 @@ Usage: $(basename "$0") [OPTIONS]
 Free up disk space by cleaning up package manager caches, etc
 
 Options:
+  --volumes     Also prune unused container volumes (Docker/Podman)
   -h, --help    Show this help message
 
 Examples:
-  $(basename "$0")          # Run cleanup
-  $(basename "$0") -h       # Show help
+  $(basename "$0")            # Run cache cleanup
+  $(basename "$0") --volumes  # Also prune container volumes
+  $(basename "$0") -h         # Show help
 
 EOF
 }
@@ -47,17 +51,22 @@ cleanup_docker() {
   if command -v docker >/dev/null 2>&1 && docker info >/dev/null 2>&1; then
     echo "Cleaning up Docker..."
     docker system prune -af
-    docker volume prune -f
-    docker image prune -af
-    docker builder prune -af
-    docker network prune -f
+    if [[ "${PRUNE_VOLUMES}" -eq 1 ]]; then
+      echo "Pruning Docker volumes..."
+      docker volume prune -af
+    fi
   fi
 }
 
 cleanup_podman() {
   if command -v podman >/dev/null 2>&1 && podman info >/dev/null 2>&1; then
     echo "Cleaning up Podman..."
-    podman system prune -af --volumes
+    if [[ "${PRUNE_VOLUMES}" -eq 1 ]]; then
+      echo "Pruning Podman volumes..."
+      podman system prune -af --volumes
+    else
+      podman system prune -af
+    fi
   fi
 }
 
@@ -110,12 +119,22 @@ main() {
   cleanup_uv
 }
 
-# Handle arguments
-case "${1:-}" in
-  -h | --help)
-    usage
-    exit 0
-    ;;
-esac
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --volumes)
+      PRUNE_VOLUMES=1
+      shift
+      ;;
+    -h | --help)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "Error: Unknown option $1" >&2
+      usage
+      exit 1
+      ;;
+  esac
+done
 
-main "$@"
+main
