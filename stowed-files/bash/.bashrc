@@ -167,9 +167,19 @@ if command_exists zoxide; then
   eval "$(zoxide init bash --hook pwd)"
 fi
 
+# Load system bash completion
+source_if_exists "/etc/bash_completion"
+# Load Homebrew bash completion, see https://docs.brew.sh/Shell-Completion
+source_if_exists "/opt/homebrew/etc/profile.d/bash_completion.sh"
+source_if_exists "/opt/homebrew/etc/bash_completion.d"
+source_if_exists "/opt/homebrew/share/bash-completion/bash_completion"
+
+# Load local bash completion
+source_if_exists "$HOME/.local/completion.d"
+
 # FZF {{{
 
-# Shell integration for ctrl-t & alt-c
+# Shell integration for ctrl-t & alt-c (loaded after bash-completion)
 if command_exists fzf; then
   eval "$(fzf --bash)"
 fi
@@ -208,16 +218,6 @@ export FZF_CTRL_T_OPTS=" \
 "
 
 # }}}
-
-# Load system bash completion
-source_if_exists "/etc/bash_completion"
-# Load Homebrew bash completion, see https://docs.brew.sh/Shell-Completion
-source_if_exists "/opt/homebrew/etc/profile.d/bash_completion.sh"
-source_if_exists "/opt/homebrew/etc/bash_completion.d"
-source_if_exists "/opt/homebrew/share/bash-completion/bash_completion"
-
-# Load local bash completion
-source_if_exists "$HOME/.local/completion.d"
 
 # Load aliases
 source_if_exists "$HOME/.aliases"

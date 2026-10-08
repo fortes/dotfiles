@@ -19,19 +19,29 @@ main() {
   result=$(
     rg --hidden --ignore-case --color=always --line-number --no-heading "$@" |
       fzf --ansi \
-      --color 'hl:-1:underline,hl+:-1:underline:reverse' \
-      --delimiter ':' \
-      --preview "${bat_command} --color=always {1} --highlight-line {2}" \
-      --preview-window='+{2}+3/3,~3'
-    )
+        --no-multi \
+        --color 'hl:-1:underline,hl+:-1:underline:reverse' \
+        --delimiter ':' \
+        --preview "${bat_command} --color=always {1} --highlight-line {2}" \
+        --preview-window='+{2}+3/3,~3' || {
+      statuses=("${PIPESTATUS[@]}")
+      if [[ "${statuses[0]}" -ge 2 ]]; then
+        exit "${statuses[0]}"
+      fi
+      if [[ "${statuses[1]}" -ne 0 && "${statuses[1]}" -ne 1 && "${statuses[1]}" -ne 130 ]]; then
+        exit "${statuses[1]}"
+      fi
+      exit 0
+    }
+  )
 
-    file="${result%%:*}"
-    linenumber="$(echo "${result}" | cut -d: -f2)"
+  file="${result%%:*}"
+  linenumber="$(echo "${result}" | cut -d: -f2)"
 
-    if [ -n "$file" ]; then
-      "${EDITOR}" +"${linenumber}" "$file"
-    fi
-  }
+  if [ -n "$file" ]; then
+    "${EDITOR}" +"${linenumber}" "$file"
+  fi
+}
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   main "$@"
