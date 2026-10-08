@@ -24,7 +24,7 @@
   # Create a fixup commit to the selected commit
   fixup = "!git log --oneline --no-decorate --no-merges | fzf -0 --preview 'git show --color=always --format=oneline {1}' | awk '{print $1}' | xargs -r git commit --fixup"
   # Fetch and rebase
-  frb = "!f() { git fetch --prune && b=$(git remote show origin 2>/dev/null | sed -n '/HEAD branch/s/.*: //p') && git rebase --autostash \"origin/${b:-main}\"; }; f"
+  frb = "!f() { git fetch --prune && b=$(git remote show origin 2>/dev/null | sed -n '/HEAD branch/s/.*: //p' | sed 's/^(unknown)$//') && git rebase --autostash \"origin/${b:-main}\"; }; f"
   # checkout origin/main
   main = "checkout origin/main"
   # Fuzzy reset staged files
