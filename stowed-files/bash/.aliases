@@ -66,6 +66,16 @@ fi
 if command_exists nvim; then
   alias vi='nvim'
   alias vim='nvim'
+
+  # Edit the Obsidian vault. With no files, opens today's daily note like
+  # Obsidian does. Subshell keeps the cd from leaking, and file arguments
+  # resolve relative to the vault.
+  notes() {
+    if [ $# -eq 0 ]; then
+      set -- +'Obsidian today'
+    fi
+    (cd "${NOTES_DIR:-$HOME/notes}" && nvim "$@")
+  }
 fi
 
 # Load local file if present
