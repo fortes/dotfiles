@@ -180,8 +180,8 @@ source_if_exists "$HOME/.local/completion.d"
 # FZF {{{
 
 # Shell integration for ctrl-t & alt-c. Must come after bash-completion,
-# which would otherwise replace fzf's `**<tab>` completion for commands like
-# cd, ssh and kill
+# which sets its own `complete -D` handler that would otherwise take over
+# `**<tab>` for commands without their own completion
 if command_exists fzf; then
   eval "$(fzf --bash)"
 fi
