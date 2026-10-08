@@ -6,9 +6,6 @@ set -euo pipefail
 
 declare dir_path
 dir_path="$(dirname "${BASH_SOURCE[0]}")"
-# Resolve the stow symlink to find the repo, since it isn't always ~/dotfiles
-declare dotfiles_root
-dotfiles_root="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/../../../.." && pwd)"
 
 main() {
   local new_theme
@@ -32,13 +29,8 @@ main() {
 
   # Colorscheme scripts have unbound variables
   set +u
-  if [[ "${new_theme}" == "light" ]]; then
-    # shellcheck source=../../../../script/base16-default-light.sh
-    . "${dotfiles_root}/script/base16-default-light.sh"
-  else
-    # shellcheck source=../../../../script/base16-default-dark.sh
-    . "${dotfiles_root}/script/base16-default-dark.sh"
-  fi
+  # shellcheck source=/dev/null
+  . "${HOME}/.local/share/base16/base16-default-${new_theme}.sh"
   set -u
 
   update_tmux_colors "${new_theme}"
