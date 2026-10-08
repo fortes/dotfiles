@@ -66,12 +66,12 @@ if len(lines) < 7:
 
 status, title, artist, album, album_artist, track_id, path = lines[:7]
 
-# Fall back to path or "artist - title" as a tracking identifier if track_id is absent
-track_desc = f"{artist} - {title}".strip(" -")
-current_track_identifier = track_id or path or track_desc
-if not current_track_identifier:
-    print("Cannot determine track identifier, skipping scrobble")
+if not artist or not title:
+    print("Missing artist/title, skipping scrobble")
     sys.exit(0)
+
+# Fall back to path as a tracking identifier if track_id is absent
+current_track_identifier = track_id or path
 
 is_new_listen = True
 

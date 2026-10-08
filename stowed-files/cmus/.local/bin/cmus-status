@@ -21,14 +21,10 @@ main() {
 
   cmus_status="$(cmus-remote -Q 2>&1 || true)"
 
-  if grep -q "cmus is not running" <<< "${cmus_status}"; then
-    rm -f "${status_file_path}"
-    return
-  fi
-
   player_status="$(grep -e '^status' <<< "${cmus_status}" | head -n 1 | awk '{print $2}' || true)"
 
-  if [[ "${player_status}" == "stopped" || "${player_status}" == "exiting" ]]; then
+  # Empty when cmus isn't running or cmus-remote fails
+  if [[ -z "${player_status}" || "${player_status}" == "stopped" || "${player_status}" == "exiting" ]]; then
     rm -f "${status_file_path}"
     return
   fi
