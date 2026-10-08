@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Used to preview files in fzf when using Ctrl-T
 #
-# Usage: fzf-directory-preview [dir]
+# Usage: fzf-file-preview [file]
 set -euo pipefail
 
 function fzf-file-preview() {
@@ -12,8 +12,8 @@ function fzf-file-preview() {
       local term_width
       local term_height
 
-      term_width=$(tput cols)
-      term_height=$(tput lines)
+      term_width="${FZF_PREVIEW_COLUMNS:-$(tput cols)}"
+      term_height="${FZF_PREVIEW_LINES:-$(tput lines)}"
 
       exec chafa --size "${term_width}x${term_height}" --format symbols "${file}" 2>&1
     fi

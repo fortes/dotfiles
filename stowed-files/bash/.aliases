@@ -22,7 +22,7 @@ alias ...="cd \$(git rev-parse --show-toplevel 2>/dev/null || echo '.')"
 
 # Add current project NPM to path
 if command_exists npm; then
-  alias npath='export PATH=$(npm bin):$PATH'
+  alias npath='export PATH="$(npm root 2>/dev/null)/.bin:$PATH"'
 fi
 
 if command_exists ctop; then

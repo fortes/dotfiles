@@ -29,13 +29,8 @@ main() {
 
   # Colorscheme scripts have unbound variables
   set +u
-  if [[ "${new_theme}" == "light" ]]; then
-    # shellcheck source=../../../../script/base16-default-light.sh
-    . ~/dotfiles/script/base16-default-light.sh
-  else
-    # shellcheck source=../../../../script/base16-default-dark.sh
-    . ~/dotfiles/script/base16-default-dark.sh
-  fi
+  # shellcheck source=/dev/null
+  . "${HOME}/.local/share/base16/base16-default-${new_theme}.sh"
   set -u
 
   update_tmux_colors "${new_theme}"

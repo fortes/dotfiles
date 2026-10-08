@@ -24,6 +24,7 @@ declare -r REAL_DIRS=(
   .config/systemd/user
   .config/yazi
   .local/bin
+  .local/share
 )
 
 main() {
