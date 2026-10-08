@@ -768,8 +768,17 @@ if has('spell')
   " spellfile plugin and Vim's spellfile.vim
   set spelllang=en_us,pt_pt
 
+  let s:nvim_spellfile = expand('~/.config/nvim/spell/en.utf-8.add')
+  if filereadable(s:nvim_spellfile)
+    let &spellfile = s:nvim_spellfile
+  endif
+
   " Re-generate spelling files if modified
-  for d in glob(fnamemodify($MYVIMRC, ':h').'/spell/*.add', 1, 1)
+  let s:spell_files = glob(fnamemodify($MYVIMRC, ':h').'/spell/*.add', 1, 1)
+  if !has('nvim')
+    let s:spell_files += glob(expand('~/.config/nvim/spell/*.add'), 1, 1)
+  endif
+  for d in s:spell_files
     if getftime(d) > getftime(d.'.spl')
       exec 'mkspell! ' . fnameescape(d)
     endif
