@@ -70,8 +70,8 @@ if not artist or not title:
     print("Missing artist/title, skipping scrobble")
     sys.exit(0)
 
-# Fall back to path as a tracking identifier if track_id is absent
-current_track_identifier = track_id or path
+# Fall back to path or "artist - title" as a tracking identifier if track_id is absent
+current_track_identifier = track_id or path or f"{artist} - {title}"
 
 is_new_listen = True
 
