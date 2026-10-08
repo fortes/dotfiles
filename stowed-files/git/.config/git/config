@@ -9,7 +9,7 @@
   # Add all changes to last commit
   append = "commit --all --amend --no-edit"
   # Fuzzy checkout a branch, showing most recent commit
-  cb = "!git branch --all | grep -v '^[*+]' | awk '{print $1}' | fzf -0 --preview 'git show --color=always {-1}' | sed 's/remotes\\/origin\\///g' | xargs -r git checkout"
+  cb = "!f() { b=$(git branch --all | grep -vE '^[*+]|/HEAD( ->|$)' | awk '{print $1}' | fzf -0 --preview 'git show --color=always {-1}' | sed 's|^remotes/||'); [ -z \"$b\" ] && return 0; if git show-ref --verify --quiet \"refs/heads/$b\"; then git checkout \"$b\"; return; fi; t=$(git for-each-ref --format='%(refname:short) %(upstream:short)' refs/heads | awk -v u=\"$b\" '$2 == u {print $1; exit}'); if [ -n \"$t\" ]; then git checkout \"$t\"; return; fi; s=\"${b#origin/}\"; if git show-ref --verify --quiet \"refs/heads/$s\"; then git checkout \"$s\"; return; fi; git checkout --track \"$b\" 2>/dev/null || git checkout \"$b\"; }; f"
   # Fuzzy apply a stash
   cs = "!git stash list | fzf -0 --preview 'git show --pretty=oneline --color=always --patch \"$(echo {} | cut -d: -f1)\"' | cut -d: -f1 | xargs -r git stash pop"
   # Fuzzy (force) delete a branch, showing most recent commit
@@ -24,7 +24,7 @@
   # Create a fixup commit to the selected commit
   fixup = "!git log --oneline --no-decorate --no-merges | fzf -0 --preview 'git show --color=always --format=oneline {1}' | awk '{print $1}' | xargs -r git commit --fixup"
   # Fetch and rebase
-  frb = "!git fetch --prune && git rebase --autostash \"$(git remote show origin | sed -n '/HEAD branch/s/.*: //p')\""
+  frb = "!git fetch --prune && git rebase --autostash origin/HEAD"
   # checkout origin/main
   main = "checkout origin/main"
   # Fuzzy reset staged files
