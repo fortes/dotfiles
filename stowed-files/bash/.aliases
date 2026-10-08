@@ -52,9 +52,6 @@ else
   alias ll='ls --color=auto -AlpFhv'
 fi
 
-if command_exists imv-wayland; then
-  alias imv='imv-wayland'
-fi
 
 # Debianisms outside of Debian
 if command_exists fd; then
