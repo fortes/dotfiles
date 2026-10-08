@@ -6,6 +6,7 @@
 #   cleanup_disk [OPTIONS]
 #
 # Options:
+#   --volumes     Also prune unused container volumes (Docker/Podman)
 #   -h, --help    Show help message
 set -euo pipefail
 IFS=$'\n\t'
@@ -131,7 +132,7 @@ while [[ $# -gt 0 ]]; do
       ;;
     *)
       echo "Error: Unknown option $1" >&2
-      usage
+      usage >&2
       exit 1
       ;;
   esac
