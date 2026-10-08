@@ -2,25 +2,24 @@
 
 # Copies to clipboard, using one or more of the following:
 # - tmux
-# - wl-copy
+# - macOS pbcopy
+# - tmux buffer
 # - OSC52 over SSH
 
 set -euo pipefail
 IFS=$'\n\t'
 
 isWithinTmux() {
-  if [ -n "${TMUX:-}" ]; then
-    return 0
-  else
-    return 1
-  fi
+  [[ -n "${TMUX:-}" ]]
 }
 
-inWayland() {
-  if [[ ${XDG_SESSION_TYPE:-} == "wayland" ]]; then
-    return 0
+isSSH() {
+  if isWithinTmux; then
+    local tmux_env
+    tmux_env="$(tmux show-environment SSH_CONNECTION 2>/dev/null || true)"
+    [[ "${tmux_env}" == SSH_CONNECTION=?* ]]
   else
-    return 1
+    [[ -n "${SSH_TTY:-}" || -n "${SSH_CLIENT:-}" || -n "${SSH_CONNECTION:-}" ]]
   fi
 }
 
@@ -31,34 +30,27 @@ OSC_52_MAX_SEQUENCE="100000"
 # base64 source as a single blob and wrap in a single OSC 52 sequence, for use
 # on raw terminal that supports OSC52.
 get_osc52() {
-  printf "%b" "\033]52;c;$(echo "$@" | base64 | tr -d '\n')\a\n"
+  printf "\033]52;c;%s\a\n" "$(printf '%s' "$1" | base64 | tr -d '\n')"
 }
 
 main() {
-  buf=$(cat "$@")
+  local buf
+  buf=$(cat "$@" && printf x)
+  buf="${buf%x}"
 
-  if inWayland; then
-    echo "$buf" | wl-copy
-    if command -v notify-send > /dev/null; then
-      notify-send \
-        --urgency low \
-        --transient \
-        --expire-time 1000 \
-        --icon edit-copy-symbolic \
-        'Copied!' 'Saved to clipboard'
-    elif isWithinTmux; then
-      tmux display-message 'Copied!'
-    fi
+  if [[ "$(uname -s)" == "Darwin" ]] && ! isSSH && command -v pbcopy >/dev/null 2>&1; then
+    printf '%s' "${buf}" | pbcopy
   else
     # Use OSC52 to copy over SSH
-    output=$(get_osc52 "$buf")
+    local output
+    output=$(get_osc52 "${buf}")
     if isWithinTmux; then
       # Escape to bypass tmux
       output=$'\033Ptmux;\033'"${output}"$'\033\\'
     fi
 
-    len=${#output}
-    if [ "${len}" -lt "${OSC_52_MAX_SEQUENCE}" ]; then
+    local len=${#output}
+    if [[ "${len}" -lt "${OSC_52_MAX_SEQUENCE}" ]]; then
       printf "%s" "${output}"
     else
       echo "ERROR: selection too long to send to terminal: ${len}" >&2
