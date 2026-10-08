@@ -19,26 +19,29 @@ main() {
   local status_file_path="/tmp/cmus-status.txt"
   local title
 
-  cmus_status="$(cmus-remote -Q 2>&1)"
-
-  if grep -q "cmus is not running" <<< "${cmus_status}"; then
+  # Fails when cmus isn't running
+  if ! cmus_status="$(cmus-remote -Q 2>/dev/null)"; then
     rm -f "${status_file_path}"
     return
   fi
 
-  player_status="$(grep -e '^status' <<< "${cmus_status}" | head -n 1 | awk '{print $2}')"
+  field() {
+    sed -n "s/^$1 //p" <<< "${cmus_status}"
+  }
+
+  player_status="$(field status)"
 
   if [[ "${player_status}" == "stopped" || "${player_status}" == "exiting" ]]; then
     rm -f "${status_file_path}"
     return
   fi
 
-  album="$(grep '^tag album ' <<< "${cmus_status}" | cut -d ' ' -f 3-)"
-  albumartist="$(grep '^tag albumartist ' <<< "${cmus_status}" | cut -d ' ' -f 3-)"
-  artist="$(grep '^tag artist ' <<< "${cmus_status}" | cut -d ' ' -f 3-)"
-  file="$(grep '^file ' <<< "${cmus_status}" | cut -d ' ' -f 3-)"
-  mb_track_id="$(grep '^tag musicbrainz_trackid ' <<< "${cmus_status}" | cut -d ' ' -f 3-)"
-  title="$(grep '^tag title ' <<< "${cmus_status}" | cut -d ' ' -f 3-)"
+  album="$(field 'tag album')"
+  albumartist="$(field 'tag albumartist')"
+  artist="$(field 'tag artist')"
+  file="$(field file)"
+  mb_track_id="$(field 'tag musicbrainz_trackid')"
+  title="$(field 'tag title')"
 
   cat > "${status_file_path}" <<CMUS_STATUS
 ${player_status}
@@ -59,5 +62,5 @@ CMUS_STATUS
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-  main "@"
+  main "$@"
 fi
