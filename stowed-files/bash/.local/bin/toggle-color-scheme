@@ -6,6 +6,9 @@ set -euo pipefail
 
 declare dir_path
 dir_path="$(dirname "${BASH_SOURCE[0]}")"
+# Resolve the stow symlink to find the repo, since it isn't always ~/dotfiles
+declare dotfiles_root
+dotfiles_root="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/../../../.." && pwd)"
 
 main() {
   local new_theme
@@ -26,14 +29,6 @@ main() {
   fi
 
   echo -n "Setting color scheme to ${new_theme}..."
-
-  local script_target
-  script_target="$(readlink -f "${BASH_SOURCE[0]}" 2>/dev/null || realpath "${BASH_SOURCE[0]}" 2>/dev/null || true)"
-  local dotfiles_root
-  dotfiles_root="$(cd "$(dirname "${script_target}")/../../../.." 2>/dev/null && pwd || true)"
-  if [[ -z "${dotfiles_root}" || ! -d "${dotfiles_root}/script" ]]; then
-    dotfiles_root="${HOME}/dotfiles"
-  fi
 
   # Colorscheme scripts have unbound variables
   set +u

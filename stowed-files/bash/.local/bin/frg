@@ -25,6 +25,10 @@ main() {
         --preview "${bat_command} --color=always {1} --highlight-line {2}" \
         --preview-window='+{2}+3/3,~3' || {
       statuses=("${PIPESTATUS[@]}")
+      # rg exits 2 on any error, even with matches, so keep a selection
+      if [[ "${statuses[1]}" -eq 0 ]]; then
+        exit 0
+      fi
       if [[ "${statuses[0]}" -ge 2 ]]; then
         exit "${statuses[0]}"
       fi
