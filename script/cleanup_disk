@@ -62,11 +62,10 @@ cleanup_docker() {
 cleanup_podman() {
   if command -v podman >/dev/null 2>&1 && podman info >/dev/null 2>&1; then
     echo "Cleaning up Podman..."
+    podman system prune -af
     if [[ "${PRUNE_VOLUMES}" -eq 1 ]]; then
       echo "Pruning Podman volumes..."
-      podman system prune -af --volumes
-    else
-      podman system prune -af
+      podman volume prune -af
     fi
   fi
 }
