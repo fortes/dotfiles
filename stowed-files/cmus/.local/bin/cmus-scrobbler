@@ -58,9 +58,20 @@ if not os.path.exists("/tmp/cmus-status.txt"):
     sys.exit(1)
 
 with open("/tmp/cmus-status.txt") as status_file:
-    [status, title, artist, album, album_artist, track_id, path] = [
-        s.strip() for s in status_file.readlines()
-    ]
+    lines = [s.strip() for s in status_file.readlines()]
+
+if len(lines) < 7:
+    print("Invalid /tmp/cmus-status.txt format, exiting")
+    sys.exit(1)
+
+status, title, artist, album, album_artist, track_id, path = lines[:7]
+
+# Fall back to path or "artist - title" as a tracking identifier if track_id is absent
+track_desc = f"{artist} - {title}".strip(" -")
+current_track_identifier = track_id or path or track_desc
+if not current_track_identifier:
+    print("Cannot determine track identifier, skipping scrobble")
+    sys.exit(0)
 
 is_new_listen = True
 
@@ -70,15 +81,15 @@ if os.path.exists("/tmp/previous-track-id.txt"):
         if len(previous_track_lines) == 0:
             is_new_listen = True
         else:
-          previous_track_id = previous_track_lines[0].strip()
-          is_new_listen = previous_track_id != track_id
+            previous_track_id = previous_track_lines[0].strip()
+            is_new_listen = previous_track_id != current_track_identifier
 
 if not is_new_listen:
     print("Not a new listen, skipping scrobble")
     sys.exit(0)
 
 with open("/tmp/previous-track-id.txt", "w") as previous_file:
-    previous_file.write(track_id)
+    previous_file.write(current_track_identifier)
 
 def listenbrainz_scrobble():
     client = pylistenbrainz.ListenBrainz()
@@ -87,7 +98,7 @@ def listenbrainz_scrobble():
     listen = pylistenbrainz.Listen(
         track_name=title,
         artist_name=artist,
-        recording_mbid=track_id,
+        recording_mbid=track_id or None,
         release_name=album,
         listened_at=time.time(),
     )
@@ -104,7 +115,7 @@ def listenbrainz_scrobble():
             listen = pylistenbrainz.Listen(
                 track_name=title,
                 artist_name=artist,
-                recording_mbid=track_id,
+                recording_mbid=track_id or None,
                 release_name=album,
             )
             print("ListenBrainz: Submitting playing now: %s - %s" % (artist, title))
@@ -131,7 +142,7 @@ def librefm_scrobble():
         title=title,
         timestamp=timestamp,
         album_artist=album_artist,
-        mbid=track_id,
+        mbid=track_id or None,
     )
     print("libre.fm: %s - %s scrobbled" % (artist, title))
 

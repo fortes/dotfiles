@@ -33,12 +33,12 @@ main() {
     return
   fi
 
-  album="$(grep '^tag album ' <<< "${cmus_status}" | cut -d ' ' -f 3-)"
-  albumartist="$(grep '^tag albumartist ' <<< "${cmus_status}" | cut -d ' ' -f 3-)"
-  artist="$(grep '^tag artist ' <<< "${cmus_status}" | cut -d ' ' -f 3-)"
-  file="$(grep '^file ' <<< "${cmus_status}" | cut -d ' ' -f 3-)"
-  mb_track_id="$(grep '^tag musicbrainz_trackid ' <<< "${cmus_status}" | cut -d ' ' -f 3-)"
-  title="$(grep '^tag title ' <<< "${cmus_status}" | cut -d ' ' -f 3-)"
+  album="$(grep '^tag album ' <<< "${cmus_status}" | cut -d ' ' -f 3- || true)"
+  albumartist="$(grep '^tag albumartist ' <<< "${cmus_status}" | cut -d ' ' -f 3- || true)"
+  artist="$(grep '^tag artist ' <<< "${cmus_status}" | cut -d ' ' -f 3- || true)"
+  file="$(grep '^file ' <<< "${cmus_status}" | cut -d ' ' -f 2- || true)"
+  mb_track_id="$(grep '^tag musicbrainz_trackid ' <<< "${cmus_status}" | cut -d ' ' -f 3- || true)"
+  title="$(grep '^tag title ' <<< "${cmus_status}" | cut -d ' ' -f 3- || true)"
 
   cat > "${status_file_path}" <<CMUS_STATUS
 ${player_status}
@@ -64,5 +64,5 @@ CMUS_STATUS
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-  main "@"
+  main "$@"
 fi
