@@ -24,17 +24,12 @@ set completion-ignore-case on
 set completion-map-case on
 # Hide what's already been completed with ...
 set completion-prefix-display-length 1
-# Treat _ and - as equivalent when matching
-set completion-map-case on
 # Confirm if we really want completion past this many results
 set completion-query-items 300
 # Append on directories when completing
 set mark-directories on
 # Append slash on completed symlinks
 set mark-symlinked-directories on
-# Bash 4.4 allows setting custom mode strings. Blank for insert, [cmd] for cmd
-set vi-ins-mode-string
-set vi-cmd-mode-string \033[1;33m[cmd]\033[0m
 # Show multiple matches right away
 set show-all-if-ambiguous on
 set show-all-if-unmodified on
