@@ -17,27 +17,54 @@ local ATTACHMENT_EXTS = {
   svg = true, webm = true, webp = true,
 }
 
--- name -> { path = 'people/Foo.md' | nil, count = <times linked> }
+-- link text -> { path = 'people/Foo.md' | nil, count = <times linked> }.
+-- Link text is the note name, or its path when several notes share a name
+-- (Obsidian's "shortest path when possible").
 local index = {}
 
 local function build_index()
-  local next_index = {}
-  local function entry(name)
-    next_index[name] = next_index[name] or { count = 0 }
-    return next_index[name]
-  end
+  local files, targets = {}, {}
   local pending = 2
   local function done()
     pending = pending - 1
-    if pending == 0 then
-      index = next_index
+    if pending > 0 then
+      return
     end
+    local by_name = {}
+    for _, path in ipairs(files) do
+      local name = vim.fn.fnamemodify(path, ':t:r')
+      by_name[name] = by_name[name] or {}
+      table.insert(by_name[name], path)
+    end
+    local next_index = {}
+    local function entry(key)
+      next_index[key] = next_index[key] or { count = 0 }
+      return next_index[key]
+    end
+    for name, paths in pairs(by_name) do
+      for _, path in ipairs(paths) do
+        entry(#paths == 1 and name or path:gsub('%.md$', '')).path = path
+      end
+    end
+    for _, target in ipairs(targets) do
+      local name = vim.fn.fnamemodify(target, ':t')
+      local key = name
+      if by_name[name] and #by_name[name] > 1 then
+        -- Shared name: only links spelling out the note's path count
+        key = next_index[target] and target
+      end
+      if key then
+        local e = entry(key)
+        e.count = e.count + 1
+      end
+    end
+    index = next_index
   end
 
   -- Hidden dirs (.obsidian, .scripts, ...) are skipped by rg by default
   vim.system({ 'rg', '--files', '-g', '*.md' }, { cwd = root, text = true }, function(res)
     for path in (res.stdout or ''):gmatch('[^\n]+') do
-      entry(vim.fn.fnamemodify(path, ':t:r')).path = path
+      table.insert(files, path)
     end
     done()
   end)
@@ -48,13 +75,10 @@ local function build_index()
     { cwd = root, text = true },
     function(res)
       for target in (res.stdout or ''):gmatch('%[%[([^\n]+)') do
-        target = vim.trim(target)
-        -- Path-style links ([[people/Foo]]) collapse to the note name
-        target = vim.fn.fnamemodify(target, ':t'):gsub('%.md$', '')
+        target = vim.trim(target):gsub('%.md$', '')
         local ext = target:match('%.(%w+)$')
         if target ~= '' and not (ext and ATTACHMENT_EXTS[ext:lower()]) then
-          local e = entry(target)
-          e.count = e.count + 1
+          table.insert(targets, target)
         end
       end
       done()
@@ -164,7 +188,18 @@ function M.setup(vault_root)
         return
       end
       local row, col = unpack(vim.api.nvim_win_get_cursor(0))
-      if vim.api.nvim_get_current_line():sub(col + 1, col + 2) == ']]' then
+      local line = vim.api.nvim_get_current_line()
+      -- Completing inside an existing [[link]] only replaced the text before
+      -- the cursor, so drop the rest of the old target (keeping |alias etc.)
+      local after = line:sub(col + 1)
+      if vim.v.event.reason == 'accept' and after:match('^[^%[%]]*%]%]') then
+        local rest = after:match('^[^%]|#%^]*')
+        if rest ~= '' then
+          vim.api.nvim_buf_set_text(0, row - 1, col, row - 1, col + #rest, {})
+          line = vim.api.nvim_get_current_line()
+        end
+      end
+      if line:sub(col + 1, col + 2) == ']]' then
         vim.api.nvim_win_set_cursor(0, { row, col + 2 })
       end
     end,
