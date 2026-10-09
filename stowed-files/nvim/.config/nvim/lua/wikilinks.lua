@@ -3,8 +3,9 @@
 -- when no note exists yet (Obsidian's "unresolved" links). Ranked by fuzzy
 -- match plus how often each target is linked, so frequent people float up.
 --
--- obsidian.nvim's LSP completes links too, but only to existing notes and
--- without ranking by usage; init.lua turns LSP completion off in the vault.
+-- obsidian.nvim's LSP completes links too, but doesn't rank by usage and
+-- needs the LSP running; init.lua turns LSP completion off in the vault.
+-- Needs rg; without it the index stays empty.
 
 local M = {}
 
@@ -12,9 +13,11 @@ local root
 
 -- Links to these are attachments, not notes, so they aren't candidates
 local ATTACHMENT_EXTS = {
-  base = true, canvas = true, csv = true, gif = true, jpeg = true, jpg = true,
-  m4a = true, mov = true, mp3 = true, mp4 = true, pdf = true, png = true,
-  svg = true, webm = true, webp = true,
+  avif = true, base = true, bmp = true, canvas = true, csv = true,
+  excalidraw = true, flac = true, gif = true, heic = true, jpeg = true,
+  jpg = true, m4a = true, mkv = true, mov = true, mp3 = true, mp4 = true,
+  ogg = true, pdf = true, png = true, svg = true, wav = true, webm = true,
+  webp = true, zip = true,
 }
 
 -- link text -> { path = 'people/Foo.md' | nil, count = <times linked> }.
@@ -23,6 +26,10 @@ local ATTACHMENT_EXTS = {
 local index = {}
 
 local function build_index()
+  -- vim.system() throws if rg is missing, which would abort all of init.lua
+  if vim.fn.executable('rg') == 0 then
+    return
+  end
   local files, targets = {}, {}
   local pending = 2
   local function done()
@@ -53,7 +60,8 @@ local function build_index()
         -- Shared name: only links spelling out the note's path count
         key = next_index[target] and target
       end
-      if key then
+      -- `[[folder/]]` has no name
+      if key and key ~= '' then
         local e = entry(key)
         e.count = e.count + 1
       end
@@ -61,8 +69,9 @@ local function build_index()
     index = next_index
   end
 
-  -- Hidden dirs (.obsidian, .scripts, ...) are skipped by rg by default
-  vim.system({ 'rg', '--files', '-g', '*.md' }, { cwd = root, text = true }, function(res)
+  -- --no-config ignores ~/.config/ripgrep/rc: its --hidden would index
+  -- .obsidian, .trash, ..., and --max-columns would truncate long links
+  vim.system({ 'rg', '--no-config', '--files', '-g', '*.md' }, { cwd = root, text = true }, function(res)
     for path in (res.stdout or ''):gmatch('[^\n]+') do
       table.insert(files, path)
     end
@@ -71,7 +80,7 @@ local function build_index()
 
   -- Link targets, without |alias, #heading, or ^block suffixes
   vim.system(
-    { 'rg', '-o', '--no-filename', '--no-line-number', '-g', '*.md', [[\[\[[^\]|#^\n]+]] },
+    { 'rg', '--no-config', '-o', '--no-filename', '--no-line-number', '-g', '*.md', [[\[\[[^\]|#^\n]+]] },
     { cwd = root, text = true },
     function(res)
       for target in (res.stdout or ''):gmatch('%[%[([^\n]+)') do
@@ -132,10 +141,11 @@ local function candidates(typed, after)
       break
     end
     local e = index[name]
+    local dir = e.path and vim.fn.fnamemodify(e.path, ':h')
     table.insert(items, {
       word = name .. close,
       abbr = name,
-      menu = e.path and vim.fn.fnamemodify(e.path, ':h') or '(no note)',
+      menu = dir == '.' and '' or dir or '(no note)',
       kind = e.count > 0 and tostring(e.count) or '',
       equal = 1, -- we already filtered; don't let Vim re-filter
       user_data = 'wikilinks',
@@ -167,8 +177,10 @@ function M.setup(vault_root)
       if not in_vault(args.buf) then
         return
       end
-      -- <C-n>/<C-p> change the text too; refreshing would drop the selection
-      if vim.fn.complete_info({ 'selected' }).selected ~= -1 then
+      -- <C-n>/<C-p> change the text too; refreshing would drop the selection.
+      -- Leave other menus (<C-x><C-o>, <C-n>) alone; ours is mode 'eval'.
+      local info = vim.fn.complete_info({ 'selected', 'mode' })
+      if info.selected ~= -1 or (info.mode ~= '' and info.mode ~= 'eval') then
         return
       end
       local start, typed, after = link_start()

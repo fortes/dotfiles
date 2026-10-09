@@ -3,5 +3,5 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 git rev-parse --is-inside-work-tree &>/dev/null || exit 0
-# To unlock files, use `git update-index --no-skip-worktree`
+# To unlock one: git update-index --no-skip-worktree <file>
 git ls-files -z '*.local' | xargs -0 -r git update-index --skip-worktree

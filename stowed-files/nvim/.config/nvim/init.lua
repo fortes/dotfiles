@@ -26,9 +26,9 @@ local function map(mode, lhs, rhs, opts)
 end
 
 -- Obsidian vault: $NOTES_DIR, default ~/notes. `[[` completion offers every
--- note plus link targets with no note yet, which obsidian.nvim's LSP
--- completion doesn't, so LSP completion is skipped in vault buffers (LspAttach
--- below). marksman doesn't run there at all (see its config).
+-- note plus unresolved link targets, ranked by how often each is linked,
+-- which obsidian.nvim's LSP completion doesn't, so LSP completion is skipped
+-- in vault buffers (LspAttach below). marksman doesn't run there at all (see its config).
 local notes_dir = vim.fn.resolve(vim.fn.expand(vim.env.NOTES_DIR or '~/notes'))
 local wikilinks = require('wikilinks')
 if vim.fn.isdirectory(notes_dir) == 1 then
@@ -38,14 +38,19 @@ local in_notes = wikilinks.in_vault
 
 -- The vault's tabs come from its .editorconfig. A reload (`checktime` after a
 -- script writes to a note) fires FileType after editorconfig has run, and the
--- ftplugin's undo resets indent options to the globals, so re-apply it. Only
--- in the vault: each call adds another trim_trailing_whitespace hook.
+-- ftplugin's undo resets indent options to the globals, so re-apply it.
+-- Clear its BufWritePre hooks first, which each call would otherwise stack.
 vim.api.nvim_create_autocmd('FileType', {
   group = vim.api.nvim_create_augroup('notes_editorconfig', { clear = true }),
   pattern = 'markdown',
   desc = 'Re-apply editorconfig to vault notes after ftplugins',
   callback = function(ev)
     if in_notes(ev.buf) then
+      vim.api.nvim_clear_autocmds({
+        group = 'nvim.editorconfig',
+        event = 'BufWritePre',
+        buffer = ev.buf,
+      })
       require('editorconfig').config(ev.buf)
     end
   end,
