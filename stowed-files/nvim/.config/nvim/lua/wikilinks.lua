@@ -178,9 +178,11 @@ function M.setup(vault_root)
         return
       end
       -- <C-n>/<C-p> change the text too; refreshing would drop the selection.
-      -- Leave other menus (<C-x><C-o>, <C-n>) alone; ours is mode 'eval'.
-      local info = vim.fn.complete_info({ 'selected', 'mode' })
-      if info.selected ~= -1 or (info.mode ~= '' and info.mode ~= 'eval') then
+      -- Leave other menus (<C-x><C-o>, <C-n>) alone. LSP's menu also comes
+      -- from complete(), so tell them apart by item rather than mode.
+      local info = vim.fn.complete_info({ 'selected', 'items' })
+      local first = info.items[1]
+      if info.selected ~= -1 or (first and first.user_data ~= 'wikilinks') then
         return
       end
       local start, typed, after = link_start()
