@@ -25,6 +25,37 @@ local function map(mode, lhs, rhs, opts)
   vim.keymap.set(mode, lhs, rhs, opts)
 end
 
+-- Obsidian vault: $NOTES_DIR, default ~/notes. `[[` completion offers every
+-- note plus unresolved link targets, ranked by how often each is linked,
+-- which obsidian.nvim's LSP completion doesn't, so LSP completion is skipped
+-- in vault buffers (LspAttach below). marksman doesn't run there at all (see its config).
+local notes_dir = vim.fn.resolve(vim.fn.expand(vim.env.NOTES_DIR or '~/notes'))
+local wikilinks = require('wikilinks')
+if vim.fn.isdirectory(notes_dir) == 1 then
+  wikilinks.setup(notes_dir)
+end
+local in_notes = wikilinks.in_vault
+
+-- The vault's tabs come from its .editorconfig. A reload (`checktime` after a
+-- script writes to a note) fires FileType after editorconfig has run, and the
+-- ftplugin's undo resets indent options to the globals, so re-apply it.
+-- Clear its BufWritePre hooks first, which each call would otherwise stack.
+vim.api.nvim_create_autocmd('FileType', {
+  group = vim.api.nvim_create_augroup('notes_editorconfig', { clear = true }),
+  pattern = 'markdown',
+  desc = 'Re-apply editorconfig to vault notes after ftplugins',
+  callback = function(ev)
+    if in_notes(ev.buf) then
+      vim.api.nvim_clear_autocmds({
+        group = 'nvim.editorconfig',
+        event = 'BufWritePre',
+        buffer = ev.buf,
+      })
+      require('editorconfig').config(ev.buf)
+    end
+  end,
+})
+
 -- Fold options are window-local, so apply them to every window showing the
 -- buffer. A buffer can be loaded while outside any window (nvim-bqf `bufload`s
 -- quickfix entries to preview them), in which case this is a no-op.
@@ -77,6 +108,14 @@ vim.api.nvim_create_autocmd('LspAttach', {
       end, { buffer = bufnr, desc = 'Fix all OXlint issues' })
     end
 
+    -- Grammar hints swamp prose in the vault; `yog` turns them back on
+    if client.name == 'harper_ls' and in_notes(bufnr) then
+      vim.diagnostic.enable(false, {
+        bufnr = bufnr,
+        ns_id = vim.lsp.diagnostic.get_namespace(client.id, false),
+      })
+    end
+
     map('n', '<leader>e', vim.diagnostic.open_float, {
       buffer = bufnr,
       desc = 'Show diagnostics under the cursor',
@@ -86,7 +125,9 @@ vim.api.nvim_create_autocmd('LspAttach', {
       desc = 'Add buffer diagnostics to the location list',
     })
 
-    if client:supports_method('textDocument/completion') then
+    -- Vault notes use wikilinks.lua for `[[` instead; LSP completion (headings
+    -- after `#`, aliases) is still there manually via <C-x><C-o>
+    if client:supports_method('textDocument/completion') and not in_notes(bufnr) then
       vim.lsp.completion.enable(true, client.id, bufnr, { autotrigger = true })
     end
 
@@ -379,6 +420,14 @@ use('https://github.com/neovim/nvim-lspconfig', function()
     -- `:checkhealth vim.lsp` report an unknown filetype
     vim.lsp.config('marksman', {
       filetypes = { 'markdown' },
+      -- Not in the vault: obsidian.nvim's LSP covers the same features there,
+      -- and marksman flags links to notes that don't exist yet, which are fine
+      -- in Obsidian. Elsewhere, same root markers as lspconfig's default.
+      root_dir = function(bufnr, on_dir)
+        if not in_notes(bufnr) then
+          on_dir(vim.fs.root(bufnr, { '.marksman.toml', '.git' }))
+        end
+      end,
       -- A .NET binary, which otherwise aborts at startup without ICU (not
       -- installed on Debian by default). Invariant mode only drops
       -- culture-aware casing and sorting, which Markdown doesn't need.
@@ -640,10 +689,9 @@ use('https://github.com/stevearc/conform.nvim', function()
       lsp_format = 'fallback',
     },
     format_after_save = function(bufnr)
-      -- Skip ~/notes — obsidian.nvim sets tabs there, but oxfmt would
-      -- reformat with spaces and undo the per-buffer setting.
-      local file_path = vim.api.nvim_buf_get_name(bufnr)
-      if vim.startswith(file_path, vim.fn.expand('~/notes/')) then
+      -- Skip the vault: oxfmt re-indents markdown lists with spaces
+      -- regardless of .editorconfig, and the vault uses tabs.
+      if in_notes(bufnr) then
         return nil
       end
       return {}
@@ -679,11 +727,28 @@ use('https://github.com/stevearc/conform.nvim', function()
   end, { desc = 'Format buffer' })
 end)
 
--- Obsidian notes integration (active only in ~/notes directory)
+-- Obsidian-style live preview for the vault: headings, checkboxes, callouts,
+-- tables, and links render in normal mode; the cursor line shows raw markdown.
+-- Markdown elsewhere (READMEs in repos) stays raw.
+use('https://github.com/MeanderingProgrammer/render-markdown.nvim', function()
+  require('render-markdown').setup({
+    -- Keep rendering in insert mode (only the cursor line shows raw), instead
+    -- of the whole buffer flipping to raw markdown on every mode change
+    render_modes = true,
+    ignore = function(bufnr)
+      return not in_notes(bufnr)
+    end,
+    latex = { enabled = false },
+    -- Raw `##` reads better than icons, background bands, and signs
+    heading = { enabled = false },
+  })
+end)
+
+-- Obsidian notes integration (active only in the vault, see notes_dir)
 -- No version pin: vim.pack doesn't support wildcard releases, tracks main branch
 use('https://github.com/obsidian-nvim/obsidian.nvim', function()
   -- obsidian.nvim hard-errors if no configured workspace path exists
-  if vim.fn.isdirectory(vim.fn.expand('~/notes')) == 0 then
+  if vim.fn.isdirectory(notes_dir) == 0 then
     return
   end
 
@@ -701,7 +766,7 @@ use('https://github.com/obsidian-nvim/obsidian.nvim', function()
         template = 'daily-journal.md',
       },
     }
-    local path = vim.fn.expand('~/notes/.obsidian/daily-notes.json')
+    local path = notes_dir .. '/.obsidian/daily-notes.json'
     if vim.fn.filereadable(path) == 0 then return synced end
     local ok, decoded = pcall(vim.json.decode, table.concat(vim.fn.readfile(path), '\n'))
     if not ok or type(decoded) ~= 'table' then return synced end
@@ -733,7 +798,7 @@ use('https://github.com/obsidian-nvim/obsidian.nvim', function()
     workspaces = {
       {
         name = 'notes',
-        path = '~/notes',
+        path = notes_dir,
       },
     },
     -- Vault convention is TitleCase filenames (e.g. "My Note Title" →
@@ -765,35 +830,93 @@ use('https://github.com/obsidian-nvim/obsidian.nvim', function()
     -- Use [[wikilinks]] with the shortest unambiguous path; auto_update
     -- rewrites existing references when renaming via :Obsidian rename
     link = { style = 'wiki', format = 'shortest', auto_update = true },
-    -- conceallevel is set per-buffer in the BufEnter autocmd below
-    ui = { ignore_conceal_warn = true },
+    -- No `ui` setting: obsidian.nvim leaves rendering to render-markdown.nvim
+    -- when it's installed
   })
 
   map('n', '<leader>os', '<cmd>Obsidian quick_switch<cr>', { desc = 'Obsidian quick switch' })
   map('n', '<leader>of', '<cmd>Obsidian search<cr>', { desc = 'Obsidian search' })
   map('n', '<leader>ob', '<cmd>Obsidian backlinks<cr>', { desc = 'Obsidian backlinks' })
   map('n', '<leader>ot', '<cmd>Obsidian today<cr>', { desc = 'Obsidian today' })
+  map('n', '<leader>oy', '<cmd>Obsidian today -1<cr>', { desc = 'Obsidian yesterday' })
   map('n', '<leader>oT', '<cmd>Obsidian template<cr>', { desc = 'Obsidian insert template' })
   map('n', '<leader>on', '<cmd>Obsidian new<cr>', { desc = 'Obsidian new note' })
   map('n', '<leader>or', '<cmd>Obsidian rename<cr>', { desc = 'Obsidian rename' })
   map('n', '<leader>oc', '<cmd>Obsidian toc<cr>', { desc = 'Obsidian table of contents' })
+  map('n', '<leader>op', '<cmd>Obsidian paste_img<cr>', { desc = 'Obsidian paste image' })
   map('x', '<leader>ol', '<cmd>Obsidian link<cr>', { desc = 'Obsidian link selection' })
+
+  -- Enter continues lists like Obsidian: the next bullet, an unchecked box, or
+  -- the next number. On an empty item it dedents, or ends a top-level list.
+  -- Anything else goes to nvim-autopairs, which owns <CR> otherwise. Its
+  -- completion_confirm() returns keys with keycodes already replaced, so the
+  -- map uses replace_keycodes = false and the rest go through vim.keycode().
+  local function list_enter()
+    -- Like Obsidian, Enter accepts the highlighted [[ suggestion, or the top one
+    if vim.fn.pumvisible() == 1 then
+      local info = vim.fn.complete_info({ 'selected', 'items' })
+      if info.selected ~= -1 then
+        return vim.keycode('<C-y>')
+      end
+      if info.items[1] and info.items[1].user_data == 'wikilinks' then
+        return vim.keycode('<C-n><C-y>')
+      end
+    end
+    local line = vim.api.nvim_get_current_line()
+    local col = vim.api.nvim_win_get_cursor(0)[2]
+    local indent, marker, rest, next_marker
+    indent, marker, rest = line:match('^(%s*)([-*+] %[.%] )(.*)$')
+    if marker then
+      next_marker = marker:sub(1, 2) .. '[ ] '
+    else
+      indent, marker, rest = line:match('^(%s*)([-*+] )(.*)$')
+      next_marker = marker
+    end
+    if not marker then
+      local num, delim
+      indent, num, delim, rest = line:match('^(%s*)(%d+)([.)]) (.*)$')
+      if num then
+        marker = num .. delim .. ' '
+        next_marker = (tonumber(num) + 1) .. delim .. ' '
+      end
+    end
+    if vim.fn.pumvisible() == 1 or not marker or col < #indent + #marker then
+      return require('nvim-autopairs').completion_confirm()
+    end
+    if rest:match('^%s*$') then
+      return vim.keycode(indent ~= '' and '<C-d>' or '<C-u>')
+    end
+    return vim.keycode('<CR>') .. next_marker
+  end
 
   vim.api.nvim_create_autocmd('BufEnter', {
     group = vim.api.nvim_create_augroup('obsidian_notes', { clear = true }),
     pattern = '*.md',
     desc = 'Notes-specific buffer settings',
-    callback = function()
-      local file_path = vim.fn.expand('%:p')
-      local notes_path = vim.fn.expand('~/notes/')
-      if vim.startswith(file_path, notes_path) then
-        -- Tabs instead of spaces
-        vim.opt_local.expandtab = false
-        vim.opt_local.shiftwidth = 4
-        vim.opt_local.tabstop = 4
-        vim.opt_local.softtabstop = 4
-        -- Required by obsidian.nvim for [[wikilink]] / link rendering
-        vim.opt_local.conceallevel = 2
+    callback = function(ev)
+      if in_notes(ev.buf) then
+        -- Spelling marks are noise while taking notes; `yos` turns them back
+        -- on until you leave the note
+        vim.opt_local.spell = false
+        -- Indent list items and dedent lines like Obsidian; both still move
+        -- through the completion menu (~/.vimrc)
+        map('i', '<Tab>', function()
+          if vim.fn.pumvisible() == 1 then
+            return '<C-n>'
+          end
+          local line = vim.api.nvim_get_current_line()
+          local is_item = line:match('^%s*[-*+] ') or line:match('^%s*%d+[.)] ')
+          return is_item and '<C-t>' or '<Tab>'
+        end, { buffer = ev.buf, expr = true, desc = 'Indent list item' })
+        map('i', '<S-Tab>', function()
+          return vim.fn.pumvisible() == 1 and '<C-p>' or '<C-d>'
+        end, { buffer = ev.buf, expr = true, desc = 'Dedent line' })
+        map('i', '<CR>', list_enter, {
+          buffer = ev.buf,
+          expr = true,
+          replace_keycodes = false,
+          desc = 'Continue list',
+        })
 
         -- <CR>, ]o, [o are bound by obsidian.nvim's own autocmd (api.smart_action,
         -- api.nav_link) for any buffer in the workspace; don't override them.

@@ -25,6 +25,7 @@ make test         # shellcheck + shfmt (also what CI runs)
 Shell startup: `.profile` (environment, PATH, helpers, `IS_DOCKER`; sources `.profile.local` last) → `.bashrc` (interactive; sources `.profile`) → `.aliases`.
 
 Neovim: `init.lua` sources `~/.vimrc`, and plugins use the built-in `vim.pack`.
+The Obsidian vault is `$NOTES_DIR` (default `~/notes`); `notes` in `.aliases` opens it.
 
 ## Conventions
 
