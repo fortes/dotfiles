@@ -48,13 +48,17 @@ local function build_index()
       next_index[key] = next_index[key] or { count = 0 }
       return next_index[key]
     end
+    -- Obsidian matches link targets to note names ignoring case
+    local by_lower = {}
     for name, paths in pairs(by_name) do
       for _, path in ipairs(paths) do
         entry(#paths == 1 and name or path:gsub('%.md$', '')).path = path
       end
+      by_lower[name:lower()] = by_lower[name:lower()] or name
     end
     for _, target in ipairs(targets) do
       local name = vim.fn.fnamemodify(target, ':t')
+      name = by_name[name] and name or by_lower[name:lower()] or name
       local key = name
       if by_name[name] and #by_name[name] > 1 then
         -- Shared name: only links spelling out the note's path count
@@ -78,9 +82,10 @@ local function build_index()
     done()
   end)
 
-  -- Link targets, without |alias, #heading, or ^block suffixes
+  -- Link targets, without |alias, #heading, or ^block suffixes. Excluding `\`
+  -- drops the escape in table links (`[[Note\|alias]]`).
   vim.system(
-    { 'rg', '--no-config', '-o', '--no-filename', '--no-line-number', '-g', '*.md', [[\[\[[^\]|#^\n]+]] },
+    { 'rg', '--no-config', '-o', '--no-filename', '--no-line-number', '-g', '*.md', [[\[\[[^\]|#^\n\\]+]] },
     { cwd = root, text = true },
     function(res)
       for target in (res.stdout or ''):gmatch('%[%[([^\n]+)') do
