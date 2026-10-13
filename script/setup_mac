@@ -29,7 +29,6 @@ BREW_PACKAGES=(
   colima
   container
   delta
-  deno
   difftastic
   docker
   docker-compose

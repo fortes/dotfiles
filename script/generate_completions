@@ -40,10 +40,6 @@ generate_completions() {
     delta --generate-completion bash >"${completion_dir}/delta_completion"
   fi
 
-  if command_exists deno; then
-    deno completions bash >"${completion_dir}/deno_completion"
-  fi
-
   if command_exists gh; then
     gh completion -s bash >"${completion_dir}/gh_completion"
   fi

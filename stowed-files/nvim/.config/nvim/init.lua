@@ -297,13 +297,6 @@ local function use(spec, setup_fn)
   if setup_fn then table.insert(_setups, setup_fn) end
 end
 
--- Per-buffer Deno detection so opening a Deno file from a non-Deno cwd
--- still routes to the right LSP/formatter
-local function in_deno_project(bufnr)
-  if os.getenv('ENABLE_DENO') == '1' then return true end
-  return vim.fs.root(bufnr or 0, { 'deno.json', 'deno.jsonc' }) ~= nil
-end
-
 -- ============================================================================
 -- Plugin declarations
 -- ============================================================================
@@ -347,32 +340,20 @@ use('https://github.com/neovim/nvim-lspconfig', function()
     end
   end
 
-  -- Deno: root_markers gate attachment to buffers actually inside a Deno
-  -- project (so this is safe to enable unconditionally)
-  if vim.fn.executable('deno') == 1 then
-    vim.lsp.config('denols', {
-      root_markers = { 'deno.json', 'deno.jsonc' },
-      single_file_support = false,
-    })
-    vim.lsp.enable('denols')
-  end
-
-  -- root_dir returning nil prevents attachment, so oxfmt/oxlint
-  -- skip Deno-managed buffers per-buffer (not just at startup)
-  local function not_in_deno(extra_markers)
+  -- Attach oxfmt/oxlint everywhere, rooted at the nearest marker or cwd
+  local function root_or_cwd(markers)
     return function(bufnr, on_dir)
-      if in_deno_project(bufnr) then return end
-      on_dir(vim.fs.root(bufnr, extra_markers) or vim.fn.getcwd())
+      on_dir(vim.fs.root(bufnr, markers) or vim.fn.getcwd())
     end
   end
 
   if vim.fn.executable('oxfmt') == 1 then
-    vim.lsp.config('oxfmt', { root_dir = not_in_deno({ 'package.json' }) })
+    vim.lsp.config('oxfmt', { root_dir = root_or_cwd({ 'package.json' }) })
     vim.lsp.enable('oxfmt')
   end
 
   if vim.fn.executable('oxlint') == 1 then
-    vim.lsp.config('oxlint', { root_dir = not_in_deno({ 'package.json', '.oxlintrc.json' }) })
+    vim.lsp.config('oxlint', { root_dir = root_or_cwd({ 'package.json', '.oxlintrc.json' }) })
     vim.lsp.enable('oxlint')
   end
 
@@ -438,23 +419,7 @@ use('https://github.com/neovim/nvim-lspconfig', function()
 
   -- `tsc` is the language server, not just the compiler: TypeScript 7's native
   -- build serves LSP over `tsc --lsp`.
-  --
-  -- lspconfig's `tsc` does its own Deno detection, comparing deno.json /
-  -- deno.lock depth against the nearest package lockfile so a Deno module
-  -- inside a Node monorepo still works. But it can't know about ENABLE_DENO,
-  -- and it lets tsc attach inside a Deno project whenever a nested package
-  -- lockfile sits deeper than deno.json — where `denols` attaches too, putting
-  -- two TypeScript servers on one buffer. Gate on our own check first (same one
-  -- oxfmt and oxlint use, so the whole toolchain agrees on what "Deno" means),
-  -- then defer to theirs. Captured before the override so this isn't recursive.
   if vim.fn.executable('tsc') == 1 then
-    local tsc_root_dir = vim.lsp.config.tsc.root_dir
-    vim.lsp.config('tsc', {
-      root_dir = function(bufnr, on_dir)
-        if in_deno_project(bufnr) then return end
-        return tsc_root_dir(bufnr, on_dir)
-      end,
-    })
     vim.lsp.enable('tsc')
   end
 
@@ -676,14 +641,6 @@ use('https://github.com/nvim-telescope/telescope-ui-select.nvim')
 use('https://github.com/stevearc/conform.nvim', function()
   vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
 
-  -- Use `deno` for formatting when in a deno project, oxfmt otherwise
-  local function deno_or_oxfmt(bufnr)
-    if vim.fs.root(bufnr, { 'deno.json', 'deno.jsonc' }) ~= nil then
-      return { 'deno_fmt', lsp_format = 'prefer' }
-    end
-    return { 'oxfmt' }
-  end
-
   require('conform').setup({
     default_format_opts = {
       lsp_format = 'fallback',
@@ -709,15 +666,15 @@ use('https://github.com/stevearc/conform.nvim', function()
     formatters_by_ft = {
       css = { 'oxfmt' },
       html = { 'oxfmt' },
-      javascript = deno_or_oxfmt,
-      javascriptreact = deno_or_oxfmt,
-      json = deno_or_oxfmt,
-      jsonc = deno_or_oxfmt,
-      markdown = deno_or_oxfmt,
+      javascript = { 'oxfmt' },
+      javascriptreact = { 'oxfmt' },
+      json = { 'oxfmt' },
+      jsonc = { 'oxfmt' },
+      markdown = { 'oxfmt' },
       python = { 'ruff' },
       sh = { 'shfmt' },
-      typescript = deno_or_oxfmt,
-      typescriptreact = deno_or_oxfmt,
+      typescript = { 'oxfmt' },
+      typescriptreact = { 'oxfmt' },
       yaml = { 'oxfmt' },
     },
   })
