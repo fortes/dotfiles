@@ -1,13 +1,5 @@
 #!/usr/bin/env bash
-#
-# cleanup_disk - Free up disk space by cleaning up package manager caches, etc
-#
-# Usage:
-#   cleanup_disk [OPTIONS]
-#
-# Options:
-#   --volumes     Also prune unused container volumes (Docker/Podman)
-#   -h, --help    Show help message
+# Remove package manager caches and unused containers. Volumes require --volumes.
 set -euo pipefail
 IFS=$'\n\t'
 
@@ -22,11 +14,6 @@ Free up disk space by cleaning up package manager caches, etc
 Options:
   --volumes     Also prune unused container volumes (Docker/Podman)
   -h, --help    Show this help message
-
-Examples:
-  $(basename "$0")            # Run cache cleanup
-  $(basename "$0") --volumes  # Also prune container volumes
-  $(basename "$0") -h         # Show help
 
 EOF
 }

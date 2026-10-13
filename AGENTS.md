@@ -24,14 +24,15 @@ make test         # shellcheck + shfmt (also what CI runs)
 
 Shell startup: `.profile` (environment, PATH, helpers, `IS_DOCKER`; sources `.profile.local` last) → `.bashrc` (interactive; sources `.profile`) → `.aliases`.
 
-Neovim: `init.lua` sources `~/.vimrc`, and plugins use the built-in `vim.pack`.
+Neovim: `init.lua` sources `~/.vimrc`; Neovim 0.12+ loads plugins with the built-in `vim.pack`, while older versions use the base Vim config.
 The Obsidian vault is `$NOTES_DIR` (default `~/notes`); `notes` in `.aliases` opens it.
 
 ## Conventions
 
 - **Keep it simple.** Scripts are idempotent, so a loud failure plus a rerun is the recovery plan. Don't add retries, traps, fallbacks, marker files or migration code for rare cases. A one-time manual step is fine.
+- **Comments:** Explain surprising behavior or constraints; skip comments that only restate the next line.
 - **No test harnesses.** `make test`, the Docker image build and running setup on the Mac are the tests.
 - **CI cost:** `.github/workflows/bash-syntax.yml` has narrow path triggers, and the Docker image build chains off it. Don't widen the triggers; add directories to its sparse checkout instead.
-- **Bash 3.2:** `setup_mac` and `script/lib.sh` run under macOS's `/bin/bash` before Homebrew bash exists, so avoid Bash 4 features and GNU-only flags there.
+- **Bash 3.2:** `setup_mac`, `script/stow` and `script/lib.sh` can run under macOS's `/bin/bash` before Homebrew bash exists. Avoid Bash 4 features and GNU-only flags there.
 - **`~/.vimrc` stays self-contained.** It's also used via `nvim -u ~/.vimrc` and copied to servers, so it must load without errors on distro Vim/Neovim and `vim.tiny`.
 - Use `uname -s` for macOS vs Linux and `IS_DOCKER` for containers.

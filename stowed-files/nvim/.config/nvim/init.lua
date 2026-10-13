@@ -1,5 +1,5 @@
 -- vim:et ft=lua sts=2 sw=2 ts=2
--- Load all base / legacy options from ~/.vimrc
+-- Base options shared with Vim and older Neovim.
 vim.cmd('source ~/.vimrc')
 
 -- Load local config, if present. Last, so it can override plugin setup
@@ -19,7 +19,6 @@ if vim.fn.has('nvim-0.12') == 0 then
   return
 end
 
--- Helper for keymaps
 local function map(mode, lhs, rhs, opts)
   opts = vim.tbl_extend('force', { silent = true }, opts or {})
   vim.keymap.set(mode, lhs, rhs, opts)
@@ -174,10 +173,8 @@ vim.api.nvim_create_autocmd('LspAttach', {
   end,
 })
 
--- ============================================================================
 -- `yo` option toggles, in the style of vim-unimpaired. `yon` and `yos` live in
 -- ~/.vimrc, since plain option toggles work in Vim too.
--- ============================================================================
 
 -- Hides every diagnostic display at once: inline text, the current-line
 -- virtual lines, and the E/W/H gutter signs (which with `signcolumn=auto:1-3`
@@ -215,7 +212,6 @@ map('n', 'yog', function()
   end
 end, { desc = 'Toggle grammar (harper) hints' })
 
--- Plugin manager: vim.pack (built-in, nvim 0.12+).
 -- Run `:lua vim.pack.update()` to install/update plugins.
 
 -- Treesitter parsers to keep installed. Parser names aren't filetypes (`.tsx`
@@ -297,9 +293,7 @@ local function use(spec, setup_fn)
   if setup_fn then table.insert(_setups, setup_fn) end
 end
 
--- ============================================================================
 -- Plugin declarations
--- ============================================================================
 
 -- Utilities used by many plugins
 use('https://github.com/nvim-lua/plenary.nvim')
@@ -365,8 +359,7 @@ use('https://github.com/neovim/nvim-lspconfig', function()
           linters = {
             SpellCheck = false,
           },
-          -- Default on MacOS goes in ~/Library/Application Support/ which
-          -- isn't stowed
+          -- Keep the dictionary in the stowed location on macOS too.
           userDictPath = vim.fn.expand('~/.config/harper-ls/dictionary.txt'),
         },
       },
@@ -380,11 +373,9 @@ use('https://github.com/neovim/nvim-lspconfig', function()
         Lua = {
           runtime = { version = 'LuaJIT' },
           diagnostics = {
-            -- Recognize the `vim` global
             globals = { 'vim' },
           },
           workspace = {
-            -- Make the server aware of Neovim runtime files
             library = vim.api.nvim_get_runtime_file('', true),
             checkThirdParty = false,
           },
@@ -1017,9 +1008,7 @@ use('https://github.com/RRethy/base16-nvim', function()
   end
 end)
 
--- ============================================================================
 -- Install plugins and run setup functions
--- ============================================================================
 
 vim.pack.add(_specs)
 
