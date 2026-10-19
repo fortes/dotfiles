@@ -85,24 +85,14 @@ BREW_PACKAGES=(
   zoxide
 )
 
+# Only casks that brew keeps updated. Apps that update themselves are installed
+# by hand instead (see README), since brew loses track of their versions
 CASK_PACKAGES=(
-  1password
   1password-cli
-  antigravity
-  antigravity-cli
-  claude
-  codex-app
-  firefox
   font-google-sans-code
   font-jetbrains-mono
   # For yazi
   font-symbols-only-nerd-font
-  ghostty
-  google-chrome
-  obsidian
-  plexamp
-  rectangle
-  signal
 )
 
 setup_shell() {
@@ -154,39 +144,7 @@ install_homebrew_packages() {
 
 install_homebrew_casks() {
   echo "Installing homebrew casks"
-
-  local missing_casks=()
-  local casks_to_install=()
-  local cask app cask_info
-
-  for cask in "${CASK_PACKAGES[@]}"; do
-    if ! "${brew_prefix}/bin/brew" list --cask "$cask" &>/dev/null; then
-      missing_casks+=("${cask}")
-    fi
-  done
-
-  # `brew install` refuses to overwrite an app installed outside of Homebrew
-  # (manual download, MDM, etc.), so leave those alone
-  if [[ ${#missing_casks[@]} -gt 0 ]]; then
-    # Capture first, since `set -e` can't see failures in process substitution
-    cask_info=$("${brew_prefix}/bin/brew" info --cask --json=v2 "${missing_casks[@]}" \
-      | "${brew_prefix}/bin/jq" -r '.casks[] | [.token, (first(.artifacts[] | select(has("app")) | .target) // "")] | @tsv')
-
-    while IFS=$'\t' read -r cask app; do
-      if [[ -n "${app}" ]] && [[ -e "${app}" ]]; then
-        echo "Skipping ${cask}: ${app} not managed by Homebrew"
-      else
-        casks_to_install+=("${cask}")
-      fi
-    done <<<"${cask_info}"
-  fi
-
-  if [[ ${#casks_to_install[@]} -gt 0 ]]; then
-    echo "Installing cask packages: ${casks_to_install[*]}"
-    "${brew_prefix}/bin/brew" install --cask --quiet "${casks_to_install[@]}"
-  else
-    echo "All cask packages already installed"
-  fi
+  "${brew_prefix}/bin/brew" install --cask --quiet "${CASK_PACKAGES[@]}"
 }
 
 main() {
