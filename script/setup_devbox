@@ -47,6 +47,7 @@ declare -r DEVBOX_APT_PACKAGES=(
   stow
   tmux
   trash-cli
+  unzip
   wget
   zoxide
 )
@@ -55,6 +56,8 @@ declare -r DEVBOX_APT_PACKAGES=(
 declare -rA DEVBOX_GITHUB_PACKAGES=(
   [fzf]=fzf
   [neovim]=nvim
+  # Quoted: shfmt reads an unquoted key with dashes as an arithmetic expression
+  ["tree-sitter-cli"]=tree-sitter
   [yq]=yq
 )
 

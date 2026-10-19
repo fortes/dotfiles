@@ -10,9 +10,9 @@ set -euo pipefail
 . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 # Match setup's lightweight path, rather than installing the full workstation
-# toolset on a devbox that only opted into three GitHub binaries.
+# toolset on a devbox that only opted into a few GitHub binaries.
 if is_devbox; then
-  exec "${dotfiles_script_dir}/install_github_packages" fzf neovim yq
+  exec "${dotfiles_script_dir}/install_github_packages" fzf neovim tree-sitter-cli yq
 fi
 
 if [[ "$(uname -s)" == Linux ]]; then
