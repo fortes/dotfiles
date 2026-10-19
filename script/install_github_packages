@@ -294,7 +294,9 @@ install_marksman() {
 }
 
 install_tree_sitter_cli() {
-  # Trixie's is too old for nvim-treesitter
+  # Trixie's is too old for nvim-treesitter. The binary asks for glibc 2.39
+  # only as a weak version, so on older glibc, like Ubuntu 22.04's, it prints
+  # "weak version `GLIBC_2.39' not found" but still works
   install_bin 'tree-sitter/tree-sitter' '/tree-sitter-cli-linux-{ARCH}\.zip$'
 }
 
