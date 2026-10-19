@@ -165,6 +165,15 @@ clean those up:
 - Set `terminal.app` profile, send option as meta key
 - May want to install command line tools manually in order to get `git`: `xcode-select --install`
 - Run `setup_mac`
+- Install apps by hand. They update themselves, which leaves Homebrew's casks stale, so setup skips them. Skip any that MDM already installed:
+
+  ```sh
+  brew install --cask 1password claude codex-app firefox ghostty google-chrome obsidian rectangle
+  # Optional
+  brew install --cask antigravity antigravity-cli
+  # Personal machines
+  brew install --cask plexamp signal
+  ```
 - Make sure keys repeat properly in apps that disable it by default:
   - Antigravity: `defaults write com.google.antigravity ApplePressAndHoldEnabled -bool false`
   - Obsidian: `defaults write md.obsidian ApplePressAndHoldEnabled -bool false`
@@ -310,12 +319,6 @@ apt-cache policy neovim
 ```
 
 This will list out all the packages installed, then need to search through to manually check which have backports available (pipe to `nvim -`).
-
-## Known Issues
-
-### Mac
-
-- Firefox cask gets ornery and no longer updates via brew, currently installed once via script, but updates have to happen manually. Need to investigate further.
 
 ## License
 
