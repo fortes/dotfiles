@@ -49,9 +49,9 @@ list_stow_packages() {
   done
 }
 
-# Startup files that Debian (.bashrc, .profile) and macOS (.bash_profile)
-# provide by default, which conflict with the bash package
-DEFAULT_DOTFILES=(.bashrc .profile .bash_profile)
+# Files provided by Debian, macOS, or devbox images that conflict with the
+# bash package
+DEFAULT_DOTFILES=(.bashrc .profile .bash_profile .hushlogin)
 
 # Whether a startup file in $HOME is machine-provided and would block stow:
 # a regular file, or a symlink that doesn't point into a stowed-files dir

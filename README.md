@@ -23,7 +23,7 @@ On Ubuntu (22.04 or later, which Coder devboxes and most devcontainers use), `sc
 DOTFILES_DEVBOX=1 ./dotfiles/script/setup
 ```
 
-Set `DOTFILES_SKIP_PACKAGES="bash ssh"` (for example) to leave stow packages alone, like `bash` to keep machine-provided shell startup files. Devbox setup never upgrades its GitHub binaries; run `script/update` for that.
+Set `DOTFILES_SKIP_PACKAGES="bash ssh"` (for example) to leave stow packages alone, like `bash` to keep machine-provided shell startup files. Setup backs up existing shell files, including `.hushlogin`, before linking them. Devbox setup never upgrades its GitHub binaries; run `script/update` for that.
 
 ## Setup and updates
 
