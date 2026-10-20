@@ -15,7 +15,6 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-# Before anything else, since the Bash 4 syntax below fails on macOS Bash 3.2
 if ! command -v apt-get &>/dev/null; then
   echo >&2 "[dotfiles] Only works on Debian-like systems"
   exit 1
@@ -50,15 +49,6 @@ declare -r DEVBOX_APT_PACKAGES=(
   unzip
   wget
   zoxide
-)
-
-# GitHub package name -> binary it installs into ~/.local/bin
-declare -rA DEVBOX_GITHUB_PACKAGES=(
-  [fzf]=fzf
-  [neovim]=nvim
-  # Quoted: shfmt reads an unquoted key with dashes as an arithmetic expression
-  ["tree-sitter-cli"]=tree-sitter
-  [yq]=yq
 )
 
 log() {
@@ -110,15 +100,17 @@ install_apt_packages() {
   fi
 
   local IFS=' '
-  log "Installing apt packages:" "${missing[@]}"
   # Keep going if a third-party source fails to update
   as_root apt-get update -qq || log_error "apt-get update failed, continuing"
 
   # One unknown name makes apt-get install nothing at all, so drop the ones
-  # this release doesn't have (e.g. eza and git-delta before Ubuntu 24.04)
-  local available=() unavailable=() package
+  # this release doesn't have (e.g. eza and git-delta before Ubuntu 24.04).
+  # Single apt-cache call, since each invocation reparses the package index.
+  local known available=() unavailable=() package
+  known=" $({ apt-cache show "${missing[@]}" 2>/dev/null || true; } \
+    | sed -n 's/^Package: //p' | tr '\n' ' ')"
   for package in "${missing[@]}"; do
-    if apt-cache show "${package}" &>/dev/null; then
+    if [[ "${known}" == *" ${package} "* ]]; then
       available+=("${package}")
     else
       unavailable+=("${package}")
@@ -131,17 +123,22 @@ install_apt_packages() {
     return
   fi
 
+  log "Installing apt packages:" "${available[@]}"
+
   # Waits out a boot-time unattended-upgrades holding the dpkg lock
   as_root apt-get install -qq --assume-yes --no-install-recommends \
     -o=Dpkg::Use-Pty=0 -o=DPkg::Lock::Timeout=120 "${available[@]}"
 }
 
 install_github_packages() {
-  local missing=()
-  local package
-  for package in "${!DEVBOX_GITHUB_PACKAGES[@]}"; do
+  local missing=() package binary
+  for package in "${DEVBOX_GITHUB_PACKAGES[@]}"; do
+    case "${package}" in
+      neovim) binary=nvim ;;
+      *) binary="${package%-cli}" ;;
+    esac
     # Presence only, so these never upgrade
-    if [[ ! -x "${HOME}/.local/bin/${DEVBOX_GITHUB_PACKAGES[${package}]}" ]]; then
+    if [[ ! -x "${HOME}/.local/bin/${binary}" ]]; then
       missing+=("${package}")
     fi
   done

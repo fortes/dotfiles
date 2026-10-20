@@ -17,7 +17,11 @@ export CARGO_HOME="$HOME/.local/share/cargo"
 export CARGO_INSTALL_ROOT="$HOME/.local"
 export BUN_INSTALL="$HOME/.local"
 
-# Shared by setup and update so they select the same scope.
+# Shared by setup_devbox and update; setup_devbox derives the binary names
+# shellcheck disable=SC2034
+DEVBOX_GITHUB_PACKAGES=(fzf neovim tree-sitter-cli yq)
+
+# Shared by setup and update so they select the same scope
 is_devbox() {
   [[ "${DOTFILES_DEVBOX:-}" == 1 ]] \
     || grep -qE '^ID="?ubuntu"?$' /etc/os-release 2>/dev/null
