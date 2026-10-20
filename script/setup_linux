@@ -83,15 +83,13 @@ EOF
 setup_locale() {
   declare -r locale="en_US.UTF-8"
 
-  if ! locale | grep -q "LANG=${locale}"; then
+  # Check generated locales rather than $LANG, which SSH may forward from the client
+  if ! locale -a 2>/dev/null | grep -qi '^en_us\.utf-\?8$'; then
     echo "Generating locale ${locale} (requires sudo)"
-    # Uncomment from `locale.gen` file
-    sudo sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
-    echo "Setting locale to ${locale}"
-    sudo -E dpkg-reconfigure --frontend=noninteractive locales \
-      && sudo -E update-locale LANG=${locale}
-    sudo debconf-set-selections -c <<<"locales locales/default_environment_locale select ${locale}"
+    sudo sed -i 's/^# *en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
+    sudo locale-gen
   fi
+  sudo update-locale "LANG=${locale}"
 }
 
 setup_nonfree() {
