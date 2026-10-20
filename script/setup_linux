@@ -181,7 +181,7 @@ main() {
   install_apt_packages
   "${dotfiles_root}/script/install_1password"
   [[ -z "${IS_DOCKER:-}" ]] && "${dotfiles_root}/script/install_et"
-  stow_with_backup
+  "${dotfiles_root}/script/stow" -R
 
   "${dotfiles_root}/script/lock_local_files"
   # Crostini is already a container, on a modest machine

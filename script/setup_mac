@@ -161,7 +161,7 @@ main() {
   install_homebrew_packages
   install_homebrew_casks
 
-  stow_with_backup
+  "${dotfiles_root}/script/stow" -R
 
   setup_shell
 

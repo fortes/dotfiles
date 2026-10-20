@@ -174,11 +174,12 @@ main() {
     return 1
   fi
 
-  local failed=0 step
-  for step in install_apt_packages install_github_packages \
-    install_ghostty_terminfo stow_with_backup "${dotfiles_root}/script/lock_local_files"; do
-    run_step "${step}" || failed=1
-  done
+  local failed=0
+  run_step install_apt_packages || failed=1
+  run_step "${dotfiles_root}/script/stow" -R || failed=1
+  run_step "${dotfiles_root}/script/lock_local_files" || failed=1
+  run_step install_ghostty_terminfo || failed=1
+  run_step install_github_packages || failed=1
 
   if [[ ${failed} -ne 0 ]]; then
     log_error "Devbox setup completed with errors"
