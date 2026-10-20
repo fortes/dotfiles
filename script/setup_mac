@@ -99,7 +99,7 @@ setup_shell() {
   local homebrew_bash_path="${brew_prefix}/bin/bash"
 
   if [[ -x "${homebrew_bash_path}" ]] && [[ "${SHELL:-}" != "${homebrew_bash_path}" ]]; then
-    if ! grep -q "${homebrew_bash_path}" /etc/shells; then
+    if ! grep -qxF "${homebrew_bash_path}" /etc/shells; then
       echo "Adding ${homebrew_bash_path} to shell list (requires sudo)"
       echo "${homebrew_bash_path}" | sudo tee -a /etc/shells >/dev/null
     fi
@@ -113,14 +113,8 @@ setup_shell() {
   fi
 }
 
-install_command_line_tools() {
-  if ! xcode-select -p >/dev/null 2>&1; then
-    echo "Installing command line tools"
-    xcode-select --install
-  fi
-}
-
-install_homebrew() {
+setup_homebrew() {
+  # Homebrew's installer also installs Xcode Command Line Tools when missing
   if [[ ! -x "${brew_prefix}/bin/brew" ]]; then
     echo "Installing Homebrew"
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
@@ -134,15 +128,10 @@ install_homebrew() {
   # Ensure `brew` in path for rest of script
   # shellcheck source=/dev/null
   . "$HOME/.profile.brew"
-}
 
-install_homebrew_packages() {
   echo "Installing homebrew packages"
-  # Use full path just in case `brew` not in path during initial setup
   "${brew_prefix}/bin/brew" install --quiet "${BREW_PACKAGES[@]}"
-}
 
-install_homebrew_casks() {
   echo "Installing homebrew casks"
   "${brew_prefix}/bin/brew" install --cask --quiet "${CASK_PACKAGES[@]}"
 }
@@ -156,10 +145,7 @@ main() {
     return 1
   }
 
-  install_command_line_tools
-  install_homebrew
-  install_homebrew_packages
-  install_homebrew_casks
+  setup_homebrew
 
   "${dotfiles_root}/script/stow" -R
 
