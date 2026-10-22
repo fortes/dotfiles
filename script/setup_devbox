@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # Set up terminal tools and dotfiles on Ubuntu or Debian devboxes/devcontainers that
 # already come with a base toolchain: a handful of apt packages, a few GitHub
-# binaries, and the dotfiles themselves. Skips everything in `setup_linux` that
-# changes system config (apt sources, podman, locale, login shell, etc).
+# binaries, the language servers init.lua enables, and the dotfiles themselves.
+# Skips everything in `setup_linux` that changes system config (apt sources,
+# podman, locale, login shell, etc).
 #
 # Safe to run on every boot: each step is a quick no-op when already done.
 # Failures are logged immediately and reported after the remaining steps run.
@@ -49,6 +50,19 @@ declare -r DEVBOX_APT_PACKAGES=(
   unzip
   wget
   zoxide
+)
+
+# Language servers init.lua enables, for the languages devbox repos use, as
+# npm package:binary
+declare -r DEVBOX_NPM_PACKAGES=(
+  bash-language-server:bash-language-server
+  dockerfile-language-server-nodejs:docker-langserver
+  pyright:pyright-langserver
+  # TypeScript 7+, whose native `tsc` serves LSP. Projects' own
+  # node_modules/.bin/tsc is often older and can't
+  typescript:tsc
+  vscode-langservers-extracted:vscode-json-language-server
+  yaml-language-server:yaml-language-server
 )
 
 log() {
@@ -151,6 +165,29 @@ install_github_packages() {
   "${dotfiles_root}/script/install_github_packages" "${missing[@]}"
 }
 
+install_npm_packages() {
+  local missing=() entry
+  for entry in "${DEVBOX_NPM_PACKAGES[@]}"; do
+    # Presence only, so these never upgrade
+    if [[ ! -x "${HOME}/.local/bin/${entry#*:}" ]]; then
+      missing+=("${entry%%:*}")
+    fi
+  done
+
+  if [[ ${#missing[@]} -eq 0 ]]; then
+    log "Npm packages already installed"
+    return
+  fi
+
+  if ! command_exists npm; then
+    log_error "npm not on PATH, can't install: ${missing[*]}"
+    return 1
+  fi
+
+  log "Installing npm packages:" "${missing[@]}"
+  npm install --global --loglevel=error --no-fund --no-audit "${missing[@]/%/@latest}"
+}
+
 # Distros with older ncurses lack Ghostty's terminfo, which breaks mouse input
 # and escape handling when connecting from Ghostty
 install_ghostty_terminfo() {
@@ -177,6 +214,7 @@ main() {
   run_step "${dotfiles_root}/script/lock_local_files" || failed=1
   run_step install_ghostty_terminfo || failed=1
   run_step install_github_packages || failed=1
+  run_step install_npm_packages || failed=1
 
   if [[ ${failed} -ne 0 ]]; then
     log_error "Devbox setup completed with errors"

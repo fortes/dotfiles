@@ -19,7 +19,7 @@ export BUN_INSTALL="$HOME/.local"
 
 # Shared by setup_devbox and update; setup_devbox derives the binary names
 # shellcheck disable=SC2034
-DEVBOX_GITHUB_PACKAGES=(fzf neovim tree-sitter-cli yq)
+DEVBOX_GITHUB_PACKAGES=(fzf marksman neovim tree-sitter-cli yq)
 
 # Shared by setup and update so they select the same scope
 is_devbox() {
