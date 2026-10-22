@@ -18,3 +18,4 @@ node_modules
 # Claude local-only settings
 **/.claude/settings.local.json
 **/.claude/worktrees
+**/.claude/.cc-writes/
