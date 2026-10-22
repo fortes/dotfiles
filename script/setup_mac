@@ -66,6 +66,8 @@ BREW_PACKAGES=(
   node
   ollama
   pipx
+  # For :Obsidian paste_img
+  pngpaste
   podman
   ripgrep
   rust
