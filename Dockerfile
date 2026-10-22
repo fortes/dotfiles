@@ -23,11 +23,8 @@ COPY script/apt-packages.txt /tmp/apt-packages.txt
 # ~100 MB of metadata into later layers.
 RUN set -eux; \
   codename="$(. /etc/os-release && echo "$VERSION_CODENAME")"; \
-  if [ -f /etc/apt/sources.list.d/debian.sources ]; then \
-    sed -i 's/Components: main$/Components: main contrib non-free non-free-firmware/' /etc/apt/sources.list.d/debian.sources; \
-  else \
-    sed -i 's/main$/main contrib non-free non-free-firmware/' /etc/apt/sources.list; \
-  fi; \
+  sed -i -E 's/^Components: main([[:space:]].*)?$/Components: main contrib non-free non-free-firmware/' \
+    /etc/apt/sources.list.d/debian.sources; \
   printf '%s\n' \
     'Types: deb' \
     'URIs: http://deb.debian.org/debian' \

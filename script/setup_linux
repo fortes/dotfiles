@@ -27,17 +27,6 @@ declare -r APT_PACKAGES_FILE="${dotfiles_root}/script/apt-packages.txt"
 declare -a APT_PACKAGES
 mapfile -t APT_PACKAGES < <(awk 'NF && $1 !~ /^#/' "${APT_PACKAGES_FILE}")
 
-has_updated=""
-
-# Avoid running multiple times
-apt_update_once() {
-  if [[ -z "$has_updated" ]]; then
-    has_updated=1
-    echo "Running apt-get update (requires sudo)"
-    sudo -E apt-get update -qq
-  fi
-}
-
 check_prerequisites() {
   if ! command_exists apt-get; then
     echo_stderr "Only works on Debian-like systems"
@@ -57,108 +46,80 @@ install_apt_packages() {
     return
   fi
 
-  apt_update_once
+  local -a packages=("${APT_PACKAGES[@]}")
+  # Crostini is already a container, on a modest machine. Include rootless
+  # recommends skipped by --no-install-recommends (networking, UID mapping,
+  # user bus, and an init for pods and --init)
+  if [[ -z "${IS_DOCKER:-}" ]] && ! compgen -G "/etc/apt/sources.list.d/cros.*" >/dev/null; then
+    packages+=(podman passt uidmap dbus-user-session catatonit)
+  fi
+
+  echo "Running apt-get update (requires sudo)"
+  sudo -E apt-get update -qq
 
   echo "Ensuring apt packages installed (requires sudo)"
-  sudo -E apt-get install "${APT_ARGS[@]}" "${APT_PACKAGES[@]}"
+  sudo -E apt-get install "${APT_ARGS[@]}" "${packages[@]}"
   echo "Apt packages installed"
 }
 
-is_package_installed() {
-  if dpkg-query -l "$1" 2>/dev/null | grep -q "^ii"; then
-    return 0
-  else
-    return 1
-  fi
-}
-
 setup_backports() {
-  declare -r codename="${VERSION_CODENAME}"
+  declare -r sources_path="/etc/apt/sources.list.d/backports.sources"
 
-  if grep -q "${codename}-backports" /etc/apt/sources.list{,.d/*} 2>/dev/null; then
+  if [[ -f "$sources_path" ]]; then
     echo "Backports already in sources.list"
     return
   fi
 
-  declare -r sources_path="/etc/apt/sources.list.d/backports.sources"
-
-  echo "${codename}-backports not in sources.list, adding (requires sudo)"
+  echo "${VERSION_CODENAME}-backports not in sources.list, adding (requires sudo)"
   sudo tee "$sources_path" >/dev/null <<EOF
 Types: deb
 URIs: http://deb.debian.org/debian
-Suites: ${codename}-backports
+Suites: ${VERSION_CODENAME}-backports
 Components: main contrib non-free non-free-firmware
 Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
 EOF
-
-  # New source requires forced updates
-  has_updated=""
-}
-
-setup_podman() {
-  # Plus recommends rootless needs (skipped by --no-install-recommends):
-  # networking, UID mapping, user bus, and an init for pods and --init
-  declare -a missing=()
-  for package in podman passt uidmap dbus-user-session catatonit; do
-    is_package_installed "${package}" || missing+=("${package}")
-  done
-  if [[ ${#missing[@]} -gt 0 ]]; then
-    apt_update_once
-    echo "Installing" "${missing[@]}" "(requires sudo)"
-    sudo -E apt-get install "${APT_ARGS[@]}" "${missing[@]}"
-  fi
 }
 
 setup_locale() {
   declare -r locale="en_US.UTF-8"
 
-  if ! locale | grep -q "LANG=${locale}"; then
+  # Check generated locales rather than $LANG, which SSH may forward from the client
+  if ! locale -a 2>/dev/null | grep -qi '^en_us\.utf-\?8$'; then
     echo "Generating locale ${locale} (requires sudo)"
-    # Uncomment from `locale.gen` file
-    sudo sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
-    echo "Setting locale to ${locale}"
-    sudo -E dpkg-reconfigure --frontend=noninteractive locales \
-      && sudo -E update-locale LANG=${locale}
-    sudo debconf-set-selections -c <<<"locales locales/default_environment_locale select ${locale}"
+    sudo sed -i 's/^# *en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
+    sudo locale-gen
   fi
+  sudo update-locale "LANG=${locale}"
 }
 
 setup_nonfree() {
   declare -r deb822_path="/etc/apt/sources.list.d/debian.sources"
-  declare -r legacy_path="/etc/apt/sources.list"
 
-  if [[ -f "$deb822_path" ]]; then
-    if grep -q non-free "$deb822_path"; then
-      echo "Non-free already in ${deb822_path}"
-      return
-    fi
-    echo "Adding contrib & non-free to ${deb822_path} (requires sudo)"
-    sudo sed -i.bak 's/Components: main$/Components: main contrib non-free non-free-firmware/' \
-      "$deb822_path"
-  elif [[ -f "$legacy_path" ]] && grep -qE '^deb ' "$legacy_path"; then
-    if grep -q non-free "$legacy_path"; then
-      echo "Non-free already in ${legacy_path}"
-      return
-    fi
-    echo "Adding contrib & non-free to ${legacy_path} (requires sudo)"
-    sudo sed -i.bak -E 's|^(deb .* main)$|\1 contrib non-free non-free-firmware|' \
-      "$legacy_path"
-  else
+  if [[ ! -f "$deb822_path" ]]; then
     echo_stderr "No debian sources found, skipping non-free setup"
     return
   fi
 
-  # New components require forced update so install_apt_packages sees them
-  has_updated=""
+  # Match standalone `non-free`, not the default `non-free-firmware`
+  if grep -qE '(^|[[:space:]])non-free([[:space:]]|$)' "$deb822_path"; then
+    echo "Non-free already in ${deb822_path}"
+    return
+  fi
+
+  echo "Adding contrib & non-free to ${deb822_path} (requires sudo)"
+  sudo sed -i -E 's/^Components: main([[:space:]].*)?$/Components: main contrib non-free non-free-firmware/' \
+    "$deb822_path"
 }
 
 setup_shell() {
-  declare -r bash_path="$(which bash)"
-  declare -r current_shell="$(getent passwd "$(id -un)" | awk -F : '{print $NF}')"
+  declare -r user="$(id -un)"
+  declare -r bash_path="$(command -v bash)"
+  declare -r current_shell="$(getent passwd "${user}" | awk -F : '{print $NF}')"
 
-  if [[ "${current_shell}" != "${bash_path}" ]]; then
+  # Merged /usr means /bin/bash and /usr/bin/bash are the same file
+  if [[ ! "${current_shell}" -ef "${bash_path}" ]]; then
     echo "Changing shell to bash (requires sudo)"
-    sudo chsh -s "${bash_path}" "$(whoami)"
+    sudo chsh -s "${bash_path}" "${user}"
   fi
 }
 
@@ -181,12 +142,9 @@ main() {
   install_apt_packages
   "${dotfiles_root}/script/install_1password"
   [[ -z "${IS_DOCKER:-}" ]] && "${dotfiles_root}/script/install_et"
-  stow_with_backup
+  "${dotfiles_root}/script/stow" -R
 
   "${dotfiles_root}/script/lock_local_files"
-  # Crostini is already a container, on a modest machine
-  [[ -z "${IS_DOCKER:-}" ]] && ! compgen -G "/etc/apt/sources.list.d/cros.*" >/dev/null \
-    && setup_podman
   setup_locale
 
   "${dotfiles_root}/script/update"

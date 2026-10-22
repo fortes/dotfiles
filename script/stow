@@ -7,8 +7,9 @@
 # Usage: stow [-n] [-v] [-D | -R] [package ...]
 #
 # Stows every package when none are given, minus any listed in the
-# space-separated DOTFILES_SKIP_PACKAGES. For other stow options, call stow
-# directly.
+# space-separated DOTFILES_SKIP_PACKAGES. Stowing `bash` backs up existing
+# default startup files into ~/.dotfiles-backup.*. For other stow options, call
+# stow directly.
 
 set -euo pipefail
 IFS=$'\n\t'
@@ -16,7 +17,8 @@ IFS=$'\n\t'
 # Directories that programs write into (keys, binaries, plugins, units), so
 # they must stay real instead of getting folded into a symlink into the repo.
 # Stow never folds a directory that already exists, so create them before
-# stowing. Dry runs skip this, so `-n` may show folds a real run won't do
+# stowing. Dry runs skip this and the startup-file backup, so `-n` may show
+# folds or conflicts a real run won't hit
 declare -r REAL_DIRS=(
   .ssh
   .config/cmus
@@ -26,6 +28,51 @@ declare -r REAL_DIRS=(
   .local/bin
   .local/share
 )
+
+# Files provided by Debian, macOS, or devbox images that conflict with the
+# bash package
+declare -r DEFAULT_DOTFILES=(.bashrc .profile .bash_profile .hushlogin)
+
+# Whether a stow package is listed in the space-separated
+# DOTFILES_SKIP_PACKAGES. Only applies when stowing everything: packages named
+# explicitly get stowed anyway
+is_skipped_package() {
+  [[ " ${DOTFILES_SKIP_PACKAGES:-} " == *" $1 "* ]]
+}
+
+list_stow_packages() {
+  local package_path package
+  for package_path in "$1"/*/; do
+    [[ -d "${package_path}" ]] || continue
+    package="$(basename "${package_path}")"
+    is_skipped_package "${package}" || echo "${package}"
+  done
+}
+
+# Whether a startup file in $HOME is machine-provided and would block stow:
+# a regular file, or a symlink that doesn't point into a stowed-files dir
+is_default_dotfile() {
+  local -r path="${HOME}/$1"
+  if [[ -L "${path}" ]]; then
+    [[ "$(readlink "${path}")" != *stowed-files/* ]]
+  else
+    [[ -f "${path}" ]]
+  fi
+}
+
+# Back up machine-provided startup files before stowing. If stow fails,
+# fix the conflict and rerun, or restore the files from the printed directory.
+backup_default_dotfiles() {
+  local filename backup_dir=''
+  for filename in "${DEFAULT_DOTFILES[@]}"; do
+    is_default_dotfile "${filename}" || continue
+    if [[ -z "${backup_dir}" ]]; then
+      backup_dir="$(mktemp -d "$HOME/.dotfiles-backup.XXXXXX")" || return 1
+      echo "Startup-file backup: ${backup_dir} (restore manually if needed)"
+    fi
+    mv "$HOME/${filename}" "${backup_dir}/original${filename}" || return 1
+  done
+}
 
 main() {
   local dotfiles_root
@@ -45,7 +92,7 @@ main() {
     return 0
   fi
 
-  local options=() packages=() action="" simulate=0 arg
+  local options=() packages=() action="" simulate=0 arg package
   for arg in "$@"; do
     case "${arg}" in
       -n) simulate=1 ;;
@@ -71,7 +118,6 @@ main() {
 
   if [[ ${#packages[@]} -eq 0 ]]; then
     # No mapfile, since macOS ships Bash 3.2
-    local package
     while IFS= read -r package; do
       packages+=("${package}")
     done < <(list_stow_packages "${stowed_files_path}")
@@ -86,6 +132,13 @@ main() {
     # remaining package
     options+=(--no-folding)
   elif [[ ${simulate} -eq 0 ]]; then
+    for package in "${packages[@]}"; do
+      if [[ "${package}" == bash ]]; then
+        backup_default_dotfiles
+        break
+      fi
+    done
+
     local dir
     for dir in "${REAL_DIRS[@]}"; do
       dir="${HOME}/${dir}"

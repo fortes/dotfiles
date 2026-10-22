@@ -5,18 +5,18 @@
 # repeatable setup_devbox. Set DOTFILES_DEVBOX=1 for it anywhere else, e.g. a
 # Debian devcontainer
 
-# Get script directory
-script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# shellcheck source=script/lib.sh
-. "${script_dir}/lib.sh"
+set -euo pipefail
 
-if is_devbox; then
-  exec "${script_dir}/setup_devbox" "$@"
-elif uname -s | grep -q Darwin; then
-  exec "${script_dir}/setup_mac" "$@"
-elif command -v apt >/dev/null 2>&1; then
-  exec "${script_dir}/setup_linux" "$@"
+# shellcheck source=script/lib.sh
+. "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+
+if [[ "$(uname -s)" == Darwin ]]; then
+  exec "${dotfiles_script_dir}/setup_mac" ${@+"$@"}
+elif is_devbox; then
+  exec "${dotfiles_script_dir}/setup_devbox" ${@+"$@"}
+elif command_exists apt-get; then
+  exec "${dotfiles_script_dir}/setup_linux" ${@+"$@"}
 else
-  echo >&2 'Unsupported OS'
+  echo_stderr 'Unsupported OS'
   exit 1
 fi

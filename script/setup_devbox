@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # Set up terminal tools and dotfiles on Ubuntu or Debian devboxes/devcontainers that
 # already come with a base toolchain: a handful of apt packages, a few GitHub
-# binaries, and the dotfiles themselves. Skips everything in `setup_linux` that
-# changes system config (apt sources, podman, locale, login shell, etc).
+# binaries, the language servers init.lua enables, and the dotfiles themselves.
+# Skips everything in `setup_linux` that changes system config (apt sources,
+# podman, locale, login shell, etc).
 #
 # Safe to run on every boot: each step is a quick no-op when already done.
 # Failures are logged immediately and reported after the remaining steps run.
@@ -15,7 +16,6 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-# Before anything else, since the Bash 4 syntax below fails on macOS Bash 3.2
 if ! command -v apt-get &>/dev/null; then
   echo >&2 "[dotfiles] Only works on Debian-like systems"
   exit 1
@@ -52,13 +52,17 @@ declare -r DEVBOX_APT_PACKAGES=(
   zoxide
 )
 
-# GitHub package name -> binary it installs into ~/.local/bin
-declare -rA DEVBOX_GITHUB_PACKAGES=(
-  [fzf]=fzf
-  [neovim]=nvim
-  # Quoted: shfmt reads an unquoted key with dashes as an arithmetic expression
-  ["tree-sitter-cli"]=tree-sitter
-  [yq]=yq
+# Language servers init.lua enables, for the languages devbox repos use, as
+# npm package:binary
+declare -r DEVBOX_NPM_PACKAGES=(
+  bash-language-server:bash-language-server
+  dockerfile-language-server-nodejs:docker-langserver
+  pyright:pyright-langserver
+  # TypeScript 7+, whose native `tsc` serves LSP. Projects' own
+  # node_modules/.bin/tsc is often older and can't
+  typescript:tsc
+  vscode-langservers-extracted:vscode-json-language-server
+  yaml-language-server:yaml-language-server
 )
 
 log() {
@@ -110,15 +114,17 @@ install_apt_packages() {
   fi
 
   local IFS=' '
-  log "Installing apt packages:" "${missing[@]}"
   # Keep going if a third-party source fails to update
   as_root apt-get update -qq || log_error "apt-get update failed, continuing"
 
   # One unknown name makes apt-get install nothing at all, so drop the ones
-  # this release doesn't have (e.g. eza and git-delta before Ubuntu 24.04)
-  local available=() unavailable=() package
+  # this release doesn't have (e.g. eza and git-delta before Ubuntu 24.04).
+  # Single apt-cache call, since each invocation reparses the package index.
+  local known available=() unavailable=() package
+  known=" $({ apt-cache show "${missing[@]}" 2>/dev/null || true; } \
+    | sed -n 's/^Package: //p' | tr '\n' ' ')"
   for package in "${missing[@]}"; do
-    if apt-cache show "${package}" &>/dev/null; then
+    if [[ "${known}" == *" ${package} "* ]]; then
       available+=("${package}")
     else
       unavailable+=("${package}")
@@ -131,17 +137,22 @@ install_apt_packages() {
     return
   fi
 
+  log "Installing apt packages:" "${available[@]}"
+
   # Waits out a boot-time unattended-upgrades holding the dpkg lock
   as_root apt-get install -qq --assume-yes --no-install-recommends \
     -o=Dpkg::Use-Pty=0 -o=DPkg::Lock::Timeout=120 "${available[@]}"
 }
 
 install_github_packages() {
-  local missing=()
-  local package
-  for package in "${!DEVBOX_GITHUB_PACKAGES[@]}"; do
+  local missing=() package binary
+  for package in "${DEVBOX_GITHUB_PACKAGES[@]}"; do
+    case "${package}" in
+      neovim) binary=nvim ;;
+      *) binary="${package%-cli}" ;;
+    esac
     # Presence only, so these never upgrade
-    if [[ ! -x "${HOME}/.local/bin/${DEVBOX_GITHUB_PACKAGES[${package}]}" ]]; then
+    if [[ ! -x "${HOME}/.local/bin/${binary}" ]]; then
       missing+=("${package}")
     fi
   done
@@ -152,6 +163,29 @@ install_github_packages() {
   fi
 
   "${dotfiles_root}/script/install_github_packages" "${missing[@]}"
+}
+
+install_npm_packages() {
+  local missing=() entry
+  for entry in "${DEVBOX_NPM_PACKAGES[@]}"; do
+    # Presence only, so these never upgrade
+    if [[ ! -x "${HOME}/.local/bin/${entry#*:}" ]]; then
+      missing+=("${entry%%:*}")
+    fi
+  done
+
+  if [[ ${#missing[@]} -eq 0 ]]; then
+    log "Npm packages already installed"
+    return
+  fi
+
+  if ! command_exists npm; then
+    log_error "npm not on PATH, can't install: ${missing[*]}"
+    return 1
+  fi
+
+  log "Installing npm packages:" "${missing[@]}"
+  npm install --global --loglevel=error --no-fund --no-audit "${missing[@]/%/@latest}"
 }
 
 # Distros with older ncurses lack Ghostty's terminfo, which breaks mouse input
@@ -174,11 +208,13 @@ main() {
     return 1
   fi
 
-  local failed=0 step
-  for step in install_apt_packages install_github_packages \
-    install_ghostty_terminfo stow_with_backup "${dotfiles_root}/script/lock_local_files"; do
-    run_step "${step}" || failed=1
-  done
+  local failed=0
+  run_step install_apt_packages || failed=1
+  run_step "${dotfiles_root}/script/stow" -R || failed=1
+  run_step "${dotfiles_root}/script/lock_local_files" || failed=1
+  run_step install_ghostty_terminfo || failed=1
+  run_step install_github_packages || failed=1
+  run_step install_npm_packages || failed=1
 
   if [[ ${failed} -ne 0 ]]; then
     log_error "Devbox setup completed with errors"

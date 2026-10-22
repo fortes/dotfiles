@@ -12,7 +12,7 @@ set -euo pipefail
 # Match setup's lightweight path, rather than installing the full workstation
 # toolset on a devbox that only opted into a few GitHub binaries.
 if is_devbox; then
-  exec "${dotfiles_script_dir}/install_github_packages" fzf neovim tree-sitter-cli yq
+  exec "${dotfiles_script_dir}/install_github_packages" "${DEVBOX_GITHUB_PACKAGES[@]}"
 fi
 
 if [[ "$(uname -s)" == Linux ]]; then
