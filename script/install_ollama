@@ -24,9 +24,8 @@ install_ollama() {
 
   if [[ -n "${force}" || ! -x "${install_location}" ]]; then
     echo "Installing Ollama..."
-    mkdir -p "$HOME/.local"
-    # Download fully first: a partial extract leaves an executable bin/ollama
-    # that the -x check above would skip on rerun
+    # Not piped into tar: a partial extract leaves an executable bin/ollama,
+    # which the -x check above would skip on rerun
     local archive
     archive="$(mktemp)"
     wget --quiet -O "${archive}" "https://ollama.com/download/ollama-linux-amd64.tar.zst"
