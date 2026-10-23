@@ -206,15 +206,13 @@ clean those up:
   ```sh
   defaults write com.lowtechguys.MusicDecoy mediaAppPath /Applications/Plexamp.app
   ```
-- Automount the media share at a fixed path for cmus/`play-albums`. Unlike Finder mounts, it remounts on access and doesn't litter `/Volumes`. macOS upgrades may reset `/etc/auto_master`; re-run the first command if so:
+- Automount the media share at a fixed path for cmus/`play-albums`. Unlike Finder mounts, it remounts on access and doesn't litter `/Volumes`. macOS upgrades may reset `/etc/auto_master`; re-run the first command if so. Use the share's read-only login; guest access fails with the misleading "No locks available" (errno 77, an SMB auth error):
 
   ```sh
   echo '/-    auto_smb    -nosuid,nobrowse' | sudo tee -a /etc/auto_master
-  echo '/System/Volumes/Data/mnt/media  -fstype=smbfs,soft,ro  ://guest:@SERVER/media' | sudo tee /etc/auto_smb
+  echo '/System/Volumes/Data/mnt/media  -fstype=smbfs,soft,ro,filemode=0644,dirmode=0755  ://media:media@SERVER/media' | sudo tee /etc/auto_smb
   sudo automount -cv
   ln -s /System/Volumes/Data/mnt/media/music ~/Music/SERVER
-  # Query a local copy of the beets DB; refresh it occasionally
-  cp ~/Music/SERVER/beets/library.db ~/.config/beets/library.db
   ```
 
   Set `LOCAL_ALBUM_DIR="$HOME/Music/SERVER/albums"` in `~/.profile.local`, and `directory: ~/Music/SERVER` in `~/.config/beets/config.yaml`.
