@@ -25,8 +25,13 @@ install_ollama() {
   if [[ -n "${force}" || ! -x "${install_location}" ]]; then
     echo "Installing Ollama..."
     mkdir -p "$HOME/.local"
-    wget --quiet -O - "https://ollama.com/download/ollama-linux-amd64.tar.zst" \
-      | tar -C "$HOME/.local" --zstd -x
+    # Download fully first: a partial extract leaves an executable bin/ollama
+    # that the -x check above would skip on rerun
+    local archive
+    archive="$(mktemp)"
+    wget --quiet -O "${archive}" "https://ollama.com/download/ollama-linux-amd64.tar.zst"
+    tar -C "$HOME/.local" --zstd -xf "${archive}"
+    rm -f -- "${archive}"
   fi
 
   echo "Ollama installed, starting service"
