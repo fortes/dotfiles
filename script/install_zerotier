@@ -12,13 +12,13 @@ install_zerotier() {
   declare -r zerotier_key_url="https://raw.githubusercontent.com/zerotier/ZeroTierOne/master/doc/contact%40zerotier.com.gpg"
   declare -r zerotier_key_path="/etc/apt/keyrings/zerotier.asc"
 
-  if [ ! -f "$zerotier_sources_list" ]; then
+  if [[ ! -f "${zerotier_sources_list}" ]]; then
     echo "Adding Zerotier GPG key (requires sudo)"
-    curl -sS "$zerotier_key_url" \
-      | sudo tee "$zerotier_key_path" >/dev/null
+    curl -fsSL "${zerotier_key_url}" \
+      | sudo tee "${zerotier_key_path}" >/dev/null
 
     echo "Zerotier sources list missing, adding (requires sudo)"
-    sudo tee "$zerotier_sources_list" >/dev/null <<EOF
+    sudo tee "${zerotier_sources_list}" >/dev/null <<EOF
 Types: deb
 URIs: http://download.zerotier.com/debian/trixie
 Suites: trixie

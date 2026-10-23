@@ -17,15 +17,16 @@ install_tailscale() {
     return 1
   fi
 
+  local distribution suite
   # shellcheck source=/dev/null
-  declare -r distribution="$(. /etc/os-release && printf '%s' "${ID}")"
+  distribution="$(. /etc/os-release && printf '%s' "${ID}")"
   if [[ "${distribution}" != debian ]]; then
     echo "Tailscale installer currently supports Debian; detected ${distribution}" >&2
     return 1
   fi
 
   # shellcheck source=/dev/null
-  declare -r suite="$(. /etc/os-release && printf '%s' "${VERSION_CODENAME:-}")"
+  suite="$(. /etc/os-release && printf '%s' "${VERSION_CODENAME:-}")"
   if [[ -z "${suite}" ]]; then
     echo "Could not determine Debian release codename from /etc/os-release" >&2
     return 1

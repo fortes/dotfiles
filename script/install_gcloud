@@ -14,8 +14,8 @@ install_gcloud_mac() {
   declare -r brew_prefix="/opt/homebrew"
 
   if ! command_exists brew; then
-    echo >&2 "Homebrew not installed"
-    exit 1
+    echo_stderr "Homebrew not installed"
+    return 1
   fi
 
   if "${brew_prefix}/bin/brew" list --cask gcloud-cli &>/dev/null; then
@@ -32,13 +32,13 @@ install_gcloud_linux() {
   declare -r gcloud_key_url="https://packages.cloud.google.com/apt/doc/apt-key.gpg"
   declare -r gcloud_key_path="/usr/share/keyrings/cloud.google.gpg"
 
-  if [ ! -f "$gcloud_sources_list" ]; then
+  if [[ ! -f "${gcloud_sources_list}" ]]; then
     echo "Adding Google Cloud GPG key (requires sudo)"
-    curl -sS "$gcloud_key_url" \
-      | sudo gpg --dearmor --yes --output "$gcloud_key_path"
+    curl -fsSL "${gcloud_key_url}" \
+      | sudo gpg --dearmor --yes --output "${gcloud_key_path}"
 
     echo "Adding Google Cloud SDK sources list (requires sudo)"
-    sudo tee "$gcloud_sources_list" >/dev/null <<EOF
+    sudo tee "${gcloud_sources_list}" >/dev/null <<EOF
 Types: deb
 URIs: https://packages.cloud.google.com/apt
 Suites: cloud-sdk
@@ -62,7 +62,7 @@ install_gcloud() {
     return 0
   fi
 
-  if uname -s | grep -q Darwin; then
+  if [[ "$(uname -s)" == Darwin ]]; then
     install_gcloud_mac
   else
     install_gcloud_linux
