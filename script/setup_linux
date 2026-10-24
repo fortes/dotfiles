@@ -9,6 +9,9 @@ IFS=$'\n\t'
 declare dotfiles_root
 dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
+# shellcheck source=script/lib.sh
+. "${dotfiles_root}/script/lib.sh"
+
 # Make sure not to get stuck on any prompts
 export DEBIAN_FRONTEND=noninteractive
 
@@ -30,7 +33,7 @@ mapfile -t APT_PACKAGES < <(awk 'NF && $1 !~ /^#/' "${APT_PACKAGES_FILE}")
 check_prerequisites() {
   if ! command_exists apt-get; then
     echo_stderr "Only works on Debian-like systems"
-    exit 1
+    return 1
   fi
 
   # shellcheck source=/dev/null
@@ -112,9 +115,10 @@ setup_nonfree() {
 }
 
 setup_shell() {
-  declare -r user="$(id -un)"
-  declare -r bash_path="$(command -v bash)"
-  declare -r current_shell="$(getent passwd "${user}" | awk -F : '{print $NF}')"
+  local user bash_path current_shell
+  user="$(id -un)"
+  bash_path="$(command -v bash)"
+  current_shell="$(getent passwd "${user}" | awk -F : '{print $NF}')"
 
   # Merged /usr means /bin/bash and /usr/bin/bash are the same file
   if [[ ! "${current_shell}" -ef "${bash_path}" ]]; then
@@ -124,9 +128,6 @@ setup_shell() {
 }
 
 main() {
-  # shellcheck source=script/lib.sh
-  . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
-
   [[ $# -eq 0 ]] || {
     echo >&2 'Usage: setup_linux (no arguments)'
     return 1

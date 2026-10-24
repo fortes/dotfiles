@@ -1,36 +1,36 @@
 #!/usr/bin/env bash
 # Install Ollama
 #
-# Usage: install_ollama
+# Usage: install_ollama [-f|--force]
 
 set -euo pipefail
 IFS=$'\n\t'
 export DEBIAN_FRONTEND=noninteractive
 
 install_ollama() {
-  local force
+  local force=""
   local install_location="$HOME/.local/bin/ollama"
-  local download_dir
-  download_dir="$(mktemp -d -t ollama-XXXX)"
 
   while [[ "$#" -gt 0 ]]; do
     case $1 in
       -f | --force) force=true ;;
       *)
-        echo "Unknown parameter passed: $1"
-        exit 1
+        echo >&2 "Unknown parameter passed: $1"
+        return 1
         ;;
     esac
     shift
   done
 
-  if [[ ${force:-} || ! -x "${install_location}" ]]; then
+  if [[ -n "${force}" || ! -x "${install_location}" ]]; then
     echo "Installing Ollama..."
-    pushd "${download_dir}" >/dev/null
-    wget --quiet -O "ollama-linux-amd64.tgz" \
-      "https://ollama.com/download/ollama-linux-amd64.tgz"
-    tar -C "$HOME/.local" -xzf "ollama-linux-amd64.tgz" >/dev/null
-    popd >/dev/null
+    # Not piped into tar: a partial extract leaves an executable bin/ollama,
+    # which the -x check above would skip on rerun
+    local archive
+    archive="$(mktemp)"
+    wget --quiet -O "${archive}" "https://ollama.com/download/ollama-linux-amd64.tar.zst"
+    tar -C "$HOME/.local" --zstd -xf "${archive}"
+    rm -f -- "${archive}"
   fi
 
   echo "Ollama installed, starting service"

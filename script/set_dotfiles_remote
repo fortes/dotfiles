@@ -17,7 +17,7 @@ set_dotfiles_remote() {
       return
     fi
 
-    if git remote get-url "$(git remote)" | grep -q https; then
+    if git remote get-url origin 2>/dev/null | grep -q https; then
       echo "Setting dotfiles git remote"
       git remote set-url origin git@github.com:fortes/dotfiles.git
     fi
