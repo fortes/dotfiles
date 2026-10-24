@@ -31,6 +31,7 @@ AVAILABLE_PACKAGES=(
   f2
   fx
   fzf
+  gemini-api
   github-cli
   harper-ls
   hugo
@@ -253,6 +254,10 @@ install_fx() {
 install_fzf() {
   # Trixie's 0.60 predates `--ghost`, which .fzf-default-options uses
   install_bin 'junegunn/fzf' '/fzf-[^/]*-linux_{ARCH}\.tar\.gz$'
+}
+
+install_gemini_api() {
+  install_bin 'google-gemini/gemini-api-cli' '/gemini-api_Linux_{ARCH}\.tar\.gz$' 'gemini-api'
 }
 
 install_hugo() {
