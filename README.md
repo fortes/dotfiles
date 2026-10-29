@@ -107,17 +107,45 @@ find ~ -maxdepth 5 -type l 2>/dev/null \
 
 Native addons in npm globals are built for one Node major version. Debian's `script/install_node` rebuilds them on major upgrades. On macOS, run `script/install_node_packages --rebuild` after Homebrew upgrades Node to a new major.
 
-## Ignoring changes to a file
+## Keeping local config edits out of Git
+
+Setup runs `./script/lock_local_files` to mark tracked `*.local` files and
+`mpdscribble.conf` as skip-worktree. To expose those edits in Git, then hide them
+again:
 
 ```sh
-git update-index --skip-worktree ./symlinks/npmrc
+./script/lock_local_files --unlock
+git status --short
+./script/lock_local_files
 ```
 
-To make changes in the future:
+This only changes Git's index flags; it doesn't change file contents. Avoid
+committing or stashing these files, since they can contain secrets.
+
+If upstream changes block a pull, back up each affected file outside the repo
+before unlocking and restoring the tracked version. For example, from the repo
+root:
 
 ```sh
-git update-index --no-skip-worktree ./symlinks/npmrc
+file=stowed-files/bash/.profile.local
+backup=$(mktemp -d)
+cp "$file" "$backup/local-config"
+./script/lock_local_files --unlock
+git restore --worktree -- "$file"
+git pull --ff-only
 ```
+
+Only continue past the backup command if it succeeds. If several files block the
+pull, back up and restore the tracked version of each before pulling. After the
+pull, even if it fails, restore your local copy and lock the files again:
+
+```sh
+cp "$backup/local-config" "$file"
+./script/lock_local_files
+```
+
+Compare your local versions with upstream template changes afterward to pick up
+new settings. The backup directory contains secrets; remove it when finished.
 
 ### Neovim
 

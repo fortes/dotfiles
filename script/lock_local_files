@@ -2,7 +2,22 @@
 # Keep machine-specific .local edits, and configs holding credentials, out of
 # git status.
 set -euo pipefail
+
+index_flag=--skip-worktree
+case "$*" in
+  '') ;;
+  --unlock) index_flag=--no-skip-worktree ;;
+  -h | --help)
+    echo "Usage: $0 [--unlock]"
+    echo "Hide local config edits from Git, or expose them with --unlock."
+    exit 0
+    ;;
+  *)
+    echo "Usage: $0 [--unlock]" >&2
+    exit 1
+    ;;
+esac
+
 cd "$(dirname "$0")/.."
 git rev-parse --is-inside-work-tree &>/dev/null || exit 0
-# To unlock one: git update-index --no-skip-worktree <file>
-git ls-files -z '*.local' '*/.mpdscribble/mpdscribble.conf' | xargs -0 -r git update-index --skip-worktree
+git ls-files -z '*.local' '*/.mpdscribble/mpdscribble.conf' | xargs -0 -r git update-index "$index_flag"
