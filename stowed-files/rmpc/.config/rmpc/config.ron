@@ -6,13 +6,11 @@
     // Auto detection queries the terminal, which fails when rmpc starts in a
     // tmux window that isn't visible and falls back to blocky half-cells
     album_art: (method: Kitty),
-    // Search only on Enter. Each keystroke otherwise sends a search through
-    // the proxy database, and slow ones block mpd for every client. rmpc
-    // needs the whole block, so the rest are its defaults
+    // Only for the Year tag; rmpc needs the whole block, so the rest are its
+    // defaults
     search: (
         case_sensitive: false,
         ignore_diacritics: false,
-        search_button: true,
         mode: Contains,
         tags: [
             (value: "any",         label: "Any Tag"),
@@ -22,6 +20,7 @@
             (value: "title",       label: "Title"),
             (value: "filename",    label: "Filename"),
             (value: "genre",       label: "Genre"),
+            (value: "originaldate", label: "Year"),
         ],
     ),
     artists: (
