@@ -17,9 +17,3 @@
 
 - [ ] **Install m4xshen/hardtime.nvim for improving vim motions** (feature)
   - Add hardtime.nvim plugin to help improve vim motion efficiency and habits
-
-### Priority 4 (Backlog)
-
-- [ ] **Use Hammerspoon to make media keys control cmus** (feature)
-  - Figure out how to use Hammerspoon to have media keys control cmus instead of launching iTunes
-  - Reference: https://github.com/Hammerspoon/Spoons/blob/master/Source/MusicAppMediaFix.spoon/init.lua

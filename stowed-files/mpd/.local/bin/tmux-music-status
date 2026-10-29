@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+#
+# Display the current MPD track. Also sourced by tmux-music-menu for the
+# helpers
+
+set -euo pipefail
+IFS=$'\n\t'
+
+# Talks to MPD directly, since mpc only shows the first value of multi-value
+# tags like genre. A subshell, since a failed `exec` exits the shell it runs in
+mpd_query() (
+  exec 3<>/dev/tcp/localhost/6600 &&
+    printf '%s\n' "$@" close >&3 &&
+    cat <&3
+) 2>/dev/null
+
+# Tag from `mpd_query` output, joining repeated values (e.g. several genres)
+# with `; `. A missing tag must not abort the script (set -e + pipefail), so
+# it's treated as empty
+mpd_tag() {
+  grep -i "^${2}: " <<<"${1}" | cut -d ' ' -f 2- | paste -sd ';' - |
+    sed 's/;/; /g' || true
+}
+
+mpd_is_playing() {
+  grep -q '^state: play$' <<<"${1}"
+}
+
+music_status() {
+  local status
+  status=$(mpd_query status currentsong || true)
+
+  local artist
+  local title
+  local album
+  local albumArtist
+  artist=$(mpd_tag "${status}" artist)
+  title=$(mpd_tag "${status}" title)
+  album=$(mpd_tag "${status}" album)
+  albumArtist=$(mpd_tag "${status}" albumartist)
+
+  # Stay blank rather than print a bare separator when the tags a branch needs
+  # are missing (e.g. a file with no tags, nothing queued or MPD not running)
+  if mpd_is_playing "${status}"; then
+    if [ -n "${artist}${title}" ]; then
+      echo "${artist} ▸ ${title}  "
+    fi
+  elif [ -n "${albumArtist}${album}" ]; then
+    echo "${albumArtist} ♪ ${album}  "
+  fi
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  music_status "${@}"
+fi

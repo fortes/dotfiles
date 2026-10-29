@@ -21,7 +21,9 @@ IFS=$'\n\t'
 # folds or conflicts a real run won't hit
 declare -r REAL_DIRS=(
   .ssh
-  .config/cmus
+  .mpd/playlists
+  Music
+  .mpdscribble
   .config/tmux
   .config/systemd/user
   .config/yazi

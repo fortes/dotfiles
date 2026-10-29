@@ -5,27 +5,20 @@
 # export DEFAULT_USERNAME=ffortes
 
 # Raises install_github_packages' GitHub API limit (else it asks gh)
-# export GH_TOKEN="xxxxxx"
+# export GH_TOKEN="REPLACE_ME"
 
 # Used for 'llm'
-# export ANTHROPIC_API_KEY="xxxxxx"
-# export GEMINI_API_KEY="xxxxxx"
+# export ANTHROPIC_API_KEY="REPLACE_ME"
+# export GEMINI_API_KEY="REPLACE_ME"
 # export LLM_GEMINI_KEY="${GEMINI_API_KEY}"
-# export LLM_MISTRAL_KEY="xxxxxx"
-# export OPENAI_API_KEY="xxxxxx"
-# export OPENROUTER_API_KEY="xxxxxx"
+# export LLM_MISTRAL_KEY="REPLACE_ME"
+# export OPENAI_API_KEY="REPLACE_ME"
+# export OPENROUTER_API_KEY="REPLACE_ME"
 
 # Typescript language server can OOM on large codebases
 # export MAX_TS_SERVER_MEMORY=32768
 # Same, but for eslint and others
 # export NODE_OPTIONS='--max_old_space_size=16384'
 
-# For scrobbing via cmus
-# export LISTENBRAINZ_AUTH_TOKEN="xxxxxx"
-# export LIBRE_FM_USERNAME="fortes"
-# export LIBRE_FM_PASSWORD="xxxxxx"
-# export LIBRE_FM_SESSION_KEY="xxxxxx"
-
 # Add machine-specific items below
 # export BEETSDIR=/data/media/music/beets
-# export LOCAL_ALBUM_DIR="$HOME/music"

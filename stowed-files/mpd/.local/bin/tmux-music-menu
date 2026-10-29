@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+#
+# Tmux menu for controlling MPD
+
+set -euo pipefail
+IFS=$'\n\t'
+
+# shellcheck source=tmux-music-status
+source "$(dirname "${BASH_SOURCE[0]}")/tmux-music-status"
+
+# Doubles `#` so tags can't inject tmux formats like #[...] or #(...)
+menu_text() {
+  local text="${1:0:60}"
+  echo "${text//#/##}"
+}
+
+music_menu() {
+  local status
+  local verb
+  if ! status=$(mpd_query status currentsong); then
+    tmux display-message "MPD not running"
+    return
+  fi
+
+  if mpd_is_playing "${status}"; then
+    verb="Pause"
+  else
+    verb="Play"
+  fi
+
+  tmux display-menu -T "#[fg=cyan]mpd" -x R -y S \
+    "" \
+    "-Title    #[nodim align=right]$(menu_text "$(mpd_tag "${status}" title)")" "" "" \
+    "-Artist   #[nodim align=right]$(menu_text "$(mpd_tag "${status}" artist)")" "" "" \
+    "-Album    #[nodim align=right]$(menu_text "$(mpd_tag "${status}" album)")" "" "" \
+    "-Genre    #[nodim align=right]$(menu_text "$(mpd_tag "${status}" genre)")" "" "" \
+    "" \
+    "Previous" "z" "run-shell -b 'mpc -q prev'" \
+    "${verb}" "c" "run-shell -b 'mpc -q toggle'" \
+    "Stop" "v" "run-shell -b 'mpc -q stop'" \
+    "Next" "b" "run-shell -b 'mpc -q next'" \
+    "" \
+    "Close" "q" ""
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  music_menu "${@}"
+fi

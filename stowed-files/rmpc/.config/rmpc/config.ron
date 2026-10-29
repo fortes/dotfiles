@@ -1,0 +1,60 @@
+#![enable(implicit_some)]
+#![enable(unwrap_newtypes)]
+#![enable(unwrap_variant_newtypes)]
+(
+    theme: "default",
+    // Auto detection queries the terminal, which fails when rmpc starts in a
+    // tmux window that isn't visible and falls back to blocky half-cells
+    album_art: (method: Kitty),
+    // Only for the Year tag; rmpc needs the whole block, so the rest are its
+    // defaults
+    search: (
+        case_sensitive: false,
+        ignore_diacritics: false,
+        mode: Contains,
+        tags: [
+            (value: "any",         label: "Any Tag"),
+            (value: "artist",      label: "Artist"),
+            (value: "album",       label: "Album"),
+            (value: "albumartist", label: "Album Artist"),
+            (value: "title",       label: "Title"),
+            (value: "filename",    label: "Filename"),
+            (value: "genre",       label: "Genre"),
+            (value: "originaldate", label: "Year"),
+        ],
+    ),
+    artists: (
+        // Dates come out as full YYYY-MM-DD with no year-only option, so hide them
+        album_display_mode: NameOnly,
+        album_sort_by: Date,
+        // Sort and label albums by original release, so reissues sit with the
+        // original (e.g. Ill Communication's 2009 reissue as 1994)
+        album_date_tags: [OriginalDate, Date],
+    ),
+    // Default tabs minus Directories, Artists and Albums. Playlists shows the
+    // server's .m3u files once mpd-sync-playlists has copied them over. No
+    // borders, and album art lives in the theme's header instead of the Queue
+    tabs: [
+        (
+            name: "Queue",
+            pane: Split(
+                direction: Vertical,
+                panes: [
+                    // Gray bar like cmus's, with the label colors in the theme
+                    (size: "1", background_color: "#949494", pane: Pane(QueueHeader())),
+                    (size: "100%", pane: Pane(Queue)),
+                ],
+            ),
+        ),
+        (name: "Album Artists", pane: Pane(AlbumArtists)),
+        (name: "Playlists", pane: Pane(Playlists)),
+        (name: "Search", pane: Pane(Search)),
+    ],
+    keybinds: (
+        global: {
+            "2": SwitchToTab("Album Artists"),
+            "3": SwitchToTab("Playlists"),
+            "4": SwitchToTab("Search"),
+        },
+    ),
+)

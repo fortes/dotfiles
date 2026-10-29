@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Copies the server's .m3u files into MPD's local playlist directory, since
+# the proxy database doesn't share stored playlists. The server keeps them in
+# playlists/ in the music directory, with paths relative to that folder.
+# Needs the server's library, so not while `mpd-offline on`
+
+set -euo pipefail
+IFS=$'\n\t'
+
+music_url=$(sed -n 's/^music_directory "\(.*\)"/\1/p' ~/.mpd/mpd.conf.local)
+playlist_dir=~/.mpd/playlists
+
+for path in $(mpc ls playlists); do
+  name=$(basename "${path}")
+  # Downloaded first, so a failure keeps the last good copy. `:url` encodes
+  # names with spaces, `#` or `?`
+  playlist=$(curl -fsS --variable "name=${name}" \
+    --expand-url "${music_url}playlists/{{name:url}}")
+  # `../albums/x.mp3` becomes `albums/x.mp3`, relative to the music directory
+  sed -e 's|^\.\./||' <<<"${playlist}" >"${playlist_dir}/${name}"
+done

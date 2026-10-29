@@ -34,7 +34,6 @@ main() {
   set -u
 
   update_tmux_colors "${new_theme}"
-  update_cmus_colors "${new_theme}"
   update_neovim_colors "${new_theme}"
 
   echo "done!"
@@ -65,20 +64,6 @@ get_current_color_theme() {
     echo "light"
   else
     echo "dark"
-  fi
-}
-
-# Check if cmus is running and update its colors if so
-update_cmus_colors() {
-  local new_theme
-  new_theme="${1:-}"
-
-  if pgrep -x cmus >/dev/null; then
-    if [[ "${new_theme}" == "light" ]]; then
-      cmus-remote -C "colorscheme xterm-white"
-    else
-      cmus-remote -C "colorscheme spotify"
-    fi
   fi
 }
 

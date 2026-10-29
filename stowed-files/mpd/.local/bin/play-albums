@@ -1,0 +1,126 @@
+#!/usr/bin/env bash
+# Helper to query beets for albums, select via FZF, then add them to MPD's
+# queue and play the first one. MPD names songs relative to its music
+# directory, which is beets' directory on the server. Offline (`mpd-offline
+# on`) the paths are the same, but only albums synced to this Mac play
+#
+# Usage:
+#
+#   # Choose from albums in a given year
+#   play-albums year:2025 genre:rock
+#
+#   # Only add to the end of the queue, without skipping to them
+#   play-albums beth gibbons --queue
+
+[[ "$TRACE" ]] && set -o xtrace
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+# shellcheck disable=SC2016
+BEET_FORMAT_STRING='$mb_albumid|$original_year|%left{$albumartist,40}|%left{$album,40}|$genres'
+COLUMN_NAMES='ID,Year,Artist,Album,Genres'
+
+FZF_ARGS=(
+  --header-lines 1
+  --height 80%
+  --layout=reverse
+  --multi
+  -0
+  --with-nth 2..
+  --accept-nth 1
+)
+
+play-albums() {
+  local album_ids
+  local queue_only=false
+  local beet_album_query
+  local beet_query_args=()
+  local beet_query_results
+  local column_name_arg
+  local music_dir
+  local song_paths
+  local queue_length
+
+  if ! mpc -q status; then
+    exit 1
+  fi
+
+  # Parse arguments
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -q | --queue)
+        queue_only=true
+        shift
+        ;;
+      *)
+        beet_query_args+=("$1")
+        shift
+        ;;
+    esac
+  done
+
+  if [[ ${#beet_query_args[@]} -eq 0 ]]; then
+    beet_query_args=("added:-4w..")
+  fi
+
+  beet_query_results=$(beet ls --album --format="${BEET_FORMAT_STRING}" \
+    added- albumartist+ original_year- \
+    "${beet_query_args[@]}" \
+  )
+
+  if uname -s | grep -vq Darwin; then
+    # Not supported on BSD `column`
+    column_name_arg="--table-columns ${COLUMN_NAMES}"
+  else
+    # Prepend row with column names
+    beet_query_results=$(echo "${COLUMN_NAMES}" | tr ',' '|'; echo "${beet_query_results}")
+  fi
+
+  # shellcheck disable=SC2086
+  album_ids=$(echo "${beet_query_results}" | \
+    column -t -s '|' ${column_name_arg:-} | \
+    fzf "${FZF_ARGS[@]}")
+
+  if [ -z "$album_ids" ]; then
+    echo "No albums found"
+    return 1
+  fi
+
+  beet_album_query=""
+  for album_id in $album_ids; do
+    beet_album_query="${beet_album_query}, mb_albumid:${album_id}"
+  done
+
+  # Remove initial ', ' using parameter substitution
+  beet_album_query=${beet_album_query#, }
+
+  # `-d` includes beets' default when the config doesn't set it
+  music_dir=$(beet config -d | sed -n 's/^directory: //p')
+
+  # Purposefuly want to use unquoted here for the query
+  # shellcheck disable=SC2086
+  song_paths=$(beet ls --path original_year- album- disc+ track+ ${beet_album_query} |
+    sed "s|^${music_dir%/}/||")
+
+  # An empty line would make `mpc add` queue the whole library
+  if [[ -z "${song_paths}" ]]; then
+    echo "No songs found"
+    return 1
+  fi
+
+  queue_length=$(mpc status '%length%')
+  # mpc reads the paths from stdin when given none
+  mpc -q add <<<"${song_paths}"
+  printf "Added %d songs\n" "$(wc -l <<<"${song_paths}")"
+
+  if ! ${queue_only}; then
+    # Positions count from 1, so this is the first added song
+    mpc -q play "$((queue_length + 1))"
+  fi
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  play-albums "$@"
+fi

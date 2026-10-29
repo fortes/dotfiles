@@ -778,8 +778,10 @@ use('https://github.com/obsidian-nvim/obsidian.nvim', function()
     -- Use [[wikilinks]] with the shortest unambiguous path; auto_update
     -- rewrites existing references when renaming via :Obsidian rename
     link = { style = 'wiki', format = 'shortest', auto_update = true },
-    -- No `ui` setting: obsidian.nvim leaves rendering to render-markdown.nvim
-    -- when it's installed
+    -- render-markdown.nvim does the rendering. obsidian.nvim already skips its
+    -- UI when that's installed, but render-markdown's :checkhealth only looks
+    -- at this flag
+    ui = { enable = false },
   })
 
   map('n', '<leader>os', '<cmd>Obsidian quick_switch<cr>', { desc = 'Obsidian quick switch' })

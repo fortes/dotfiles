@@ -8,7 +8,7 @@ My usage is mostly terminal-based on MacOS, Debian Trixie over SSH, or sometimes
 - bash / tmux
 - Neovim
 - fzf / fd / ripgrep
-- cmus
+- MPD with rmpc
 
 ## Letting me own your machine
 
@@ -66,7 +66,13 @@ Once you've run setup, you'll still have to do the following universal manual st
      path = ~/.config/git/company.gitconfig
    ```
 
-6. Log into Coding agents
+6. Fill in the placeholders in tracked templates, for the parts you use:
+
+   ```sh
+   rg --hidden -l REPLACE_ME stowed-files README.md
+   ```
+
+7. Log into Coding agents
 
    ```sh
    # GitHub CLI client
@@ -206,16 +212,36 @@ clean those up:
   ```sh
   defaults write com.lowtechguys.MusicDecoy mediaAppPath /Applications/Plexamp.app
   ```
-- Automount the media share at a fixed path for cmus/`play-albums`. Unlike Finder mounts, it remounts on access and doesn't litter `/Volumes`. macOS upgrades may reset `/etc/auto_master`; re-run the first command if so. Use the share's read-only login; guest access fails with the misleading "No locks available" (errno 77, an SMB auth error):
+- Automount the media share at a fixed path. Unlike Finder mounts, it remounts on access and doesn't litter `/Volumes`. macOS upgrades may reset `/etc/auto_master`; re-run the first command if so. Use the share's read-only login; guest access fails with the misleading "No locks available" (errno 77, an SMB auth error):
 
   ```sh
   echo '/-    auto_smb    -nosuid,nobrowse' | sudo tee -a /etc/auto_master
-  echo '/System/Volumes/Data/mnt/media  -fstype=smbfs,soft,ro,filemode=0644,dirmode=0755  ://media:media@SERVER/media' | sudo tee /etc/auto_smb
+  echo '/System/Volumes/Data/mnt/media  -fstype=smbfs,soft,ro,filemode=0644,dirmode=0755  ://media:media@REPLACE_ME/media' | sudo tee /etc/auto_smb
   sudo automount -cv
   ln -s /System/Volumes/Data/mnt/media/music ~/Music/SERVER
   ```
+- Start MPD, which plays here using the server's library, then use `rmpc` or `play-albums`. Set the server's address in `~/.mpd/mpd.conf.local`, replacing `REPLACE_ME`. `play-albums` turns beets paths into MPD ones by stripping beets' `directory`, so keep that at the server's music path (`/data/media/music`). MPD needs System Settings → Privacy & Security → Local Network access to reach the server, otherwise it fails with "No route to host". Homebrew upgrades may ask again:
 
-  Set `LOCAL_ALBUM_DIR="$HOME/Music/SERVER/albums"` in `~/.profile.local`, and `directory: ~/Music/SERVER` in `~/.config/beets/config.yaml`.
+  ```sh
+  brew services start mpd
+  ```
+- The proxy database doesn't share the server's playlists, so copy its `.m3u` files into `~/.mpd/playlists` for rmpc's Playlists tab. Rerun after the server regenerates them. Large playlists load slowly, since MPD looks up each song on the server:
+
+  ```sh
+  mpd-sync-playlists
+  ```
+- Offline, `mpd-offline on` swaps MPD to the albums synced from the server into `~/Music/albums`, with its own queue; `mpd-offline off` goes back to the server's library. Only local albums play, from rmpc, playlists or `play-albums`. Scrobbles wait in mpdscribble's journal until the network returns. Offline mode doesn't survive a reboot: run `mpd-offline on` again, or `mpd-offline off` to go back.
+- Scrobble MPD plays to Libre.fm and ListenBrainz: fill in the `REPLACE_ME`s in `~/.mpdscribble/mpdscribble.conf`. Like the `.local` files, edits stay out of git once `script/lock_local_files` has run (setup does it):
+
+  ```sh
+  chmod 600 ~/.mpdscribble/mpdscribble.conf
+  brew services start mpdscribble
+  ```
+- Media keys and Control Centre's Now Playing control MPD through `mpd-now-playable`. Setup writes its LaunchAgent; start it once and it runs at login after that:
+
+  ```sh
+  launchctl bootstrap "gui/$(id -u)" ~/Library/LaunchAgents/local.mpd-now-playable.plist
+  ```
 
 ### Debian Server / Crostini
 
