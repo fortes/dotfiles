@@ -3,6 +3,27 @@
 #![enable(unwrap_variant_newtypes)]
 (
     theme: "default",
+    // Auto detection queries the terminal, which fails when rmpc starts in a
+    // tmux window that isn't visible and falls back to blocky half-cells
+    album_art: (method: Kitty),
+    // Search only on Enter. Each keystroke otherwise sends a search through
+    // the proxy database, and slow ones block mpd for every client. rmpc
+    // needs the whole block, so the rest are its defaults
+    search: (
+        case_sensitive: false,
+        ignore_diacritics: false,
+        search_button: true,
+        mode: Contains,
+        tags: [
+            (value: "any",         label: "Any Tag"),
+            (value: "artist",      label: "Artist"),
+            (value: "album",       label: "Album"),
+            (value: "albumartist", label: "Album Artist"),
+            (value: "title",       label: "Title"),
+            (value: "filename",    label: "Filename"),
+            (value: "genre",       label: "Genre"),
+        ],
+    ),
     artists: (
         // Dates come out as full YYYY-MM-DD with no year-only option, so hide them
         album_display_mode: NameOnly,
@@ -12,112 +33,23 @@
         album_date_tags: [OriginalDate, Date],
     ),
     // Default tabs minus Directories, Artists and Albums. Playlists shows the
-    // server's .m3u files once mpd-sync-playlists has copied them over
+    // server's .m3u files once mpd-sync-playlists has copied them over. No
+    // borders, and album art lives in the theme's header instead of the Queue
     tabs: [
         (
             name: "Queue",
             pane: Split(
-                direction: Horizontal,
+                direction: Vertical,
                 panes: [
-                    (
-                        size: "35%",
-                        pane: Split(
-                            direction: Vertical,
-                            panes: [
-                                (
-                                    size: "100%",
-                                    borders: "LEFT | RIGHT | TOP",
-                                    border_symbols: Rounded,
-                                    pane: Pane(AlbumArt)
-                                ),
-                                (
-                                    size: "7",
-                                    borders: "ALL",
-                                    border_symbols: Inherited(parent: Rounded, top_left: "├", top_right: "┤",),
-                                    border_title: [(kind: Text(" Lyrics "))],
-                                    border_title_alignment: Right,
-                                    pane: Pane(Lyrics)
-                                ),
-                            ],
-                        ),
-                    ), 
-                    (
-                        size: "65%",
-                        pane: Split(
-                            direction: Vertical,
-                            panes: [
-                                (
-                                    size: "3",
-                                    borders: "ALL",
-                                    border_symbols: Inherited(parent: Rounded, bottom_left: "├", bottom_right: "┤",),
-                                    pane: Split(
-                                        direction: Horizontal,
-                                        panes: [
-                                            (
-                                                size: "1",
-                                                pane: Pane(Empty())
-                                            ),
-                                            (
-                                                size: "100%",
-                                                pane: Pane(QueueHeader())
-                                            ),
-                                        ]
-                                    )
-                                ),
-                                (
-                                    size: "100%",
-                                    borders: "LEFT | RIGHT | BOTTOM",
-                                    border_symbols: Rounded,
-                                    pane: Split(
-                                        direction: Horizontal,
-                                        panes: [
-                                            (
-                                                size: "1",
-                                                pane: Pane(Empty())
-                                            ),
-                                            (
-                                                size: "100%",
-                                                pane: Pane(Queue)
-                                            ),
-                                        ]
-                                    )
-                                ),
-                            ],
-                        )
-                    ),
+                    // Gray bar like cmus's, with the label colors in the theme
+                    (size: "1", background_color: "#949494", pane: Pane(QueueHeader())),
+                    (size: "100%", pane: Pane(Queue)),
                 ],
             ),
         ),
-        (
-            name: "Album Artists",
-            borders: "ALL",
-            border_symbols: Rounded,
-            pane: Split(
-                size: "100%",
-                direction: Vertical,
-                panes: [(pane: Pane(AlbumArtists), size: "100%", borders: "ALL", border_symbols: Rounded)],
-            )
-        ),
-        (
-            name: "Playlists",
-            borders: "ALL",
-            border_symbols: Rounded,
-            pane: Split(
-                size: "100%",
-                direction: Vertical,
-                panes: [(pane: Pane(Playlists), size: "100%", borders: "ALL", border_symbols: Rounded)],
-            )
-        ),
-        (
-            name: "Search",
-            borders: "ALL",
-            border_symbols: Rounded,
-            pane: Split(
-                size: "100%",
-                direction: Vertical,
-                panes: [(pane: Pane(Search), size: "100%", borders: "ALL", border_symbols: Rounded)],
-            )
-        ),
+        (name: "Album Artists", pane: Pane(AlbumArtists)),
+        (name: "Playlists", pane: Pane(Playlists)),
+        (name: "Search", pane: Pane(Search)),
     ],
     keybinds: (
         global: {

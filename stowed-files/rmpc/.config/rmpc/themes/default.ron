@@ -7,7 +7,7 @@
     // Nerd Font glyph, which Ghostty has built in
     symbols: (
         song: "♪",
-        dir: "",
+        dir: "",
         playlist: "≡",
         marker: "M",
         ellipsis: "...",
@@ -15,4 +15,161 @@
         dir_style: (fg: "dark_gray"),
         playlist_style: (fg: "dark_gray"),
     ),
+    // Columns cribbed from cmus: artist, album, track, title, then genre and
+    // year off to the right
+    progress_bar: (
+        symbols: ["", "━", "━", " ", ""],
+        elapsed_style: (fg: "blue"),
+        thumb_style: (fg: "blue"),
+    ),
+    // Narrower song info column so the artist and album lists get more room,
+    // with dimmed labels so the values stand out
+    browser_column_widths: [25, 45, 30],
+    preview_label_style: (fg: "dark_gray"),
+    preview_metadata_group_style: (fg: "yellow", modifiers: "Bold"),
+    song_table_format: [
+        (
+            prop: (kind: Property(Artist), default: (kind: Text("Unknown"))),
+            label_prop: (kind: Text("Artist"), style: (fg: "#262626")),
+            width: "20%",
+        ),
+        (
+            prop: (kind: Property(Album), style: (fg: "white"),
+                default: (kind: Text("Unknown Album"), style: (fg: "white"))
+            ),
+            label_prop: (kind: Text("Album"), style: (fg: "#262626")),
+            width: "20%",
+        ),
+        (
+            prop: (kind: Property(Track), style: (fg: "dark_gray"), default: (kind: Text(""))),
+            label_prop: (kind: Text("#"), style: (fg: "#262626")),
+            width: "3",
+            alignment: Right,
+        ),
+        (
+            prop: (kind: Property(Title), default: (kind: Text("Unknown"))),
+            label_prop: (kind: Text("Title"), style: (fg: "#262626")),
+            width: "45%",
+        ),
+        (
+            prop: (kind: Property(Other("genre")), style: (fg: "dark_gray"), default: (kind: Text(""))),
+            label_prop: (kind: Text("Genre"), style: (fg: "#262626")),
+            width: "15%",
+            alignment: Right,
+        ),
+        (
+            // Dates are full YYYY-MM-DD, so keep only the year
+            prop: (kind: Transform(Truncate(
+                content: (kind: Property(Other("originaldate")), default: (kind: Property(Other("date")))),
+                length: 4,
+            )), style: (fg: "dark_gray"), default: (kind: Text(""))),
+            label_prop: (kind: Text("Year"), style: (fg: "#262626")),
+            width: "4",
+        ),
+        (
+            prop: (kind: Property(Duration), default: (kind: Text("-"))),
+            label_prop: (kind: Text("Time"), style: (fg: "#262626")),
+            width: "6",
+            alignment: Right,
+        ),
+    ],
+    // cmus-style: no borders or tab bar so lists get the full width (1-4
+    // switch tabs), with the now playing info and album art along the bottom
+    layout: Split(
+        direction: Vertical,
+        panes: [
+            (size: "100%", pane: Pane(TabContent)),
+            (
+                size: "10",
+                pane: Split(
+                    direction: Horizontal,
+                    panes: [
+                        // Terminal cells are about twice as tall as wide, so
+                        // 20x10 is roughly square
+                        (size: "20", pane: Pane(AlbumArt)),
+                        (size: "2", pane: Pane(Empty())),
+                        (size: "100%", pane: Component("now_playing")),
+                        (size: "1", pane: Pane(Empty())),
+                    ]
+                )
+            ),
+        ],
+    ),
+    components: {
+        "now_playing": Split(
+            direction: Vertical,
+            panes: [
+                (size: "1", pane: Pane(Empty())),
+                (size: "1", pane: Pane(Property(
+                    content: [
+                        (kind: Property(Song(Title)), style: (modifiers: "Bold"),
+                            default: (kind: Text("No Song"), style: (modifiers: "Bold"))),
+                    ], align: Left, scroll_speed: 1
+                ))),
+                (size: "1", pane: Pane(Property(
+                    content: [
+                        (kind: Property(Song(Artist)), style: (fg: "yellow", modifiers: "Bold"),
+                            default: (kind: Text("Unknown"), style: (fg: "yellow", modifiers: "Bold"))),
+                    ], align: Left, scroll_speed: 1
+                ))),
+                (size: "1", pane: Pane(Property(
+                    content: [(kind: Property(Song(Album)), default: (kind: Text("Unknown Album")))],
+                    align: Left, scroll_speed: 1
+                ))),
+                (size: "1", pane: Pane(Property(
+                    content: [(kind: Property(Song(Other("genre"))), style: (fg: "dark_gray"))],
+                    align: Left, scroll_speed: 1
+                ))),
+                (size: "1", pane: Pane(Property(
+                    content: [(kind: Transform(Truncate(
+                        content: (kind: Property(Song(Other("originaldate"))),
+                            default: (kind: Property(Song(Other("date"))))),
+                        length: 4,
+                    )), style: (fg: "dark_gray"))],
+                    align: Left
+                ))),
+                (size: "100%", pane: Pane(Empty())),
+                (size: "1", pane: Split(
+                    direction: Horizontal,
+                    panes: [
+                        (size: "100%", pane: Pane(Property(
+                            content: [
+                                (kind: Property(Status(InputBuffer())), style: (fg: "blue")),
+                                (kind: Property(Status(QueueLength())), style: (fg: "dark_gray")),
+                                (kind: Text(" songs / "), style: (fg: "dark_gray")),
+                                (kind: Property(Status(QueueTimeTotal())), style: (fg: "dark_gray")),
+                            ], align: Left,
+                        ))),
+                        (size: "20", pane: Pane(Volume(kind: Slider(symbols: (filled: "─", thumb: "●", track: "─"))))),
+                        (size: "5", pane: Pane(Property(content: [(kind: Property(Status(Volume)), style: (fg: "blue")), (kind: Text("%"), style: (fg: "blue"))], align: Right))),
+                    ]
+                )),
+                // Like cmus: time on the same line as a thin progress bar
+                (size: "1", pane: Split(
+                    direction: Horizontal,
+                    panes: [
+                        (size: "15", pane: Pane(Property(
+                            content: [
+                                (kind: Property(Status(StateV2(playing_label: "▶", paused_label: "⏸", stopped_label: "■"))), style: (fg: "yellow")),
+                                (kind: Text(" ")),
+                                (kind: Property(Status(Elapsed))),
+                                (kind: Text(" / ")),
+                                (kind: Property(Status(Duration))),
+                            ], align: Left,
+                        ))),
+                        (size: "100%", pane: Pane(ProgressBar)),
+                        (size: "1", pane: Pane(Empty())),
+                        (size: "6", pane: Pane(Property(content: [
+                            (kind: Text("[")),
+                            (kind: Property(Status(RepeatV2(on_label: "z", off_label: "z", on_style: (fg: "yellow", modifiers: "Bold"), off_style: (fg: "blue", modifiers: "Dim"))))),
+                            (kind: Property(Status(RandomV2(on_label: "x", off_label: "x", on_style: (fg: "yellow", modifiers: "Bold"), off_style: (fg: "blue", modifiers: "Dim"))))),
+                            (kind: Property(Status(ConsumeV2(on_label: "c", off_label: "c", oneshot_label: "c", on_style: (fg: "yellow", modifiers: "Bold"), off_style: (fg: "blue", modifiers: "Dim"), oneshot_style: (fg: "red", modifiers: "Dim"))))),
+                            (kind: Property(Status(SingleV2(on_label: "v", off_label: "v", oneshot_label: "v", on_style: (fg: "yellow", modifiers: "Bold"), off_style: (fg: "blue", modifiers: "Dim"), oneshot_style: (fg: "red", modifiers: "Bold"))))),
+                            (kind: Text("]")),
+                        ], align: Right))),
+                    ]
+                )),
+            ]
+        ),
+    },
 )
