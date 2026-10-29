@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Install packages directly from GitHub, for ones Debian doesn't ship or ships
-# too old. `--help` lists them.
+# Install packages directly from GitHub, for ones the OS doesn't ship or ships
+# too old. `--help` lists the packages supported on this platform.
 #
 # Usage `install_github_packages [package_names...]`
 
@@ -43,6 +43,11 @@ AVAILABLE_PACKAGES=(
   yazi
   yq
 )
+
+# Other macOS tools come from Homebrew.
+if [[ "$(uname -s)" == Darwin ]]; then
+  AVAILABLE_PACKAGES=(gemini-api)
+fi
 
 is_available_package() {
   local available
@@ -140,6 +145,10 @@ get_latest_release_asset() {
 # `find` only sees that package.
 fetch_asset() {
   local asset url digest file
+  local -a checksum_command=(sha256sum)
+  if [[ "$(uname -s)" == Darwin ]]; then
+    checksum_command=(shasum -a 256)
+  fi
   # Set at startup, so unset only when the script is sourced. Guards the
   # `rm -rf` below.
   : "${DOWNLOAD_ROOT:?not set, run install_github_packages first}"
@@ -156,7 +165,7 @@ fetch_asset() {
 
   if [[ "${digest}" != sha256:* ]]; then
     echo_stderr "Warning: no checksum published for $(basename "${url}"), not verified"
-  elif ! echo "${digest#sha256:}  ${file}" | sha256sum --check --status -; then
+  elif ! echo "${digest#sha256:}  ${file}" | "${checksum_command[@]}" --check --status -; then
     echo_stderr "Error: checksum mismatch for $(basename "${url}")"
     exit 2
   fi
@@ -257,7 +266,7 @@ install_fzf() {
 }
 
 install_gemini_api() {
-  install_bin 'google-gemini/gemini-api-cli' '/gemini-api_Linux_{ARCH}\.tar\.gz$' 'gemini-api'
+  install_bin 'google-gemini/gemini-api-cli' "/gemini-api_$(uname -s)_{ARCH}\\.tar\\.gz$" 'gemini-api'
 }
 
 install_hugo() {
@@ -358,14 +367,23 @@ install_github_packages() {
     fi
   done
 
-  if ! command_exists apt-get; then
-    echo_stderr "Only works on Debian-like systems"
-    exit 1
-  fi
+  case "$(uname -s)" in
+    Darwin) ;;
+    Linux)
+      command_exists apt-get || {
+        echo_stderr "Only works on Debian-like Linux systems"
+        exit 1
+      }
+      ;;
+    *)
+      echo_stderr "Unsupported platform: $(uname -s)"
+      exit 1
+      ;;
+  esac
 
   case "$(uname -m)" in
     x86_64) ARCH_PATTERN='(amd64|x86_64|x64)' ;;
-    aarch64) ARCH_PATTERN='(arm64|aarch64)' ;;
+    arm64 | aarch64) ARCH_PATTERN='(arm64|aarch64)' ;;
     *)
       echo_stderr "Error: Unsupported architecture: $(uname -m)"
       exit 1
@@ -376,7 +394,7 @@ install_github_packages() {
   GITHUB_API_TOKEN="$(github_api_token)"
 
   mkdir -p "${XDG_CACHE_HOME:-$HOME/.cache}"
-  DOWNLOAD_ROOT="$(mktemp --directory -p "${XDG_CACHE_HOME:-$HOME/.cache}" install_github_packages.XXXXXX)"
+  DOWNLOAD_ROOT="$(mktemp -d "${XDG_CACHE_HOME:-$HOME/.cache}/install_github_packages.XXXXXX")"
   trap 'rm -rf "${DOWNLOAD_ROOT}"' EXIT
 
   echo -n "Installing GitHub packages:"

@@ -15,8 +15,8 @@ if is_devbox; then
   exec "${dotfiles_script_dir}/install_github_packages" "${DEVBOX_GITHUB_PACKAGES[@]}"
 fi
 
+"${dotfiles_script_dir}/install_github_packages"
 if [[ "$(uname -s)" == Linux ]]; then
-  "${dotfiles_script_dir}/install_github_packages"
   "${dotfiles_script_dir}/install_node"
   "${dotfiles_script_dir}/install_agy"
 fi
