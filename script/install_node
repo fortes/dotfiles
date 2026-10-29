@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Install the latest Node.js release from nodejs.org into ~/.local, checking
+# Install the latest stable Node.js release from nodejs.org into ~/.local, checking
 # the tarball against the release's SHASUMS256.txt
 #
 # Usage: install_node
@@ -75,7 +75,9 @@ install_node() {
   local arch current version
   arch="$(node_arch)"
   current="$("${INSTALL_ROOT}/current/bin/node" --version 2>/dev/null || true)"
-  version="$(curl "${CURL_ARGS[@]}" "${DIST_URL}/index.json" | jq --raw-output '.[0].version')"
+  # The release index can put prereleases ahead of the latest stable release.
+  version="$(curl "${CURL_ARGS[@]}" "${DIST_URL}/index.json" \
+    | jq --raw-output 'first(.[] | .version | select(test("^v[0-9]+\\.[0-9]+\\.[0-9]+$")))')"
   if [[ ! "${version}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
     echo >&2 "⨯ Unexpected Node version in release index: ${version}"
     exit 1
