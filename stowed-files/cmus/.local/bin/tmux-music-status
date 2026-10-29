@@ -1,32 +1,100 @@
 #!/usr/bin/env bash
 #
-# Display current track information if cmus is playing
+# Display current track information if cmus or MPD is playing. Also sourced by
+# tmux-music-menu for the player helpers
 
 set -euo pipefail
 IFS=$'\n\t'
 
-cmus_status() {
-  local cmus_status
-  cmus_status=$(cmus-remote -Q 2>&1 || echo)
-  if echo "${cmus_status}" | grep -qi "not running"; then
+# Prints `cmus` or `mpd`: whichever is furthest along playing > paused >
+# stopped. MPD runs as a background service, so cmus wins ties when it's open
+active_player() {
+  local cmus_state=""
+  local mpd_state=""
+
+  if command -v cmus-remote >/dev/null 2>&1; then
+    cmus_state=$(cmus-remote -Q 2>/dev/null | sed -n 's/^status //p' || true)
+  fi
+  # Controls go through mpc, so ignore MPD on machines without it
+  if command -v mpc >/dev/null 2>&1; then
+    mpd_state=$(mpd_query status | sed -n 's/^state: //p' || true)
+  fi
+
+  if [[ $(state_rank "${mpd_state}") -gt $(state_rank "${cmus_state}") ]]; then
+    echo mpd
+  elif [[ -n "${cmus_state}" ]]; then
+    echo cmus
+  fi
+}
+
+# cmus says playing/paused/stopped, MPD play/pause/stop
+state_rank() {
+  case "${1}" in
+    playing | play) echo 3 ;;
+    paused | pause) echo 2 ;;
+    stopped | stop) echo 1 ;;
+    *) echo 0 ;;
+  esac
+}
+
+# Talks to MPD directly, since mpc only shows the first value of multi-value
+# tags like genre. A subshell, since a failed `exec` exits the shell it runs in
+mpd_query() (
+  exec 3<>/dev/tcp/localhost/6600 &&
+    printf '%s\n' "$@" close >&3 &&
+    cat <&3
+) 2>/dev/null
+
+# Tag lines from cmus-remote -Q or MPD, joining repeated values (e.g. several
+# genres) with `; `. A missing tag must not abort the script (set -e +
+# pipefail), so it's treated as empty
+player_tag() {
+  local player="${1}"
+  local status="${2}"
+  local tag="${3}"
+
+  if [[ "${player}" == "cmus" ]]; then
+    sed -n "s/^tag ${tag} //p" <<<"${status}" | paste -sd ';' - | sed 's/;/; /g'
+  else
+    grep -i "^${tag}: " <<<"${status}" | cut -d ' ' -f 2- | paste -sd ';' - |
+      sed 's/;/; /g' || true
+  fi
+}
+
+player_status() {
+  if [[ "${1}" == "cmus" ]]; then
+    cmus-remote -Q 2>/dev/null || true
+  else
+    mpd_query status currentsong || true
+  fi
+}
+
+player_is_playing() {
+  grep -qiE '^(status playing|state: play)$' <<<"${1}"
+}
+
+music_status() {
+  local player
+  player=$(active_player)
+  if [[ -z "${player}" ]]; then
     return
   fi
+
+  local status
+  status=$(player_status "${player}")
 
   local artist
   local title
   local album
   local albumArtist
-
-  # A missing tag must not abort the script (set -e + pipefail), so tolerate no
-  # match and treat the tag as empty
-  artist=$(echo "${cmus_status}" | grep -i '^tag artist ' | cut -d ' ' -f 3- || true)
-  title=$(echo "${cmus_status}" | grep -i '^tag title ' | cut -d ' ' -f 3- || true)
-  album=$(echo "${cmus_status}" | grep -i '^tag album ' | cut -d ' ' -f 3- || true)
-  albumArtist=$(echo "${cmus_status}" | grep -i '^tag albumartist ' | cut -d ' ' -f 3- || true)
+  artist=$(player_tag "${player}" "${status}" artist)
+  title=$(player_tag "${player}" "${status}" title)
+  album=$(player_tag "${player}" "${status}" album)
+  albumArtist=$(player_tag "${player}" "${status}" albumartist)
 
   # Stay blank rather than print a bare separator when the tags a branch needs
-  # are missing (e.g. a file with no tags at all)
-  if echo "${cmus_status}" | grep -qi "status playing"; then
+  # are missing (e.g. a file with no tags at all, or MPD with nothing queued)
+  if player_is_playing "${status}"; then
     if [ -n "${artist}${title}" ]; then
       echo "${artist} ▸ ${title}  "
     fi
@@ -36,7 +104,5 @@ cmus_status() {
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-  if command -v cmus-remote >/dev/null 2>&1; then
-    cmus_status "${@}"
-  fi
+  music_status "${@}"
 fi

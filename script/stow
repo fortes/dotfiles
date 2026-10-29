@@ -22,6 +22,8 @@ IFS=$'\n\t'
 declare -r REAL_DIRS=(
   .ssh
   .config/cmus
+  .mpd/playlists
+  .mpdscribble
   .config/tmux
   .config/systemd/user
   .config/yazi

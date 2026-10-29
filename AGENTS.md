@@ -20,7 +20,7 @@ make test         # shellcheck + shfmt (also what CI runs)
 - **Binaries missing or too old in Debian:** Either use backports or via `script/install_github_packages`
 - **npm / uv / cargo globals:** `script/install_{node,python,cargo}_packages`
 - **Config files:** `stowed-files/<package>/`, mirroring `$HOME`. Each directory is a stow package; `DOTFILES_SKIP_PACKAGES` (space-separated) skips some. Directories programs write into (`REAL_DIRS` in `script/stow`, e.g. `~/.ssh`) are created first so stow doesn't fold them into the repo.
-- **Machine-specific settings:** tracked `*.local` templates (`.profile.local`, `.gitconfig.local`) are stowed and marked skip-worktree by `script/lock_local_files`, so per-machine edits stay out of git. `~/.bashrc.local` and `~/.vimrc.local` are untracked.
+- **Machine-specific settings:** tracked `*.local` templates (`.profile.local`, `.gitconfig.local`) and configs that hold credentials (`~/.mpdscribble/mpdscribble.conf`) are stowed and marked skip-worktree by `script/lock_local_files`, so per-machine edits stay out of git. `~/.bashrc.local` and `~/.vimrc.local` are untracked.
 
 Shell startup: `.profile` (environment, PATH, helpers, `IS_DOCKER`; sources `.profile.local` last) → `.bashrc` (interactive; sources `.profile`) → `.aliases`.
 

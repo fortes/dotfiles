@@ -78,6 +78,21 @@ if command_exists nvim; then
   }
 fi
 
+# MPD keeps playing after rmpc quits, and rmpc keys can't both stop and quit,
+# so stop on the way out like cmus. Only for the TUI, not subcommands
+if command_exists rmpc && command_exists mpc; then
+  rmpc() {
+    if [ $# -gt 0 ]; then
+      command rmpc "$@"
+      return
+    fi
+    local status=0
+    command rmpc || status=$?
+    mpc -q stop
+    return "${status}"
+  }
+fi
+
 # Load local file if present
 if [ -f ~/.aliases.local ]; then
   # shellcheck source=/dev/null

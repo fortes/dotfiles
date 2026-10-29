@@ -1,0 +1,10 @@
+# Server for mpd.conf, kept local: script/lock_local_files marks this file
+# skip-worktree
+database {
+    plugin "proxy"
+    host "SERVER"
+    # Notice connections that died during sleep or a network switch
+    keepalive "yes"
+}
+# Song paths from the server's database, fetched over HTTP from Caddy
+music_directory "http://SERVER:8090/music/"

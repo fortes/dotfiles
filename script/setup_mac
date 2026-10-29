@@ -59,6 +59,9 @@ BREW_PACKAGES=(
   lua-language-server
   marksman
   moreutils
+  mpc
+  mpd
+  mpdscribble
   mpv
   music-decoy
   ncdu
@@ -70,6 +73,7 @@ BREW_PACKAGES=(
   pngpaste
   podman
   ripgrep
+  rmpc
   rust
   sad
   # For yazi
@@ -138,6 +142,35 @@ setup_homebrew() {
   "${brew_prefix}/bin/brew" install --cask --quiet "${CASK_PACKAGES[@]}"
 }
 
+# Lets media keys control MPD. Written here rather than stowed, since launchd
+# needs absolute paths
+setup_mpd_now_playable() {
+  local -r label="local.mpd-now-playable"
+  local -r plist="$HOME/Library/LaunchAgents/${label}.plist"
+  mkdir -p "$HOME/Library/LaunchAgents"
+  cat >"${plist}" <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>${label}</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>$HOME/.local/bin/mpd-now-playable</string>
+  </array>
+  <key>RunAtLoad</key>
+  <true/>
+  <!-- Exits when MPD isn't up yet, so keep retrying -->
+  <key>KeepAlive</key>
+  <true/>
+  <key>StandardErrorPath</key>
+  <string>$HOME/Library/Logs/mpd-now-playable.log</string>
+</dict>
+</plist>
+EOF
+}
+
 main() {
   # shellcheck source=script/lib.sh
   . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
@@ -157,6 +190,8 @@ main() {
   "${dotfiles_root}/script/set_dotfiles_remote"
 
   "${dotfiles_root}/script/update"
+
+  setup_mpd_now_playable
 
   echo "Setup complete!"
 }

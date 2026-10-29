@@ -1,62 +1,83 @@
 #!/usr/bin/env bash
 #
-# Tmux menu for controlling playerctl-compatible music players
+# Tmux menu for controlling cmus or MPD. `tmux-music-menu toggle` just
+# plays/pauses
 
 set -euo pipefail
 IFS=$'\n\t'
 
-cmus_menu() {
-  local title
-  local artist
-  local album
+# shellcheck source=tmux-music-status
+source "$(dirname "${BASH_SOURCE[0]}")/tmux-music-status"
 
-  local previous_command
-  local toggle_command
-  local stop_command
-  local next_command
+player_command() {
+  local player="${1}"
+  local action="${2}"
 
-  cmus_status=$(cmus-remote -Q 2>&1 || echo)
-  if echo "${cmus_status}" | grep -qi "not running"; then
+  if [[ "${player}" == "cmus" ]]; then
+    case "${action}" in
+      previous) echo "cmus-remote --prev" ;;
+      toggle) echo "cmus-remote --pause" ;;
+      stop) echo "cmus-remote --stop" ;;
+      next) echo "cmus-remote --next" ;;
+    esac
+  else
+    case "${action}" in
+      previous) echo "mpc -q prev" ;;
+      toggle) echo "mpc -q toggle" ;;
+      stop) echo "mpc -q stop" ;;
+      next) echo "mpc -q next" ;;
+    esac
+  fi
+}
+
+music_menu() {
+  local player
+  player=$(active_player)
+  if [[ -z "${player}" ]]; then
     tmux display-message "Not playing music"
     return
   fi
 
-  # A missing tag must not abort the script (set -e + pipefail), so tolerate no
-  # match and treat the tag as empty
-  artist=$(echo "${cmus_status}" | grep -i '^tag artist ' | cut -d ' ' -f 3- || true)
-  title=$(echo "${cmus_status}" | grep -i '^tag title ' | cut -d ' ' -f 3- || true)
-  album=$(echo "${cmus_status}" | grep -i '^tag album ' | cut -d ' ' -f 3- || true)
-  genre=$(echo "${cmus_status}" | grep -i '^tag genre ' | cut -d ' ' -f 3- || true)
+  if [[ "${1:-}" == "toggle" ]]; then
+    eval "$(player_command "${player}" toggle)"
+    return
+  fi
 
-  previous_command="cmus-remote --prev"
-  toggle_command="cmus-remote --pause"
-  stop_command="cmus-remote --stop"
-  next_command="cmus-remote --next"
-
-  if echo "${cmus_status}" | grep -qi "^status playing"; then
+  local status
+  local verb
+  status=$(player_status "${player}")
+  if player_is_playing "${status}"; then
     verb="Pause"
   else
     verb="Play"
   fi
 
-  artist="${artist}" \
-    album="${album}" \
-    title="${title}" \
-    genre="${genre}" \
-    previous_command="${previous_command}" \
-    toggle_command="${toggle_command}" \
-    stop_command="${stop_command}" \
-    next_command="${next_command}" \
+  player="${player}" \
+    artist="$(player_tag "${player}" "${status}" artist)" \
+    album="$(player_tag "${player}" "${status}" album)" \
+    title="$(player_tag "${player}" "${status}" title)" \
+    genre="$(player_tag "${player}" "${status}" genre)" \
+    verb="${verb}" \
+    previous_command="$(player_command "${player}" previous)" \
+    toggle_command="$(player_command "${player}" toggle)" \
+    stop_command="$(player_command "${player}" stop)" \
+    next_command="$(player_command "${player}" next)" \
     display_menu
 }
 
+# Doubles `#` so tags can't inject tmux formats like #[...] or #(...)
+menu_text() {
+  local text="${1:0:60}"
+  echo "${text//#/##}"
+}
+
 display_menu() {
-  tmux display-menu -T "#[fg=cyan]cmus" -x R -y S \
+  tmux display-menu -T "#[fg=cyan]${player}" -x R -y S \
     "" \
-    "-Title    #[nodim align=right]${title:0:60}" "" "" \
-    "-Artist   #[nodim align=right]${artist:0:60}" "" "" \
-    "-Album    #[nodim align=right]${album:0:60}" "" "" \
-    "-Genre    #[nodim align=right]${genre:0:60}" "" "" \
+    "-Title    #[nodim align=right]$(menu_text "${title}")" "" "" \
+    "-Artist   #[nodim align=right]$(menu_text "${artist}")" "" "" \
+    "-Album    #[nodim align=right]$(menu_text "${album}")" "" "" \
+    "-Genre    #[nodim align=right]$(menu_text "${genre}")" "" "" \
     "" \
     "Previous" "z" "run-shell -b '${previous_command}'" \
     "${verb}" "c" "run-shell -b '${toggle_command}'" \
@@ -67,7 +88,5 @@ display_menu() {
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-  if command -v cmus-remote >/dev/null 2>&1; then
-    cmus_menu "${@}"
-  fi
+  music_menu "${@}"
 fi

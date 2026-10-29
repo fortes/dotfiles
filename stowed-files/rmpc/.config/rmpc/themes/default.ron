@@ -1,0 +1,18 @@
+#![enable(implicit_some)]
+#![enable(unwrap_newtypes)]
+#![enable(unwrap_variant_newtypes)]
+(
+    // Small dimmed type markers in place of the default S/D/P letters. rmpc
+    // uses the dir one for folders, artists and albums alike. The folder is a
+    // Nerd Font glyph, which Ghostty has built in
+    symbols: (
+        song: "♪",
+        dir: "",
+        playlist: "≡",
+        marker: "M",
+        ellipsis: "...",
+        song_style: (fg: "dark_gray"),
+        dir_style: (fg: "dark_gray"),
+        playlist_style: (fg: "dark_gray"),
+    ),
+)

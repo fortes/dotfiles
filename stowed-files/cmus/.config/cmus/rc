@@ -7,9 +7,6 @@ colorscheme gruvbox
 # Enable mouse
 set mouse=true
 
-# Enable use of `playerctl` and other standard utilities
-set mpris=true
-
 # Scrobber
 set status_display_program=cmus-status
 

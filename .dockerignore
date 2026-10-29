@@ -1,5 +1,8 @@
 .git
 .github
-# Per-machine settings may hold secrets; both are optional at runtime
+# Per-machine settings and credentials may hold secrets; all are optional at
+# runtime
 stowed-files/bash/.profile.local
 stowed-files/git/.gitconfig.local
+stowed-files/mpd/.mpd/mpd.conf.local
+stowed-files/mpd/.mpdscribble/mpdscribble.conf

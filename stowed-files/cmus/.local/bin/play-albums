@@ -1,26 +1,21 @@
 #!/usr/bin/env bash
-# Helper to query beets for albums, select via FZF, then play in cmus.
-# Also handles rewriting remote paths to local paths.
-#
-# Set the local path by editing this script, or (preferrably) via the
-# `LOCAL_ALBUM_DIR` env variable
+# Helper to query beets for albums, select via FZF, then play in MPD. MPD
+# names songs relative to its music directory, which is beets' directory on
+# the server
 #
 # Usage:
 #
 #   # Choose from albums in a given year
 #   play-albums year:2025 genre:rock
 #
-#   # Append to play queue instead of clearing
-#   play-albums beth gibbons --append
+#   # Add to the end of the queue instead of replacing it
+#   play-albums beth gibbons -q
 
 [[ "$TRACE" ]] && set -o xtrace
 
 set -o errexit
 set -o nounset
 set -o pipefail
-
-BEETS_ALBUM_DIR="/data/media/music/albums/"
-LOCAL_ALBUM_DIR="${LOCAL_ALBUM_DIR:-${BEETS_ALBUM_DIR}}"
 
 # shellcheck disable=SC2016
 BEET_FORMAT_STRING='$mb_albumid|$original_year|%left{$albumartist,40}|%left{$album,40}|$genres'
@@ -43,32 +38,16 @@ play-albums() {
   local beet_query_args=()
   local beet_query_results
   local column_name_arg
-  local cmus_full_status
-  local play_status
+  local music_dir
 
-  if [[ ! -d "${LOCAL_ALBUM_DIR}" ]]; then
-    echo "Local album directory not found: ${LOCAL_ALBUM_DIR}"
+  if ! mpc -q status; then
     exit 1
   fi
 
-  set +o errexit
-  cmus_full_status=$(cmus-remote --raw status 2>/dev/null)
-  # shellcheck disable=SC2181
-  if [ $? -ne 0 ]; then
-    echo "cmus not running"
-    exit 1
-  fi
-  set -o errexit
-
-  play_status=$(echo "${cmus_full_status}" | grep '^status' | awk '{print $2}')
-
-  # Make sure `LOCAL_ALBUM_DIR` ends with a trailing slash
-  LOCAL_ALBUM_DIR="$(realpath "${LOCAL_ALBUM_DIR}")/"
-
-   # Parse arguments
+  # Parse arguments
   while [[ $# -gt 0 ]]; do
     case "$1" in
-      --append)
+      -q | --queue | --append)
         append=true
         shift
         ;;
@@ -116,60 +95,39 @@ play-albums() {
   # Remove initial ', ' using parameter substitution
   beet_album_query=${beet_album_query#, }
 
-  # Generate a list of paths to the matched albums
-  local tmp_m3u_file
-  tmp_m3u_file="$(mktemp).m3u"
+  # `-d` includes beets' default when the config doesn't set it
+  music_dir=$(beet config -d | sed -n 's/^directory: //p')
+  music_dir="${music_dir/#\~/${HOME}}"
 
-  # Make sure to clean up the temp file on exit
-  # shellcheck disable=SC2064
-  trap "rm -f \"${tmp_m3u_file:-}\"" EXIT
-
-  # Technically, can use `beet play` if the local and remote paths match,
-  # but for now keep a single codepath
-  #
+  local song_path
+  local song_paths=""
   # Purposefuly want to use unquoted here for the query
   # shellcheck disable=SC2086
-  beet ls --path original_year- album- track+ ${beet_album_query} \
-    | sed -e "s|${BEETS_ALBUM_DIR}|${LOCAL_ALBUM_DIR}|" > "${tmp_m3u_file}"
-
-  # Check if those files are available in local directory, catches the case
-  # where trying to play off a remote share that is not mounted
   while IFS= read -r song_path; do
-    if [[ ! -f "${song_path}" ]]; then
-      >&2 echo "Not found locally: ${song_path#"${LOCAL_ALBUM_DIR}"}, aborting"
-      exit 1
-    fi
-  done < "${tmp_m3u_file}"
+    song_paths+="${song_path#"${music_dir%/}/"}"$'\n'
+  done < <(beet ls --path original_year- album- disc+ track+ ${beet_album_query})
 
-  if ! ${append}; then
-    cmus-remote --clear --queue
+  # An empty line would make `mpc add` queue the whole library
+  if [[ -z "${song_paths}" ]]; then
+    echo "No songs found"
+    return 1
   fi
 
-  # Output number of albums being played
   local song_count
-  song_count=$(wc -l < "${tmp_m3u_file}")
+  song_count=$(printf '%s' "${song_paths}" | wc -l)
 
   if ${append}; then
     printf "Adding %d songs\n" "${song_count}"
   else
     printf "Playing %d songs\n" "${song_count}"
+    mpc -q clear
   fi
 
-  # Switch to queue view
-  cmus-remote --raw 'view queue'
-  cmus-remote --queue "${tmp_m3u_file}"
+  # mpc reads the paths from stdin when given none
+  printf '%s' "${song_paths}" | mpc -q add
 
-  # Wait a beat in order to make sure cmus has queued the album
-  sleep 2
-
-  if ! "${append}"; then
-    if [[ "${play_status}" != "stopped" ]]; then
-      # Skip current track (which isn't part of added queue)
-      cmus-remote --next
-    fi
-
-    # Ensure playing if paused / stopped
-    cmus-remote --play
+  if ! ${append}; then
+    mpc -q play
   fi
 }
 

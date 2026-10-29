@@ -41,6 +41,12 @@ install_python_packages() {
   done
   uv tool install --quiet --force --refresh beets --with requests --with pylast \
     --with 'beets[embedart,fetchart,lyrics,lastgenre,plexupdate]'
+  if [[ "$(uname -s)" == "Darwin" ]]; then
+    # Media keys for MPD. Python 3.15 breaks its Core Foundation event loop
+    # (`_add_reader()` gets an unexpected `context`), so stay on the version
+    # it targets
+    uv tool install --quiet --force --refresh --python 3.12 mpd-now-playable
+  fi
   echo "uvx packages installed!"
 }
 

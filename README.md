@@ -8,7 +8,7 @@ My usage is mostly terminal-based on MacOS, Debian Trixie over SSH, or sometimes
 - bash / tmux
 - Neovim
 - fzf / fd / ripgrep
-- cmus
+- cmus, and MPD with rmpc
 
 ## Letting me own your machine
 
@@ -206,7 +206,7 @@ clean those up:
   ```sh
   defaults write com.lowtechguys.MusicDecoy mediaAppPath /Applications/Plexamp.app
   ```
-- Automount the media share at a fixed path for cmus/`play-albums`. Unlike Finder mounts, it remounts on access and doesn't litter `/Volumes`. macOS upgrades may reset `/etc/auto_master`; re-run the first command if so. Use the share's read-only login; guest access fails with the misleading "No locks available" (errno 77, an SMB auth error):
+- Automount the media share at a fixed path for cmus. Unlike Finder mounts, it remounts on access and doesn't litter `/Volumes`. macOS upgrades may reset `/etc/auto_master`; re-run the first command if so. Use the share's read-only login; guest access fails with the misleading "No locks available" (errno 77, an SMB auth error):
 
   ```sh
   echo '/-    auto_smb    -nosuid,nobrowse' | sudo tee -a /etc/auto_master
@@ -214,8 +214,27 @@ clean those up:
   sudo automount -cv
   ln -s /System/Volumes/Data/mnt/media/music ~/Music/SERVER
   ```
+- Start MPD, which plays here using the server's library, then use `rmpc` or `play-albums`. Set the server's address in `~/.mpd/mpd.conf.local`. `play-albums` turns beets paths into MPD ones by stripping beets' `directory`, so keep that at the server's music path (`/data/media/music`). MPD needs System Settings → Privacy & Security → Local Network access to reach the server, otherwise it fails with "No route to host". Homebrew upgrades may ask again:
 
-  Set `LOCAL_ALBUM_DIR="$HOME/Music/SERVER/albums"` in `~/.profile.local`, and `directory: ~/Music/SERVER` in `~/.config/beets/config.yaml`.
+  ```sh
+  brew services start mpd
+  ```
+- The proxy database doesn't share the server's playlists, so copy its `.m3u` files into `~/.mpd/playlists` for rmpc's Playlists tab. Rerun after the server regenerates them. Large playlists load slowly, since MPD looks up each song on the server:
+
+  ```sh
+  mpd-sync-playlists
+  ```
+- Scrobble MPD plays to Libre.fm and ListenBrainz: fill in the passwords in `~/.mpdscribble/mpdscribble.conf`. Like the `.local` files, edits stay out of git once `script/lock_local_files` has run (setup does it):
+
+  ```sh
+  chmod 600 ~/.mpdscribble/mpdscribble.conf
+  brew services start mpdscribble
+  ```
+- Media keys and Control Centre's Now Playing control MPD through `mpd-now-playable`. Setup writes its LaunchAgent; start it once and it runs at login after that:
+
+  ```sh
+  launchctl bootstrap "gui/$(id -u)" ~/Library/LaunchAgents/local.mpd-now-playable.plist
+  ```
 
 ### Debian Server / Crostini
 
