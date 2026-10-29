@@ -9,9 +9,6 @@ local_conf=~/.mpd/local_music.conf
 
 case "${1:-}" in
   on)
-    # MPD only serves art from cover.*, but the synced albums have folder.jpg
-    find ~/Music/albums -name folder.jpg -execdir \
-      sh -c '[ -e cover.jpg ] || ln -s folder.jpg cover.jpg' \;
     brew services stop mpd
     mpd "${local_conf}"
     # mpd returns before it's listening

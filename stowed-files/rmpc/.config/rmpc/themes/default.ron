@@ -15,8 +15,6 @@
         dir_style: (fg: "dark_gray"),
         playlist_style: (fg: "dark_gray"),
     ),
-    // Columns cribbed from cmus: artist, album, track, title, then genre and
-    // year off to the right
     progress_bar: (
         symbols: ["", "━", "━", " ", ""],
         elapsed_style: (fg: "blue"),
@@ -27,6 +25,8 @@
     browser_column_widths: [25, 45, 30],
     preview_label_style: (fg: "dark_gray"),
     preview_metadata_group_style: (fg: "yellow", modifiers: "Bold"),
+    // Columns cribbed from cmus: artist, album, track, title, then genre and
+    // year off to the right
     song_table_format: [
         (
             prop: (kind: Property(Artist), default: (kind: Text("Unknown"))),

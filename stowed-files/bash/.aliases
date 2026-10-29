@@ -79,7 +79,7 @@ if command_exists nvim; then
 fi
 
 # MPD keeps playing after rmpc quits, and rmpc keys can't both stop and quit,
-# so stop on the way out like cmus. Only for the TUI, not subcommands
+# so stop on the way out. Only for the TUI, not subcommands
 if command_exists rmpc && command_exists mpc; then
   rmpc() {
     if [ $# -gt 0 ]; then

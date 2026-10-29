@@ -12,7 +12,10 @@ playlist_dir=~/.mpd/playlists
 
 for path in $(mpc ls playlists); do
   name=$(basename "${path}")
+  # Downloaded first, so a failure keeps the last good copy. `:url` encodes
+  # names with spaces, `#` or `?`
+  playlist=$(curl -fsS --variable "name=${name}" \
+    --expand-url "${music_url}playlists/{{name:url}}")
   # `../albums/x.mp3` becomes `albums/x.mp3`, relative to the music directory
-  curl -fsS "${music_url}playlists/${name}" |
-    sed -e 's|^\.\./||' >"${playlist_dir}/${name}"
+  sed -e 's|^\.\./||' <<<"${playlist}" >"${playlist_dir}/${name}"
 done

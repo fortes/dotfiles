@@ -24,7 +24,6 @@ BREW_PACKAGES=(
   oven-sh/bun/bun
   chafa
   cloudflared
-  cmus
   # Docker fallback for projects that need it, alongside podman
   colima
   container

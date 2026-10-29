@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
-# Helper to query beets for albums, select via FZF, then play in MPD. MPD
-# names songs relative to its music directory, which is beets' directory on
-# the server. Offline (`mpd-offline on`) the paths are the same, but only
-# albums synced to this Mac play
+# Helper to query beets for albums, select via FZF, then add them to MPD's
+# queue and play the first one. MPD names songs relative to its music
+# directory, which is beets' directory on the server. Offline (`mpd-offline
+# on`) the paths are the same, but only albums synced to this Mac play
 #
 # Usage:
 #
 #   # Choose from albums in a given year
 #   play-albums year:2025 genre:rock
 #
-#   # Add to the end of the queue instead of replacing it
-#   play-albums beth gibbons -q
+#   # Only add to the end of the queue, without skipping to them
+#   play-albums beth gibbons --queue
 
 [[ "$TRACE" ]] && set -o xtrace
 
@@ -34,12 +34,14 @@ FZF_ARGS=(
 
 play-albums() {
   local album_ids
-  local append=false
+  local queue_only=false
   local beet_album_query
   local beet_query_args=()
   local beet_query_results
   local column_name_arg
   local music_dir
+  local song_paths
+  local queue_length
 
   if ! mpc -q status; then
     exit 1
@@ -48,8 +50,8 @@ play-albums() {
   # Parse arguments
   while [[ $# -gt 0 ]]; do
     case "$1" in
-      -q | --queue | --append)
-        append=true
+      -q | --queue)
+        queue_only=true
         shift
         ;;
       *)
@@ -63,8 +65,6 @@ play-albums() {
     beet_query_args=("added:-4w..")
   fi
 
-  # Purposefuly want to use unquoted here
-  # shellcheck disable=SC2086
   beet_query_results=$(beet ls --album --format="${BEET_FORMAT_STRING}" \
     added- albumartist+ original_year- \
     "${beet_query_args[@]}" \
@@ -98,15 +98,11 @@ play-albums() {
 
   # `-d` includes beets' default when the config doesn't set it
   music_dir=$(beet config -d | sed -n 's/^directory: //p')
-  music_dir="${music_dir/#\~/${HOME}}"
 
-  local song_path
-  local song_paths=""
   # Purposefuly want to use unquoted here for the query
   # shellcheck disable=SC2086
-  while IFS= read -r song_path; do
-    song_paths+="${song_path#"${music_dir%/}/"}"$'\n'
-  done < <(beet ls --path original_year- album- disc+ track+ ${beet_album_query})
+  song_paths=$(beet ls --path original_year- album- disc+ track+ ${beet_album_query} |
+    sed "s|^${music_dir%/}/||")
 
   # An empty line would make `mpc add` queue the whole library
   if [[ -z "${song_paths}" ]]; then
@@ -114,21 +110,14 @@ play-albums() {
     return 1
   fi
 
-  local song_count
-  song_count=$(printf '%s' "${song_paths}" | wc -l)
-
-  if ${append}; then
-    printf "Adding %d songs\n" "${song_count}"
-  else
-    printf "Playing %d songs\n" "${song_count}"
-    mpc -q clear
-  fi
-
+  queue_length=$(mpc status '%length%')
   # mpc reads the paths from stdin when given none
-  printf '%s' "${song_paths}" | mpc -q add
+  mpc -q add <<<"${song_paths}"
+  printf "Added %d songs\n" "$(wc -l <<<"${song_paths}")"
 
-  if ! ${append}; then
-    mpc -q play
+  if ! ${queue_only}; then
+    # Positions count from 1, so this is the first added song
+    mpc -q play "$((queue_length + 1))"
   fi
 }
 

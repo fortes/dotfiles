@@ -8,7 +8,7 @@ My usage is mostly terminal-based on MacOS, Debian Trixie over SSH, or sometimes
 - bash / tmux
 - Neovim
 - fzf / fd / ripgrep
-- cmus, and MPD with rmpc
+- MPD with rmpc
 
 ## Letting me own your machine
 
@@ -66,7 +66,13 @@ Once you've run setup, you'll still have to do the following universal manual st
      path = ~/.config/git/company.gitconfig
    ```
 
-6. Log into Coding agents
+6. Fill in the placeholders in tracked templates, for the parts you use:
+
+   ```sh
+   rg --hidden -l REPLACE_ME stowed-files README.md
+   ```
+
+7. Log into Coding agents
 
    ```sh
    # GitHub CLI client
@@ -210,11 +216,11 @@ clean those up:
 
   ```sh
   echo '/-    auto_smb    -nosuid,nobrowse' | sudo tee -a /etc/auto_master
-  echo '/System/Volumes/Data/mnt/media  -fstype=smbfs,soft,ro,filemode=0644,dirmode=0755  ://media:media@SERVER/media' | sudo tee /etc/auto_smb
+  echo '/System/Volumes/Data/mnt/media  -fstype=smbfs,soft,ro,filemode=0644,dirmode=0755  ://media:media@REPLACE_ME/media' | sudo tee /etc/auto_smb
   sudo automount -cv
   ln -s /System/Volumes/Data/mnt/media/music ~/Music/SERVER
   ```
-- Start MPD, which plays here using the server's library, then use `rmpc` or `play-albums`. Set the server's address in `~/.mpd/mpd.conf.local`. `play-albums` turns beets paths into MPD ones by stripping beets' `directory`, so keep that at the server's music path (`/data/media/music`). MPD needs System Settings → Privacy & Security → Local Network access to reach the server, otherwise it fails with "No route to host". Homebrew upgrades may ask again:
+- Start MPD, which plays here using the server's library, then use `rmpc` or `play-albums`. Set the server's address in `~/.mpd/mpd.conf.local`, replacing `REPLACE_ME`. `play-albums` turns beets paths into MPD ones by stripping beets' `directory`, so keep that at the server's music path (`/data/media/music`). MPD needs System Settings → Privacy & Security → Local Network access to reach the server, otherwise it fails with "No route to host". Homebrew upgrades may ask again:
 
   ```sh
   brew services start mpd
@@ -225,7 +231,7 @@ clean those up:
   mpd-sync-playlists
   ```
 - Offline, `mpd-offline on` swaps MPD to the albums synced from the server into `~/Music/albums`, with its own queue; `mpd-offline off` goes back to the server's library. Only local albums play, from rmpc, playlists or `play-albums`. Scrobbles wait in mpdscribble's journal until the network returns. Offline mode doesn't survive a reboot: run `mpd-offline on` again, or `mpd-offline off` to go back.
-- Scrobble MPD plays to Libre.fm and ListenBrainz: fill in the passwords in `~/.mpdscribble/mpdscribble.conf`. Like the `.local` files, edits stay out of git once `script/lock_local_files` has run (setup does it):
+- Scrobble MPD plays to Libre.fm and ListenBrainz: fill in the `REPLACE_ME`s in `~/.mpdscribble/mpdscribble.conf`. Like the `.local` files, edits stay out of git once `script/lock_local_files` has run (setup does it):
 
   ```sh
   chmod 600 ~/.mpdscribble/mpdscribble.conf
