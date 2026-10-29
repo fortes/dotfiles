@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Copies the server's .m3u files into MPD's local playlist directory, since
 # the proxy database doesn't share stored playlists. The server keeps them in
-# playlists/ in the music directory, with paths relative to that folder
+# playlists/ in the music directory, with paths relative to that folder.
+# Needs the server's library, so not while `mpd-offline on`
 
 set -euo pipefail
 IFS=$'\n\t'

@@ -1,0 +1,4 @@
+# For mpd-offline, which scans ~/Music. Symlink to the server's SMB share
+macaronesia
+# Apple Music's library
+Music

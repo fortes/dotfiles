@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Helper to query beets for albums, select via FZF, then play in MPD. MPD
 # names songs relative to its music directory, which is beets' directory on
-# the server
+# the server. Offline (`mpd-offline on`) the paths are the same, but only
+# albums synced to this Mac play
 #
 # Usage:
 #

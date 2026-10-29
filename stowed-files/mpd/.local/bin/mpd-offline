@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# Switches MPD between the server's library and the albums on this Mac, e.g.
+# on a plane. Both listen on the same port, so rmpc, mpc, mpdscribble and
+# mpd-now-playable keep working
+
+set -euo pipefail
+
+local_conf=~/.mpd/local_music.conf
+
+case "${1:-}" in
+  on)
+    # MPD only serves art from cover.*, but the synced albums have folder.jpg
+    find ~/Music/albums -name folder.jpg -execdir \
+      sh -c '[ -e cover.jpg ] || ln -s folder.jpg cover.jpg' \;
+    brew services stop mpd
+    mpd "${local_conf}"
+    # mpd returns before it's listening
+    until mpc -q status 2>/dev/null; do sleep 0.2; done
+    # Picks up albums added since last time
+    mpc -q update
+    ;;
+  off)
+    # Not `mpd --kill`: on macOS mpd leaves its pid file empty
+    # Not running after a reboot, since it isn't a service
+    pkill -f "mpd ${local_conf}" || true
+    # The server's mpd can't bind the port until this one has exited
+    while pgrep -qf "mpd ${local_conf}"; do sleep 0.2; done
+    brew services start mpd
+    ;;
+  *)
+    echo "Usage: $(basename "$0") on|off" >&2
+    exit 1
+    ;;
+esac

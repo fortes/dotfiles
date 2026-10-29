@@ -23,6 +23,7 @@ declare -r REAL_DIRS=(
   .ssh
   .config/cmus
   .mpd/playlists
+  Music
   .mpdscribble
   .config/tmux
   .config/systemd/user

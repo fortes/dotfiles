@@ -206,7 +206,7 @@ clean those up:
   ```sh
   defaults write com.lowtechguys.MusicDecoy mediaAppPath /Applications/Plexamp.app
   ```
-- Automount the media share at a fixed path for cmus. Unlike Finder mounts, it remounts on access and doesn't litter `/Volumes`. macOS upgrades may reset `/etc/auto_master`; re-run the first command if so. Use the share's read-only login; guest access fails with the misleading "No locks available" (errno 77, an SMB auth error):
+- Automount the media share at a fixed path. Unlike Finder mounts, it remounts on access and doesn't litter `/Volumes`. macOS upgrades may reset `/etc/auto_master`; re-run the first command if so. Use the share's read-only login; guest access fails with the misleading "No locks available" (errno 77, an SMB auth error):
 
   ```sh
   echo '/-    auto_smb    -nosuid,nobrowse' | sudo tee -a /etc/auto_master
@@ -224,6 +224,7 @@ clean those up:
   ```sh
   mpd-sync-playlists
   ```
+- Offline, `mpd-offline on` swaps MPD to the albums synced from the server into `~/Music/albums`, with its own queue; `mpd-offline off` goes back to the server's library. Only local albums play, from rmpc, playlists or `play-albums`. Scrobbles wait in mpdscribble's journal until the network returns. Offline mode doesn't survive a reboot: run `mpd-offline on` again, or `mpd-offline off` to go back.
 - Scrobble MPD plays to Libre.fm and ListenBrainz: fill in the passwords in `~/.mpdscribble/mpdscribble.conf`. Like the `.local` files, edits stay out of git once `script/lock_local_files` has run (setup does it):
 
   ```sh
