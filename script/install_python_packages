@@ -12,8 +12,6 @@ IFS=$'\n\t'
 UVX_PACKAGES=(
   argcomplete
   epy-reader
-  files-to-prompt
-  llm
   # `pynvim`, not the `neovim` alias: PyPI calls that a transition package, and
   # depending on it pins an old pynvim. Neovim 0.12+ finds it automatically
   # without needing `g:python3_host_prog`.

@@ -86,5 +86,3 @@ yank
 # yq
 yt-dlp/trixie-backports
 zoxide
-# install_ollama unpacks .tar.zst
-zstd

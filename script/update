@@ -21,6 +21,6 @@ if [[ "$(uname -s)" == Linux ]]; then
   "${dotfiles_script_dir}/install_agy"
 fi
 for step in install_node_packages install_claude_code install_python_packages \
-  install_cargo_packages install_llm_plugins install_yazi_plugins generate_completions; do
+  install_cargo_packages install_yazi_plugins generate_completions; do
   "${dotfiles_script_dir}/${step}"
 done
