@@ -2,7 +2,7 @@
 # Call stow with correct paths for dotfiles
 #
 # Should be able to run with `-R` to delete stale files, otherwise can do
-# `find -L ~/.config -type l [-delete]` to find/remove stale links
+# `find -L ~/.config -type l [-exec rm {} +]` to find/remove stale links
 #
 # Usage: stow [-n] [-v] [-D | -R] [package ...]
 #
