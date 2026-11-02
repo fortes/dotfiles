@@ -60,7 +60,7 @@ main() {
 
   # Add to tmux clipboard as well
   if isWithinTmux; then
-    tmux set-buffer "$buf"
+    tmux set-buffer -- "$buf"
     tmux display-message 'Copied!'
   fi
 }

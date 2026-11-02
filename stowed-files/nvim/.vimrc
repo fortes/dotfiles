@@ -465,7 +465,7 @@ if has('eval')
       endif
 
       let [buffer, line, col, _] = mark.pos
-      let text = readfile(filename)[line - 1]
+      let text = get(readfile(filename), line - 1, '')
 
       call add(items, { 'filename': filename, 'buffer': buffer, 'text': name..' | '..text, 'lnum': line, 'col': max([col, 1]) })
     endfor
@@ -761,11 +761,7 @@ if has('spell')
   endif
 
   " Re-generate spelling files if modified
-  let s:spell_files = glob(fnamemodify($MYVIMRC, ':h').'/spell/*.add', 1, 1)
-  if !has('nvim')
-    let s:spell_files += glob(expand('~/.config/nvim/spell/*.add'), 1, 1)
-  endif
-  for d in s:spell_files
+  for d in glob(expand('~/.config/nvim/spell/*.add'), 1, 1)
     if getftime(d) > getftime(d.'.spl')
       exec 'mkspell! ' . fnameescape(d)
     endif

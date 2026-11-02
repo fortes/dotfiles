@@ -7,7 +7,7 @@
     // Nerd Font glyph, which Ghostty has built in
     symbols: (
         song: "♪",
-        dir: "",
+        dir: "",
         playlist: "≡",
         marker: "M",
         ellipsis: "...",
