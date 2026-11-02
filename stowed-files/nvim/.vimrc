@@ -697,20 +697,6 @@ augroup filetype_tweaks
     autocmd FileType javascript,javascriptreact,typescript,typescriptreact setlocal errorformat+=%-G%.%#
   endif
 
-  " TypeScript type checking
-  if executable('tsc')
-    autocmd FileType typescript setlocal makeprg=tsc\ --allowJs\ --noEmit\ --strict\ %\
-
-    autocmd FileType typescript setlocal errorformat=%E%f(%l\\,%c):\ error\ %m
-    autocmd FileType typescript setlocal errorformat+=%W%f(%l\\,%c):\ warning\ %m
-
-    " Ignore TS usage warnings when type checking disabled
-    autocmd FileType typescript setlocal errorformat+=%-GWarning:\ %m
-
-    " Ignore remaining non-matching lines
-    autocmd FileType typescript setlocal errorformat+=%-G%.%#
-  endif
-
   " Linting for shell scripts
   if executable('shellcheck')
     autocmd FileType sh setlocal makeprg=shellcheck\ -x\ -f\ gcc\ %

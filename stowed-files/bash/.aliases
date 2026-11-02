@@ -25,11 +25,6 @@ if command_exists npm; then
   alias npath='export PATH="$(npm root 2>/dev/null)/.bin:$PATH"'
 fi
 
-if command_exists ctop; then
-  # Doesn't work well in tmux https://github.com/bcicen/ctop/issues/263
-  alias ctop='TERM="${TERM/#tmux/screen}" ctop'
-fi
-
 if command_exists eza; then
   # Purposefully binding the variable immediately
   # shellcheck disable=SC2139

@@ -14,7 +14,6 @@ NPM_PACKAGES=(
   bash-language-server
   cf
   corepack
-  cssmodules-language-server
   dockerfile-language-server-nodejs
   eslint
   fkill-cli
@@ -24,7 +23,6 @@ NPM_PACKAGES=(
   prettier
   tsx
   typescript
-  typescript-language-server
   vim-language-server
   vscode-langservers-extracted
   yaml-language-server

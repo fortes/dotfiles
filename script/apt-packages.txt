@@ -4,7 +4,6 @@
 # For yazi
 7zip
 apt-file
-apt-transport-https
 apt-utils
 aptitude
 bash-completion
@@ -62,7 +61,6 @@ python3-dev
 python3-pip
 python3-proselint
 python3-pygments
-python3-pylast
 python3-venv
 python3-virtualenv
 ripgrep
@@ -79,7 +77,6 @@ trash-cli
 unzip
 wamerican
 wget
-yank
 # Debian ships a different `yq` (a python jq wrapper with an incompatible
 # CLI), get mikefarah's from `install_github_packages`
 # yq

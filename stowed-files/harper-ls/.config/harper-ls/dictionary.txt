@@ -4,10 +4,7 @@ Ghostty
 LspAttach
 MacOS
 autocmd
-autocmd
-cmus
 codespaces
-deno
 fd
 fzf
 iCloud
@@ -15,5 +12,4 @@ ripgrep
 tmux
 typecheck
 uBlock
-vimrc
 vimrc

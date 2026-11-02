@@ -49,10 +49,6 @@ generate_completions() {
     hugo gen man --dir "${man_dir_path}" >/dev/null
   fi
 
-  if command_exists jules; then
-    jules completion bash >"${completion_dir}/jules_completion"
-  fi
-
   if command_exists npm; then
     npm completion >"${completion_dir}/npm_completion"
   fi
