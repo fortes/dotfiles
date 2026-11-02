@@ -57,10 +57,6 @@ generate_completions() {
     npm completion >"${completion_dir}/npm_completion"
   fi
 
-  if command_exists pipx; then
-    register-python-argcomplete --shell bash pipx >"${completion_dir}/pipx_completion"
-  fi
-
   if command_exists uv; then
     uv generate-shell-completion bash >"${completion_dir}/uv_completion"
   fi
