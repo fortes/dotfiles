@@ -538,7 +538,7 @@ augroup END
 if executable('rg')
   " Print every match on its own line with filename, line, and column numbers.
   " Unlike nvim's default (`rg --vimgrep -uu`), this respects .gitignore
-  set grepprg=rg\ --vimgrep
+  set grepprg=rg\ --vimgrep\ --max-columns=2000
   set grepformat=%f:%l:%c:%m
 else
   " Mimic rg settings (literal, recursive, ignore common directories)

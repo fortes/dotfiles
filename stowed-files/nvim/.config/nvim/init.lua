@@ -562,6 +562,8 @@ use('https://github.com/nvim-telescope/telescope.nvim', function()
         '--line-number',
         '--column',
         '--smart-case',
+        -- Raise ripgrep/rc's 160-column cap for prose without dumping minified lines
+        '--max-columns=2000',
         '--trim', -- Remove leading indentation
       },
     },
