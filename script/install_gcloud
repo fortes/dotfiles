@@ -45,10 +45,10 @@ Suites: cloud-sdk
 Components: main
 Signed-By: ${gcloud_key_path}
 EOF
-
-    echo "Google Cloud SDK sources added, updating packages"
-    sudo -E apt-get update -qq
   fi
+
+  echo "Updating apt package indexes (requires sudo)"
+  sudo -E apt-get update -qq
 
   echo "Installing google-cloud-cli package (requires sudo)"
   sudo -E apt-get install -qq -o=Dpkg::Use-Pty=0 --assume-yes \

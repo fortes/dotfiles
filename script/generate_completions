@@ -57,6 +57,10 @@ generate_completions() {
     npm completion >"${completion_dir}/npm_completion"
   fi
 
+  if command_exists op; then
+    op completion bash >"${completion_dir}/op_completion"
+  fi
+
   if command_exists uv; then
     uv generate-shell-completion bash >"${completion_dir}/uv_completion"
   fi

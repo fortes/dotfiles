@@ -25,10 +25,10 @@ Suites: trixie
 Components: main
 Signed-By: ${et_key_path}
 EOF
-
-    echo "Eternal Terminal sources added, updating packages"
-    sudo -E apt-get update -qq
   fi
+
+  echo "Updating apt package indexes (requires sudo)"
+  sudo -E apt-get update -qq
 
   echo "Installing et package (requires sudo)"
   sudo -E apt-get install -qq -o=Dpkg::Use-Pty=0 --assume-yes \

@@ -20,15 +20,15 @@ install_zerotier() {
     echo "Zerotier sources list missing, adding (requires sudo)"
     sudo tee "${zerotier_sources_list}" >/dev/null <<EOF
 Types: deb
-URIs: http://download.zerotier.com/debian/trixie
+URIs: https://download.zerotier.com/debian/trixie
 Suites: trixie
 Components: main
 Signed-By: ${zerotier_key_path}
 EOF
-
-    echo "Zerotier sources added, updating packages"
-    sudo -E apt-get update -qq
   fi
+
+  echo "Updating apt package indexes (requires sudo)"
+  sudo -E apt-get update -qq
 
   echo "Installing zerotier package (requires sudo)"
   sudo -E apt-get install -qq -o=Dpkg::Use-Pty=0 --assume-yes \
