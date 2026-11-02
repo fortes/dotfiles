@@ -24,10 +24,16 @@ local ATTACHMENT_EXTS = {
 -- Link text is the note name, or its path when several notes share a name
 -- (Obsidian's "shortest path when possible").
 local index = {}
+local indexing = false
+local dirty = false
 
 local function build_index()
   -- vim.system() throws if rg is missing, which would abort all of init.lua
-  if vim.fn.executable('rg') == 0 then
+  if vim.fn.executable('rg') == 0 or vim.fn.isdirectory(root) == 0 then
+    return
+  end
+  if indexing then
+    dirty = true
     return
   end
   local files, targets = {}, {}
@@ -71,8 +77,14 @@ local function build_index()
       end
     end
     index = next_index
+    indexing = false
+    if dirty then
+      dirty = false
+      build_index()
+    end
   end
 
+  indexing = true
   -- --no-config ignores ~/.config/ripgrep/rc: its --hidden would index
   -- .obsidian, .trash, ..., and --max-columns would truncate long links
   vim.system({ 'rg', '--no-config', '--files', '-g', '*.md' }, { cwd = root, text = true }, function(res)
