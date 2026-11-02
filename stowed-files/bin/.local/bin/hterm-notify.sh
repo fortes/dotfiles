@@ -15,12 +15,12 @@ notify_tmux() {
 notify() {
   local title="${1-}" body="${2-}"
   case ${TERM-} in
-  tmux*)
-    notify_tmux "${title}" "${body}"
-    ;;
-  *)
-    printf '\033]777;notify;%s;%s\a' "${title}" "${body}"
-    ;;
+    tmux*)
+      notify_tmux "${title}" "${body}"
+      ;;
+    *)
+      printf '\033]777;notify;%s;%s\a' "${title}" "${body}"
+      ;;
   esac
 }
 
@@ -55,7 +55,7 @@ main() {
 
   while [ $# -gt 0 ]; do
     case $1 in
-      -h|--help)
+      -h | --help)
         usage
         ;;
       -*)

@@ -17,8 +17,8 @@ main() {
   fi
 
   result=$(
-    rg --hidden --ignore-case --color=always --line-number --no-heading "$@" |
-      fzf --ansi \
+    rg --hidden --ignore-case --color=always --line-number --no-heading "$@" \
+      | fzf --ansi \
         --no-multi \
         --color 'hl:-1:underline,hl+:-1:underline:reverse' \
         --delimiter ':' \

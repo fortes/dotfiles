@@ -1,12 +1,12 @@
 .PHONY: format format-check lint test
 
 format:
-	@echo "Formatting shell scripts in script/..."
-	@shfmt -w -i 2 -ci -bn script/
+	@echo "Formatting shell scripts..."
+	@shfmt -w -i 2 -ci -bn script/ stowed-files/
 
 format-check:
 	@echo "Checking shell script formatting..."
-	@shfmt -d -i 2 -ci -bn script/
+	@shfmt -d -i 2 -ci -bn script/ stowed-files/
 
 # Stowed helpers and startup files get error-level checks only
 lint:

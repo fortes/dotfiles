@@ -46,15 +46,15 @@ list_from_tmp() {
 main() {
   for arg in "$@"; do
     case "$arg" in
-    -h | --help)
-      usage
-      exit 0
-      ;;
-    *)
-      echo "Error: Unknown option: $arg" >&2
-      echo "Try '${SCRIPT_NAME} --help' for more information." >&2
-      exit 1
-      ;;
+      -h | --help)
+        usage
+        exit 0
+        ;;
+      *)
+        echo "Error: Unknown option: $arg" >&2
+        echo "Try '${SCRIPT_NAME} --help' for more information." >&2
+        exit 1
+        ;;
     esac
   done
 

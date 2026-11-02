@@ -121,9 +121,9 @@ update_tmux_server() {
   done < <("$@" list-sessions -F '#{session_id}')
 
   # No client to refresh when targeting the main server from the console
-  "$@" source-file ~/.config/tmux/tmux.conf &&
-    "$@" refresh-client -S 2>/dev/null ||
-    true
+  "$@" source-file ~/.config/tmux/tmux.conf \
+    && "$@" refresh-client -S 2>/dev/null \
+    || true
 }
 
 update_tmux_colors() {

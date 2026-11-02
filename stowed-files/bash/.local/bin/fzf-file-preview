@@ -37,4 +37,3 @@ function fzf-file-preview() {
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   fzf-file-preview "$@"
 fi
-
