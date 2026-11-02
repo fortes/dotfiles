@@ -162,7 +162,8 @@ fetch_asset() {
   file="${DOWNLOAD_ROOT}/asset/$(basename "${url}")"
   # stderr, since stdout is the path for the caller
   echo_stderr "Downloading $(basename "${url}") ..."
-  wget --quiet -O "${file}" "${url}"
+  curl --silent --show-error --fail --location --retry 3 --retry-connrefused \
+    --output "${file}" "${url}"
 
   if [[ "${digest}" != sha256:* ]]; then
     echo_stderr "Warning: no checksum published for $(basename "${url}"), not verified"
