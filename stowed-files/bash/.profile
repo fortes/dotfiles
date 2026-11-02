@@ -2,22 +2,25 @@
 
 # Add path if not present
 add_to_path() {
-  if ! echo ":$PATH:" | grep -q ":$*:"; then
+  if [[ ":${PATH}:" != *":$*:"* ]]; then
     export PATH="$*:$PATH"
   fi
 }
 
 # Source file only if it exists
 source_if_exists() {
+  local file f
   for file in "$@"; do
     if [[ -f "${file}" ]]; then
       # shellcheck source=/dev/null
       . "${file}"
     elif [[ -d "${file}" ]]; then
-      while IFS= read -r -d $'\0' f; do
-        # shellcheck source=/dev/null
-        . "${f}"
-      done < <(find "${file}" -maxdepth 2 -type f -print0)
+      for f in "${file}"/*; do
+        if [[ -f "${f}" && "${f##*/}" != .* ]]; then
+          # shellcheck source=/dev/null
+          . "${f}"
+        fi
+      done
     fi
   done
 }
