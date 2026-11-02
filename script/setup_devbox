@@ -57,6 +57,8 @@ declare -r DEVBOX_APT_PACKAGES=(
 declare -r DEVBOX_NPM_PACKAGES=(
   bash-language-server:bash-language-server
   dockerfile-language-server-nodejs:docker-langserver
+  oxfmt:oxfmt
+  oxlint:oxlint
   pyright:pyright-langserver
   # TypeScript 7+, whose native `tsc` serves LSP. Projects' own
   # node_modules/.bin/tsc is often older and can't
