@@ -19,4 +19,6 @@ jobs:
           ref: ${{ github.event.workflow_run.head_sha }}
 
       - name: Setup machine
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: bash ./script/setup_mac

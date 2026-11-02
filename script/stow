@@ -25,10 +25,8 @@ declare -r REAL_DIRS=(
   Music
   .mpdscribble
   .config/tmux
-  .config/systemd/user
   .config/yazi
   .local/bin
-  .local/share
 )
 
 # Files provided by Debian, macOS, or devbox images that conflict with the

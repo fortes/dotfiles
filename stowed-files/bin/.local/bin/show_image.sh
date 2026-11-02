@@ -23,21 +23,21 @@ screen_dcs() {
 print_seq() {
   local seq="$1"
   case ${TERM-} in
-  screen*)
-    # Since tmux defaults to setting TERM=screen (ugh), we need to detect
-    # it here specially.
-    if [ -n "${TMUX-}" ]; then
+    screen*)
+      # Since tmux defaults to setting TERM=screen (ugh), we need to detect
+      # it here specially.
+      if [ -n "${TMUX-}" ]; then
+        tmux_dcs "${seq}"
+      else
+        screen_dcs "${seq}"
+      fi
+      ;;
+    tmux*)
       tmux_dcs "${seq}"
-    else
-      screen_dcs "${seq}"
-    fi
-    ;;
-  tmux*)
-    tmux_dcs "${seq}"
-    ;;
-  *)
-    echo "${seq}"
-    ;;
+      ;;
+    *)
+      echo "${seq}"
+      ;;
   esac
 }
 # Base64 encode stdin.
@@ -82,15 +82,15 @@ main() {
   set -e
   while [ $# -gt 0 ]; do
     case $1 in
-    -h|--help)
-      usage
-      ;;
-    -*)
-      usage "Unknown option: $1"
-      ;;
-    *)
-      break
-      ;;
+      -h | --help)
+        usage
+        ;;
+      -*)
+        usage "Unknown option: $1"
+        ;;
+      *)
+        break
+        ;;
     esac
   done
   if [ $# -eq 0 ]; then

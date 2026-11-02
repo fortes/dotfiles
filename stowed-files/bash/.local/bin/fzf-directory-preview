@@ -7,7 +7,6 @@ set -euo pipefail
 function fzf-directory-preview() {
   local dir="${1:-.}"
 
-
   if ! type eza &>/dev/null; then
     exec ls --color=always -A -1 "${dir}"
   fi

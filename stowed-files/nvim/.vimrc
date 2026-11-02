@@ -465,7 +465,7 @@ if has('eval')
       endif
 
       let [buffer, line, col, _] = mark.pos
-      let text = readfile(filename)[line - 1]
+      let text = get(readfile(filename), line - 1, '')
 
       call add(items, { 'filename': filename, 'buffer': buffer, 'text': name..' | '..text, 'lnum': line, 'col': max([col, 1]) })
     endfor
@@ -538,7 +538,7 @@ augroup END
 if executable('rg')
   " Print every match on its own line with filename, line, and column numbers.
   " Unlike nvim's default (`rg --vimgrep -uu`), this respects .gitignore
-  set grepprg=rg\ --vimgrep
+  set grepprg=rg\ --vimgrep\ --max-columns=2000
   set grepformat=%f:%l:%c:%m
 else
   " Mimic rg settings (literal, recursive, ignore common directories)
@@ -697,20 +697,6 @@ augroup filetype_tweaks
     autocmd FileType javascript,javascriptreact,typescript,typescriptreact setlocal errorformat+=%-G%.%#
   endif
 
-  " TypeScript type checking
-  if executable('tsc')
-    autocmd FileType typescript setlocal makeprg=tsc\ --allowJs\ --noEmit\ --strict\ %\
-
-    autocmd FileType typescript setlocal errorformat=%E%f(%l\\,%c):\ error\ %m
-    autocmd FileType typescript setlocal errorformat+=%W%f(%l\\,%c):\ warning\ %m
-
-    " Ignore TS usage warnings when type checking disabled
-    autocmd FileType typescript setlocal errorformat+=%-GWarning:\ %m
-
-    " Ignore remaining non-matching lines
-    autocmd FileType typescript setlocal errorformat+=%-G%.%#
-  endif
-
   " Linting for shell scripts
   if executable('shellcheck')
     autocmd FileType sh setlocal makeprg=shellcheck\ -x\ -f\ gcc\ %
@@ -775,11 +761,7 @@ if has('spell')
   endif
 
   " Re-generate spelling files if modified
-  let s:spell_files = glob(fnamemodify($MYVIMRC, ':h').'/spell/*.add', 1, 1)
-  if !has('nvim')
-    let s:spell_files += glob(expand('~/.config/nvim/spell/*.add'), 1, 1)
-  endif
-  for d in s:spell_files
+  for d in glob(expand('~/.config/nvim/spell/*.add'), 1, 1)
     if getftime(d) > getftime(d.'.spl')
       exec 'mkspell! ' . fnameescape(d)
     endif

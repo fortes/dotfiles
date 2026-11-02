@@ -17,8 +17,10 @@ main() {
   fi
 
   result=$(
-    rg --hidden --ignore-case --color=always --line-number --no-heading "$@" |
-      fzf --ansi \
+    # Raise ripgrep/rc's 160-column cap for long prose lines while still
+    # bounding minified files
+    rg --hidden --ignore-case --with-filename --max-columns=2000 --color=always --line-number --no-heading "$@" \
+      | fzf --ansi \
         --no-multi \
         --color 'hl:-1:underline,hl+:-1:underline:reverse' \
         --delimiter ':' \
@@ -43,7 +45,7 @@ main() {
   linenumber="$(echo "${result}" | cut -d: -f2)"
 
   if [ -n "$file" ]; then
-    "${EDITOR}" +"${linenumber}" "$file"
+    "${EDITOR:-nvim}" +"${linenumber}" "$file"
   fi
 }
 

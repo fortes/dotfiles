@@ -40,6 +40,7 @@ AVAILABLE_PACKAGES=(
   neovim
   sad
   tree-sitter-cli
+  uv
   yazi
   yq
 )
@@ -161,7 +162,8 @@ fetch_asset() {
   file="${DOWNLOAD_ROOT}/asset/$(basename "${url}")"
   # stderr, since stdout is the path for the caller
   echo_stderr "Downloading $(basename "${url}") ..."
-  wget --quiet -O "${file}" "${url}"
+  curl --silent --show-error --fail --location --retry 3 --retry-connrefused \
+    --output "${file}" "${url}"
 
   if [[ "${digest}" != sha256:* ]]; then
     echo_stderr "Warning: no checksum published for $(basename "${url}"), not verified"
@@ -312,6 +314,16 @@ install_tree_sitter_cli() {
   # only as a weak version, so on older glibc, like Ubuntu 22.04's, it prints
   # "weak version `GLIBC_2.39' not found" but still works
   install_bin 'tree-sitter/tree-sitter' '/tree-sitter-cli-linux-{ARCH}\.zip$'
+}
+
+install_uv() {
+  local file dir
+  file="$(fetch_asset 'astral-sh/uv' '/uv-{ARCH}-unknown-linux-gnu\.tar\.gz$')"
+  dir="$(dirname "${file}")"
+  tar --no-same-owner -xzf "${file}" --strip-components=1 -C "${dir}"
+  install_executable "${dir}/uv" "$HOME/.local/bin/uv"
+  install_executable "${dir}/uvx" "$HOME/.local/bin/uvx"
+  echo "uv installed"
 }
 
 install_yazi() {

@@ -9,44 +9,55 @@ IFS=$'\n\t'
 # Talks to MPD directly, since mpc only shows the first value of multi-value
 # tags like genre. A subshell, since a failed `exec` exits the shell it runs in
 mpd_query() (
-  exec 3<>/dev/tcp/localhost/6600 &&
-    printf '%s\n' "$@" close >&3 &&
-    cat <&3
+  exec 3<>/dev/tcp/localhost/6600 \
+    && printf '%s\n' "$@" close >&3 \
+    && cat <&3
 ) 2>/dev/null
 
 # Tag from `mpd_query` output, joining repeated values (e.g. several genres)
 # with `; `. A missing tag must not abort the script (set -e + pipefail), so
 # it's treated as empty
 mpd_tag() {
-  grep -i "^${2}: " <<<"${1}" | cut -d ' ' -f 2- | paste -sd ';' - |
-    sed 's/;/; /g' || true
+  grep -i "^${2}: " <<<"${1}" | cut -d ' ' -f 2- | paste -sd ';' - \
+    | sed 's/;/; /g' || true
 }
 
 mpd_is_playing() {
   grep -q '^state: play$' <<<"${1}"
 }
 
+mpd_is_paused() {
+  grep -q '^state: pause$' <<<"${1}"
+}
+
 music_status() {
   local status
-  status=$(mpd_query status currentsong || true)
+  status=$(mpd_query status currentsong) || return 0
 
   local artist
   local title
   local album
   local albumArtist
-  artist=$(mpd_tag "${status}" artist)
-  title=$(mpd_tag "${status}" title)
-  album=$(mpd_tag "${status}" album)
-  albumArtist=$(mpd_tag "${status}" albumartist)
+  local line=""
 
   # Stay blank rather than print a bare separator when the tags a branch needs
-  # are missing (e.g. a file with no tags, nothing queued or MPD not running)
+  # are missing (e.g. a file with no tags, nothing queued or MPD stopped)
   if mpd_is_playing "${status}"; then
+    artist=$(mpd_tag "${status}" artist)
+    title=$(mpd_tag "${status}" title)
     if [ -n "${artist}${title}" ]; then
-      echo "${artist} ▸ ${title}  "
+      line="${artist} ▸ ${title}  "
     fi
-  elif [ -n "${albumArtist}${album}" ]; then
-    echo "${albumArtist} ♪ ${album}  "
+  elif mpd_is_paused "${status}"; then
+    album=$(mpd_tag "${status}" album)
+    albumArtist=$(mpd_tag "${status}" albumartist)
+    if [ -n "${albumArtist}${album}" ]; then
+      line="${albumArtist} ♪ ${album}  "
+    fi
+  fi
+
+  if [ -n "${line}" ]; then
+    echo "${line//#/##}"
   fi
 }
 

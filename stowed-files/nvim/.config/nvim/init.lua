@@ -562,6 +562,8 @@ use('https://github.com/nvim-telescope/telescope.nvim', function()
         '--line-number',
         '--column',
         '--smart-case',
+        -- Raise ripgrep/rc's 160-column cap for prose without dumping minified lines
+        '--max-columns=2000',
         '--trim', -- Remove leading indentation
       },
     },
@@ -839,15 +841,31 @@ use('https://github.com/obsidian-nvim/obsidian.nvim', function()
     return vim.keycode('<CR>') .. next_marker
   end
 
+  local notes_group = vim.api.nvim_create_augroup('obsidian_notes', { clear = true })
+
+  -- `'spell'` is window-local, so mark windows where a vault note turned it
+  -- off and restore the global setting when a non-vault buffer enters that
+  -- window (`yos` turns it back on until you leave the note)
   vim.api.nvim_create_autocmd('BufEnter', {
-    group = vim.api.nvim_create_augroup('obsidian_notes', { clear = true }),
-    pattern = '*.md',
-    desc = 'Notes-specific buffer settings',
+    group = notes_group,
+    desc = 'Disable spell checking in vault notes',
     callback = function(ev)
       if in_notes(ev.buf) then
-        -- Spelling marks are noise while taking notes; `yos` turns them back
-        -- on until you leave the note
+        vim.w.notes_nospell = true
         vim.opt_local.spell = false
+      elseif vim.w.notes_nospell then
+        vim.w.notes_nospell = nil
+        vim.opt_local.spell = vim.go.spell
+      end
+    end,
+  })
+
+  vim.api.nvim_create_autocmd('FileType', {
+    group = notes_group,
+    pattern = 'markdown',
+    desc = 'Notes-specific buffer mappings',
+    callback = function(ev)
+      if in_notes(ev.buf) then
         -- Indent list items and dedent lines like Obsidian; both still move
         -- through the completion menu (~/.vimrc)
         map('i', '<Tab>', function()

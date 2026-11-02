@@ -27,16 +27,64 @@ main() {
 
   echo -n "Setting color scheme to ${new_theme}..."
 
-  # Colorscheme scripts have unbound variables
-  set +u
-  # shellcheck source=/dev/null
-  . "${HOME}/.local/share/base16/base16-default-${new_theme}.sh"
-  set -u
-
+  update_terminal_colors "${new_theme}"
   update_tmux_colors "${new_theme}"
   update_neovim_colors "${new_theme}"
 
   echo "done!"
+}
+
+update_terminal_colors() {
+  [[ "${TERM:-}" != linux* ]] || return 0
+
+  local -a colors=(
+    "18/18/18" # 00 - Black
+    "ab/46/42" # 01 - Red
+    "a1/b5/6c" # 02 - Green
+    "f7/ca/88" # 03 - Yellow
+    "7c/af/c2" # 04 - Blue
+    "ba/8b/af" # 05 - Magenta
+    "86/c1/b9" # 06 - Cyan
+    "d8/d8/d8" # 07 - White
+    "58/58/58" # 08 - Bright Black
+    "ab/46/42" # 09 - Bright Red
+    "a1/b5/6c" # 10 - Bright Green
+    "f7/ca/88" # 11 - Bright Yellow
+    "7c/af/c2" # 12 - Bright Blue
+    "ba/8b/af" # 13 - Bright Magenta
+    "86/c1/b9" # 14 - Bright Cyan
+    "f8/f8/f8" # 15 - Bright White
+    "dc/96/56" # 16 - Base 09
+    "a1/69/46" # 17 - Base 0F
+    "28/28/28" # 18 - Base 01
+    "38/38/38" # 19 - Base 02
+    "b8/b8/b8" # 20 - Base 04
+    "e8/e8/e8" # 21 - Base 06
+  )
+  if [[ "${1:-}" == "light" ]]; then
+    colors[0]="f8/f8/f8"
+    colors[7]="38/38/38"
+    colors[8]="b8/b8/b8"
+    colors[15]="18/18/18"
+    colors[18]="e8/e8/e8"
+    colors[19]="d8/d8/d8"
+    colors[20]="58/58/58"
+    colors[21]="28/28/28"
+  fi
+
+  local osc=$'\033]' st=$'\033\\'
+  if [[ -n "${TMUX:-}" ]]; then
+    osc=$'\033Ptmux;\033\033]'
+    st=$'\033\033\\\033\\'
+  fi
+
+  local i
+  for i in "${!colors[@]}"; do
+    printf '%s4;%d;rgb:%s%s' "${osc}" "${i}" "${colors[i]}" "${st}"
+  done
+  printf '%s10;rgb:%s%s' "${osc}" "${colors[7]}" "${st}"
+  printf '%s11;rgb:%s%s' "${osc}" "${colors[0]}" "${st}"
+  printf '%s12;7%s' "${osc}" "${st}"
 }
 
 get_current_color_theme() {
@@ -98,7 +146,7 @@ update_neovim_colors() {
 
   while IFS= read -r socket; do
     [[ -S "${socket}" ]] || continue
-    nvim --server "${socket}" --remote-send "<Esc>:set background=${background}|colorscheme ${colorscheme}<cr>"
+    nvim --server "${socket}" --remote-expr "execute('set background=${background} | silent! colorscheme ${colorscheme}')" >/dev/null 2>&1 || true
   done <<<"${sockets_output}"
 }
 
@@ -121,9 +169,9 @@ update_tmux_server() {
   done < <("$@" list-sessions -F '#{session_id}')
 
   # No client to refresh when targeting the main server from the console
-  "$@" source-file ~/.config/tmux/tmux.conf &&
-    "$@" refresh-client -S 2>/dev/null ||
-    true
+  "$@" source-file ~/.config/tmux/tmux.conf \
+    && "$@" refresh-client -S 2>/dev/null \
+    || true
 }
 
 update_tmux_colors() {

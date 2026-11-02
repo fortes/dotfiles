@@ -11,8 +11,11 @@ esac
 # shellcheck source=/dev/null
 source "$HOME/.profile"
 
-# make less more friendly for non-text input files, see lesspipe(1)
-[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+# Debian's lesspipe just prints these exports when called without arguments.
+if [ -x /usr/bin/lesspipe ]; then
+  export LESSOPEN='| /usr/bin/lesspipe %s'
+  export LESSCLOSE='/usr/bin/lesspipe %s %s'
+fi
 
 HISTFILE=$HOME/.bash_history
 # Never forget
@@ -73,46 +76,26 @@ shopt -qs nocaseglob nocasematch
 shopt -qs progcomp_alias
 # }}}
 
-# shellcheck disable=SC2034
-BLACK="\[$(tput setaf 0)\]"
-RED="\[$(tput setaf 1)\]"
-GREEN="\[$(tput setaf 2)\]"
-YELLOW="\[$(tput setaf 3)\]"
-BLUE="\[$(tput setaf 4)\]"
-# shellcheck disable=SC2034
-MAGENTA="\[$(tput setaf 5)\]"
-CYAN="\[$(tput setaf 6)\]"
-# shellcheck disable=SC2034
-WHITE="\[$(tput setaf 7)\]"
-BOLD="\[$(tput bold)\]"
-# shellcheck disable=SC2034
-DIM="\[$(tput dim)\]"
-# shellcheck disable=SC2034
-UNDERLINE="\[$(tput smul)\]"
-# shellcheck disable=SC2034
-STANDOUT="\[$(tput smso)\]"
-RESET="\[$(tput sgr0)\]"
+RED='\[\e[31m\]'
+GREEN='\[\e[32m\]'
+YELLOW='\[\e[33m\]'
+BLUE='\[\e[34m\]'
+BOLD='\[\e[1m\]'
+RESET='\[\e[m\]'
 
 # Hide normal username
-if [ "$(whoami)" != "${DEFAULT_USERNAME:-fortes}" ]; then
+if ((EUID == 0)) || [[ "${USER:-$(id -un)}" != "${DEFAULT_USERNAME:-fortes}" ]]; then
   BASE_PROMPT="$RED\u@"
 else
   BASE_PROMPT=""
 fi
-# Different host colors for different environments
-if [ "$IS_DOCKER" == "1" ]; then
-  HOST_COLOR="$GREEN"
-elif [[ -n "$SSH_TTY" && -n "$ET_VERSION" && -z "$IS_DOCKER" ]]; then
-  HOST_COLOR="$RED"
+# [[user@]host]:pwd $ (green host in containers, red over SSH/ET)
+if [[ "${IS_DOCKER:-}" == "1" ]]; then
+  BASE_PROMPT="${BASE_PROMPT}${GREEN}\h:${YELLOW}\w${RESET}"
+elif [[ -n "${SSH_TTY:-}" || -n "${ET_VERSION:-}" ]]; then
+  BASE_PROMPT="${BASE_PROMPT}${RED}\h:${YELLOW}\w${RESET}"
 else
-  HOST_COLOR="$CYAN"
-fi
-
-# [[user@]host]:pwd $
-if [[ -z "$SSH_TTY" && -z "$ET_VERSION" && -z "$IS_DOCKER" ]]; then
   BASE_PROMPT="${BASE_PROMPT}${YELLOW}\w${RESET}"
-else
-  BASE_PROMPT="${BASE_PROMPT}${HOST_COLOR}\h:${YELLOW}\w${RESET}"
 fi
 JOB_COUNT="${BOLD}${BLUE}[\j]${RESET} "
 # Write out history after every command. Add job count if non-zero stopped.
@@ -171,8 +154,6 @@ fi
 source_if_exists "/etc/bash_completion"
 # Load Homebrew bash completion, see https://docs.brew.sh/Shell-Completion
 source_if_exists "/opt/homebrew/etc/profile.d/bash_completion.sh"
-source_if_exists "/opt/homebrew/etc/bash_completion.d"
-source_if_exists "/opt/homebrew/share/bash-completion/bash_completion"
 
 # Load local bash completion
 source_if_exists "$HOME/.local/completion.d"

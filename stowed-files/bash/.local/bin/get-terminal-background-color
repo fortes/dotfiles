@@ -18,7 +18,7 @@ main() {
   fi
 
   # Open a new file descriptor for the terminal
-  exec 3<> /dev/tty
+  exec 3<>/dev/tty
 
   # Disable terminal echoing
   stty -echo <&3

@@ -10,7 +10,6 @@ IFS=$'\n\t'
 . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 UVX_PACKAGES=(
-  argcomplete
   epy-reader
   # `pynvim`, not the `neovim` alias: PyPI calls that a transition package, and
   # depending on it pins an old pynvim. Neovim 0.12+ finds it automatically
@@ -22,14 +21,9 @@ UVX_PACKAGES=(
 )
 
 install_python_packages() {
-  if ! command_exists pipx; then
-    echo >&2 "⨯ pipx not installed!"
-    exit 1
-  fi
-
   if ! command_exists uv; then
-    echo >&2 "⨯ uv not installed, installing"
-    pipx install --quiet --force uv
+    echo >&2 "⨯ uv not installed!"
+    exit 1
   fi
 
   echo "Installing global uvx packages …"

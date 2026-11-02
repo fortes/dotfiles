@@ -25,29 +25,17 @@ if command_exists npm; then
   alias npath='export PATH="$(npm root 2>/dev/null)/.bin:$PATH"'
 fi
 
-if command_exists ctop; then
-  # Doesn't work well in tmux https://github.com/bcicen/ctop/issues/263
-  alias ctop='TERM="${TERM/#tmux/screen}" ctop'
-fi
-
 if command_exists eza; then
-  # Purposefully binding the variable immediately
-  # shellcheck disable=SC2139
-  alias ls="eza --group-directories-first --classify=auto"
-  # shellcheck disable=SC2139
-  alias la="eza --all --group-directories-first --classify=auto"
-  # shellcheck disable=SC2139
-  alias ll="eza --header --git --long --group-directories-first --classify=auto"
-  # shellcheck disable=SC2139
-  alias ltree="eza --header --git --long --tree --level=2 --group-directories-first --classify=auto"
+  alias ls='eza --group-directories-first --classify=auto'
+  alias la='eza --all --group-directories-first --classify=auto'
+  alias ll='eza --header --git --long --group-directories-first --classify=auto'
+  alias ltree='eza --header --git --long --tree --level=2 --group-directories-first --classify=auto'
+elif [[ "$(uname -s)" == Darwin ]]; then
+  alias ls='ls -GpFh'
+  alias la='ls -GApFh'
+  alias ll='ls -GAlpFh'
 else
-  # Map ls to be colorful and reasonable defaults
-  if uname | grep -q Darwin; then
-    alias ls='ls --color=auto -pFhv'
-  else
-    # --quoting-style not available on Mac
-    alias ls='ls --color=auto -pFhv --quoting-style=shell-escape'
-  fi
+  alias ls='ls --color=auto -pFhv --quoting-style=shell-escape'
   alias la='ls --color=auto -ApFhv'
   alias ll='ls --color=auto -AlpFhv'
 fi
