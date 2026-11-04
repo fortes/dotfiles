@@ -10,9 +10,13 @@ set -euo pipefail
 . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 # Match setup's lightweight path, rather than installing the full workstation
-# toolset on a devbox that only opted into a few GitHub binaries.
+# toolset on a devbox that only opted into a few GitHub binaries and language
+# servers.
 if is_devbox; then
-  exec "${dotfiles_script_dir}/install_github_packages" "${DEVBOX_GITHUB_PACKAGES[@]}"
+  "${dotfiles_script_dir}/install_github_packages" "${DEVBOX_GITHUB_PACKAGES[@]}"
+  npm_packages=("${DEVBOX_NPM_PACKAGES[@]%%:*}")
+  npm install --global --loglevel=error --no-fund --no-audit "${npm_packages[@]/%/@latest}"
+  exit
 fi
 
 "${dotfiles_script_dir}/install_github_packages"

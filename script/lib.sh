@@ -21,6 +21,22 @@ export BUN_INSTALL="$HOME/.local"
 # shellcheck disable=SC2034
 DEVBOX_GITHUB_PACKAGES=(delta fzf marksman neovim tree-sitter-cli yq)
 
+# Language servers init.lua enables, for the languages devbox repos use, as
+# npm package:binary
+# shellcheck disable=SC2034
+DEVBOX_NPM_PACKAGES=(
+  bash-language-server:bash-language-server
+  dockerfile-language-server-nodejs:docker-langserver
+  oxfmt:oxfmt
+  oxlint:oxlint
+  pyright:pyright-langserver
+  # TypeScript 7+, whose native `tsc` serves LSP. Projects' own
+  # node_modules/.bin/tsc is often older and can't
+  typescript:tsc
+  vscode-langservers-extracted:vscode-json-language-server
+  yaml-language-server:yaml-language-server
+)
+
 # Shared by setup and update so they select the same scope
 is_devbox() {
   [[ "${DOTFILES_DEVBOX:-}" == 1 ]] \
