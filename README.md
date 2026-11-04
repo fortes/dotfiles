@@ -63,7 +63,7 @@ Once you've run setup, you'll still have to do the following universal manual st
 
    ```
    [includeIf "gitdir:~/src/company/"]
-     path = ~/.config/git/company.gitconfig
+     path = ~/.gitconfig.company
    ```
 
 6. Fill in the placeholders in tracked templates, for the parts you use:
