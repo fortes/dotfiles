@@ -31,6 +31,7 @@ The Obsidian vault is `$NOTES_DIR` (default `~/notes`); `notes` in `.aliases` op
 
 - **Keep it simple.** Scripts are idempotent, so a loud failure plus a rerun is the recovery plan. Don't add retries, traps, fallbacks, marker files or migration code for rare cases. A one-time manual step is fine.
 - **Comments:** Explain surprising behavior or constraints; skip comments that only restate the next line.
+- **Long options:** Spell out flags whose short form isn't widely known (`fzf --exit-0`, `shfmt --case-indent`) instead of commenting them. Idioms like `grep -v`, `mkdir -p` and `curl -fsSL` stay short, as do flags in macOS-facing code where the BSD tool has no long form (`xargs`, `cut`).
 - **No test harnesses.** `make test`, the Docker image build and running setup on the Mac are the tests.
 - **CI cost:** `.github/workflows/bash-syntax.yml` has narrow path triggers, and the Docker image build chains off it. Don't widen the triggers; add directories to its sparse checkout instead.
 - **Bash 3.2:** `setup_mac`, `script/stow` and `script/lib.sh` can run under macOS's `/bin/bash` before Homebrew bash exists. Avoid Bash 4 features and GNU-only flags there.
