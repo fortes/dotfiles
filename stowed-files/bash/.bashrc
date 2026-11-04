@@ -72,8 +72,8 @@ shopt -qs hostcomplete
 shopt -qs no_empty_cmd_completion
 # Case insensitive glob matching and case statements
 shopt -qs nocaseglob nocasematch
-# Expand aliases in order to find completions
-shopt -qs progcomp_alias
+# Expand aliases in order to find completions (unsupported in Mac version)
+shopt -qs progcomp_alias 2>/dev/null || true
 # }}}
 
 RED='\[\e[31m\]'

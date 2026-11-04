@@ -218,7 +218,7 @@ clean those up:
     # Get the app id
     osascript -e 'id of app "Cursor"'
     # Outputs something like `com.todesktop.xxxxx`
-    defaults write -g com.todesktop.xxxxx ApplePressAndHoldEnabled -bool false
+    defaults write com.todesktop.xxxxx ApplePressAndHoldEnabled -bool false
     ```
 - `terminal.app` sucks with colors, switch to Ghostty and pin it in the dock
 - Make sure `Rectangle.app` starts on login
@@ -246,7 +246,7 @@ clean those up:
 
   ```sh
   echo '/-    auto_smb    -nosuid,nobrowse' | sudo tee -a /etc/auto_master
-  echo '/System/Volumes/Data/mnt/media  -fstype=smbfs,soft,ro,filemode=0644,dirmode=0755  ://media:media@REPLACE_ME/media' | sudo tee /etc/auto_smb
+  echo '/System/Volumes/Data/mnt/media  -fstype=smbfs,soft,ro,filemode=0644,dirmode=0755  ://media:REPLACE_ME@REPLACE_ME/media' | sudo tee /etc/auto_smb
   sudo automount -cv
   ln -s /System/Volumes/Data/mnt/media/music ~/Music/SERVER
   ```

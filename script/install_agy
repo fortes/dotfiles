@@ -41,5 +41,7 @@ else
 fi
 rm "${cache}/release"
 chmod 755 "$HOME/.local/bin/agy"
+# Configures the shell environment, and exits non-zero on soft warnings (as
+# upstream's install.sh notes)
 "$HOME/.local/bin/agy" install || true
 echo 'agy installed!'
