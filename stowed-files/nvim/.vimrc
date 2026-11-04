@@ -53,7 +53,8 @@ if !has('nvim')
   set sessionoptions+=unix,slash
   set noshelltemp
   set shortmess-=S
-  set shortmess+=CF
+  set shortmess+=F
+  silent! set shortmess+=C  " not supported by Vim 8.2
   set showcmd
   set sidescroll=1
   set smarttab
@@ -385,8 +386,8 @@ set list
 set listchars=trail:·,tab:→-,nbsp:␣
 " Show wrap indicators
 set listchars+=extends:»,precedes:«
-" Indent guides
-set listchars+=multispace:\ ·,leadmultispace:\┊\ ,
+" Indent guides (not supported by Vim 8.2)
+silent! set listchars+=multispace:\ ·,leadmultispace:\┊\ ,
 if has('nvim-0.12')
   " Indent guide for leading tabs (not supported by Vim or older nvim)
   set listchars+=leadtab:\┊\ ,
