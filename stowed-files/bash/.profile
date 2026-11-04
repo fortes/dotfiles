@@ -30,6 +30,12 @@ command_exists() {
   command -v "$1" &> /dev/null
 }
 
+# Homebrew paths, etc. Before picking an editor, so Homebrew nvim counts
+source_if_exists "$HOME/.profile.brew"
+
+# Locally-installed packages belong in path
+add_to_path "$HOME/.local/bin"
+
 # Use local NeoVim if we have it
 if [[ -x "$HOME/.local/bin/nvim" ]]; then
   VISUAL="$HOME/.local/bin/nvim"
@@ -43,12 +49,6 @@ if [[ -n ${VISUAL:-} ]]; then
   EDITOR="$VISUAL"
   export EDITOR VISUAL
 fi
-
-# Homebrew paths, etc
-source_if_exists "$HOME/.profile.brew"
-
-# Locally-installed packages belong in path
-add_to_path "$HOME/.local/bin"
 
 export PNPM_HOME="${HOME}/.local/share/pnpm"
 
