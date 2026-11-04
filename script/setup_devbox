@@ -34,7 +34,6 @@ declare -r DEVBOX_APT_PACKAGES=(
   curl
   eza
   fd-find
-  git-delta
   git-extras
   git-lfs
   htop
@@ -120,7 +119,7 @@ install_apt_packages() {
   as_root apt-get update -qq || log_error "apt-get update failed, continuing"
 
   # One unknown name makes apt-get install nothing at all, so drop the ones
-  # this release doesn't have (e.g. eza and git-delta before Ubuntu 24.04).
+  # this release doesn't have (e.g. eza before Ubuntu 24.04).
   # Single apt-cache call, since each invocation reparses the package index.
   local known available=() unavailable=() package
   known=" $({ apt-cache show "${missing[@]}" 2>/dev/null || true; } \
