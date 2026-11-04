@@ -4,8 +4,8 @@
   skippedCherryPicks = false
 [alias]
   # Fuzzy add modified files, optionally via patch
-  addm = "!git ls-files --deleted --modified --other --exclude-standard | fzf -0 -m --preview 'git diff --color=always {-1}' | xargs -r git add"
-  addmp = "!git ls-files --deleted --modified --exclude-standard | fzf -0 -m --preview 'git diff --color=always {-1}' | xargs -r -o git add -p"
+  addm = "!git ls-files -z --deleted --modified --other --exclude-standard | fzf -0 -m --read0 --print0 --preview 'git diff --color=always -- {}' | xargs -0 -r git add --"
+  addmp = "!git ls-files -z --deleted --modified --exclude-standard | fzf -0 -m --read0 --print0 --preview 'git diff --color=always -- {}' | xargs -0 -r -o git add -p --"
   # Add all changes to last commit
   append = "commit --all --amend --no-edit"
   # Fuzzy checkout a branch, showing most recent commit
@@ -20,7 +20,7 @@
   # Fuzzy delete a stash
   ds = "!git stash list | fzf -0 --no-multi --preview 'git show --pretty=oneline --color=always --patch \"$(echo {} | cut -d: -f1)\"' | cut -d: -f1 | xargs -r git stash drop"
   # Select modified files to edit
-  edit = "!git ls-files --modified --other --exclude-standard | sort -u | fzf -0 --multi --preview 'git diff --color {}' | xargs -r $EDITOR -p"
+  edit = "!git ls-files -z --modified --other --exclude-standard | sort -zu | fzf -0 --multi --read0 --print0 --preview 'git diff --color -- {}' | xargs -0 -r $EDITOR -p"
   # Create a fixup commit to the selected commit
   fixup = "!git log --oneline --no-decorate --no-merges | fzf -0 --no-multi --preview 'git show --color=always --format=oneline {1}' | awk '{print $1}' | xargs -r git commit --fixup"
   # Fetch and rebase
@@ -28,7 +28,7 @@
   # checkout origin/main
   main = "checkout origin/main"
   # Fuzzy reset staged files
-  resetm = "!git diff --name-only --cached | fzf -0 -m --preview 'git diff --cached --color=always {-1}' | xargs -r git reset"
+  resetm = "!git diff -z --name-only --cached | fzf -0 -m --read0 --print0 --preview 'git diff --cached --color=always -- {}' | xargs -0 -r git reset --"
   # Show today's commits
   today = "!git log --after=yesterday --author=\"$(git config user.name)\" --oneline --no-decorate --no-merges"
   # Undo last commit, but keeping changes
@@ -63,7 +63,7 @@
   prompt = false
   tool = nvim
 [mergetool "nvim"]
-  cmd = "nvim -d $MERGED $LOCAL $REMOTE"
+  cmd = nvim -d \"$MERGED\" \"$LOCAL\" \"$REMOTE\"
 [pager]
   difftool = true
 [pull]

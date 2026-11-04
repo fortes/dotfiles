@@ -18,7 +18,7 @@ fi
 alias mv='mv -i'
 
 # CD into root of git project via `...`
-alias ...="cd \$(git rev-parse --show-toplevel 2>/dev/null || echo '.')"
+alias ...='cd "$(git rev-parse --show-toplevel 2>/dev/null || echo .)"'
 
 # Add current project NPM to path
 if command_exists npm; then
