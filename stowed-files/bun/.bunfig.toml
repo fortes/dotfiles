@@ -1,0 +1,5 @@
+[install]
+# Only install versions published 3+ days ago: compromised releases are usually
+# pulled within hours. Matches min-release-age in ~/.npmrc. Exempt a package
+# with minimumReleaseAgeExcludes
+minimumReleaseAge = 259200
