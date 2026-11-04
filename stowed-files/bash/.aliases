@@ -40,7 +40,6 @@ else
   alias ll='ls --color=auto -AlpFhv'
 fi
 
-
 # Debianisms outside of Debian
 if command_exists fd; then
   alias fdfind='fd'

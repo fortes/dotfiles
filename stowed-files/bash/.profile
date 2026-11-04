@@ -27,7 +27,7 @@ source_if_exists() {
 
 # Check for command in path
 command_exists() {
-  command -v "$1" &> /dev/null
+  command -v "$1" &>/dev/null
 }
 
 # Homebrew paths, etc. Before picking an editor, so Homebrew nvim counts
@@ -96,8 +96,8 @@ if [ -z "${SSH_AUTH_SOCK:-}" ] && command_exists keychain; then
   SSH_SOCKET_LOCATION="$HOME/.ssh/ssh_auth_sock"
   mkdir -p "$(dirname "${SSH_SOCKET_LOCATION}")"
   if [ ! -S "${SSH_SOCKET_LOCATION}" ] && [ -S "${SSH_AUTH_SOCK}" ]; then
-    ln -sf "${SSH_AUTH_SOCK}" "${SSH_SOCKET_LOCATION}" || \
-      echo "Warning: Failed to symlink SSH_AUTH_SOCK to ${SSH_SOCKET_LOCATION}"
+    ln -sf "${SSH_AUTH_SOCK}" "${SSH_SOCKET_LOCATION}" \
+      || echo "Warning: Failed to symlink SSH_AUTH_SOCK to ${SSH_SOCKET_LOCATION}"
   fi
 fi
 
