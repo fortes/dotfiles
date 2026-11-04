@@ -20,7 +20,7 @@
   # Fuzzy delete a stash
   ds = "!git stash list | fzf --exit-0 --no-multi --preview 'git show --pretty=oneline --color=always --patch \"$(echo {} | cut -d: -f1)\"' | cut -d: -f1 | xargs -r git stash drop"
   # Select modified files to edit
-  edit = "!git ls-files -z --modified --other --exclude-standard | sort --zero-terminated --unique | fzf --exit-0 --multi --read0 --print0 --preview 'git diff --color -- {}' | xargs -0 -r $EDITOR -p"
+  edit = "!git ls-files -z --modified --other --exclude-standard | sort --zero-terminated --unique | fzf --exit-0 --multi --read0 --print0 --preview 'git diff --color -- {}' | xargs -0 -r -o $EDITOR -p"
   # Create a fixup commit to the selected commit
   fixup = "!git log --oneline --no-decorate --no-merges | fzf --exit-0 --no-multi --preview 'git show --color=always --format=oneline {1}' | awk '{print $1}' | xargs -r git commit --fixup"
   # Fetch and rebase
