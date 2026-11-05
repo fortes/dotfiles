@@ -4,7 +4,7 @@
 # needed in non-interactive shells goes in `.profile`
 case $- in
   *i*) ;;
-    *) return;;
+  *) return ;;
 esac
 
 # Make sure we have always loaded ~/.profile, which can get lost
@@ -26,7 +26,7 @@ HISTCONTROL=ignoreboth:erasedups
 
 # Make sure the terminal type we're using is supported (tmux-256color doesn't
 # work everywhere yet)
-if ! infocmp "${TERM}" > /dev/null 2>&1; then
+if ! infocmp "${TERM}" >/dev/null 2>&1; then
   if [[ "${TERM}" = "tmux-256color" ]]; then
     export TERM="screen-256color"
   else
@@ -41,21 +41,21 @@ fi
 
 # Bash Options {{{
 # cd without typing cd (unsupported in Mac version)
-shopt -qs autocd 2> /dev/null || true
+shopt -qs autocd 2>/dev/null || true
 # Auto-correct directory typos
 shopt -qs cdspell
 # Check hash before executing
 shopt -qs checkhash
 # Check for stopped jobs before exiting (unsupported in Mac version)
-shopt -qs checkjobs 2> /dev/null || true
+shopt -qs checkjobs 2>/dev/null || true
 # Check window size after each command, and update $LINES and $COLUMNS
 shopt -qs checkwinsize
 # Save all lines of multiline commands
 shopt -qs cmdhist
 # Expand directory names when doing file completion (unsupported in Mac version)
-shopt -qs direxpand 2> /dev/null || true
+shopt -qs direxpand 2>/dev/null || true
 # Fix typos for directories in completion (unsupported in Mac version)
-shopt -qs dirspell 2> /dev/null || true
+shopt -qs dirspell 2>/dev/null || true
 # Include filenames that begin with '.' in filename expansion
 shopt -qs dotglob
 # Extended pattern matching
@@ -63,7 +63,7 @@ shopt -qs extglob
 # Allow escape sequencing within ${parameter} expansions
 shopt -qs extquote
 # Support ** for expansion (unsupported in Mac version)
-shopt -qs globstar 2> /dev/null || true
+shopt -qs globstar 2>/dev/null || true
 # Append to history list. Allow editing of history substitution in readline
 shopt -qs histappend histreedit histverify
 # Do hostname completion on words that contain @
@@ -72,8 +72,8 @@ shopt -qs hostcomplete
 shopt -qs no_empty_cmd_completion
 # Case insensitive glob matching and case statements
 shopt -qs nocaseglob nocasematch
-# Expand aliases in order to find completions
-shopt -qs progcomp_alias
+# Expand aliases in order to find completions (unsupported in Mac version)
+shopt -qs progcomp_alias 2>/dev/null || true
 # }}}
 
 RED='\[\e[31m\]'
@@ -132,8 +132,8 @@ if [[ -n "${TMUX:-}" ]]; then
   # Added to PROMPT_COMMAND at the end of this file, so it runs after anything
   # that rebuilds PS1 on every prompt (__git_ps1, hooks in .bashrc.local)
   __osc133_mark_prompt() {
-    [[ "$PS1" == "$__osc133_prompt_start"* ]] ||
-      PS1="${__osc133_prompt_start}${PS1}"
+    [[ "$PS1" == "$__osc133_prompt_start"* ]] \
+      || PS1="${__osc133_prompt_start}${PS1}"
   }
   [[ "${PS0:-}" == *'133;C'* ]] || PS0="${PS0:-}"'\e]133;C\a'
 fi
@@ -209,6 +209,6 @@ source_if_exists "$HOME/.aliases"
 source_if_exists "$HOME/.bashrc.local"
 
 # Mark prompt start last (see OSC 133 section above)
-if declare -F __osc133_mark_prompt > /dev/null; then
+if declare -F __osc133_mark_prompt >/dev/null; then
   PROMPT_COMMAND="$PROMPT_COMMAND; __osc133_mark_prompt"
 fi

@@ -65,9 +65,9 @@ cleanup_bun() {
 }
 
 cleanup_npx() {
-  if command -v npx >/dev/null 2>&1; then
+  if command -v npm >/dev/null 2>&1; then
     echo "Cleaning up npx cache..."
-    npx clear-npx-cache 2>/dev/null || true
+    rm -rf "$(npm config get cache)/_npx"
   fi
 }
 

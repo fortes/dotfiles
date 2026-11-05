@@ -4,31 +4,31 @@
   skippedCherryPicks = false
 [alias]
   # Fuzzy add modified files, optionally via patch
-  addm = "!git ls-files --deleted --modified --other --exclude-standard | fzf -0 -m --preview 'git diff --color=always {-1}' | xargs -r git add"
-  addmp = "!git ls-files --deleted --modified --exclude-standard | fzf -0 -m --preview 'git diff --color=always {-1}' | xargs -r -o git add -p"
+  addm = "!git ls-files -z --deleted --modified --other --exclude-standard | fzf --exit-0 --multi --read0 --print0 --preview 'git diff --color=always -- {}' | xargs -0 -r git add --"
+  addmp = "!git ls-files -z --deleted --modified --exclude-standard | fzf --exit-0 --multi --read0 --print0 --preview 'git diff --color=always -- {}' | xargs -0 -r -o git add -p --"
   # Add all changes to last commit
   append = "commit --all --amend --no-edit"
   # Fuzzy checkout a branch, showing most recent commit
-  cb = "!f() { b=$(git branch --all | grep -vE '^[*+]|/HEAD( ->|$)' | awk '{print $1}' | fzf -0 --no-multi --preview 'git show --color=always {-1}' | sed 's|^remotes/||'); [ -z \"$b\" ] && return 0; if git show-ref --verify --quiet \"refs/heads/$b\"; then git checkout \"$b\"; return; fi; t=$(git for-each-ref --format='%(refname:short) %(upstream:short)' refs/heads | awk -v u=\"$b\" '$2 == u {print $1; exit}'); if [ -n \"$t\" ]; then git checkout \"$t\"; return; fi; s=\"${b#origin/}\"; if git show-ref --verify --quiet \"refs/heads/$s\"; then git checkout \"$s\"; return; fi; git checkout --track \"$b\" 2>/dev/null || git checkout \"$b\"; }; f"
+  cb = "!f() { b=$(git branch --all | grep -vE '^[*+]|/HEAD( ->|$)' | awk '{print $1}' | fzf --exit-0 --no-multi --preview 'git show --color=always {-1}' | sed 's|^remotes/||'); [ -z \"$b\" ] && return 0; if git show-ref --verify --quiet \"refs/heads/$b\"; then git checkout \"$b\"; return; fi; t=$(git for-each-ref --format='%(refname:short) %(upstream:short)' refs/heads | awk -v u=\"$b\" '$2 == u {print $1; exit}'); if [ -n \"$t\" ]; then git checkout \"$t\"; return; fi; s=\"${b#origin/}\"; if git show-ref --verify --quiet \"refs/heads/$s\"; then git checkout \"$s\"; return; fi; git checkout --track \"$b\" 2>/dev/null || git checkout \"$b\"; }; f"
   # Fuzzy apply a stash
-  cs = "!git stash list | fzf -0 --no-multi --preview 'git show --pretty=oneline --color=always --patch \"$(echo {} | cut -d: -f1)\"' | cut -d: -f1 | xargs -r git stash pop"
+  cs = "!git stash list | fzf --exit-0 --no-multi --preview 'git show --pretty=oneline --color=always --patch \"$(echo {} | cut -d: -f1)\"' | cut -d: -f1 | xargs -r git stash pop"
   # Fuzzy (force) delete a branch, showing most recent commit
-  db = "!git branch | grep -v '^[*+]' | awk '{print $1}' | fzf -0 --multi --preview 'git show --color=always {-1}' | xargs -r git branch --delete"
-  Db = "!git branch | grep -v '^[*+]' | awk '{print $1}' | fzf -0 --multi --preview 'git show --color=always {-1}' | xargs -r git branch --delete --force"
+  db = "!git branch | grep -v '^[*+]' | awk '{print $1}' | fzf --exit-0 --multi --preview 'git show --color=always {-1}' | xargs -r git branch --delete"
+  Db = "!git branch | grep -v '^[*+]' | awk '{print $1}' | fzf --exit-0 --multi --preview 'git show --color=always {-1}' | xargs -r git branch --delete --force"
   # Delete merged branches
   dm = "!git fetch && git branch --merged | grep -v '^[*+]' | xargs -r git branch --delete --force"
   # Fuzzy delete a stash
-  ds = "!git stash list | fzf -0 --no-multi --preview 'git show --pretty=oneline --color=always --patch \"$(echo {} | cut -d: -f1)\"' | cut -d: -f1 | xargs -r git stash drop"
+  ds = "!git stash list | fzf --exit-0 --no-multi --preview 'git show --pretty=oneline --color=always --patch \"$(echo {} | cut -d: -f1)\"' | cut -d: -f1 | xargs -r git stash drop"
   # Select modified files to edit
-  edit = "!git ls-files --modified --other --exclude-standard | sort -u | fzf -0 --multi --preview 'git diff --color {}' | xargs -r $EDITOR -p"
+  edit = "!git ls-files -z --modified --other --exclude-standard | sort --zero-terminated --unique | fzf --exit-0 --multi --read0 --print0 --preview 'git diff --color -- {}' | xargs -0 -r -o $EDITOR -p"
   # Create a fixup commit to the selected commit
-  fixup = "!git log --oneline --no-decorate --no-merges | fzf -0 --no-multi --preview 'git show --color=always --format=oneline {1}' | awk '{print $1}' | xargs -r git commit --fixup"
+  fixup = "!git log --oneline --no-decorate --no-merges | fzf --exit-0 --no-multi --preview 'git show --color=always --format=oneline {1}' | awk '{print $1}' | xargs -r git commit --fixup"
   # Fetch and rebase
   frb = "!git fetch --prune && git rebase --autostash origin/HEAD"
   # checkout origin/main
   main = "checkout origin/main"
   # Fuzzy reset staged files
-  resetm = "!git diff --name-only --cached | fzf -0 -m --preview 'git diff --cached --color=always {-1}' | xargs -r git reset"
+  resetm = "!git diff -z --name-only --cached | fzf --exit-0 --multi --read0 --print0 --preview 'git diff --cached --color=always -- {}' | xargs -0 -r git reset --"
   # Show today's commits
   today = "!git log --after=yesterday --author=\"$(git config user.name)\" --oneline --no-decorate --no-merges"
   # Undo last commit, but keeping changes
@@ -63,7 +63,7 @@
   prompt = false
   tool = nvim
 [mergetool "nvim"]
-  cmd = "nvim -d $MERGED $LOCAL $REMOTE"
+  cmd = nvim -d \"$MERGED\" \"$LOCAL\" \"$REMOTE\"
 [pager]
   difftool = true
 [pull]

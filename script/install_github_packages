@@ -27,6 +27,7 @@ DOWNLOAD_ROOT=''
 AVAILABLE_PACKAGES=(
   bun
   cloudflared
+  delta
   difftastic
   f2
   fx
@@ -244,6 +245,10 @@ install_bun() {
 
 install_cloudflared() {
   install_deb 'cloudflare/cloudflared' '/cloudflared-linux-{ARCH}\.deb$'
+}
+
+install_delta() {
+  install_bin 'dandavison/delta' '/delta-[^/]*{ARCH}-unknown-linux-gnu\.tar\.gz$' 'delta'
 }
 
 install_difftastic() {

@@ -18,7 +18,7 @@ fi
 alias mv='mv -i'
 
 # CD into root of git project via `...`
-alias ...="cd \$(git rev-parse --show-toplevel 2>/dev/null || echo '.')"
+alias ...='cd "$(git rev-parse --show-toplevel 2>/dev/null || echo .)"'
 
 # Add current project NPM to path
 if command_exists npm; then
@@ -39,7 +39,6 @@ else
   alias la='ls --color=auto -ApFhv'
   alias ll='ls --color=auto -AlpFhv'
 fi
-
 
 # Debianisms outside of Debian
 if command_exists fd; then

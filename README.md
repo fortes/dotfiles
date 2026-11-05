@@ -23,7 +23,9 @@ On Ubuntu (22.04 or later, which Coder devboxes and most devcontainers use), `sc
 DOTFILES_DEVBOX=1 ./dotfiles/script/setup
 ```
 
-Set `DOTFILES_SKIP_PACKAGES="bash ssh"` (for example) to leave stow packages alone, like `bash` to keep machine-provided shell startup files. Stowing `bash` backs up existing shell files, including `.hushlogin`, before linking them. Devbox setup never upgrades its GitHub binaries; run `script/update` for that.
+Devbox setup never upgrades its GitHub binaries or npm language servers; run `script/update` for that, with the same `DOTFILES_DEVBOX=1` (or export it in `~/.profile.local`).
+
+Set `DOTFILES_SKIP_PACKAGES="bash ssh"` (for example) to leave stow packages alone, like `bash` to keep machine-provided shell startup files. Stowing `bash` backs up existing shell files, including `.hushlogin`, before linking them.
 
 ## Setup and updates
 
@@ -63,7 +65,7 @@ Once you've run setup, you'll still have to do the following universal manual st
 
    ```
    [includeIf "gitdir:~/src/company/"]
-     path = ~/.config/git/company.gitconfig
+     path = ~/.gitconfig.company
    ```
 
 6. Fill in the placeholders in tracked templates, for the parts you use:
@@ -216,7 +218,7 @@ clean those up:
     # Get the app id
     osascript -e 'id of app "Cursor"'
     # Outputs something like `com.todesktop.xxxxx`
-    defaults write -g com.todesktop.xxxxx ApplePressAndHoldEnabled -bool false
+    defaults write com.todesktop.xxxxx ApplePressAndHoldEnabled -bool false
     ```
 - `terminal.app` sucks with colors, switch to Ghostty and pin it in the dock
 - Make sure `Rectangle.app` starts on login
@@ -244,7 +246,7 @@ clean those up:
 
   ```sh
   echo '/-    auto_smb    -nosuid,nobrowse' | sudo tee -a /etc/auto_master
-  echo '/System/Volumes/Data/mnt/media  -fstype=smbfs,soft,ro,filemode=0644,dirmode=0755  ://media:media@REPLACE_ME/media' | sudo tee /etc/auto_smb
+  echo '/System/Volumes/Data/mnt/media  -fstype=smbfs,soft,ro,filemode=0644,dirmode=0755  ://media:REPLACE_ME@REPLACE_ME/media' | sudo tee /etc/auto_smb
   sudo automount -cv
   ln -s /System/Volumes/Data/mnt/media/music ~/Music/SERVER
   ```

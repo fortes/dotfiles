@@ -27,8 +27,14 @@ source_if_exists() {
 
 # Check for command in path
 command_exists() {
-  command -v "$1" &> /dev/null
+  command -v "$1" &>/dev/null
 }
+
+# Homebrew paths, etc. Before picking an editor, so Homebrew nvim counts
+source_if_exists "$HOME/.profile.brew"
+
+# Locally-installed packages belong in path
+add_to_path "$HOME/.local/bin"
 
 # Use local NeoVim if we have it
 if [[ -x "$HOME/.local/bin/nvim" ]]; then
@@ -43,12 +49,6 @@ if [[ -n ${VISUAL:-} ]]; then
   EDITOR="$VISUAL"
   export EDITOR VISUAL
 fi
-
-# Homebrew paths, etc
-source_if_exists "$HOME/.profile.brew"
-
-# Locally-installed packages belong in path
-add_to_path "$HOME/.local/bin"
 
 export PNPM_HOME="${HOME}/.local/share/pnpm"
 
@@ -96,8 +96,8 @@ if [ -z "${SSH_AUTH_SOCK:-}" ] && command_exists keychain; then
   SSH_SOCKET_LOCATION="$HOME/.ssh/ssh_auth_sock"
   mkdir -p "$(dirname "${SSH_SOCKET_LOCATION}")"
   if [ ! -S "${SSH_SOCKET_LOCATION}" ] && [ -S "${SSH_AUTH_SOCK}" ]; then
-    ln -sf "${SSH_AUTH_SOCK}" "${SSH_SOCKET_LOCATION}" || \
-      echo "Warning: Failed to symlink SSH_AUTH_SOCK to ${SSH_SOCKET_LOCATION}"
+    ln -sf "${SSH_AUTH_SOCK}" "${SSH_SOCKET_LOCATION}" \
+      || echo "Warning: Failed to symlink SSH_AUTH_SOCK to ${SSH_SOCKET_LOCATION}"
   fi
 fi
 

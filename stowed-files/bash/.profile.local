@@ -7,7 +7,7 @@
 # Raises install_github_packages' GitHub API limit (else it asks gh)
 # export GH_TOKEN="REPLACE_ME"
 
-# Used for 'llm'
+# AI API keys
 # export ANTHROPIC_API_KEY="REPLACE_ME"
 # export GEMINI_API_KEY="REPLACE_ME"
 # export LLM_GEMINI_KEY="${GEMINI_API_KEY}"
