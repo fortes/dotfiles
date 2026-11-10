@@ -68,8 +68,12 @@ install_apt_packages() {
 setup_backports() {
   declare -r sources_path="/etc/apt/sources.list.d/backports.sources"
 
-  if [[ -f "$sources_path" ]]; then
-    echo "Backports already in sources.list"
+  # Ask APT so existing .list/.sources entries and disabled sources are handled.
+  # --no-release-info also works before package indexes have been downloaded.
+  # shellcheck disable=SC2016 # APT expands $(RELEASE).
+  if apt-get indextargets --no-release-info --format '$(RELEASE)' \
+    | grep -Fx "${VERSION_CODENAME}-backports" >/dev/null; then
+    echo "Backports already configured"
     return
   fi
 
