@@ -90,6 +90,8 @@ play-albums() {
 
   # `-d` includes beets' default when the config doesn't set it
   music_dir=$(beet config -d | sed -n 's/^directory: //p')
+  # `beet ls --path` prints expanded paths, but the config may use `~`
+  music_dir="${music_dir/#\~/$HOME}"
 
   song_paths=$(beet ls --path original_year- album- disc+ track+ "${beet_album_query[@]}" \
     | sed "s|^${music_dir%/}/||")
