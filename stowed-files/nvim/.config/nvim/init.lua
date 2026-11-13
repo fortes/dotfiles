@@ -982,6 +982,29 @@ use('https://github.com/kristijanhusak/vim-dirvish-git')
 -- Surround text with quotes/parens/tags
 use('https://github.com/kylechui/nvim-surround', function()
   require('nvim-surround').setup({})
+
+  -- In the vault, `[` means a [[wikilink]] (instead of `[ padded ]`), so `S[`
+  -- links a selection and `ds[`/`cs[` act on whole wikilinks. `]` stays `[x]`.
+  vim.api.nvim_create_autocmd('FileType', {
+    group = vim.api.nvim_create_augroup('notes_surround', { clear = true }),
+    pattern = 'markdown',
+    desc = 'Surround with [[wikilinks]] in vault notes',
+    callback = function(ev)
+      if in_notes(ev.buf) then
+        require('nvim-surround').buffer_setup({
+          surrounds = {
+            ['['] = {
+              add = { '[[', ']]' },
+              find = function()
+                return require('nvim-surround.config').get_selection({ pattern = '%[%[.-%]%]' })
+              end,
+              delete = '^(%[%[)().-(%]%])()$',
+            },
+          },
+        })
+      end
+    end,
+  })
 end)
 
 -- Readline-like bindings in insert/command mode
