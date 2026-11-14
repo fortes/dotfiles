@@ -35,9 +35,11 @@ Set `DOTFILES_SKIP_PACKAGES="bash ssh"` (for example) to leave stow packages alo
 | --- | --- |
 | `script/setup` | Provision the platform, install/update tools, and link configuration. |
 | `script/stow` | Relink configuration without package installs. |
-| `script/update` | Update user tools without linking or changing OS configuration. |
+| `script/update` | Update user tools, not OS config; in the image, also `script/dev/setup_container`. |
 
-Run `make test` for shell checks and `podman build -t dotfiles .` to test Debian setup.
+On Linux, some GitHub binaries aren't installed by default, like cloudflared, difftastic and hugo. Install them when needed with `script/install_github_packages <name>`; `--help` lists them all. Likewise, `script/install_docker` sets up Docker on Debian when a project needs it (use `sudo docker`, since it skips the docker group).
+
+Run `make test` for shell checks; see [Building locally](#building-locally) for image builds.
 
 ## Post-Setup
 
@@ -68,38 +70,15 @@ Once you've run setup, you'll still have to do the following universal manual st
    rg -l REPLACE_ME ~/.profile.local ~/.gitconfig.local ~/.mpd/mpd.conf.local ~/.mpdscribble/mpdscribble.conf
    ```
 
-7. Log into Coding agents
-
-   ```sh
-   # GitHub CLI client
-   gh auth login
-
-   # Launch Claude Code, which will take you through the flow
-   claude
-
-   # Launch codex CLI to log in
-   codex
-
-   # Launch Antigravity CLI agent
-   agy
-   ```
+7. On the Mac, log into the GitHub CLI (`gh auth login`) and launch `claude` and `codex` (and `agy`, if installed) once each to sign in. Containers sign in separately (see [Signing in agents](#signing-in-agents)).
 
 ## Cleaning up stale symlinks
 
 `script/stow` doesn't unstow packages that no longer exist in the repo. After pulling changes that delete a `stowed-files/<pkg>/` directory, broken symlinks can linger in `$HOME`. To remove broken symlinks that point into the dotfiles tree:
 
 ```sh
-find ~ -maxdepth 5 -type l 2>/dev/null \
-  | while read -r link; do
-      [ -e "$link" ] && continue
-      target=$(readlink "$link")
-      case "$target" in *dotfiles/stowed-files*) rm -v "$link" ;; esac
-    done
+find ~ -maxdepth 5 -lname '*dotfiles/stowed-files*' ! -exec test -e {} \; -exec rm -v {} + 2>/dev/null
 ```
-
-## Node package managers
-
-`./script/install_node_packages` installs and updates Corepack through npm and enables its pnpm and Yarn shims in `~/.local/bin`. These select the package-manager version declared by each project. Node and npm come from Homebrew on macOS or `./script/install_node` on Linux; Corepack does not manage the Node version.
 
 ## Machine-specific settings
 
@@ -185,8 +164,7 @@ clean those up:
 - `terminal.app` sucks with colors, switch to Ghostty and pin it in the dock
 - Make sure `Rectangle.app` starts on login
 - Install the 1Password extension in Safari (others should sync automatically)
-- Create the Podman VM once with `podman machine init`. Add `--now` to also start it; after that, run `podman machine start` when needed.
-- Colima stays installed for projects that still need Docker. Run `colima start` when needed (avoid `brew services start colima` so it doesn't run on login). Skip `podman-mac-helper`, which takes `/var/run/docker.sock` from Colima.
+- Start Apple's container service with `container system start`; the first run downloads a Linux kernel (see [Containers](#containers)).
 
 - If gaming, install battle.net/Steam via brew:
 
@@ -268,60 +246,108 @@ clean those up:
 
 ### Containers
 
-Images are built with some frequency, via CI. Podman runs them rootless. On Linux, `--userns=keep-id` maps your user to the image's `fortes` user (UID 1000), so files written to `/workspaces` belong to you on the host. macOS's `podman machine` already maps mounted files to your user, so the flag is harmless there.
+Coding and unattended agents run in containers. Hosts (macOS, Debian servers, Crostini) get Homebrew or apt packages plus the short lists in `script/update`; the Mac also keeps the agent CLIs and a few language servers for notes and quick questions, under the agents' own sandboxes. The image adds the coding toolchain with `script/dev/setup_container`. That way a compromised package release, or an agent running with `--dangerously-skip-permissions`, only reaches what one container holds.
 
-Docker works too: swap `podman` for `docker` and drop the `--userns=…` flag, since rootful Docker already maps UID 1000 straight through. On Debian, `script/install_docker` installs Docker (not run by setup, and skips the docker group, so use `sudo docker`).
+What keeps that boundary intact:
 
-On Debian, rootless containers stop when you log out. Run `sudo loginctl enable-linger "$USER"` to keep a long-running container alive.
+- **One container per trust group, not per project.** Projects that share a token can share a container. Clone untrusted repos into a throwaway container with no token.
+- **Each repo lives on one side.** Clone a container's repos into its `src` and do their git work inside it. Running host git in a checkout a container wrote can run that checkout's `.git/hooks` or `core.fsmonitor` on the host.
+- **Mount only the container's `src` and its state,** never `~` or all of `~/src`.
+- **Agent logins live in each container's own `state`,** mounted at `/state` (`CLAUDE_CONFIG_DIR`, `CODEX_HOME`, plus links for agy), so they survive image upgrades and the projects can't see them, though anything running in the container can. `dev create --shared-state` uses `~/containers/.state` instead, shared by every container created that way: one sign-in, but each of them can read the others' logins. Keep untrusted repos out of the shared ones. GitHub access is always per container, from each one's `env`.
 
-### Long-running container
+#### Using containers
 
-```sh
-# Start container in background
-podman run -d -it --name dotfiles --userns=keep-id:uid=1000,gid=1000 \
-  -v ~/src:/workspaces ghcr.io/fortes/dotfiles:latest tmux new-session -s main
-
-# Connect to tmux session
-podman exec -it dotfiles tmux attach -t main
-
-# Stop/restart as needed
-podman stop dotfiles
-podman start dotfiles
-```
-
-### One-off ephemeral session
-
-Gets deleted when you exit.
+`dev` (in `~/.local/bin`) wraps Apple's `container` on macOS and podman elsewhere:
 
 ```sh
-podman run -it --rm --name dotfiles --userns=keep-id:uid=1000,gid=1000 \
-  -v ~/src:/workspaces ghcr.io/fortes/dotfiles:latest
+dev create personal   # ~/containers/personal/{src,state,env} and the container
+dev personal          # Login shell in /workspaces, starting the container if needed
 ```
 
-### Persistent container
+Run `dev` from a host tmux window rather than nesting tmux. Pass an image as the last argument to use a project's own, e.g. `dev create new-project new-project`.
 
-Preserves state, but not always running
+`dev create` writes `~/containers/<name>/env` with commented-out variables (the bot's `GH_TOKEN`, git identity, `GEMINI_API_KEY`). It's read each time `dev` opens a shell; leave it commented out for a container with no GitHub access. Git pushes over HTTPS through `gh`, so the token is all GitHub needs.
+
+Inside, agents run without prompts: `claude --dangerously-skip-permissions`, `codex --dangerously-bypass-approvals-and-sandbox`, `agy --dangerously-skip-permissions`.
+
+Images are built with some frequency, via CI, for amd64 and arm64. Builds reuse cached install layers until the scripts or package lists change, so a new image doesn't always mean newer tools; `container build --no-cache` (or `podman build --no-cache`) refreshes everything. To move a container to a new image, keeping its `src`, `env` and logins (repeat `--shared-state` if it used it):
 
 ```sh
-# First time
-podman run -it --name dotfiles --userns=keep-id:uid=1000,gid=1000 \
-  -v ~/src:/workspaces ghcr.io/fortes/dotfiles:latest
-
-# Later sessions
-podman start -ai dotfiles
+container image pull ghcr.io/fortes/dotfiles:latest
+container rm --force personal && dev create personal
 ```
 
-### Building locally
+Anything installed in a container outside `/workspaces` and `/state` is lost when it's recreated.
+
+#### Signing in agents
+
+The Mac's logins can't be shared with containers (Claude Code keeps them in the Keychain).
+
+| Tool | Mac | Containers |
+| --- | --- | --- |
+| Claude Code | Run `claude` | `claude auth login` |
+| Codex | Run `codex` | `codex login --device-auth` (no browser callback needed) |
+| agy | Install the `antigravity-cli` cask by hand, run `agy` | Run `agy` and follow its sign-in |
+| gemini-api | `gemini-api configure` with an [AI Studio key](https://aistudio.google.com/apikey) | `GEMINI_API_KEY` in the container's `env` |
+| GitHub | `gh auth login` as yourself | The bot's `GH_TOKEN` in `env` |
+
+Claude Code and agy update themselves. In containers, `script/update` updates Codex, gemini-api and the rest, or move to a new image. On the Mac, `brew upgrade` covers the casks, and `script/update` covers gemini-api.
+
+#### Other model providers
+
+Point Claude Code at another Anthropic-compatible provider from a container of its own, so the provider's key is all that container holds and no other container's `claude` changes. For example, [OpenInfer](https://console.openinfer.ai/docs/getting-started/coding-agents): `dev create openinfer`, then in `~/containers/openinfer/env`:
 
 ```sh
-podman build -t dotfiles .
+ANTHROPIC_BASE_URL=https://api.openinfer.ai
+ANTHROPIC_AUTH_TOKEN=REPLACE_ME
+# Empty rather than unset, so Claude Code uses the token above
+ANTHROPIC_API_KEY=
+ANTHROPIC_MODEL=@oi/GLM-5.3-Flash
+ANTHROPIC_DEFAULT_OPUS_MODEL=@oi/GLM-5.3-Flash
+ANTHROPIC_DEFAULT_SONNET_MODEL=@oi/GLM-5.3-Flash
+ANTHROPIC_DEFAULT_HAIKU_MODEL=@oi/Qwen3.5-9B
+CLAUDE_CODE_SUBAGENT_MODEL=@oi/GLM-5.3-Flash
+# The model's real context window, compacting at about three quarters of it
+CLAUDE_CODE_MAX_CONTEXT_TOKENS=131072
+CLAUDE_CODE_AUTO_COMPACT_WINDOW=98304
 ```
 
-Then follow normal pattern, just use the local image name like so:
+Check the provider's terms before giving it code: only clone repos into that container that you'd be fine sending there.
+
+#### Agent GitHub access
+
+Give agents their own GitHub account, so their PRs need your approval to merge:
+
+1. Create a machine account (GitHub allows one per person), and set `DOTFILES_AGENT_BOT` to its login in `~/.profile.local`.
+2. Give it a classic token with the `repo` scope, for the containers' `env`. Fine-grained tokens only cover repos the token's own account (or its orgs) owns.
+3. Create repos agents work on with `new-github-repo <owner/name>`. It invites the bot, and adds a ruleset on the default branch requiring a pull request with one approval and blocking force pushes and deletion. Rulesets on private repos need GitHub Pro.
+
+#### Starting a project
+
+1. On the Mac: `new-github-repo fortes/new-project`.
+2. In a container whose `env` has the bot's token (`dev personal`), run the two commands it prints: accept the invite, and clone.
+3. Start from the template: `cp -R ~/dotfiles/script/dev/project-template/. .` It has an `AGENTS.md` and a `Makefile` with `setup`, `doctor` and `check`, backed by `script/setup` and `script/doctor`. Pin tool versions and lock dependencies there, so every environment runs the same `make setup`: dev containers, CI, Claude's and Codex's cloud setup scripts, and a devcontainer's `postCreateCommand` if the project ever wants one.
+4. Agents work on branches, push as the bot and open PRs; you review and merge on GitHub.
+5. When the project needs more than the image has (a browser, a database, its own secrets), give it a Dockerfile `FROM ghcr.io/fortes/dotfiles` and its own container: `container build --tag new-project .`, then `dev create new-project new-project` and clone it there.
+
+#### macOS: Apple container
+
+Homebrew installs [`container`](https://github.com/apple/container), which runs each container in its own lightweight VM. Files containers write to mounts belong to your Mac user. It has no Docker-compatible API, so devcontainer tooling (VS Code, the `devcontainer` CLI) needs podman instead.
+
+#### Linux: Podman
+
+Podman runs containers rootless and is installed by `script/setup`, and `dev` uses it when Apple's `container` isn't there. Unlike Apple's VM per container, rootless Podman shares the host kernel, so on a server run dev containers as a separate user (`sudo adduser dev`) and SSH in as them. A container escape then lands in an account without your SSH keys or 1Password.
+
+Rootless containers stop when their user logs out. Run `sudo loginctl enable-linger dev` to keep long-running ones alive.
+
+#### Building locally
 
 ```sh
-podman run -it --rm --name dotfiles --userns=keep-id:uid=1000,gid=1000 dotfiles
+container build --tag dotfiles .                     # dev image (podman build on Linux)
+container build --target host --tag dotfiles-host .  # fresh Debian server running script/setup, as CI does
 ```
+
+Then use `dotfiles` in place of `ghcr.io/fortes/dotfiles:latest`, or `container run --rm --interactive --tty dotfiles-host` to look around the fresh server.
 
 ## Other Notes
 

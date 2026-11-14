@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Install the auto-updating Antigravity CLI on Linux. macOS installs it by hand
+# (see README).
+set -euo pipefail
+[[ ! -x "$HOME/.local/bin/agy" ]] || exit 0
+
+arch="$(dpkg --print-architecture)"
+base_url='https://antigravity-cli-auto-updater-974169037036.us-central1.run.app'
+manifest="$(curl -fsSL "${base_url}/manifests/linux_${arch}.json")"
+version="$(jq -r '.version' <<<"${manifest}")"
+url="$(jq -er '.url' <<<"${manifest}")"
+sha512="$(jq -er '.sha512' <<<"${manifest}")"
+
+echo "Installing agy ${version} ..."
+download="$(mktemp -d)"
+curl -fsSL -o "${download}/release" "${url}"
+sha512sum --check --quiet <<<"${sha512}  ${download}/release"
+if [[ "${url}" == *.tar.gz* ]]; then
+  tar -xzf "${download}/release" -C "${download}" antigravity
+  install -D --mode=755 "${download}/antigravity" "$HOME/.local/bin/agy"
+else
+  install -D --mode=755 "${download}/release" "$HOME/.local/bin/agy"
+fi
+rm -rf "${download}"
+# Configures the shell environment, and exits non-zero on soft warnings (as
+# upstream's install.sh notes)
+"$HOME/.local/bin/agy" install || true
+echo 'agy installed!'

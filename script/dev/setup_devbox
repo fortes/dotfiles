@@ -8,10 +8,9 @@
 # Safe to run on every boot: each step is a quick no-op when already done.
 # Failures are logged immediately and reported after the remaining steps run.
 #
-# Usage: setup_devbox
-#
-# Set DOTFILES_SKIP_PACKAGES to a space-separated list of stow packages to
-# leave alone, e.g. ones whose config the machine already manages.
+# Usage: setup_devbox [--upgrade]
+#   --upgrade (run by script/update) only reinstalls the GitHub binaries and
+#   language servers at their latest versions
 
 set -euo pipefail
 IFS=$'\n\t'
@@ -22,9 +21,10 @@ if ! command -v apt-get &>/dev/null; then
 fi
 
 declare dotfiles_root
-dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
 export DEBIAN_FRONTEND=noninteractive
+UPGRADE=''
 
 # Names from Debian Trixie and Ubuntu Noble, without pinning to a suite. Older
 # releases skip whatever they lack
@@ -49,6 +49,24 @@ declare -r DEVBOX_APT_PACKAGES=(
   unzip
   wget
   zoxide
+)
+
+# GitHub binaries, named so their binary is the package name minus any `-cli`.
+# Includes delta, since Ubuntu 22.04 (the work devcontainer) has no git-delta
+declare -r DEVBOX_GITHUB_PACKAGES=(delta fzf marksman neovim tree-sitter-cli yq)
+
+# Language servers init.lua enables, for the languages devbox repos use, as
+# npm package:binary
+declare -r DEVBOX_NPM_PACKAGES=(
+  bash-language-server:bash-language-server
+  dockerfile-language-server-nodejs:docker-langserver
+  oxfmt:oxfmt
+  oxlint:oxlint
+  # TypeScript 7+, whose native `tsc` serves LSP. Projects' own
+  # node_modules/.bin/tsc is often older and can't
+  typescript:tsc
+  vscode-langservers-extracted:vscode-json-language-server
+  yaml-language-server:yaml-language-server
 )
 
 log() {
@@ -137,8 +155,7 @@ install_github_packages() {
       neovim) binary=nvim ;;
       *) binary="${package%-cli}" ;;
     esac
-    # Presence only, so these never upgrade
-    if [[ ! -x "${HOME}/.local/bin/${binary}" ]]; then
+    if [[ -n "${UPGRADE}" || ! -x "${HOME}/.local/bin/${binary}" ]]; then
       missing+=("${package}")
     fi
   done
@@ -154,8 +171,7 @@ install_github_packages() {
 install_npm_packages() {
   local missing=() entry
   for entry in "${DEVBOX_NPM_PACKAGES[@]}"; do
-    # Presence only, so these never upgrade
-    if [[ ! -x "${HOME}/.local/bin/${entry#*:}" ]]; then
+    if [[ -n "${UPGRADE}" || ! -x "${HOME}/.local/bin/${entry#*:}" ]]; then
       missing+=("${entry%%:*}")
     fi
   done
@@ -171,7 +187,8 @@ install_npm_packages() {
   fi
 
   log "Installing npm packages:" "${missing[@]}"
-  npm install --global --loglevel=error --no-fund --no-audit "${missing[@]/%/@latest}"
+  npm install --global --loglevel=error --no-fund --no-audit --ignore-scripts \
+    "${missing[@]/%/@latest}"
 }
 
 # Debian and Ubuntu name these fdfind and batcat
@@ -196,12 +213,22 @@ main() {
   # shellcheck source=script/lib.sh
   . "${dotfiles_root}/script/lib.sh"
 
-  if [[ $# -gt 0 ]]; then
-    log_error "Usage: setup_devbox (takes no arguments)"
-    return 1
-  fi
+  case "$*" in
+    '') ;;
+    --upgrade) UPGRADE=1 ;;
+    *)
+      log_error "Usage: setup_devbox [--upgrade]"
+      return 1
+      ;;
+  esac
 
   local failed=0
+  if [[ -n "${UPGRADE}" ]]; then
+    run_step install_github_packages || failed=1
+    run_step install_npm_packages || failed=1
+    return "${failed}"
+  fi
+
   run_step install_apt_packages || failed=1
   run_step "${dotfiles_root}/script/stow" -R || failed=1
   run_step install_ghostty_terminfo || failed=1

@@ -44,11 +44,9 @@
 [diff]
   algorithm = minimal
   colorMoved = default
-  tool = difftastic
+  tool = nvimdiff
 [difftool]
   prompt = false
-[difftool "difftastic"]
-  cmd = difft "$LOCAL" "$REMOTE"
 [fetch]
   prune = true
 [help]
@@ -64,8 +62,6 @@
   tool = nvim
 [mergetool "nvim"]
   cmd = nvim -d \"$MERGED\" \"$LOCAL\" \"$REMOTE\"
-[pager]
-  difftool = true
 [pull]
   autostash = true
   rebase = true

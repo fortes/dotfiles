@@ -11,14 +11,14 @@ Personal dotfiles for macOS, Debian Trixie (headless servers, Docker image), Ubu
 make test         # shellcheck + shfmt (also what CI runs)
 ```
 
-`script/setup` runs `setup_mac`, `setup_linux` (Debian), or `setup_devbox` (Ubuntu, or `DOTFILES_DEVBOX=1`). `setup_devbox` is a light, run-on-every-boot subset that leaves system config alone.
+`script/setup` runs `setup_mac`, `setup_linux` (Debian), or `dev/setup_devbox` (Ubuntu or `DOTFILES_DEVBOX=1`: a light, run-on-every-boot subset that leaves system config alone).
 
 ## Where things go
 
 - **macOS packages:** `BREW_PACKAGES` / `CASK_PACKAGES` in `script/setup_mac`
-- **Debian packages:** `script/apt-packages.txt`; third-party apt repos get their own `script/install_*`
-- **Binaries missing or too old in Debian:** Either use backports or via `script/install_github_packages`
-- **npm / uv globals:** `script/install_{node,python}_packages`
+- **Debian packages:** `script/apt-packages.txt` (backports when stable is too old), shared by hosts and the image; mark host-only lines `# host-only`. Dev-only packages go in `script/dev/apt-packages.txt`. Third-party apt repos get their own `script/install_*`
+- **Host tools beyond brew/apt:** the short lists in `script/update`, only for tools used outside code (shell, notes, music), so a bad release can't reach host credentials. `script/install_github_packages <name>` and `script/install_docker` cover on-demand installs.
+- **Dev environments (opt-in):** `script/dev/`: `setup_container` (what the image adds), `setup_devbox`, `project-template/`; `dev` and `new-github-repo` live in `stowed-files/bin`. Project dependencies go in a project Dockerfile `FROM ghcr.io/fortes/dotfiles`, not here.
 - **Config files:** `stowed-files/<package>/`, mirroring `$HOME`. Each directory is a stow package; `DOTFILES_SKIP_PACKAGES` (space-separated) skips some. `script/stow` links files one by one (`--no-folding`), so directories in `$HOME` stay real and programs never write into the repo.
 - **Machine-specific settings:** templates in `local-templates/<package>/` (`.profile.local`, `.gitconfig.local`, MPD's server and mpdscribble's credentials), copied into `$HOME` as private untracked files when that package is stowed and the file is missing. Mark what each machine must fill in (hosts, usernames, secrets) with `REPLACE_ME` so it's greppable. `~/.bashrc.local` and `~/.vimrc.local` are untracked.
 
@@ -34,6 +34,7 @@ The Obsidian vault is `$NOTES_DIR` (default `~/notes`); `notes` in `.aliases` op
 - **Long options:** Spell out flags whose short form isn't widely known (`fzf --exit-0`, `shfmt --case-indent`) instead of commenting them. Idioms like `grep -v`, `mkdir -p` and `curl -fsSL` stay short, as do flags in macOS-facing code where the BSD tool has no long form (`xargs`, `cut`).
 - **No test harnesses.** `make test`, the Docker image build and running setup on the Mac are the tests.
 - **CI cost:** `.github/workflows/bash-syntax.yml` has narrow path triggers, and the Docker image build chains off it. Don't widen the triggers; add directories to its sparse checkout instead.
+- **Linux-only code:** Scripts only the image runs can assume GNU/Linux. Host scripts and shell config still have to work on macOS.
 - **Bash 3.2:** `setup_mac`, `script/stow` and `script/lib.sh` can run under macOS's `/bin/bash` before Homebrew bash exists. Avoid Bash 4 features and GNU-only flags there.
 - **`~/.vimrc` stays self-contained.** It's also used via `nvim -u ~/.vimrc` and copied to servers, so it must load without errors on distro Vim/Neovim and `vim.tiny`.
-- Use `uname -s` for macOS vs Linux and `IS_DOCKER` for containers.
+- Use `uname -s` for macOS vs Linux, `IS_DOCKER` for containers, and `DOTFILES_DEV_IMAGE` for the dev image.

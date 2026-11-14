@@ -325,6 +325,7 @@ use('https://github.com/neovim/nvim-lspconfig', function()
     dockerls = 'docker-langserver',
     html = 'vscode-html-language-server',
     jsonls = 'vscode-json-language-server',
+    ty = 'ty',
     vimls = 'vim-language-server',
   }
   for server, bin in pairs(simple_servers) do

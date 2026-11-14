@@ -1,0 +1,87 @@
+#!/usr/bin/env bash
+# Dev containers from the dotfiles image (see the README's Containers section).
+# Uses Apple's `container` where it's installed, otherwise rootless podman.
+#
+# Usage:
+#   dev <name>       Shell in the container, starting it if needed
+#   dev create [--shared-state] <name> [image]
+#                    Make ~/containers/<name> and its container
+#
+# Mounts ~/containers/<name>/{src,state} (or the shared ~/containers/.state) at
+# /workspaces and /state, and reads ~/containers/<name>/env on every shell.
+
+set -euo pipefail
+IFS=$'\n\t'
+
+readonly root="${HOME}/containers"
+
+if command -v container >/dev/null 2>&1; then
+  runtime=container
+  run_args=()
+else
+  runtime=podman
+  # Maps the image's UID 1000 user to yours, so mounted files stay yours
+  run_args=(--userns=keep-id:uid=1000,gid=1000)
+fi
+
+usage() {
+  echo "Usage: dev <name> | dev create [--shared-state] <name> [image]" >&2
+  exit 1
+}
+
+create() {
+  local state_dir=''
+  if [[ "${1:-}" == --shared-state ]]; then
+    state_dir="${root}/.state"
+    shift
+  fi
+  [[ $# -ge 1 && $# -le 2 ]] || usage
+  local name="$1" image="${2:-ghcr.io/fortes/dotfiles:latest}"
+  local dir="${root}/${name}"
+  state_dir="${state_dir:-${dir}/state}"
+
+  # Private, since it holds agent logins
+  (umask 077 && mkdir -p "${state_dir}"/{claude,codex,antigravity,gemini})
+  mkdir -p "${dir}/src"
+  if [[ ! -e "${dir}/env" ]]; then
+    (
+      umask 077
+      cat >"${dir}/env" <<'EOF'
+# Read by `dev` each time it opens a shell. Leave everything commented out for
+# a container without GitHub access.
+# GH_TOKEN=
+# GIT_AUTHOR_NAME=
+# GIT_AUTHOR_EMAIL=
+# GIT_COMMITTER_NAME=
+# GIT_COMMITTER_EMAIL=
+# GEMINI_API_KEY=
+EOF
+    )
+  fi
+
+  "${runtime}" run --detach --name "${name}" --memory 8G ${run_args[@]+"${run_args[@]}"} \
+    --volume "${dir}/src:/workspaces" --volume "${state_dir}:/state" \
+    "${image}" sleep infinity >/dev/null
+  echo "Created ${name}. Add its GitHub token to ${dir}/env if it needs one, then: dev ${name}"
+}
+
+shell() {
+  local name="$1"
+  # A no-op when it's already running
+  "${runtime}" start "${name}" >/dev/null
+  # exec resets TERM, so pass through the host tmux's TERM and truecolor
+  exec "${runtime}" exec --interactive --tty --env TERM --env COLORTERM \
+    --env-file "${root}/${name}/env" --workdir /workspaces "${name}" bash --login
+}
+
+case "${1:-}" in
+  '' | -h | --help) usage ;;
+  create)
+    shift
+    create "$@"
+    ;;
+  *)
+    [[ $# -eq 1 ]] || usage
+    shell "$1"
+    ;;
+esac

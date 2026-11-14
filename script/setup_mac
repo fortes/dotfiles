@@ -20,17 +20,13 @@ dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BREW_PACKAGES=(
   bash
   bash-completion@2
+  bash-language-server
   bat
-  oven-sh/bun/bun
+  beets
   chafa
-  cloudflared
-  # Docker fallback for projects that need it, alongside podman
-  colima
   container
   delta
-  difftastic
-  docker
-  docker-compose
+  dockerfile-language-server
   duf
   MisterTea/et/et
   eza
@@ -64,9 +60,9 @@ BREW_PACKAGES=(
   ncdu
   neovim
   node
+  oxfmt
   # For :Obsidian paste_img
   pngpaste
-  podman
   ripgrep
   rmpc
   sad
@@ -79,7 +75,9 @@ BREW_PACKAGES=(
   tmux
   tree-sitter-cli
   uv
+  vscode-langservers-extracted
   wget
+  yaml-language-server
   yazi
   yq
   yt-dlp
@@ -90,6 +88,8 @@ BREW_PACKAGES=(
 # by hand instead (see README), since brew loses track of their versions
 CASK_PACKAGES=(
   1password-cli
+  claude-code
+  codex
   font-google-sans-code
   font-jetbrains-mono
   # For yazi

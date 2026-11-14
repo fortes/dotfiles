@@ -3,31 +3,25 @@
 #
 # Usage: stow [-n] [-v] [-D | -R] [package ...]
 #
-# Stows all packages (minus DOTFILES_SKIP_PACKAGES, and Mac-only ones elsewhere)
-# with --no-folding, backs up machine-provided startup files, then copies
-# missing local-templates/<package>/ files into $HOME. For other stow options,
-# call stow directly.
+# Stows all packages (minus DOTFILES_SKIP_PACKAGES) with --no-folding, backs up
+# machine-provided startup files, then copies missing local-templates/<package>/
+# files into $HOME. For other stow options, call stow directly.
 
 set -euo pipefail
 IFS=$'\n\t'
-
-# Only macOS has a GUI and the music setup
-declare -r MAC_ONLY_PACKAGES=(ghostty mpd rmpc)
 
 # Files provided by Debian, macOS, or devbox images that conflict with the
 # bash package
 declare -r DEFAULT_DOTFILES=(.bashrc .profile .bash_profile .hushlogin)
 
-# Copy each file under template dir $1 to the same path in $HOME, unless a file
-# is there. Broken links (into old repo paths) get replaced. Private, since the
-# copies hold secrets
+# Copy each file under template dir $1 to the same path in $HOME, unless
+# something is there. Private, since the copies hold secrets
 copy_local_templates() {
   local templates="$1" file
   [[ -d "${templates}" ]] || return 0
   while IFS= read -r file; do
     file="${file#"${templates}/"}"
-    [[ -e "${HOME}/${file}" ]] && continue
-    rm -f "${HOME}/${file}"
+    [[ -e "${HOME}/${file}" || -L "${HOME}/${file}" ]] && continue
     mkdir -p "$(dirname "${HOME}/${file}")"
     (umask 077 && cp "${templates}/${file}" "${HOME}/${file}")
     echo "Copied ${file} into ~; fill in its REPLACE_MEs"
@@ -105,11 +99,7 @@ main() {
     # DOTFILES_SKIP_PACKAGES only applies here: named packages get stowed anyway
     for package in "${stowed_files_path}"/*/; do
       package="$(basename "${package}")"
-      [[ " ${DOTFILES_SKIP_PACKAGES:-} " == *" ${package} "* ]] && continue
-      if [[ "$(uname -s)" != Darwin ]] && is_listed "${package}" "${MAC_ONLY_PACKAGES[@]}"; then
-        continue
-      fi
-      packages+=("${package}")
+      [[ " ${DOTFILES_SKIP_PACKAGES:-} " == *" ${package} "* ]] || packages+=("${package}")
     done
   fi
 
