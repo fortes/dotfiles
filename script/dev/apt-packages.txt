@@ -1,6 +1,0 @@
-# Debian/apt packages the container image adds to ../apt-packages.txt. Lines
-# starting with # are ignored. Other toolchains (Rust, Go, …) belong in each
-# project's own Dockerfile.
-
-# Codex sandbox requirement
-bubblewrap

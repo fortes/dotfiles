@@ -246,7 +246,7 @@ clean those up:
 
 ### Containers
 
-Coding and unattended agents run in containers. Hosts (macOS, Debian servers, Crostini) get Homebrew or apt packages plus the short lists in `script/update`; the Mac also keeps the agent CLIs and a few language servers for notes and quick questions, under the agents' own sandboxes. The image adds the coding toolchain with `script/dev/setup_container`. That way a compromised package release, or an agent running with `--dangerously-skip-permissions`, only reaches what one container holds.
+Coding and unattended agents run in containers. Hosts (macOS, Debian servers, Crostini) get Homebrew or apt packages plus the short lists in `script/update`; hosts also keep Claude Code, Codex and agy for quick questions (the Mac adds a few language servers for notes), with their own prompts and sandboxes. The image adds the coding toolchain with `script/dev/setup_container`. That way a compromised package release, or an agent running with `--dangerously-skip-permissions`, only reaches what one container holds.
 
 What keeps that boundary intact:
 
@@ -268,7 +268,7 @@ Run `dev` from a host tmux window rather than nesting tmux. Pass an image as the
 
 `dev create` writes `~/containers/<name>/env` with commented-out variables (the bot's `GH_TOKEN`, git identity, `GEMINI_API_KEY`). It's read each time `dev` opens a shell; leave it commented out for a container with no GitHub access. Git pushes over HTTPS through `gh`, so the token is all GitHub needs.
 
-Inside, agents run without prompts: `claude --dangerously-skip-permissions`, `codex --dangerously-bypass-approvals-and-sandbox`, `agy --dangerously-skip-permissions`.
+Inside, agents run without prompts: `claude --dangerously-skip-permissions`, `codex --dangerously-bypass-approvals-and-sandbox`, `agy --dangerously-skip-permissions`. On hosts, keep their prompts, or for a quick question start them read-only: `claude --permission-mode plan`, `codex --sandbox read-only`, `agy --mode plan`.
 
 Images are built with some frequency, via CI, for amd64 and arm64. Builds reuse cached install layers until the scripts or package lists change, so a new image doesn't always mean newer tools; `container build --no-cache` (or `podman build --no-cache`) refreshes everything. To move a container to a new image, keeping its `src`, `env` and logins (repeat `--shared-state` if it used it):
 
@@ -281,15 +281,15 @@ Anything installed in a container outside `/workspaces` and `/state` is lost whe
 
 #### Signing in agents
 
-The Mac's logins can't be shared with containers (Claude Code keeps them in the Keychain).
+Hosts and containers each sign in separately; the Mac's logins can't be shared with containers anyway (Claude Code keeps them in the Keychain).
 
-| Tool | Mac | Containers |
+| Tool | Mac | Debian hosts and containers |
 | --- | --- | --- |
 | Claude Code | Run `claude` | `claude auth login` |
 | Codex | Run `codex` | `codex login --device-auth` (no browser callback needed) |
 | agy | Install the `antigravity-cli` cask by hand, run `agy` | Run `agy` and follow its sign-in |
-| gemini-api | `gemini-api configure` with an [AI Studio key](https://aistudio.google.com/apikey) | `GEMINI_API_KEY` in the container's `env` |
-| GitHub | `gh auth login` as yourself | The bot's `GH_TOKEN` in `env` |
+| gemini-api | `gemini-api configure` with an [AI Studio key](https://aistudio.google.com/apikey) | Containers only: `GEMINI_API_KEY` in the container's `env` |
+| GitHub | `gh auth login` as yourself | Containers: the bot's `GH_TOKEN` in `env` |
 
 Claude Code and agy update themselves. In containers, `script/update` updates Codex, gemini-api and the rest, or move to a new image. On the Mac, `brew upgrade` covers the casks, and `script/update` covers gemini-api.
 

@@ -1,6 +1,6 @@
 # Debian/apt packages for hosts, which the image shares except `# host-only`
 # lines (media tools, and server tools for remote mounts and SSH keys). Lines
-# starting with # are ignored; coding toolchains go in dev/apt-packages.txt.
+# starting with # are ignored; project toolchains belong in each project.
 
 # For yazi
 7zip
@@ -11,6 +11,8 @@ bash-completion
 bat
 # Neovim compiles its treesitter parsers and telescope-fzf-native
 build-essential
+# Codex sandbox requirement
+bubblewrap
 ca-certificates
 chafa  # host-only
 curl

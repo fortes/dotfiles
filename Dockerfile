@@ -40,11 +40,10 @@ ENV LANG=en_US.UTF-8 \
     LANGUAGE=en_US:en \
     LC_ALL=en_US.UTF-8
 
-# The host apt list minus `# host-only` lines, plus the dev additions, with
-# contrib/non-free and backports enabled as setup_linux does on hosts. This
-# layer only rebuilds when the lists change, which keeps apt downloads cached.
+# The host apt list minus `# host-only` lines, with contrib/non-free and
+# backports enabled as setup_linux does on hosts. This layer only rebuilds when
+# the list changes, which keeps apt downloads cached.
 COPY script/apt-packages.txt /tmp/apt-packages.txt
-COPY script/dev/apt-packages.txt /tmp/dev-apt-packages.txt
 USER root
 RUN set -eux; \
   codename="$(. /etc/os-release && echo "$VERSION_CODENAME")"; \
@@ -56,9 +55,9 @@ RUN set -eux; \
     'Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg' \
     >/etc/apt/sources.list.d/backports.sources; \
   apt-get -qq update; \
-  awk 'NF && $1 !~ /^#/ && !/# host-only/ {print $1}' /tmp/apt-packages.txt /tmp/dev-apt-packages.txt \
+  awk 'NF && $1 !~ /^#/ && !/# host-only/ {print $1}' /tmp/apt-packages.txt \
     | xargs -r apt-get install -qq --no-install-recommends -y; \
-  rm -rf /var/lib/apt/lists/* /tmp/apt-packages.txt /tmp/dev-apt-packages.txt; \
+  rm -rf /var/lib/apt/lists/* /tmp/apt-packages.txt; \
   sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
 
 # Codex requires CODEX_HOME to exist. Pushes use the container's GH_TOKEN

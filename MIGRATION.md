@@ -85,8 +85,9 @@ apt, became on-demand, or went away:
 
 ```sh
 # GitHub binaries no longer installed on hosts (delta now comes from apt)
-rm -f ~/.local/bin/{bun,bunx,codex,gemini-api,fx,yq,delta,difft,hugo,agy,claude}
-rm -rf ~/.local/share/lua-language-server ~/.local/share/claude
+# (codex, agy and claude stay: hosts keep them for quick questions)
+rm -f ~/.local/bin/{bun,bunx,gemini-api,fx,yq,delta,difft,hugo}
+rm -rf ~/.local/share/lua-language-server
 # Their .deb installs; keep cloudflared if the homelab uses it
 sudo apt-get remove gh sad f2 hugo
 # Dropped apt packages

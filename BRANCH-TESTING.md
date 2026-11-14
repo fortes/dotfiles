@@ -25,7 +25,7 @@ container run --rm --interactive --tty dotfiles-host
 
 A stock `debian:trixie` after a sudo user ran `script/setup`, deleted on exit.
 Try `nvim` (give the first launch a minute to install plugins and build
-parsers), `tmux`, `git log` (pages through delta), `beet --version`, and
+parsers), `tmux`, `git log` (pages through delta), `beet --version`, the agents for quick questions (`claude --permission-mode plan`, `codex --sandbox read-only`, `agy --mode plan`), and
 `ls -la ~` for the private `.local` copies.
 
 ## A throwaway dev container, no agents

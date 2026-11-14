@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# The coding toolchain and agent CLIs the container image adds on top of the
-# Debian host setup. script/update runs it in the image, so run that to update.
+# The coding toolchain the container image adds on top of the Debian host
+# setup. script/update runs it in the image, so run that to update.
 
 set -euo pipefail
 IFS=$'\n\t'
@@ -9,7 +9,7 @@ IFS=$'\n\t'
 . "$(dirname "${BASH_SOURCE[0]}")/../lib.sh"
 
 # On top of the host's (script/update)
-GITHUB_PACKAGES=(bun codex fx gemini-api github-cli luals sad yq)
+GITHUB_PACKAGES=(bun fx gemini-api github-cli luals sad yq)
 
 NPM_PACKAGES=(
   @playwright/mcp
@@ -27,7 +27,6 @@ NPM_PACKAGES=(
 )
 
 "${dotfiles_script_dir}/install_github_packages" "${GITHUB_PACKAGES[@]}"
-"${dotfiles_script_dir}/dev/install_agy"
 
 # No global needs its install scripts (agent-browser's launcher links its
 # native binary on first run), which also leaves no native addons to rebuild
@@ -36,6 +35,3 @@ npm install --global --loglevel=error --no-fund --no-audit --ignore-scripts \
   "${NPM_PACKAGES[@]/%/@latest}"
 # pnpm and Yarn shims that select each project's declared version
 corepack enable --install-directory "$HOME/.local/bin" pnpm yarn
-
-# Updates itself once installed
-command_exists claude || bun x @anthropic-ai/claude-code install
