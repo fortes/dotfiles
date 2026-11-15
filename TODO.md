@@ -18,6 +18,9 @@
 - [ ] **Sign or pin the dev image** (task)
   - Every container runs `ghcr.io/fortes/dotfiles:latest`, so whoever can push to the GitHub account can change what agents run. Sign it in CI (cosign, attestations) and verify on pull, or have `dev create` use a pinned digest
 
+- [ ] **Add a release cooldown to GitHub release installs** (task)
+  - npm, bun and uv skip releases newer than 3 days; `install_github_packages` always takes the latest, for Codex, neovim, fzf, uv and the rest. It already reads the release from GitHub's API, so it could skip releases younger than 3 days
+
 - [ ] **Give the agent bot's token an expiry and a rotation reminder** (task)
   - It's a classic `repo`-scope token, reaching every repo the bot is invited to
 
