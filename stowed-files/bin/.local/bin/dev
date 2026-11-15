@@ -35,17 +35,18 @@ usage() {
   exit 1
 }
 
-# Run container $1 from the image and ports `dev create` saved for it. --init
-# reaps the processes agents' tools leave behind
+# Run container $1 from image $2, with the ports saved for it. --init reaps the
+# processes agents' tools leave behind
 run_container() {
-  local name="$1" dir="${root}/$1" port publish=()
+  local name="$1" image="$2" dir="${root}/$1" port publish=()
   while IFS= read -r port; do
+    [[ -n "${port}" ]] || continue
     publish+=(--publish "0.0.0.0:${port}:${port}")
   done <"${dir}/ports"
   "${runtime}" run --detach --init --name "${name}" --memory 8G \
     ${run_args[@]+"${run_args[@]}"} ${publish[@]+"${publish[@]}"} \
     --volume "${dir}/src:/workspaces" --volume "$(cd "${dir}/state" && pwd -P):/state" \
-    "$(cat "${dir}/image")" sleep infinity >/dev/null
+    "${image}" sleep infinity >/dev/null
 }
 
 create() {
@@ -75,7 +76,7 @@ create() {
   # the container keeps sharing
   if [[ -n "${shared}" ]]; then
     (umask 077 && mkdir -p "${root}/.state"/{claude,codex,antigravity,gemini})
-    ln -s ../.state "${dir}/state"
+    ln -sfn ../.state "${dir}/state"
   else
     (umask 077 && mkdir -p "${dir}/state"/{claude,codex,antigravity,gemini})
   fi
@@ -96,13 +97,15 @@ create() {
 EOF
     )
   fi
-  echo "${image}" >"${dir}/image"
   : >"${dir}/ports"
   for port in ${ports[@]+"${ports[@]}"}; do
     echo "${port}" >>"${dir}/ports"
   done
 
-  run_container "${name}"
+  run_container "${name}" "${image}"
+  # Only once it runs, so a failed create (a typo in the image, a port in use)
+  # can simply be rerun
+  echo "${image}" >"${dir}/image"
   echo "Created ${name}. Add its GitHub token to ${dir}/env if it needs one, then: dev ${name}"
 }
 
@@ -119,7 +122,7 @@ recreate() {
   fi
   # It may already be gone
   "${runtime}" rm --force "${name}" >/dev/null 2>&1 || true
-  run_container "${name}"
+  run_container "${name}" "${image}"
   echo "Recreated ${name} from ${image}"
 }
 

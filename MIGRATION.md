@@ -40,18 +40,26 @@ tracked=(stowed-files/bash/.profile.local stowed-files/git/.gitconfig.local
 git update-index --no-skip-worktree "${tracked[@]}"
 git checkout -- "${tracked[@]}"
 git pull
+if [[ "$(uname -s)" != Darwin ]]; then
+  # Linux no longer stows the Mac-only packages. Only known files go, and the
+  # directories only if empty, so a real ~/Music stays
+  script/stow -D ghostty mpd rmpc
+  rm -f ~/.mpd/mpd.conf.local ~/.mpdscribble/mpdscribble.conf ~/Music/.mpdignore
+  rmdir ~/.mpd/playlists ~/.mpd ~/.mpdscribble ~/Music ~/.config/ghostty ~/.config/rmpc 2>/dev/null || true
+fi
 # Relink one file at a time; this unfolds the old directory links
 script/stow -R
 # Programs wrote some files into the repo through those old links (Neovim's
-# plugin lockfile and spell files, ~/.ssh's known_hosts and keys), and stow just
-# linked them back. Make each a real file in ~ and drop the repo copy
+# plugin lockfile and spell files, ~/.ssh's known_hosts, keys and agent socket
+# link), and stow just linked them back. Move each into place in ~
 git ls-files --others -z stowed-files | while IFS= read -r -d '' f; do
   rel="${f#stowed-files/*/}"
   [[ -L ~/"$rel" ]] || continue
-  cp -p ~/"$rel" ~/"$rel.new"
-  mv -f ~/"$rel.new" ~/"$rel"
-  rm "$f"
+  rm ~/"$rel"
+  mv "$f" ~/"$rel"
 done
+# Links left dangling by removed packages and scripts (epy, prettier, ...)
+find ~ -maxdepth 5 -lname '*dotfiles/stowed-files*' ! -exec test -e {} \; -exec rm -v {} + 2>/dev/null || true
 EOF
 ```
 
