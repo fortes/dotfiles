@@ -79,7 +79,7 @@ setup_suite() {
 Types: deb
 URIs: ${uri}
 Suites: ${suite}
-Components: main
+Components: main contrib non-free non-free-firmware
 Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
 EOF
 }
@@ -120,6 +120,7 @@ main() {
 
   "${dotfiles_root}/script/set_dotfiles_remote"
 
+  setup_nonfree
   setup_suite "${VERSION_CODENAME}-security" http://deb.debian.org/debian-security
   setup_suite "${VERSION_CODENAME}-updates" http://deb.debian.org/debian
   setup_suite "${VERSION_CODENAME}-backports" http://deb.debian.org/debian
