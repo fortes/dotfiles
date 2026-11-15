@@ -22,7 +22,6 @@ else
   install -D --mode=755 "${download}/release" "$HOME/.local/bin/agy"
 fi
 rm -rf "${download}"
-# Configures the shell environment, and exits non-zero on soft warnings (as
-# upstream's install.sh notes)
-"$HOME/.local/bin/agy" install || true
+# Not `agy install`: it only adds ~/.local/bin to PATH, which .profile already
+# does, by appending to the shell startup files, i.e. the stowed ones in the repo
 echo 'agy installed!'

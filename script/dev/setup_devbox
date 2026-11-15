@@ -187,7 +187,8 @@ install_npm_packages() {
   fi
 
   log "Installing npm packages:" "${missing[@]}"
-  npm install --global --loglevel=error --no-fund --no-audit --ignore-scripts \
+  # Explicit cooldown, since devboxes may skip stowing ~/.npmrc
+  npm install --global --loglevel=error --no-fund --no-audit --ignore-scripts --min-release-age=3 \
     "${missing[@]/%/@latest}"
 }
 
@@ -235,6 +236,7 @@ main() {
   run_step install_github_packages || failed=1
   run_step link_debian_names || failed=1
   run_step install_npm_packages || failed=1
+  run_step link_debian_names || failed=1
 
   if [[ ${failed} -ne 0 ]]; then
     log_error "Devbox setup completed with errors"

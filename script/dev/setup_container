@@ -31,7 +31,7 @@ NPM_PACKAGES=(
 # No global needs its install scripts (agent-browser's launcher links its
 # native binary on first run), which also leaves no native addons to rebuild
 # after Node major upgrades
-npm install --global --loglevel=error --no-fund --no-audit --ignore-scripts \
+npm install --global --loglevel=error --no-fund --no-audit --ignore-scripts --min-release-age=3 \
   "${NPM_PACKAGES[@]/%/@latest}"
 # pnpm and Yarn shims that select each project's declared version
 corepack enable --install-directory "$HOME/.local/bin" pnpm yarn

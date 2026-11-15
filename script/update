@@ -28,7 +28,10 @@ else
   "${dotfiles_script_dir}/install_node"
   # Both update themselves once installed
   "${dotfiles_script_dir}/install_agy"
-  command_exists claude || npx --yes @anthropic-ai/claude-code install
+  command_exists claude || npx --yes --min-release-age=3 @anthropic-ai/claude-code install
+  # Debian names these fdfind and batcat
+  ln -sf /usr/bin/fdfind "$HOME/.local/bin/fd"
+  ln -sf /usr/bin/batcat "$HOME/.local/bin/bat"
   if [[ -n "${DOTFILES_DEV_IMAGE:-}" ]]; then
     # IS_DOCKER is true in any container, so the dev image's Dockerfile sets this
     "${dotfiles_script_dir}/dev/setup_container"

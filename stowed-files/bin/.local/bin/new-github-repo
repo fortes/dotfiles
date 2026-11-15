@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Create a private GitHub repo for agent work: a ruleset on the default branch
 # requires a pull request with one approval (dismissed when new commits arrive,
-# so it covers what's merged) and blocks force pushes and deletion, and then
-# the agent bot is invited with push access. It can push branches and open
-# PRs, and merge only what you've approved. Accept the invite as the bot
-# afterwards (see README). Rulesets on private repos need GitHub Pro for
-# personal accounts.
+# so it covers what's merged) and blocks force pushes and deletion, though repo
+# admins (you) can bypass it. Then the agent bot is invited with push access:
+# it can push branches and open PRs, and merge only what you've approved.
+# Accept the invite as the bot afterwards (see README). Rulesets on private
+# repos need GitHub Pro for personal accounts.
 #
 # Usage: new-github-repo <owner/name>, with DOTFILES_AGENT_BOT set to the bot's
 # GitHub login (e.g. in ~/.profile.local)
@@ -20,14 +20,14 @@ IFS=$'\n\t'
 repo="$1"
 bot="${DOTFILES_AGENT_BOT:?Set DOTFILES_AGENT_BOT to the agent bot GitHub login}"
 
-# With a README, the default branch exists before the ruleset protects it, so
-# everything after this goes through pull requests
+# With a README, the default branch exists before the ruleset protects it
 gh repo create "${repo}" --private --add-readme
 gh api --method POST "repos/${repo}/rulesets" --input - >/dev/null <<'EOF'
 {
   "name": "Protect default branch",
   "target": "branch",
   "enforcement": "active",
+  "bypass_actors": [{"actor_id": 5, "actor_type": "RepositoryRole", "bypass_mode": "always"}],
   "conditions": {"ref_name": {"include": ["~DEFAULT_BRANCH"], "exclude": []}},
   "rules": [
     {"type": "deletion"},
@@ -51,5 +51,7 @@ gh api --method PUT "repos/${repo}/collaborators/${bot}" --field permission=push
 
 echo "Created https://github.com/${repo} and invited ${bot}."
 echo "In a container whose env has ${bot}'s token, accept and clone it:"
-echo "  gh api user/repository_invitations --jq '.[].id' | xargs -I{} gh api --method PATCH user/repository_invitations/{}"
+echo "  gh api user/repository_invitations --jq '.[] | select(.repository.full_name == \"${repo}\") | .id' | xargs -I{} gh api --method PATCH user/repository_invitations/{}"
 echo "  git clone https://github.com/${repo}.git"
+echo "The bot can push workflow changes that run before review, so keep any"
+echo "Actions secrets in an environment that requires your approval."

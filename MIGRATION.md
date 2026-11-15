@@ -42,6 +42,16 @@ git checkout -- "${tracked[@]}"
 git pull
 # Relink one file at a time; this unfolds the old directory links
 script/stow -R
+# Programs wrote some files into the repo through those old links (Neovim's
+# plugin lockfile and spell files, ~/.ssh's known_hosts and keys), and stow just
+# linked them back. Make each a real file in ~ and drop the repo copy
+git ls-files --others -z stowed-files | while IFS= read -r -d '' f; do
+  rel="${f#stowed-files/*/}"
+  [[ -L ~/"$rel" ]] || continue
+  cp -p ~/"$rel" ~/"$rel.new"
+  mv -f ~/"$rel.new" ~/"$rel"
+  rm "$f"
+done
 EOF
 ```
 
@@ -109,7 +119,7 @@ Coder runs `~/figma/dotfiles/users/ffortes/install.sh` on every start, and its
 1 once in the workspace. The matching `install.sh` changes are already made in
 `~/figma/dotfiles` but not committed: its delta fallback checks for the real
 `~/.gitconfig.local` file instead of a stow link, the difftastic fallback is
-gone, and it skips the `mpd` and `rmpc` packages. Commit and push those first.
+gone. Commit and push those first.
 
 ## 5. Once, for agents
 

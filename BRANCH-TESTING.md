@@ -59,7 +59,7 @@ agy --dangerously-skip-permissions   # signs in on first run
 
 Things worth confirming: `agy` can sign in without a browser on the container,
 and `claude`/`codex` still have their logins after
-`container rm --force agents-test && dev create agents-test dotfiles`.
+`dev recreate agents-test`.
 
 ### GitHub pushes as the bot
 

@@ -72,29 +72,26 @@ RUN ln -s /state/antigravity .antigravity && ln -s /state/gemini .gemini
 
 # ~/.local/bin (node, npm globals, etc.) for shells that skip ~/.profile, like
 # `podman exec dotfiles node`. DOTFILES_DEV_IMAGE makes script/update add the
-# coding toolchain. The music stow packages (MPD, rmpc, ~/Music) only make
-# sense on hosts.
+# coding toolchain.
 ENV IS_DOCKER=1 \
     DOTFILES_DEV_IMAGE=1 \
-    DOTFILES_SKIP_PACKAGES="mpd rmpc" \
-    PATH=/home/$USER_NAME/.local/bin:$PATH \
-    CLAUDE_CONFIG_DIR=/state/claude \
-    CODEX_HOME=/state/codex
+    PATH=/home/$USER_NAME/.local/bin:$PATH
 
-# Only the scripts and the npm, bun and uv configs (linked first, for their
-# release-age settings), so dotfile edits don't rebuild this heavy layer.
-# Download caches, over a gigabyte, are deleted in the same layer.
+# Only the scripts, so dotfile edits don't rebuild this heavy layer; npm
+# installs pass their release-age cooldown explicitly. Download caches (over a
+# gigabyte) and the Claude Code config its installer writes are deleted in the
+# same layer, so no image carries one install's IDs.
 COPY --chown=$USER_NAME:$USER_NAME script/ dotfiles/script/
-COPY --chown=$USER_NAME:$USER_NAME stowed-files/npm/ dotfiles/stowed-files/npm/
-COPY --chown=$USER_NAME:$USER_NAME stowed-files/bun/ dotfiles/stowed-files/bun/
-COPY --chown=$USER_NAME:$USER_NAME stowed-files/uv/ dotfiles/stowed-files/uv/
 RUN --mount=type=secret,id=GH_TOKEN,mode=0444 \
   export GH_TOKEN="$(cat /run/secrets/GH_TOKEN 2>/dev/null)" && \
-  ./dotfiles/script/stow npm bun uv && \
   ./dotfiles/script/update && \
   sudo apt-get clean && \
   sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
-  rm -rf ~/.cache ~/.local/install/cache
+  rm -rf ~/.cache ~/.local/install/cache ~/.claude ~/.claude.json
+
+# Agent logins go in the /state mount, set only after installing
+ENV CLAUDE_CONFIG_DIR=/state/claude \
+    CODEX_HOME=/state/codex
 
 COPY --chown=$USER_NAME:$USER_NAME . dotfiles/
 RUN ./dotfiles/script/stow

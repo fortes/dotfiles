@@ -254,7 +254,7 @@ What keeps that boundary intact:
 - **Each repo lives on one side.** Clone a container's repos into its `src` and do their git work inside it. Running host git in a checkout a container wrote can run that checkout's `.git/hooks` or `core.fsmonitor` on the host.
 - **Mount only the container's `src` and its state,** never `~` or all of `~/src`.
 - **Agents have passwordless sudo inside,** so they can install whatever a project needs. Treat everything in a container as theirs: the protections are what it's given (mounts, `env`, tokens), not restrictions inside it.
-- **Agent logins live in each container's own `state`,** mounted at `/state` (`CLAUDE_CONFIG_DIR`, `CODEX_HOME`, plus links for agy), so they survive image upgrades and the projects can't see them, though anything running in the container can. `dev create --shared-state` uses `~/containers/.state` instead, shared by every container created that way: one sign-in, but each of them can read the others' logins. Keep untrusted repos out of the shared ones. GitHub access is always per container, from each one's `env`.
+- **Agent logins live in each container's own `state`,** mounted at `/state` (`CLAUDE_CONFIG_DIR`, `CODEX_HOME`, plus links for agy), so they survive image upgrades and the projects can't see them, though anything running in the container can. `dev create --shared-state` links it to `~/containers/.state` instead, shared by every container created that way: one sign-in, but each of them can read the others' logins. Keep untrusted repos out of the shared ones. GitHub access is always per container, from each one's `env`.
 
 #### Using containers
 
@@ -267,18 +267,13 @@ dev personal          # Login shell in /workspaces, starting the container if ne
 
 Run `dev` from a host tmux window rather than nesting tmux. Pass an image as the last argument to use a project's own, e.g. `dev create new-project new-project`.
 
-To reach a dev server from other machines on the LAN (a phone, another laptop), publish its port when creating the container: `dev create --publish 1313 site`. It's served on the same port on every interface of the host, so `http://<host>:1313` works from the network with no SSH tunnel, as long as the server binds to `0.0.0.0` (`hugo server --bind 0.0.0.0`; Hugo also needs `--baseURL http://<host>:1313/` for its links to work off the host). Ports are fixed when the container is created: recreate it to change them, which keeps `src`, `state` and `env`. On the Mac, the firewall may ask once whether to let `container` accept incoming connections.
+To reach a dev server from other machines on the LAN (a phone, another laptop), publish its port when creating the container: `dev create --publish 1313 site`. It's served on the same port on every interface of the host, so `http://<host>:1313` works from the network with no SSH tunnel, as long as the server binds to `0.0.0.0` (`hugo server --bind 0.0.0.0`; Hugo also needs `--baseURL http://<host>:1313/` for its links to work off the host). To change them later, edit `~/containers/<name>/ports` (one per line) and run `dev recreate <name>`. On the Mac, the firewall may ask once whether to let `container` accept incoming connections.
 
 `dev create` writes `~/containers/<name>/env` with commented-out variables (the bot's `GH_TOKEN`, git identity, `GEMINI_API_KEY`). It's read each time `dev` opens a shell; leave it commented out for a container with no GitHub access. Git pushes over HTTPS through `gh`, so the token is all GitHub needs.
 
 Inside, agents run without prompts: `claude --dangerously-skip-permissions`, `codex --dangerously-bypass-approvals-and-sandbox`, `agy --dangerously-skip-permissions`. On hosts, keep their prompts, or for a quick question start them read-only: `claude --permission-mode plan`, `codex --sandbox read-only`, `agy --mode plan`.
 
-Images are built with some frequency, via CI, for amd64 and arm64. Builds reuse cached install layers until the scripts or package lists change, so a new image doesn't always mean newer tools; `container build --no-cache` (or `podman build --no-cache`) refreshes everything. To move a container to a new image, keeping its `src`, `env` and logins (repeat `--shared-state` if it used it):
-
-```sh
-container image pull ghcr.io/fortes/dotfiles:latest
-container rm --force personal && dev create personal
-```
+Images are built with some frequency, via CI, for amd64 and arm64. Builds reuse cached install layers until the scripts or package lists change, so a new image doesn't always mean newer tools; `container build --no-cache` (or `podman build --no-cache`) refreshes everything. To move a container to a new image, keeping its `src`, `env`, logins and ports, `dev recreate personal` pulls the image and replaces the container.
 
 Anything installed in a container outside `/workspaces` and `/state` is lost when it's recreated.
 
@@ -323,7 +318,8 @@ Give agents their own GitHub account, so their PRs need your approval to merge:
 
 1. Create a machine account (GitHub allows one per person), and set `DOTFILES_AGENT_BOT` to its login in `~/.profile.local`.
 2. Give it a classic token with the `repo` scope, for the containers' `env`. Fine-grained tokens only cover repos the token's own account (or its orgs) owns.
-3. Create repos agents work on with `new-github-repo <owner/name>`. It invites the bot, and adds a ruleset on the default branch requiring a pull request with one approval and blocking force pushes and deletion. Rulesets on private repos need GitHub Pro.
+3. Create repos agents work on with `new-github-repo <owner/name>`. It adds a ruleset on the default branch requiring a pull request with one approval (dismissed by new commits) and blocking force pushes and deletion, which you as admin can bypass, then invites the bot. Rulesets on private repos need GitHub Pro.
+4. The bot can push branches whose workflow changes run before any review, so keep Actions secrets on agent repos in an environment that requires your approval.
 
 #### Starting a project
 
