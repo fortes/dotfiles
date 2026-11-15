@@ -13,6 +13,8 @@ export PATH="$HOME/.local/bin:$PATH"
 # Installers must work before stow and from shells that never read .profile.
 [[ ! -x /opt/homebrew/bin/brew ]] || export PATH="/opt/homebrew/bin:$PATH"
 export NPM_CONFIG_PREFIX="$HOME/.local"
+# Like ~/.npmrc's, for machines and builds that haven't stowed it
+export NPM_CONFIG_CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/npm"
 export BUN_INSTALL="$HOME/.local"
 
 # Shared by setup and update so they select the same scope

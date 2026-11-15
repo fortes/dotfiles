@@ -72,22 +72,24 @@ RUN ln -s /state/antigravity .antigravity && ln -s /state/gemini .gemini
 
 # ~/.local/bin (node, npm globals, etc.) for shells that skip ~/.profile, like
 # `podman exec dotfiles node`. DOTFILES_DEV_IMAGE makes script/update add the
-# coding toolchain.
+# coding toolchain. Corepack's prompt is off for agents that skip .profile too.
 ENV IS_DOCKER=1 \
     DOTFILES_DEV_IMAGE=1 \
-    PATH=/home/$USER_NAME/.local/bin:$PATH
+    PATH=/home/$USER_NAME/.local/bin:$PATH \
+    COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 
 # Only the scripts, so dotfile edits don't rebuild this heavy layer; npm
 # installs pass their release-age cooldown explicitly. Download caches (over a
-# gigabyte) and the Claude Code config its installer writes are deleted in the
-# same layer, so no image carries one install's IDs.
+# gigabyte), and the Claude Code and Codex config their installers and
+# completions write, are deleted in the same layer, so no image carries one
+# install's IDs.
 COPY --chown=$USER_NAME:$USER_NAME script/ dotfiles/script/
 RUN --mount=type=secret,id=GH_TOKEN,mode=0444 \
   export GH_TOKEN="$(cat /run/secrets/GH_TOKEN 2>/dev/null)" && \
   ./dotfiles/script/update && \
   sudo apt-get clean && \
   sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
-  rm -rf ~/.cache ~/.local/install/cache ~/.claude ~/.claude.json
+  rm -rf ~/.cache ~/.local/install/cache ~/.claude ~/.claude.json ~/.codex
 
 # Agent logins go in the /state mount, set only after installing
 ENV CLAUDE_CONFIG_DIR=/state/claude \

@@ -130,9 +130,10 @@ Follow MIGRATION.md, but in step 1's second block replace `git pull` with
    - Back up `~/dotfiles` and the `.local` files first.
    - After migrating and `script/setup`: `beet ls` (plugins load, library
      intact), SSH and Eternal Terminal still connect, tmux.
-   - Containers: create the `dev` user, `sudo loginctl enable-linger dev`, and
-     as `dev`, `dev create scratch`. This is the first run of `dev`'s podman
-     path.
+   - Containers: create the `dev` user and `sudo loginctl enable-linger dev`.
+     As `dev`, clone the repo and run `script/stow` (not `script/setup`; it has
+     no sudo), then `dev create scratch`. This is the first run of `dev`'s
+     podman path.
 3. **Coder devbox**: after the merge, per MIGRATION.md section 4.
 
 ## Rolling a machine back

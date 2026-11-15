@@ -13,7 +13,7 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-[[ $# -eq 1 ]] || {
+[[ $# -eq 1 && "$1" == */* ]] || {
   echo "Usage: new-github-repo <owner/name>" >&2
   exit 1
 }

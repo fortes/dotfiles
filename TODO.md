@@ -4,9 +4,6 @@
 
 ### Priority 1 (High)
 
-- [ ] **Check Apple's container service survives a reboot** (task)
-  - `container system start` registers a launchd service, but a reboot was never tested. If it doesn't come back, `dev` fails until it's started again; decide whether `dev` should say so or start it
-
 - [ ] **Ship agent config into containers** (feature)
   - Claude Code's `settings.json`, global `CLAUDE.md`, hooks and MCP servers live in each container's `/state`, so every new container starts from defaults. Copy them in from the dotfiles the way `local-templates/` works, so every container's agents behave the same
   - For Claude Code, the image can install `/etc/claude-code/managed-settings.json`, which takes precedence over user and project settings: shared hooks, permission rules and MCP servers for every container (https://code.claude.com/docs/en/devcontainer)
@@ -32,7 +29,7 @@
   - It's a classic `repo`-scope token, reaching every repo the bot is invited to
 
 - [ ] **Test agents on a headless server** (task)
-  - Claude Code's and agy's sign-in over SSH on the homelab, and `codex --sandbox read-only` running for real there (it can't inside a container)
+  - Claude Code's sign-in over SSH on the homelab, and `codex --sandbox read-only` running for real there (it can't inside a container). agy's sign-in already works without a browser: it prints a URL and takes the code back
 
 - [ ] **Pin tool versions per project** (task)
   - Starting with fil-ter.com once fortes.com's `make setup` works in Claude's cloud: a `make setup`/`make doctor`, relaxing `check-deps`' exact Node match, and mise or a plain setup script for Node, Bun and Hugo

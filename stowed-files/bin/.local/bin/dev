@@ -3,12 +3,13 @@
 # Uses Apple's `container` where it's installed, otherwise rootless podman.
 #
 # Usage:
+#   dev              List dev containers
 #   dev <name>       Shell in the container, starting it if needed
 #   dev create [--shared-state] [--publish <port>]... <name> [image]
 #                    Make ~/containers/<name> and its container
-#   dev recreate <name>
+#   dev recreate <name> [image]
 #                    Replace the container, e.g. for a new image, keeping its
-#                    files, logins, ports and image
+#                    files, logins and ports (and image, unless given)
 #
 # Mounts ~/containers/<name>/{src,state} at /workspaces and /state (with
 # --shared-state, state links to the shared ~/containers/.state), and reads
@@ -24,6 +25,8 @@ readonly root="${HOME}/containers"
 if command -v container >/dev/null 2>&1; then
   runtime=container
   run_args=()
+  # Its service doesn't come back after a reboot or a Homebrew upgrade
+  container system status >/dev/null 2>&1 || container system start
 else
   runtime=podman
   # Maps the image's UID 1000 user to yours, so mounted files stay yours
@@ -31,7 +34,7 @@ else
 fi
 
 usage() {
-  echo "Usage: dev <name> | dev create [--shared-state] [--publish <port>]... <name> [image] | dev recreate <name>" >&2
+  echo "Usage: dev [<name>] | dev create [--shared-state] [--publish <port>]... <name> [image] | dev recreate <name> [image]" >&2
   exit 1
 }
 
@@ -43,8 +46,11 @@ run_container() {
     [[ -n "${port}" ]] || continue
     publish+=(--publish "0.0.0.0:${port}:${port}")
   done <"${dir}/ports"
+  # Apple's container already uses the name as the hostname, for the prompt
+  local hostname=()
+  [[ "${runtime}" == podman ]] && hostname=(--hostname "${name}")
   "${runtime}" run --detach --init --name "${name}" --memory 8G \
-    ${run_args[@]+"${run_args[@]}"} ${publish[@]+"${publish[@]}"} \
+    ${run_args[@]+"${run_args[@]}"} ${hostname[@]+"${hostname[@]}"} ${publish[@]+"${publish[@]}"} \
     --volume "${dir}/src:/workspaces" --volume "$(cd "${dir}/state" && pwd -P):/state" \
     "${image}" sleep infinity >/dev/null
 }
@@ -102,6 +108,8 @@ EOF
     echo "${port}" >>"${dir}/ports"
   done
 
+  # Podman leaves a container behind when its start fails (a port in use)
+  "${runtime}" rm --force "${name}" >/dev/null 2>&1 || true
   run_container "${name}" "${image}"
   # Only once it runs, so a failed create (a typo in the image, a port in use)
   # can simply be rerun
@@ -109,12 +117,30 @@ EOF
   echo "Created ${name}. Add its GitHub token to ${dir}/env if it needs one, then: dev ${name}"
 }
 
-recreate() {
-  local name="$1" image
-  [[ -e "${root}/${name}/image" ]] || {
-    echo "No dev container ${name}; use: dev create ${name}" >&2
+# Exit unless `dev create` made container $1
+require_container() {
+  [[ -e "${root}/$1/image" ]] || {
+    echo "No dev container $1; use: dev create $1" >&2
     exit 1
   }
+}
+
+list() {
+  local dir name
+  for dir in "${root}"/*/; do
+    name="$(basename "${dir}")"
+    [[ -e "${dir}/image" ]] || continue
+    printf '%s\t%s\t%s\n' "${name}" "$(cat "${dir}/image")" \
+      "$(tr '\n' ' ' <"${dir}/ports")"
+  done
+}
+
+recreate() {
+  local name="$1" image
+  require_container "${name}"
+  if [[ -n "${2:-}" ]]; then
+    echo "$2" >"${root}/${name}/image"
+  fi
   image="$(cat "${root}/${name}/image")"
   # Pull the newest from a registry; local builds are already current
   if [[ "${image}" == */* ]]; then
@@ -128,6 +154,7 @@ recreate() {
 
 shell() {
   local name="$1"
+  require_container "${name}"
   # A no-op when it's already running
   "${runtime}" start "${name}" >/dev/null
   # exec resets TERM, so pass through the host tmux's TERM and truecolor
@@ -136,14 +163,16 @@ shell() {
 }
 
 case "${1:-}" in
-  '' | -h | --help) usage ;;
+  '') list ;;
+  -h | --help) usage ;;
   create)
     shift
     create "$@"
     ;;
   recreate)
-    [[ $# -eq 2 ]] || usage
-    recreate "$2"
+    [[ $# -ge 2 && $# -le 3 ]] || usage
+    shift
+    recreate "$@"
     ;;
   *)
     [[ $# -eq 1 ]] || usage

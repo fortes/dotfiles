@@ -45,7 +45,8 @@ if [[ "$(uname -s)" != Darwin ]]; then
   # directories only if empty, so a real ~/Music stays
   script/stow -D ghostty mpd rmpc
   rm -f ~/.mpd/mpd.conf.local ~/.mpdscribble/mpdscribble.conf ~/Music/.mpdignore
-  rmdir ~/.mpd/playlists ~/.mpd ~/.mpdscribble ~/Music ~/.config/ghostty ~/.config/rmpc 2>/dev/null || true
+  rmdir ~/.mpd/playlists ~/.mpd ~/.mpdscribble ~/Music ~/.config/ghostty \
+    ~/.config/rmpc/themes ~/.config/rmpc 2>/dev/null || true
 fi
 # Relink one file at a time; this unfolds the old directory links
 script/stow -R
@@ -60,6 +61,8 @@ git ls-files --others -z stowed-files | while IFS= read -r -d '' f; do
 done
 # Links left dangling by removed packages and scripts (epy, prettier, ...)
 find ~ -maxdepth 5 -lname '*dotfiles/stowed-files*' ! -exec test -e {} \; -exec rm -v {} + 2>/dev/null || true
+# And folders that deleted packages left in the repo once their files moved out
+find stowed-files -type d -empty -delete
 EOF
 ```
 
@@ -124,10 +127,15 @@ Linux: Podman) and run `dev create` as them.
 
 Coder runs `~/figma/dotfiles/users/ffortes/install.sh` on every start, and its
 `git pull --ff-only` fails while the skip-worktree files are there, so run step
-1 once in the workspace. The matching `install.sh` changes are already made in
-`~/figma/dotfiles` but not committed: its delta fallback checks for the real
-`~/.gitconfig.local` file instead of a stow link, the difftastic fallback is
-gone. Commit and push those first.
+1 once in the workspace, with `export DOTFILES_SKIP_PACKAGES=npm` first:
+`~/.bashrc.local` sets it, but step 1's non-interactive shells don't read it,
+so `script/stow -R` would otherwise link `~/.npmrc` (or conflict with the
+image's). Then run `script/setup`, which adds the `fd` and `bat` links.
+
+The matching `install.sh` changes are already made in `~/figma/dotfiles` but
+not committed: its delta fallback checks for the real `~/.gitconfig.local` file
+instead of a stow link, and the difftastic fallback is gone. Commit and push
+those first.
 
 ## 5. Once, for agents
 

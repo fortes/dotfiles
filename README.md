@@ -337,7 +337,7 @@ Homebrew installs [`container`](https://github.com/apple/container), which runs 
 
 Podman runs containers rootless and is installed by `script/setup`, and `dev` uses it when Apple's `container` isn't there. Unlike Apple's VM per container, rootless Podman shares the host kernel, so on a server run dev containers as a separate user (`sudo adduser dev`) and SSH in as them. A container escape then lands in an account without your SSH keys or 1Password.
 
-Rootless containers stop when their user logs out. Run `sudo loginctl enable-linger dev` to keep long-running ones alive.
+Rootless containers stop when their user logs out. Run `sudo loginctl enable-linger dev` to keep long-running ones alive. The `dev` user has no sudo, so it only clones the repo and runs `script/stow` for the `dev` helper and shell config; the host's own setup installed podman.
 
 #### Building locally
 

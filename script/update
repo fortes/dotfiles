@@ -29,6 +29,10 @@ else
   # Both update themselves once installed
   "${dotfiles_script_dir}/install_agy"
   command_exists claude || npx --yes --min-release-age=3 @anthropic-ai/claude-code install
+  # Trixie's ncurses-term only has `ghostty`, not the `xterm-ghostty` Ghostty
+  # sets, which tmux needs for its modified keys and true color
+  infocmp xterm-ghostty &>/dev/null \
+    || tic -x -o "$HOME/.terminfo" "${dotfiles_script_dir}/xterm-ghostty.terminfo"
   # Debian names these fdfind and batcat
   ln -sf /usr/bin/fdfind "$HOME/.local/bin/fd"
   ln -sf /usr/bin/batcat "$HOME/.local/bin/bat"

@@ -32,7 +32,6 @@ declare -r DEVBOX_APT_PACKAGES=(
   bat
   ca-certificates
   curl
-  eza
   fd-find
   git-extras
   git-lfs
