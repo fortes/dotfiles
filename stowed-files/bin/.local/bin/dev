@@ -138,10 +138,7 @@ list() {
 recreate() {
   local name="$1" image
   require_container "${name}"
-  if [[ -n "${2:-}" ]]; then
-    echo "$2" >"${root}/${name}/image"
-  fi
-  image="$(cat "${root}/${name}/image")"
+  image="${2:-$(cat "${root}/${name}/image")}"
   # Pull the newest from a registry; local builds are already current
   if [[ "${image}" == */* ]]; then
     "${runtime}" image pull "${image}" >/dev/null
@@ -149,6 +146,8 @@ recreate() {
   # It may already be gone
   "${runtime}" rm --force "${name}" >/dev/null 2>&1 || true
   run_container "${name}" "${image}"
+  # Only once it runs, so a typo in a new image keeps the old one
+  echo "${image}" >"${root}/${name}/image"
   echo "Recreated ${name} from ${image}"
 }
 
