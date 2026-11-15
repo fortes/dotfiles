@@ -28,7 +28,13 @@ else
   "${dotfiles_script_dir}/install_node"
   # Both update themselves once installed
   "${dotfiles_script_dir}/install_agy"
-  command_exists claude || npx --yes --min-release-age=3 @anthropic-ai/claude-code install
+  if ! command_exists claude; then
+    # A throwaway npm cache: nothing else on a host uses npm, and this install
+    # would otherwise leave ~500 MB behind
+    npm_cache="$(mktemp -d)"
+    NPM_CONFIG_CACHE="${npm_cache}" npx --yes --min-release-age=3 @anthropic-ai/claude-code install
+    rm -rf "${npm_cache}"
+  fi
   # Trixie's ncurses-term only has `ghostty`, not the `xterm-ghostty` Ghostty
   # sets, which tmux needs for its modified keys and true color
   infocmp xterm-ghostty &>/dev/null \
