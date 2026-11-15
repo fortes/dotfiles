@@ -70,8 +70,8 @@ stow
 sudo
 tmux/trixie-backports
 trash-cli
-# Automatic security updates on servers and Crostini
-unattended-upgrades
+# Security updates on servers and Crostini; images are rebuilt instead
+unattended-upgrades  # host-only
 unzip
 wamerican
 wget

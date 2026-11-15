@@ -40,8 +40,8 @@ ENV LANG=en_US.UTF-8 \
     LANGUAGE=en_US:en \
     LC_ALL=en_US.UTF-8
 
-# The host apt list minus `# host-only` lines, with contrib/non-free and
-# backports enabled as setup_linux does on hosts. This layer only rebuilds when
+# The host apt list minus `# host-only` lines, with backports enabled as
+# setup_linux does on hosts. This layer only rebuilds when
 # the list changes, which keeps apt downloads cached.
 COPY script/apt-packages.txt /tmp/apt-packages.txt
 USER root
