@@ -4,11 +4,13 @@
 #
 # Usage:
 #   dev <name>       Shell in the container, starting it if needed
-#   dev create [--shared-state] <name> [image]
+#   dev create [--shared-state] [--publish <port>]... <name> [image]
 #                    Make ~/containers/<name> and its container
 #
 # Mounts ~/containers/<name>/{src,state} (or the shared ~/containers/.state) at
 # /workspaces and /state, and reads ~/containers/<name>/env on every shell.
+# --publish serves a container port on the same port on every host interface,
+# so other machines on the LAN can reach dev servers that bind to 0.0.0.0.
 
 set -euo pipefail
 IFS=$'\n\t'
@@ -25,16 +27,24 @@ else
 fi
 
 usage() {
-  echo "Usage: dev <name> | dev create [--shared-state] <name> [image]" >&2
+  echo "Usage: dev <name> | dev create [--shared-state] [--publish <port>]... <name> [image]" >&2
   exit 1
 }
 
 create() {
-  local state_dir=''
-  if [[ "${1:-}" == --shared-state ]]; then
-    state_dir="${root}/.state"
+  local state_dir='' publish=()
+  while [[ "${1:-}" == --* ]]; do
+    case "$1" in
+      --shared-state) state_dir="${root}/.state" ;;
+      --publish)
+        [[ "${2:-}" =~ ^[0-9]+$ ]] || usage
+        publish+=(--publish "0.0.0.0:$2:$2")
+        shift
+        ;;
+      *) usage ;;
+    esac
     shift
-  fi
+  done
   [[ $# -ge 1 && $# -le 2 ]] || usage
   local name="$1" image="${2:-ghcr.io/fortes/dotfiles:latest}"
   local dir="${root}/${name}"
@@ -60,6 +70,7 @@ EOF
   fi
 
   "${runtime}" run --detach --name "${name}" --memory 8G ${run_args[@]+"${run_args[@]}"} \
+    ${publish[@]+"${publish[@]}"} \
     --volume "${dir}/src:/workspaces" --volume "${state_dir}:/state" \
     "${image}" sleep infinity >/dev/null
   echo "Created ${name}. Add its GitHub token to ${dir}/env if it needs one, then: dev ${name}"

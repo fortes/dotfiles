@@ -266,6 +266,8 @@ dev personal          # Login shell in /workspaces, starting the container if ne
 
 Run `dev` from a host tmux window rather than nesting tmux. Pass an image as the last argument to use a project's own, e.g. `dev create new-project new-project`.
 
+To reach a dev server from other machines on the LAN (a phone, another laptop), publish its port when creating the container: `dev create --publish 1313 site`. It's served on the same port on every interface of the host, so `http://<host>:1313` works from the network with no SSH tunnel, as long as the server binds to `0.0.0.0` (`hugo server --bind 0.0.0.0`; Hugo also needs `--baseURL http://<host>:1313/` for its links to work off the host). Ports are fixed when the container is created: recreate it to change them, which keeps `src`, `state` and `env`. On the Mac, the firewall may ask once whether to let `container` accept incoming connections.
+
 `dev create` writes `~/containers/<name>/env` with commented-out variables (the bot's `GH_TOKEN`, git identity, `GEMINI_API_KEY`). It's read each time `dev` opens a shell; leave it commented out for a container with no GitHub access. Git pushes over HTTPS through `gh`, so the token is all GitHub needs.
 
 Inside, agents run without prompts: `claude --dangerously-skip-permissions`, `codex --dangerously-bypass-approvals-and-sandbox`, `agy --dangerously-skip-permissions`. On hosts, keep their prompts, or for a quick question start them read-only: `claude --permission-mode plan`, `codex --sandbox read-only`, `agy --mode plan`.

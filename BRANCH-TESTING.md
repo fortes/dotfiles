@@ -73,6 +73,17 @@ and `claude`/`codex` still have their logins after
 4. Approve and merge it on GitHub as yourself; pushing another commit should
    dismiss the approval.
 
+### Published ports
+
+```sh
+dev create --publish 1313 site dotfiles
+dev site   # then, inside: cd /tmp && python3 -m http.server 1313 --bind 0.0.0.0
+```
+
+Open `http://<Mac's LAN IP>:1313` from a phone on the same network. On the
+homelab, the same with podman (`dev create --publish 1313 site` as the `dev`
+user) is untested.
+
 ### Shared logins
 
 ```sh
