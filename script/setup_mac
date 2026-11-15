@@ -23,6 +23,7 @@ BREW_PACKAGES=(
   bash-language-server
   bat
   beets
+  oven-sh/bun/bun
   chafa
   container
   delta

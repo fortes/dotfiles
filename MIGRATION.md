@@ -81,7 +81,7 @@ Homebrew doesn't uninstall dropped formulae, and old installs in `~/.local/bin`
 shadow the new ones because it comes first on `PATH`:
 
 ```sh
-brew uninstall rust bun docker docker-compose colima podman f2 difftastic cloudflared
+brew uninstall rust docker docker-compose colima podman f2 difftastic cloudflared
 # Old npm globals (codex, language servers, prettier, qmd, ...) and Corepack shims
 rm -rf ~/.local/lib/node_modules
 # Native Claude Code install (the cask replaces it; ~/.claude is untouched)
@@ -106,8 +106,8 @@ apt, became on-demand, or went away:
 
 ```sh
 # GitHub binaries no longer installed on hosts (delta now comes from apt)
-# (codex, agy and claude stay: hosts keep them for quick questions)
-rm -f ~/.local/bin/{bun,bunx,gemini-api,fx,yq,delta,difft,hugo}
+# (bun, codex, agy and claude stay on hosts)
+rm -f ~/.local/bin/{gemini-api,fx,yq,delta,difft,hugo}
 rm -rf ~/.local/share/lua-language-server
 # Their .deb installs; keep cloudflared if the homelab uses it
 sudo apt-get remove gh sad f2 hugo

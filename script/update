@@ -22,8 +22,8 @@ if [[ "$(uname -s)" == Darwin ]]; then
 else
   # Debian's are missing or too old for git, the shell, init.lua, notes and yazi.
   # Codex, agy and Claude Code are for quick questions on servers too
-  "${dotfiles_script_dir}/install_github_packages" codex fzf harper-ls marksman \
-    neovim tree-sitter-cli uv yazi
+  "${dotfiles_script_dir}/install_github_packages" bun codex fzf harper-ls \
+    marksman neovim tree-sitter-cli uv yazi
   # Debian's nodejs is past upstream end of life
   "${dotfiles_script_dir}/install_node"
   # Both update themselves once installed
