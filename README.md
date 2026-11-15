@@ -269,7 +269,7 @@ Run `dev` from a host tmux window rather than nesting tmux. Pass an image as the
 
 To reach a dev server from other machines on the LAN (a phone, another laptop), publish its port when creating the container: `dev create --publish 1313 site`. It's served on the same port on every interface of the host, so `http://<host>:1313` works from the network with no SSH tunnel, as long as the server binds to `0.0.0.0` (`hugo server --bind 0.0.0.0`; Hugo also needs `--baseURL http://<host>:1313/` for its links to work off the host). To change them later, edit `~/containers/<name>/ports` (one per line) and run `dev recreate <name>`. On the Mac, the firewall may ask once whether to let `container` accept incoming connections.
 
-`dev create` writes `~/containers/<name>/env` with commented-out variables (the bot's `GH_TOKEN`, git identity, `GEMINI_API_KEY`). It's read each time `dev` opens a shell; leave it commented out for a container with no GitHub access. Git pushes over HTTPS through `gh`, so the token is all GitHub needs.
+`dev create` writes `~/containers/<name>/env` with commented-out variables (a `GH_TOKEN`, yours or the bot's per [GitHub access](#github-access), its git identity, `GEMINI_API_KEY`). It's read each time `dev` opens a shell; leave it commented out for a container with no GitHub access. Git pushes over HTTPS through `gh`, so the token is all GitHub needs.
 
 Inside, agents run without prompts: `claude --dangerously-skip-permissions`, `codex --dangerously-bypass-approvals-and-sandbox`, `agy --dangerously-skip-permissions`. On hosts, keep their prompts, or for a quick question start them read-only: `claude --permission-mode plan`, `codex --sandbox read-only`, `agy --mode plan`.
 
@@ -287,7 +287,7 @@ Hosts and containers each sign in separately; the Mac's logins can't be shared w
 | Codex | Run `codex` | `codex login --device-auth` (no browser callback needed) |
 | agy | Install the `antigravity-cli` cask by hand, run `agy` | Run `agy` and follow its sign-in |
 | gemini-api | `gemini-api configure` with an [AI Studio key](https://aistudio.google.com/apikey) | Containers only: `GEMINI_API_KEY` in the container's `env` |
-| GitHub | `gh auth login` as yourself | Containers: the bot's `GH_TOKEN` in `env` |
+| GitHub | `gh auth login` as yourself | Containers: a `GH_TOKEN` in `env`, yours or the bot's |
 
 Claude Code and agy update themselves. In containers, `script/update` updates Codex, gemini-api and the rest, or move to a new image. On the Mac, `brew upgrade` covers the casks, and `script/update` covers gemini-api.
 
@@ -312,9 +312,14 @@ CLAUDE_CODE_AUTO_COMPACT_WINDOW=98304
 
 Check the provider's terms before giving it code: only clone repos into that container that you'd be fine sending there.
 
-#### Agent GitHub access
+#### GitHub access
 
-Give agents their own GitHub account, so their PRs need your approval to merge:
+Each container's `GH_TOKEN` decides who its pushes come from. Pick per container:
+
+- **Your own token**, for trusted work where you don't need to review what lands on `main` (your blog, small personal projects). Use a fine-grained token limited to those repos, with Contents and Pull requests read/write. You and agents push to `main` directly as you, no rulesets needed, and repos are plain `gh repo create`.
+- **The agent bot's token**, for containers where agents run unattended and you want to review everything first. Its PRs need your approval to merge, set up as below. Changes you make yourself in such a container go through a PR too.
+
+To set up the bot:
 
 1. Create a machine account (GitHub allows one per person), and set `DOTFILES_AGENT_BOT` to its login in `~/.profile.local`.
 2. Give it a classic token with the `repo` scope, for the containers' `env`. Fine-grained tokens only cover repos the token's own account (or its orgs) owns.
@@ -324,7 +329,7 @@ Give agents their own GitHub account, so their PRs need your approval to merge:
 #### Starting a project
 
 1. On the Mac: `new-github-repo fortes/new-project`.
-2. In a container whose `env` has the bot's token (`dev personal`), run the two commands it prints: accept the invite, and clone.
+2. In a container whose `env` has the bot's token, run the two commands it prints: accept the invite, and clone. (For a repo you'll only work on with your own token, `gh repo create` and `git clone` are enough.)
 3. Start from the template: `cp -R ~/dotfiles/script/dev/project-template/. .` It has an `AGENTS.md` and a `Makefile` with `setup`, `doctor` and `check`, backed by `script/setup` and `script/doctor`. Pin tool versions and lock dependencies there, so every environment runs the same `make setup`: dev containers, CI, Claude's and Codex's cloud setup scripts, and a devcontainer's `postCreateCommand` if the project ever wants one.
 4. Agents work on branches, push as the bot and open PRs; you review and merge on GitHub.
 5. When the project needs more than the image has (a browser, a database, its own secrets), give it a Dockerfile `FROM ghcr.io/fortes/dotfiles` and its own container: `container build --tag new-project .`, then `dev create new-project new-project` and clone it there.

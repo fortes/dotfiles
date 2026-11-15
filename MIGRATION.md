@@ -139,10 +139,11 @@ those first.
 
 ## 5. Once, for agents
 
-- Create the agent bot GitHub account and a classic `repo`-scope token for it
-  (README, Agent GitHub access). Set `DOTFILES_AGENT_BOT` in the Mac's
-  `~/.profile.local`.
-- `dev create personal`, put the bot's token and git identity in
+- For containers where agents run unattended, create the agent bot GitHub
+  account and a classic `repo`-scope token for it (README, GitHub access), and
+  set `DOTFILES_AGENT_BOT` in the Mac's `~/.profile.local`. Trusted containers
+  can use a fine-grained token of your own instead.
+- `dev create personal`, put the token (and, for the bot, its git identity) in
   `~/containers/personal/env`, then `dev personal` and sign in each agent
   (README, Signing in agents).
 - Rotate the Linear API key that showed up in an agent session.
