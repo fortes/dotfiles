@@ -253,6 +253,7 @@ What keeps that boundary intact:
 - **One container per trust group, not per project.** Projects that share a token can share a container. Clone untrusted repos into a throwaway container with no token.
 - **Each repo lives on one side.** Clone a container's repos into its `src` and do their git work inside it. Running host git in a checkout a container wrote can run that checkout's `.git/hooks` or `core.fsmonitor` on the host.
 - **Mount only the container's `src` and its state,** never `~` or all of `~/src`.
+- **Agents have passwordless sudo inside,** so they can install whatever a project needs. Treat everything in a container as theirs: the protections are what it's given (mounts, `env`, tokens), not restrictions inside it.
 - **Agent logins live in each container's own `state`,** mounted at `/state` (`CLAUDE_CONFIG_DIR`, `CODEX_HOME`, plus links for agy), so they survive image upgrades and the projects can't see them, though anything running in the container can. `dev create --shared-state` uses `~/containers/.state` instead, shared by every container created that way: one sign-in, but each of them can read the others' logins. Keep untrusted repos out of the shared ones. GitHub access is always per container, from each one's `env`.
 
 #### Using containers

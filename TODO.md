@@ -12,6 +12,10 @@
 
 - [ ] **Ship agent config into containers** (feature)
   - Claude Code's `settings.json`, global `CLAUDE.md`, hooks and MCP servers live in each container's `/state`, so every new container starts from defaults. Copy them in from the dotfiles the way `local-templates/` works, so every container's agents behave the same
+  - For Claude Code, the image can install `/etc/claude-code/managed-settings.json`, which takes precedence over user and project settings: shared hooks, permission rules and MCP servers for every container (https://code.claude.com/docs/en/devcontainer)
+
+- [ ] **Sign containers into Claude Code with `claude setup-token`** (task)
+  - A long-lived `CLAUDE_CODE_OAUTH_TOKEN` in a container's env (filled from 1Password, per the item above) gives it Claude access without a browser sign-in per container or `--shared-state`, and can be revoked on its own
 
 ### Priority 2 (Medium)
 
@@ -20,6 +24,9 @@
 
 - [ ] **Add a release cooldown to GitHub release installs** (task)
   - npm, bun and uv skip releases newer than 3 days; `install_github_packages` always takes the latest, for Codex, neovim, fzf, uv and the rest. It already reads the release from GitHub's API, so it could skip releases younger than 3 days
+
+- [ ] **Try Claude Code's auto mode in containers that hold secrets** (task)
+  - Instead of `--dangerously-skip-permissions`, auto mode has a classifier review each action before it runs, still without prompts. A middle ground for containers like fil-ter.com's with API keys (https://code.claude.com/docs/en/permission-modes)
 
 - [ ] **Give the agent bot's token an expiry and a rotation reminder** (task)
   - It's a classic `repo`-scope token, reaching every repo the bot is invited to
@@ -33,6 +40,7 @@
 - [ ] **Investigate Apple's sandboxy for agent containers** (task)
   - Apple's example runs coding agents in micro VMs whose only way out is a host proxy with a per-hostname allowlist (e.g. `*.anthropic.com`), which would close the open-egress gap in our agent containers: https://github.com/apple/container-examples/tree/main/containerization-sandboxy
   - Experimental, and relies on tools honoring `HTTP_PROXY`. Check whether its `baseImage` can be `ghcr.io/fortes/dotfiles`, or whether to borrow the proxy pattern for `container run` instead
+  - Filtering has to be enforced outside the container (host proxy, host network rules): agents have passwordless sudo inside it by design, so an in-container firewall like Anthropic's reference `init-firewall.sh` (iptables with `NET_ADMIN`) could just be turned off
 
 - [ ] **Investigate markdown-oxide LSP** (task)
   - Seems like it can work alongside obsidian.nvim, see https://oxide.md/index
