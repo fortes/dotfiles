@@ -22,14 +22,19 @@ if [[ "$(uname -s)" == Darwin ]]; then
 else
   # Debian's are missing or too old for git, the shell, init.lua, notes and yazi.
   # Codex, agy and Claude Code are for quick questions on servers too
-  "${dotfiles_script_dir}/install_github_packages" bun codex fzf harper-ls \
-    marksman neovim tree-sitter-cli uv yazi
+  "${dotfiles_script_dir}/install_github_packages" bun fzf harper-ls marksman \
+    neovim tree-sitter-cli uv yazi
   # Debian's nodejs is past upstream end of life
   "${dotfiles_script_dir}/install_node"
-  # Formats notes, like Homebrew's on the Mac. Its native binary comes as a
-  # regular dependency, so it needs no install scripts
+  # The notes formatter and language servers, like Homebrew's on the Mac. None
+  # needs install scripts: oxfmt's and Codex's native binaries are dependencies
   npm install --global --loglevel=error --no-fund --no-audit --ignore-scripts \
-    --min-release-age=3 oxfmt@latest
+    --min-release-age=3 oxfmt@latest bash-language-server@latest \
+    dockerfile-language-server-nodejs@latest vscode-langservers-extracted@latest \
+    yaml-language-server@latest
+  # Codex releases often and nags until updated, so it skips the cooldown
+  npm install --global --loglevel=error --no-fund --no-audit --ignore-scripts \
+    --min-release-age=0 @openai/codex@latest
   # Both update themselves once installed
   "${dotfiles_script_dir}/install_agy"
   if ! command_exists claude; then

@@ -14,15 +14,11 @@ GITHUB_PACKAGES=(fx gemini-api github-cli luals sad yq)
 NPM_PACKAGES=(
   @playwright/mcp
   agent-browser
-  bash-language-server
   corepack
-  dockerfile-language-server-nodejs
   oxlint
   tsx
   typescript
   vim-language-server
-  vscode-langservers-extracted
-  yaml-language-server
 )
 
 "${dotfiles_script_dir}/install_github_packages" "${GITHUB_PACKAGES[@]}"

@@ -121,6 +121,10 @@ Already done: the `.local` files are real private files in `~`, and
 
 ## Other machines
 
+A machine that already ran an earlier version of this branch (like the Debian
+VM) needs `rm ~/.local/bin/codex` once before `script/update`: Codex now comes
+from npm, which won't overwrite the old GitHub binary.
+
 Follow MIGRATION.md, but in step 1's second block replace `git pull` with
 `git fetch && git checkout containers`. Go from lowest to highest stakes:
 

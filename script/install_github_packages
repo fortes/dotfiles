@@ -27,7 +27,6 @@ DOWNLOAD_ROOT=''
 AVAILABLE_PACKAGES=(
   bun
   cloudflared
-  codex
   delta
   difftastic
   fx
@@ -244,16 +243,6 @@ install_bun() {
 
 install_cloudflared() {
   install_deb 'cloudflare/cloudflared' '/cloudflared-linux-{ARCH}\.deb$'
-}
-
-# The npm package bundles every platform's binary. The release tarball holds
-# one, named after its target triple
-install_codex() {
-  local file
-  file="$(fetch_asset 'openai/codex' '/codex-{ARCH}-unknown-linux-musl\.tar\.gz$')"
-  tar --no-same-owner -xzf "${file}" -C "$(dirname "${file}")"
-  install_executable "${file%.tar.gz}" "$HOME/.local/bin/codex"
-  echo "codex installed"
 }
 
 install_delta() {

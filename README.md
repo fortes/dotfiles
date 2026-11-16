@@ -246,7 +246,7 @@ clean those up:
 
 ### Containers
 
-Coding and unattended agents run in containers. Hosts (macOS, Debian servers, Crostini) get Homebrew or apt packages plus the short lists in `script/update`; hosts also keep Claude Code, Codex and agy for quick questions (the Mac adds a few language servers for notes), with their own prompts and sandboxes. The image adds the coding toolchain with `script/dev/setup_container`. That way a compromised package release, or an agent running with `--dangerously-skip-permissions`, only reaches what one container holds.
+Coding and unattended agents run in containers. Hosts (macOS, Debian servers, Crostini) get Homebrew or apt packages plus the short lists in `script/update`; hosts also keep Claude Code, Codex and agy for quick questions (plus a few language servers and the oxfmt formatter, for notes and config files), with their own prompts and sandboxes. The image adds the coding toolchain with `script/dev/setup_container`. That way a compromised package release, or an agent running with `--dangerously-skip-permissions`, only reaches what one container holds.
 
 What keeps that boundary intact:
 
@@ -289,7 +289,7 @@ Hosts and containers each sign in separately; the Mac's logins can't be shared w
 | gemini-api | `gemini-api configure` with an [AI Studio key](https://aistudio.google.com/apikey) | Containers only: `GEMINI_API_KEY` in the container's `env` |
 | GitHub | `gh auth login` as yourself | Containers: a `GH_TOKEN` in `env`, yours or the bot's |
 
-Claude Code and agy update themselves. In containers, `script/update` updates Codex, gemini-api and the rest, or move to a new image. On the Mac, `brew upgrade` covers the casks, and `script/update` covers gemini-api.
+Claude Code and agy update themselves. On Linux, `script/update` updates Codex (always the newest release, skipping the cooldown) and the rest; containers can also move to a new image. On the Mac, `brew upgrade` covers the casks, and `script/update` covers gemini-api.
 
 #### Other model providers
 

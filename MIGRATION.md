@@ -100,9 +100,9 @@ Start Apple's container service once with `container system start`.
 First remove what moved to apt, became on-demand, or went away:
 
 ```sh
-# GitHub binaries no longer installed on hosts (delta now comes from apt)
-# (bun, codex, agy and claude stay on hosts)
-rm -f ~/.local/bin/{gemini-api,fx,yq,delta,difft,hugo}
+# GitHub binaries no longer installed on hosts (delta now comes from apt, codex
+# from npm, which won't overwrite an existing binary; bun, agy and claude stay)
+rm -f ~/.local/bin/{gemini-api,fx,yq,delta,difft,hugo,codex}
 rm -rf ~/.local/share/lua-language-server
 # Their .deb installs; keep cloudflared if the homelab uses it
 sudo apt-get remove gh sad f2 hugo
