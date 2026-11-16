@@ -1,7 +1,8 @@
 # Moving a machine to the containers layout
 
 Temporary: delete this file once every machine is moved. This Mac (already
-done) is the reference.
+done) is the reference. Section 1 is the same as on `main`; skip it on machines
+that already did it.
 
 ## 1. Every machine with an old checkout
 

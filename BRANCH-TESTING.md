@@ -125,8 +125,9 @@ A machine that already ran an earlier version of this branch (like the Debian
 VM) needs `rm ~/.local/bin/codex` once before `script/update`: Codex now comes
 from npm, which won't overwrite the old GitHub binary.
 
-Follow MIGRATION.md, but in step 1's second block replace `git pull` with
-`git fetch && git checkout containers`. Go from lowest to highest stakes:
+Follow MIGRATION.md: section 1 on `main` if the machine hasn't done it yet, then
+`git fetch && git checkout containers` and the rest. Go from lowest to highest
+stakes:
 
 1. **Crostini** (no services). Migrate, `script/setup`, then a login shell,
    nvim on a note, and tmux.
