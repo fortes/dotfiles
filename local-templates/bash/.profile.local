@@ -1,5 +1,5 @@
-# Machine-specific settings, sourced last by ~/.profile. Edits stay local:
-# script/lock_local_files marks this file skip-worktree.
+# Machine-specific settings, sourced last by ~/.profile. script/stow copies
+# this template to ~ once; that copy is yours and never tracked.
 
 # Affects bash prompt, which hides unless this is the username
 # export DEFAULT_USERNAME=ffortes

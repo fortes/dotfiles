@@ -1,5 +1,5 @@
-# Server for mpd.conf, kept local: script/lock_local_files marks this file
-# skip-worktree
+# Server for mpd.conf. script/stow copies this template to ~ once; that copy is
+# yours and never tracked.
 database {
     plugin "proxy"
     host "REPLACE_ME"

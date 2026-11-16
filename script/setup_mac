@@ -189,11 +189,12 @@ main() {
 
   setup_shell
 
-  "${dotfiles_root}/script/lock_local_files"
   "${dotfiles_root}/script/set_dotfiles_remote"
 
   "${dotfiles_root}/script/update"
 
+  # MPD's playlist_directory, which the repo has no files in
+  mkdir -p "$HOME/.mpd/playlists"
   setup_mpd_now_playable
 
   echo "Setup complete!"

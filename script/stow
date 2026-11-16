@@ -1,52 +1,47 @@
 #!/usr/bin/env bash
 # Call stow with correct paths for dotfiles
 #
-# Should be able to run with `-R` to delete stale files, otherwise can do
-# `find -L ~/.config -type l [-exec rm {} +]` to find/remove stale links
-#
 # Usage: stow [-n] [-v] [-D | -R] [package ...]
 #
-# Stows every package when none are given, minus any listed in the
-# space-separated DOTFILES_SKIP_PACKAGES. Stowing `bash` backs up existing
-# default startup files into ~/.dotfiles-backup.*. For other stow options, call
-# stow directly.
+# Stows all packages (minus DOTFILES_SKIP_PACKAGES, and Mac-only ones elsewhere)
+# with --no-folding, backs up machine-provided startup files, then copies
+# missing local-templates/<package>/ files into $HOME. For other stow options,
+# call stow directly.
 
 set -euo pipefail
 IFS=$'\n\t'
 
-# Directories that programs write into (keys, binaries, plugins, units), so
-# they must stay real instead of getting folded into a symlink into the repo.
-# Stow never folds a directory that already exists, so create them before
-# stowing. Dry runs skip this and the startup-file backup, so `-n` may show
-# folds or conflicts a real run won't hit
-declare -r REAL_DIRS=(
-  .ssh
-  .mpd/playlists
-  Music
-  .mpdscribble
-  .config/tmux
-  .config/yazi
-  .local/bin
-)
+# Only macOS has a GUI and the music setup
+declare -r MAC_ONLY_PACKAGES=(ghostty mpd rmpc)
 
 # Files provided by Debian, macOS, or devbox images that conflict with the
 # bash package
 declare -r DEFAULT_DOTFILES=(.bashrc .profile .bash_profile .hushlogin)
 
-# Whether a stow package is listed in the space-separated
-# DOTFILES_SKIP_PACKAGES. Only applies when stowing everything: packages named
-# explicitly get stowed anyway
-is_skipped_package() {
-  [[ " ${DOTFILES_SKIP_PACKAGES:-} " == *" $1 "* ]]
+# Copy each file under template dir $1 to the same path in $HOME, unless a file
+# is there. Broken links (into old repo paths) get replaced. Private, since the
+# copies hold secrets
+copy_local_templates() {
+  local templates="$1" file
+  [[ -d "${templates}" ]] || return 0
+  while IFS= read -r file; do
+    file="${file#"${templates}/"}"
+    [[ -e "${HOME}/${file}" ]] && continue
+    rm -f "${HOME}/${file}"
+    mkdir -p "$(dirname "${HOME}/${file}")"
+    (umask 077 && cp "${templates}/${file}" "${HOME}/${file}")
+    echo "Copied ${file} into ~; fill in its REPLACE_MEs"
+  done < <(find "${templates}" -type f)
 }
 
-list_stow_packages() {
-  local package_path package
-  for package_path in "$1"/*/; do
-    [[ -d "${package_path}" ]] || continue
-    package="$(basename "${package_path}")"
-    is_skipped_package "${package}" || echo "${package}"
+# Whether $1 is among the remaining arguments
+is_listed() {
+  local needle="$1" item
+  shift
+  for item in "$@"; do
+    [[ "${item}" == "${needle}" ]] && return 0
   done
+  return 1
 }
 
 # Whether a startup file in $HOME is machine-provided and would block stow:
@@ -82,14 +77,10 @@ main() {
   # shellcheck source=script/lib.sh
   . "${dotfiles_root}/script/lib.sh"
 
+  # Otherwise the startup-file backup moves .bashrc and friends aside, then dies
   if ! command_exists stow; then
     echo_stderr "Error: stow command not found. Please install GNU Stow first."
     return 1
-  fi
-
-  if [[ ! -d "${stowed_files_path}" ]]; then
-    echo_stderr "Warning: stowed-files directory not found at ${stowed_files_path}, skipping stow"
-    return 0
   fi
 
   local options=() packages=() action="" simulate=0 arg package
@@ -97,13 +88,7 @@ main() {
     case "${arg}" in
       -n) simulate=1 ;;
       -v) ;;
-      -D | -R)
-        if [[ -n "${action}" ]]; then
-          echo_stderr "Error: pass only one of -D or -R."
-          return 1
-        fi
-        action="${arg}"
-        ;;
+      -D | -R) action="${arg}" ;;
       -*)
         echo_stderr "Error: unsupported option ${arg}; call stow directly."
         return 1
@@ -117,42 +102,36 @@ main() {
   done
 
   if [[ ${#packages[@]} -eq 0 ]]; then
-    # No mapfile, since macOS ships Bash 3.2
-    while IFS= read -r package; do
+    # DOTFILES_SKIP_PACKAGES only applies here: named packages get stowed anyway
+    for package in "${stowed_files_path}"/*/; do
+      package="$(basename "${package}")"
+      [[ " ${DOTFILES_SKIP_PACKAGES:-} " == *" ${package} "* ]] && continue
+      if [[ "$(uname -s)" != Darwin ]] && is_listed "${package}" "${MAC_ONLY_PACKAGES[@]}"; then
+        continue
+      fi
       packages+=("${package}")
-    done < <(list_stow_packages "${stowed_files_path}")
-    if [[ ${#packages[@]} -eq 0 ]]; then
-      echo_stderr "Warning: no packages found in ${stowed_files_path}, nothing to stow"
-      return 0
-    fi
+    done
   fi
 
-  if [[ "${action}" == -D ]]; then
-    # Otherwise a partial delete can refold a writable directory into a
-    # remaining package
-    options+=(--no-folding)
-  elif [[ ${simulate} -eq 0 ]]; then
-    for package in "${packages[@]}"; do
-      if [[ "${package}" == bash ]]; then
-        backup_default_dotfiles
-        break
-      fi
-    done
-
-    local dir
-    for dir in "${REAL_DIRS[@]}"; do
-      dir="${HOME}/${dir}"
-      [[ -e "${dir}" || -L "${dir}" ]] && continue
-      mkdir -p "${dir}"
-      # Private, since it holds keys
-      if [[ "${dir}" == "${HOME}/.ssh" ]]; then
-        chmod 700 "${dir}"
-      fi
-    done
+  options+=(--no-folding)
+  if [[ "${action}" != -D && ${simulate} -eq 0 ]]; then
+    if is_listed bash "${packages[@]}"; then
+      backup_default_dotfiles
+    fi
+    if is_listed ssh "${packages[@]}"; then
+      # Holds keys, so create it private before stow does
+      [[ -d "${HOME}/.ssh" ]] || mkdir -m 700 "${HOME}/.ssh"
+    fi
   fi
 
   stow --dir="${stowed_files_path}/" --target="${HOME}" \
     ${options[@]+"${options[@]}"} "${packages[@]}"
+
+  if [[ "${action}" != -D && ${simulate} -eq 0 ]]; then
+    for package in "${packages[@]}"; do
+      copy_local_templates "${dotfiles_root}/local-templates/${package}"
+    done
+  fi
 }
 
 # Bash 3.2 treats an empty "$@" as unset under `set -u`

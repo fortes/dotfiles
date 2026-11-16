@@ -55,25 +55,17 @@ Once you've run setup, you'll still have to do the following universal manual st
 
 4. Add your favorite servers into `.ssh/config.local`
 
-5. Setup `.gitconfig.local`:
-
-   ```
-   [user]
-     name = Your Name
-     email = xyz@abc.com
-   ```
-
-   If you need to tweak any config based upon the directory path, do something like
+5. Adjust `~/.gitconfig.local`, e.g. per-directory config:
 
    ```
    [includeIf "gitdir:~/src/company/"]
      path = ~/.gitconfig.company
    ```
 
-6. Fill in the placeholders in tracked templates, for the parts you use:
+6. Fill in the placeholders in your copies of the templates (see [Machine-specific settings](#machine-specific-settings)), for the parts you use:
 
    ```sh
-   rg --hidden -l REPLACE_ME stowed-files README.md
+   rg -l REPLACE_ME ~/.profile.local ~/.gitconfig.local ~/.mpd/mpd.conf.local ~/.mpdscribble/mpdscribble.conf
    ```
 
 7. Log into Coding agents
@@ -109,45 +101,15 @@ find ~ -maxdepth 5 -type l 2>/dev/null \
 
 `./script/install_node_packages` installs and updates Corepack through npm and enables its pnpm and Yarn shims in `~/.local/bin`. These select the package-manager version declared by each project. Node and npm come from Homebrew on macOS or `./script/install_node` on Linux; Corepack does not manage the Node version.
 
-## Keeping local config edits out of Git
+## Machine-specific settings
 
-Setup runs `./script/lock_local_files` to mark tracked `*.local` files and
-`mpdscribble.conf` as skip-worktree. To expose those edits in Git, then hide them
-again:
+Per-machine settings and secrets live in real files in your home directory, which git never sees: `~/.profile.local`, `~/.gitconfig.local`, `~/.mpd/mpd.conf.local` and `~/.mpdscribble/mpdscribble.conf`. `script/stow` copies each one from `local-templates/<package>/` the first time, private to you, and never overwrites it. Fill in its `REPLACE_ME`s afterwards. To pick up later template changes, compare by hand:
 
 ```sh
-./script/lock_local_files --unlock
-git status --short
-./script/lock_local_files
+diff ~/.profile.local local-templates/bash/.profile.local
 ```
 
-This only changes Git's index flags; it doesn't change file contents. Avoid
-committing or stashing these files, since they can contain secrets.
-
-If upstream changes block a pull, back up each affected file outside the repo
-before unlocking and restoring the tracked version. For example, from the repo
-root:
-
-```sh
-file=stowed-files/bash/.profile.local
-backup=$(mktemp -d)
-cp "$file" "$backup/local-config"
-./script/lock_local_files --unlock
-git restore --worktree -- "$file"
-git pull --ff-only
-```
-
-Only continue past the backup command if it succeeds. If several files block the
-pull, back up and restore the tracked version of each before pulling. After the
-pull, even if it fails, restore your local copy and lock the files again:
-
-```sh
-cp "$backup/local-config" "$file"
-./script/lock_local_files
-```
-
-Compare your local versions with upstream template changes afterward to pick up
-new settings. The backup directory contains secrets; remove it when finished.
+`~/.bashrc.local`, `~/.vimrc.local` and `~/.ssh/config.local` are yours to create; nothing copies them.
 
 ### Neovim
 
@@ -261,10 +223,9 @@ clean those up:
   mpd-sync-playlists
   ```
 - Offline, `mpd-offline on` swaps MPD to the albums synced from the server into `~/Music/albums`, with its own queue; `mpd-offline off` goes back to the server's library. Only local albums play, from rmpc, playlists or `play-albums`. Scrobbles wait in mpdscribble's journal until the network returns. Offline mode doesn't survive a reboot: run `mpd-offline on` again, or `mpd-offline off` to go back.
-- Scrobble MPD plays to Libre.fm and ListenBrainz: fill in the `REPLACE_ME`s in `~/.mpdscribble/mpdscribble.conf`. Like the `.local` files, edits stay out of git once `script/lock_local_files` has run (setup does it):
+- Scrobble MPD plays to Libre.fm and ListenBrainz: fill in the `REPLACE_ME`s in `~/.mpdscribble/mpdscribble.conf` (a private copy of the template, outside git), then start it:
 
   ```sh
-  chmod 600 ~/.mpdscribble/mpdscribble.conf
   brew services start mpdscribble
   ```
 - Media keys and Control Centre's Now Playing control MPD through `mpd-now-playable`. Setup writes its LaunchAgent; start it once and it runs at login after that:

@@ -204,7 +204,6 @@ main() {
   local failed=0
   run_step install_apt_packages || failed=1
   run_step "${dotfiles_root}/script/stow" -R || failed=1
-  run_step "${dotfiles_root}/script/lock_local_files" || failed=1
   run_step install_ghostty_terminfo || failed=1
   run_step install_github_packages || failed=1
   run_step link_debian_names || failed=1
