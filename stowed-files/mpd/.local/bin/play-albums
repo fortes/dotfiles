@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Helper to query beets for albums, select via FZF, then add them to MPD's
-# queue and play the first one. MPD names songs relative to its music
+# Helper to query beets for albums, select via FZF, then replace MPD's queue
+# with them and play the first one. MPD names songs relative to its music
 # directory, which is beets' directory on the server. Offline (`mpd-offline
 # on`) the paths are the same, but only albums synced to this Mac play
 #
@@ -37,7 +37,6 @@ play-albums() {
   local beet_query_results
   local music_dir
   local song_paths
-  local queue_length
 
   if ! mpc -q status; then
     exit 1
@@ -102,14 +101,13 @@ play-albums() {
     return 1
   fi
 
-  queue_length=$(mpc status '%length%')
+  ${queue_only} || mpc -q clear
   # mpc reads the paths from stdin when given none
   mpc -q add <<<"${song_paths}"
   printf "Added %d songs\n" "$(wc -l <<<"${song_paths}")"
 
   if ! ${queue_only}; then
-    # Positions count from 1, so this is the first added song
-    mpc -q play "$((queue_length + 1))"
+    mpc -q play 1
   fi
 }
 
