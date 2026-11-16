@@ -97,12 +97,7 @@ Start Apple's container service once with `container system start`.
 
 ## 3. Debian hosts (homelab, Crostini)
 
-```sh
-script/setup
-```
-
-That adds `build-essential` and `git-delta` from apt. Then remove what moved to
-apt, became on-demand, or went away:
+First remove what moved to apt, became on-demand, or went away:
 
 ```sh
 # GitHub binaries no longer installed on hosts (delta now comes from apt)
@@ -118,6 +113,13 @@ sudo apt-get autoremove
 rm -rf ~/.local/lib/node_modules ~/.local/share/cargo
 uv tool uninstall epy-reader pynvim pyright ruff streamdown
 find ~/.local/bin -type l ! -exec test -e {} \; -print -delete
+```
+
+Then run setup, which installs the new pieces (`build-essential`, `git-delta`,
+oxfmt from npm) after the cleanup above removed the old npm globals:
+
+```sh
+script/setup
 ```
 
 For dev containers on the homelab, create the separate `dev` user (README,

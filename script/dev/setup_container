@@ -17,7 +17,6 @@ NPM_PACKAGES=(
   bash-language-server
   corepack
   dockerfile-language-server-nodejs
-  oxfmt
   oxlint
   tsx
   typescript

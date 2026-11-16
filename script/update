@@ -26,6 +26,10 @@ else
     marksman neovim tree-sitter-cli uv yazi
   # Debian's nodejs is past upstream end of life
   "${dotfiles_script_dir}/install_node"
+  # Formats notes, like Homebrew's on the Mac. Its native binary comes as a
+  # regular dependency, so it needs no install scripts
+  npm install --global --loglevel=error --no-fund --no-audit --ignore-scripts \
+    --min-release-age=3 oxfmt@latest
   # Both update themselves once installed
   "${dotfiles_script_dir}/install_agy"
   if ! command_exists claude; then
