@@ -51,6 +51,11 @@ if [[ -n ${VISUAL:-} ]]; then
 fi
 
 export PNPM_HOME="${HOME}/.local/share/pnpm"
+# Where `pnpm add --global` links binaries: $PNPM_HOME/bin in newer pnpm (12
+# does), the directory itself in older ones. pnpm refuses global installs when
+# it's not on PATH
+add_to_path "${PNPM_HOME}"
+add_to_path "${PNPM_HOME}/bin"
 # Corepack otherwise asks before fetching a project's pnpm or Yarn, which
 # leaves agents' commands hanging
 export COREPACK_ENABLE_DOWNLOAD_PROMPT=0
