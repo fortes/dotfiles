@@ -39,11 +39,14 @@ apt_install() {
   local IFS=' ' log="${XDG_CACHE_HOME:-$HOME/.cache}/dotfiles/apt-install.log"
   mkdir -p "$(dirname "${log}")"
   echo "=== $(date) apt-get install $*" >>"${log}"
+  # So a failure shows only this install's output
+  local start
+  start="$(wc -l <"${log}")"
   # shellcheck disable=SC2024 # The log is yours, so the redirect skips sudo
   if ! DEBIAN_FRONTEND=noninteractive sudo -E apt-get install -qq --assume-yes \
     --fix-broken --no-install-recommends -o=Dpkg::Use-Pty=0 \
     -o=Dpkg::Progress-Fancy=0 -o=APT::Get::Show-Progress=false "$@" >>"${log}"; then
-    tail -n 20 "${log}" >&2
+    tail -n "+$((start + 1))" "${log}" | tail -n 20 >&2
     echo_stderr "apt-get install failed; full output in ${log}"
     return 1
   fi
