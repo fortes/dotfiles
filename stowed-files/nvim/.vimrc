@@ -132,9 +132,6 @@ set ttimeoutlen=50
 
 " Mapping timeout
 set timeoutlen=600
-
-" Neovim 0.12+ finds `pynvim-python` (from `uv tool install pynvim`) on $PATH
-" automatically; no need to set g:python3_host_prog.
 " }}}
 
 " UI {{{
@@ -772,9 +769,10 @@ endif
 " Disable things we don't care about
 " Providers only exist to host remote plugins (|rplugin|), and nothing here is
 " one -- every plugin is Lua or Vimscript. Disabling stops :checkhealth asking
-" for the `neovim` npm/gem/cpan package for each of them. Inside `if` since
-" vim.tiny has no `:let` (it skips `if` blocks entirely)
+" for the `neovim` npm/gem/cpan/pip package for each of them. Inside `if`
+" since vim.tiny has no `:let` (it skips `if` blocks entirely)
 if has('nvim')
+  let g:loaded_python3_provider = 0
   let g:loaded_node_provider = 0
   let g:loaded_perl_provider = 0
   let g:loaded_ruby_provider = 0
