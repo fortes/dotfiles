@@ -92,8 +92,9 @@ export LIBVIRT_DEFAULT_URI="qemu:///system"
 export RIPGREP_CONFIG_PATH="$XDG_CONFIG_HOME/ripgrep/rc"
 
 if [ -z "${SSH_AUTH_SOCK:-}" ] && command_exists keychain; then
-  # Don't prompt for password to load key if not already loaded
-  eval "$(keychain --eval --noask --agents ssh --quiet)"
+  # Don't prompt for password to load key if not already loaded. Starts only
+  # ssh-agent by default; keychain 3 deprecated --agents and warns about it
+  eval "$(keychain --eval --noask --quiet)"
 
   # Use consistent location for SSH_AUTH_SOCK, useful for tmux sessions where
   # can end up on different machines, or reconnecting to a session
