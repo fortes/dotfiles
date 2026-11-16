@@ -97,8 +97,9 @@ find ~/.local/bin -type l ! -exec test -e {} \; -print -delete
 Start Apple's container service once with `container system start`.
 
 `mpd-sync` replaces `mpd-sync-playlists`, and also copies the server's beets
-library for `play-albums`, so it no longer needs the media share or `BEETSDIR`.
-It finds `beets.db` next to the music directory, which port 8090 doesn't
+library into `BEETSDIR`, which `~/.profile` now sets to `~/.mpd/beets`, so
+`play-albums` and `beet` no longer need the media share. Drop any `BEETSDIR`
+from the Mac's `~/.profile.local`, which would override it. It finds `beets.db` next to the music directory, which port 8090 doesn't
 serve: switch `music_directory` in `~/.mpd/mpd.conf.local` to the server's
 HTTPS address, restart MPD, and sync:
 

@@ -195,7 +195,7 @@ clean those up:
   ```sh
   brew services start mpd
   ```
-- Copy the server's playlists and beets library to this Mac. The proxy database doesn't share playlists, so this puts its `.m3u` files in `~/.mpd/playlists` for rmpc's Playlists tab; `play-albums` searches the library copy in `~/.mpd/beets`, offline too. The library only downloads when the server's is newer. Rerun after the server regenerates them. Large playlists load slowly, since MPD looks up each song on the server:
+- Copy the server's playlists and beets library to this Mac. The proxy database doesn't share playlists, so this puts its `.m3u` files in `~/.mpd/playlists` for rmpc's Playlists tab; beets (`play-albums`, or `beet` itself) uses the library copy in `BEETSDIR`, which `~/.profile` sets to `~/.mpd/beets`, offline too. The library only downloads when the server's is newer. Rerun after the server regenerates them. Large playlists load slowly, since MPD looks up each song on the server:
 
   ```sh
   mpd-sync

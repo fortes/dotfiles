@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # Helper to query beets for albums, select via FZF, then replace MPD's queue
-# with them and play the first one. Uses the copy of the server's beets
-# library that mpd-sync keeps in ~/.mpd/beets. MPD names songs relative to its
+# with them and play the first one. Searches the library BEETSDIR points at,
+# mpd-sync's copy of the server's by default. MPD names songs relative to its
 # music directory, which is beets' directory on the server. Offline
-# (`mpd-offline on`) the paths are the same, but only albums synced to this
-# Mac play
+# (`mpd-offline on`) the paths are the same, but only albums synced to this Mac
+# play
 #
 # Usage:
 #
@@ -44,10 +44,11 @@ play-albums() {
     exit 1
   fi
 
-  # The synced copy, not a BEETSDIR from ~/.profile.local
-  export BEETSDIR=~/.mpd/beets
-  if [[ ! -f "${BEETSDIR}/library.db" ]]; then
-    echo "No beets library yet; run mpd-sync" >&2
+  # Whichever library BEETSDIR points beets at (mpd-sync's copy by default)
+  local library
+  library=$(beet config | sed -n 's/^library: //p')
+  if [[ ! -f "${library/#\~/$HOME}" ]]; then
+    echo "No beets library at ${library}; run mpd-sync" >&2
     exit 1
   fi
 

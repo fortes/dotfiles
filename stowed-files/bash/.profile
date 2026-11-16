@@ -63,6 +63,13 @@ export COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 # Keep bun's cache and any globals under ~/.local
 export BUN_INSTALL="${HOME}/.local"
 
+# With the MPD setup, beets reads the copy of the server's library that
+# mpd-sync keeps, so play-albums and any `beet` command agree. A server with
+# its own library sets BEETSDIR in ~/.profile.local, which comes later
+if [[ -d "$HOME/.mpd" ]]; then
+  export BEETSDIR="$HOME/.mpd/beets"
+fi
+
 # Use NeoVim as man pager, when available
 if command_exists nvim; then
   export MANPAGER="nvim +Man!"

@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Copies the server's playlists and beets library to this Mac, so rmpc's
-# Playlists tab and play-albums work without mounting the media share, offline
-# too. Both come over HTTP from next to the music directory in mpd.conf.local:
+# Playlists tab, play-albums and `beet` work without mounting the media share,
+# offline too. The library goes in $BEETSDIR (~/.mpd/beets, from ~/.profile).
+# Both come over HTTP from next to the music directory in mpd.conf.local:
 # playlists from <music>/playlists/, beets.db from the server's root. Rerun
 # after the server regenerates them. Needs the server's library, so not while
 # `mpd-offline on`
@@ -12,7 +13,7 @@ IFS=$'\n\t'
 # e.g. https://server/music/
 music_url=$(sed -n 's/^music_directory "\(.*\)"/\1/p' ~/.mpd/mpd.conf.local)
 playlist_dir=~/.mpd/playlists
-beets_dir=~/.mpd/beets
+beets_dir="${BEETSDIR:?BEETSDIR is not set; open a new login shell}"
 # Where the server's beets keeps its music. play-albums strips it from beets'
 # paths to get MPD's, which are relative to the music directory
 server_music_dir=/data/media/music
@@ -46,5 +47,8 @@ else
   echo "Beets library already current"
 fi
 
-printf '%s\n' "directory: ${server_music_dir}" "library: ${db}" \
-  >"${beets_dir}/config.yaml"
+# Once, so your own settings (plugins, formats) survive later syncs
+if [[ ! -f "${beets_dir}/config.yaml" ]]; then
+  printf '%s\n' "directory: ${server_music_dir}" "library: ${db}" \
+    >"${beets_dir}/config.yaml"
+fi
