@@ -25,5 +25,5 @@ set_dotfiles_remote() {
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-  set_dotfiles_remote "${@}"
+  set_dotfiles_remote
 fi

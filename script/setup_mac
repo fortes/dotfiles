@@ -121,9 +121,11 @@ setup_homebrew() {
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
   fi
 
-  if [[ ! -f "$HOME/.profile.brew" ]]; then
+  # shellenv prints nothing when Homebrew is already first on PATH, so run it
+  # from a clean one. Rewrite an empty file an earlier run left behind
+  if [[ ! -s "$HOME/.profile.brew" ]]; then
     echo "Exporting brew shellenv"
-    "${brew_prefix}/bin/brew" shellenv >"$HOME/.profile.brew"
+    PATH=/usr/bin:/bin "${brew_prefix}/bin/brew" shellenv bash >"$HOME/.profile.brew"
   fi
 
   # Ensure `brew` in path for rest of script
