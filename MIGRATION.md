@@ -81,8 +81,15 @@ servers, `oxfmt`, `beets`, `container`). Then remove what moved or went away.
 Homebrew doesn't uninstall dropped formulae, and old installs in `~/.local/bin`
 shadow the new ones because it comes first on `PATH`:
 
+`brew uninstall` also removes dependencies nothing else needs, including
+`lima` (colima's) even if you use it directly, so skip that and check what
+`brew autoremove` would take afterwards. Delete the old Podman VM first, or
+its disk (often tens of GB) stays behind:
+
 ```sh
-brew uninstall rust docker docker-compose colima podman f2 difftastic cloudflared lua-language-server
+podman machine rm --force podman-machine-default
+HOMEBREW_NO_AUTOREMOVE=1 brew uninstall rust docker docker-compose colima podman f2 difftastic cloudflared lua-language-server
+brew autoremove --dry-run
 # Old npm globals (codex, language servers, prettier, qmd, ...) and Corepack shims
 rm -rf ~/.local/lib/node_modules
 # Native Claude Code install (the cask replaces it; ~/.claude is untouched)
