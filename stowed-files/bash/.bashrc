@@ -167,22 +167,17 @@ if command_exists fzf; then
   eval "$(fzf --bash)"
 fi
 
-fd_command="fd"
-if ! command_exists "${fd_command}"; then
-  # Debian uses `fdfind`
-  fd_command="fdfind"
-fi
-
 # Note: --multi set by default here, so need to disable when inappropriate
 export FZF_DEFAULT_OPTS_FILE="$HOME/.fzf-default-options"
 
-if command_exists "${fd_command}"; then
+# Debian's fdfind is linked as fd by script/update
+if command_exists fd; then
   # Use `fd` when available for far better performance
   #
   # $FZF_DEFAULT_COMMAND is executed with `sh -c`, so need to be careful with
   # POSIX compliance
-  export FZF_DEFAULT_COMMAND="${fd_command} --type file --hidden --color always"
-  export FZF_ALT_C_COMMAND="${fd_command} --type directory --hidden --color always"
+  export FZF_DEFAULT_COMMAND="fd --type file --hidden --color always"
+  export FZF_ALT_C_COMMAND="fd --type directory --hidden --color always"
   export FZF_CTRL_T_COMMAND="${FZF_DEFAULT_COMMAND}"
 fi
 

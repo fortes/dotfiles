@@ -130,6 +130,14 @@ setup_homebrew() {
   # shellcheck source=/dev/null
   . "$HOME/.profile.brew"
 
+  # Homebrew only loads formulae from third-party taps once trusted. Trust just
+  # the ones listed (user/tap/formula), not their whole taps
+  local package tapped=()
+  for package in "${BREW_PACKAGES[@]}"; do
+    [[ "${package}" == */*/* ]] && tapped+=("${package}")
+  done
+  "${brew_prefix}/bin/brew" trust --formula "${tapped[@]}"
+
   echo "Installing homebrew packages"
   "${brew_prefix}/bin/brew" install --quiet "${BREW_PACKAGES[@]}"
 

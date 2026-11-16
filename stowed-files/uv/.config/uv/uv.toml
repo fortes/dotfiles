@@ -1,0 +1,4 @@
+# Only install versions published 3+ days ago: compromised releases are usually
+# pulled within hours. Matches min-release-age in ~/.npmrc. Override once with
+# --exclude-newer, or per package with exclude-newer-package
+exclude-newer = "3 days"

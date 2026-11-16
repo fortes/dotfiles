@@ -23,6 +23,13 @@ fi
 if [[ "$(uname -s)" == Linux ]]; then
   "${dotfiles_script_dir}/install_node"
   "${dotfiles_script_dir}/install_agy"
+  # Trixie's ncurses-term only has `ghostty`, not the `xterm-ghostty` Ghostty
+  # sets, which tmux needs for its modified keys and true color
+  infocmp xterm-ghostty &>/dev/null \
+    || tic -x -o "$HOME/.terminfo" "${dotfiles_script_dir}/xterm-ghostty.terminfo"
+  # Debian names these fdfind and batcat
+  ln -sf /usr/bin/fdfind "$HOME/.local/bin/fd"
+  ln -sf /usr/bin/batcat "$HOME/.local/bin/bat"
 fi
 for step in install_node_packages install_claude_code install_python_packages \
   install_yazi_plugins generate_completions; do

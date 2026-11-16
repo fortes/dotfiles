@@ -17,18 +17,11 @@ function fzf-file-preview() {
     exec chafa --size "${term_width}x${term_height}" --format symbols "${file}" 2>&1
   fi
 
-  local bat_name="bat"
-
-  # For Debian-based systems that use `batcat`
-  if command -v batcat &>/dev/null; then
-    bat_name="batcat"
-  fi
-
-  if ! type "${bat_name}" &>/dev/null; then
+  if ! command -v bat &>/dev/null; then
     exec cat "${file}"
   fi
 
-  exec "${bat_name}" "${file}" \
+  exec bat "${file}" \
     --color always
 }
 

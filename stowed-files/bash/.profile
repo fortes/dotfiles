@@ -51,6 +51,9 @@ if [[ -n ${VISUAL:-} ]]; then
 fi
 
 export PNPM_HOME="${HOME}/.local/share/pnpm"
+# Corepack otherwise asks before fetching a project's pnpm or Yarn, which
+# leaves agents' commands hanging
+export COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 
 # Keep bun's cache and any globals under ~/.local
 export BUN_INSTALL="${HOME}/.local"
