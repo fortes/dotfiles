@@ -55,8 +55,17 @@ install_apt_packages() {
   echo "Running apt-get update (requires sudo)"
   sudo -E apt-get update -qq
 
-  echo "Ensuring apt packages installed (requires sudo)"
-  sudo -E apt-get install "${APT_ARGS[@]}" "${packages[@]}"
+  # dpkg ignores -qq and prints four lines per package, over 1,000 on a fresh
+  # machine, so its stdout goes to a log. Errors and warnings are on stderr
+  local log="${XDG_CACHE_HOME:-$HOME/.cache}/dotfiles/apt-install.log"
+  mkdir -p "$(dirname "${log}")"
+  echo "Ensuring apt packages installed (requires sudo), output in ${log}"
+  # shellcheck disable=SC2024 # The log is yours, so the redirect skips sudo
+  if ! sudo -E apt-get install "${APT_ARGS[@]}" "${packages[@]}" >"${log}"; then
+    tail -n 20 "${log}" >&2
+    echo_stderr "apt-get install failed; full output in ${log}"
+    return 1
+  fi
   echo "Apt packages installed"
 }
 
