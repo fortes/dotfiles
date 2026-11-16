@@ -17,6 +17,8 @@ git clone https://github.com/fortes/dotfiles.git
 ./dotfiles/script/setup
 ```
 
+A fresh Debian install (netinst, Crostini) has no `git`: run `sudo apt-get update && sudo apt-get install --yes git` first.
+
 On Ubuntu (22.04 or later, which Coder devboxes and most devcontainers use), `script/setup` runs a lighter setup instead that only installs a few packages and links dotfiles, and is safe to run on every boot (requires root or sudo access). For the same on other pre-provisioned machines, like a Debian 13 (Trixie) devcontainer:
 
 ```sh
@@ -274,7 +276,7 @@ clean those up:
 ### Debian Server / Crostini
 
 - For servers, make sure to set up [email delivery](https://fortes.com/2020/getting-debian-to-send-emails-that-actually-get-delivered/)
-- Should also set up unattended upgrades via `sudo dpkg-reconfigure unattended-upgrades`
+- Setup installs `unattended-upgrades` for automatic security updates; `sudo dpkg-reconfigure unattended-upgrades` to check or change it
 - You may need to install `avahi-daemon`, `avahi-dnsconfd`, `avahi-utils`, and `libnss-mdns` to get `.local` hostnames to resolve properly
 - `mergerfs` if you want to do any pooling of drives
 - `cifs-utils` may also be useful to have installed for mounting Windows shares
@@ -284,7 +286,12 @@ clean those up:
 - All the steps from `Chrome` section above
 - Set up "Night Light" if it didn't automatically sync
 - Enable Linux, choose a larger disk size (20GB fine?). Double check which debian version it is via `grep VERSION_CODENAME /etc/os-release` (should be `trixie`)
-- Run `script/setup` (skips podman: Crostini is already a container)
+- Install git, which the image lacks, then clone the repo and run `script/setup` (skips podman: Crostini is already a container). Setup also adds Debian's security and stable-update sources, which ChromeOS's image ships without:
+
+  ```sh
+  sudo apt-get update && sudo apt-get install --yes git
+  git clone https://github.com/fortes/dotfiles.git ~/dotfiles && ~/dotfiles/script/setup
+  ```
 - Share `Downloads` folder with Linux, then symlink via `ln -s /mnt/chromeos/MyFiles/Downloads ~/downloads`
 - Change terminal font by going to `chrome-untrusted://terminal/html/nassh_preferences_editor.html`
   - Add `'DejaVu Sans Mono Nerd'` to the beginning of "Text Font Family"

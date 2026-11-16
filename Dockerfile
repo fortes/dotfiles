@@ -17,19 +17,17 @@ ENV LANG=en_US.UTF-8 \
 # list changes. That keeps apt downloads cached between Docker builds.
 COPY script/apt-packages.txt /tmp/apt-packages.txt
 
-# Enable contrib/non-free and backports before installing packages so that
-# every environment (Docker or host) sees the same repositories. Install all
-# base packages in a single layer, then purge apt caches so we don't carry
-# ~100 MB of metadata into later layers.
+# Enable backports before installing packages so that every environment
+# (Docker or host) sees the same repositories. Install all base packages in a
+# single layer, then purge apt caches so we don't carry ~100 MB of metadata
+# into later layers.
 RUN set -eux; \
   codename="$(. /etc/os-release && echo "$VERSION_CODENAME")"; \
-  sed -i -E 's/^Components: main([[:space:]].*)?$/Components: main contrib non-free non-free-firmware/' \
-    /etc/apt/sources.list.d/debian.sources; \
   printf '%s\n' \
     'Types: deb' \
     'URIs: http://deb.debian.org/debian' \
     "Suites: ${codename}-backports" \
-    'Components: main contrib non-free non-free-firmware' \
+    'Components: main' \
     'Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg' \
     > /etc/apt/sources.list.d/backports.sources; \
   apt-get -qqy update; \
