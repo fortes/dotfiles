@@ -51,7 +51,6 @@ BREW_PACKAGES=(
   imagemagick
   jq
   keychain
-  marksman
   moreutils
   mpc
   mpd

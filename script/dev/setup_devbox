@@ -52,7 +52,7 @@ declare -r DEVBOX_APT_PACKAGES=(
 
 # GitHub binaries, named so their binary is the package name minus any `-cli`.
 # Includes delta, since Ubuntu 22.04 (the work devcontainer) has no git-delta
-declare -r DEVBOX_GITHUB_PACKAGES=(delta fzf marksman neovim tree-sitter-cli yq)
+declare -r DEVBOX_GITHUB_PACKAGES=(delta fzf neovim tree-sitter-cli yq)
 
 # Language servers init.lua enables, for the languages devbox repos use, as
 # npm package:binary
