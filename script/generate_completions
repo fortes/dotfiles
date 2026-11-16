@@ -36,6 +36,10 @@ generate_completions() {
     codex completion bash >"${completion_dir}/codex.completion.bash"
   fi
 
+  if command_exists container; then
+    container --generate-completion-script bash >"${completion_dir}/container.completion.bash"
+  fi
+
   if command_exists delta; then
     delta --generate-completion bash >"${completion_dir}/delta_completion"
   fi
@@ -61,7 +65,8 @@ generate_completions() {
     uv generate-shell-completion bash >"${completion_dir}/uv_completion"
   fi
 
-  if command_exists yq; then
+  # Debian/Ubuntu ship a Python `yq` wrapper around jq that lacks `shell-completion`
+  if command_exists yq && [[ "$(yq --version 2>/dev/null)" == *mikefarah* ]]; then
     yq shell-completion bash >"${completion_dir}/yq_completion"
   fi
 

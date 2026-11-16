@@ -204,7 +204,7 @@ clean those up:
 - Install apps by hand. They update themselves, which leaves Homebrew's casks stale, so setup skips them. Skip any that MDM already installed:
 
   ```sh
-  brew install --cask 1password claude codex-app firefox ghostty google-chrome obsidian rectangle
+  brew install --cask 1password chatgpt claude firefox ghostty google-chrome obsidian rectangle
   # Optional
   brew install --cask antigravity antigravity-cli
   # Personal machines
