@@ -52,10 +52,6 @@ fi
 
 export PNPM_HOME="${HOME}/.local/share/pnpm"
 
-export CARGO_HOME="${HOME}/.local/share/cargo"
-# Cargo packages install to ~/.local/bin
-export CARGO_INSTALL_ROOT="${HOME}/.local"
-
 # Keep bun's cache and any globals under ~/.local
 export BUN_INSTALL="${HOME}/.local"
 

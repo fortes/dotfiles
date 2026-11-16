@@ -34,7 +34,6 @@ BREW_PACKAGES=(
   duf
   MisterTea/et/et
   eza
-  f2
   fd
   # For yazi
   ffmpeg
@@ -56,7 +55,6 @@ BREW_PACKAGES=(
   jq
   keychain
   lua-language-server
-  marksman
   moreutils
   mpc
   mpd
@@ -71,7 +69,6 @@ BREW_PACKAGES=(
   podman
   ripgrep
   rmpc
-  rust
   sad
   # For yazi
   sevenzip

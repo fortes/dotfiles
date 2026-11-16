@@ -1,53 +1,27 @@
 #!/usr/bin/env bash
-# Install global npm packages, or rebuild their native addons after a Node
-# major upgrade
+# Install global npm packages
 #
-# Usage: install_node_packages [--rebuild]
+# Usage: install_node_packages
 
 set -euo pipefail
 IFS=$'\n\t'
 NPM_PACKAGES=(
   @openai/codex
   @playwright/mcp
-  @tobilu/qmd
   agent-browser
   bash-language-server
-  cf
   corepack
   dockerfile-language-server-nodejs
-  eslint
-  fkill-cli
-  npm-check-updates
   oxfmt
   oxlint
-  prettier
   tsx
   typescript
-  vim-language-server
   vscode-langservers-extracted
   yaml-language-server
 )
 
-# npm global packages whose install scripts may run (npm 11 warns about the
-# rest, npm 12 blocks them). Only pass this with --global: npm rejects
-# --allow-scripts in project installs, so it can't live in ~/.npmrc (npm
-# exports config to lifecycle scripts, which would break nested installs).
-# These are qmd's native deps, which build from source when no prebuild
-# matches (node-llama-cpp would otherwise do it on first use anyway)
-NPM_GLOBAL_ALLOW_SCRIPTS="better-sqlite3,node-llama-cpp,tree-sitter-go,tree-sitter-javascript,tree-sitter-python,tree-sitter-rust,tree-sitter-typescript"
-
 # shellcheck source=script/lib.sh
 . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
-
-# Native addons in npm globals (e.g. better-sqlite3) are built for one Node
-# major version's ABI
-rebuild_globals() {
-  [[ -d "$HOME/.local/lib/node_modules" ]] || return 0
-
-  echo "Rebuilding global npm packages for Node $(node --version) …"
-  npm rebuild --global --allow-scripts="${NPM_GLOBAL_ALLOW_SCRIPTS}" \
-    || echo >&2 "⚠ Rebuild failed, run: $(basename "$0") --rebuild"
-}
 
 require_node() {
   if ! command_exists node || ! command_exists npm; then
@@ -57,25 +31,22 @@ require_node() {
 }
 
 install_node_packages() {
-  [[ $# -le 1 && ("${1:-}" == '' || "${1:-}" == --rebuild) ]] \
-    || {
-      echo >&2 'Usage: install_node_packages [--rebuild]'
-      return 1
-    }
+  [[ $# -eq 0 ]] || {
+    echo >&2 'Usage: install_node_packages (no arguments)'
+    return 1
+  }
 
   # lib.sh supplies installer paths, including Homebrew before stow.
   require_node
 
-  if [[ "${1:-}" == --rebuild ]]; then
-    rebuild_globals
-    return
-  fi
-
   echo "Using Node $(node --version)"
 
+  # None needs its install scripts (Codex's and oxfmt's native binaries are
+  # dependencies, and agent-browser's launcher links its own on first run),
+  # which also leaves no native addons to rebuild after Node major upgrades
   echo "Installing global npm packages …"
-  npm install --global --loglevel=error --no-fund --no-audit \
-    --allow-scripts="${NPM_GLOBAL_ALLOW_SCRIPTS}" "${NPM_PACKAGES[@]/%/@latest}"
+  npm install --global --loglevel=error --no-fund --no-audit --ignore-scripts \
+    "${NPM_PACKAGES[@]/%/@latest}"
   echo "Npm packages installed!"
 
   # Keep project package-manager shims in the user prefix across Node

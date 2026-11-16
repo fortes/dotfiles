@@ -34,11 +34,6 @@ node_arch() {
   esac
 }
 
-major() {
-  local version="${1#v}"
-  echo "${version%%.*}"
-}
-
 # Download and verify before extracting. Interrupted installs can be rerun.
 download_release() {
   local version="$1" dist="$2"
@@ -105,12 +100,6 @@ install_node() {
       rm --recursive --force -- "${old}"
     fi
   done
-
-  # npm globals' native addons are built for one major version. Without a
-  # previous install, the globals' Node version is unknown, so rebuild them too
-  if [[ "$(major "${current:-v0}")" != "$(major "${version}")" ]]; then
-    "${dotfiles_script_dir}/install_node_packages" --rebuild
-  fi
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then

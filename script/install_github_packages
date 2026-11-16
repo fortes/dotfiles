@@ -29,7 +29,6 @@ AVAILABLE_PACKAGES=(
   cloudflared
   delta
   difftastic
-  f2
   fx
   fzf
   gemini-api
@@ -37,7 +36,6 @@ AVAILABLE_PACKAGES=(
   harper-ls
   hugo
   luals
-  marksman
   neovim
   sad
   tree-sitter-cli
@@ -259,10 +257,6 @@ install_github_cli() {
   install_deb 'cli/cli' '/gh_[^/]*_linux_{ARCH}\.deb$'
 }
 
-install_f2() {
-  install_deb 'ayoisaiah/f2' '/f2_[^/]*_linux_{ARCH}\.deb$'
-}
-
 install_fx() {
   install_bin 'antonmedv/fx' '/fx_linux_{ARCH}$'
 }
@@ -306,12 +300,6 @@ install_neovim() {
 
   echo "neovim stable installed"
   echo "Run ':lua vim.pack.update()' in Neovim to install plugins"
-}
-
-install_marksman() {
-  # Must be the glibc build: the musl ones can't run on Debian (no musl
-  # loader). init.lua runs it in .NET's invariant mode, so it doesn't need ICU.
-  install_bin 'artempyanykh/marksman' '/marksman-linux-{ARCH}$'
 }
 
 install_tree_sitter_cli() {

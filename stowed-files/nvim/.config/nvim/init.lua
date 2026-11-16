@@ -27,7 +27,7 @@ end
 -- Obsidian vault: $NOTES_DIR, default ~/notes. `[[` completion offers every
 -- note plus unresolved link targets, ranked by how often each is linked,
 -- which obsidian.nvim's LSP completion doesn't, so LSP completion is skipped
--- in vault buffers (LspAttach below). marksman doesn't run there at all (see its config).
+-- in vault buffers (LspAttach below).
 local notes_dir = vim.fn.resolve(vim.fn.expand(vim.env.NOTES_DIR or '~/notes'))
 local wikilinks = require('wikilinks')
 if vim.fn.isdirectory(notes_dir) == 1 then
@@ -325,7 +325,6 @@ use('https://github.com/neovim/nvim-lspconfig', function()
     dockerls = 'docker-langserver',
     html = 'vscode-html-language-server',
     jsonls = 'vscode-json-language-server',
-    pyright = 'pyright-langserver',
     vimls = 'vim-language-server',
   }
   for server, bin in pairs(simple_servers) do
@@ -384,28 +383,6 @@ use('https://github.com/neovim/nvim-lspconfig', function()
       },
     })
     vim.lsp.enable('lua_ls')
-  end
-
-  if vim.fn.executable('marksman') == 1 then
-    -- Same as yamlls below: `markdown.mdx` is a filetype Neovim never sets
-    -- (an .mdx file is detected as `conf`), so it only serves to make
-    -- `:checkhealth vim.lsp` report an unknown filetype
-    vim.lsp.config('marksman', {
-      filetypes = { 'markdown' },
-      -- Not in the vault: obsidian.nvim's LSP covers the same features there,
-      -- and marksman flags links to notes that don't exist yet, which are fine
-      -- in Obsidian. Elsewhere, same root markers as lspconfig's default.
-      root_dir = function(bufnr, on_dir)
-        if not in_notes(bufnr) then
-          on_dir(vim.fs.root(bufnr, { '.marksman.toml', '.git' }))
-        end
-      end,
-      -- A .NET binary, which otherwise aborts at startup without ICU (not
-      -- installed on Debian by default). Invariant mode only drops
-      -- culture-aware casing and sorting, which Markdown doesn't need.
-      cmd_env = { DOTNET_SYSTEM_GLOBALIZATION_INVARIANT = '1' },
-    })
-    vim.lsp.enable('marksman')
   end
 
   -- `tsc` is the language server, not just the compiler: TypeScript 7's native
