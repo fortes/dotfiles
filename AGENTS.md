@@ -19,8 +19,8 @@ make test         # shellcheck + shfmt (also what CI runs)
 - **Debian packages:** `script/apt-packages.txt`; third-party apt repos get their own `script/install_*`
 - **Binaries missing or too old in Debian:** Either use backports or via `script/install_github_packages`
 - **npm / uv globals:** `script/install_{node,python}_packages`
-- **Config files:** `stowed-files/<package>/`, mirroring `$HOME`. Each directory is a stow package; `DOTFILES_SKIP_PACKAGES` (space-separated) skips some. Directories programs write into (`REAL_DIRS` in `script/stow`, e.g. `~/.ssh`) are created first so stow doesn't fold them into the repo.
-- **Machine-specific settings:** tracked `*.local` templates (`.profile.local`, `.gitconfig.local`) and configs that hold credentials (`~/.mpdscribble/mpdscribble.conf`) are stowed and marked skip-worktree by `script/lock_local_files`, so per-machine edits stay out of git. Mark what each machine must fill in (hosts, usernames, secrets) with `REPLACE_ME` so it's greppable. `~/.bashrc.local` and `~/.vimrc.local` are untracked.
+- **Config files:** `stowed-files/<package>/`, mirroring `$HOME`. Each directory is a stow package; `DOTFILES_SKIP_PACKAGES` (space-separated) skips some. `script/stow` links files one by one (`--no-folding`), so directories in `$HOME` stay real and programs never write into the repo.
+- **Machine-specific settings:** templates in `local-templates/<package>/` (`.profile.local`, `.gitconfig.local`, MPD's server and mpdscribble's credentials), copied into `$HOME` as private untracked files when that package is stowed and the file is missing. Mark what each machine must fill in (hosts, usernames, secrets) with `REPLACE_ME` so it's greppable. `~/.bashrc.local` and `~/.vimrc.local` are untracked.
 
 Shell startup: `.profile` (environment, PATH, helpers, `IS_DOCKER`; sources `.profile.local` last) → `.bashrc` (interactive; sources `.profile`) → `.aliases`.
 
