@@ -51,7 +51,7 @@ BREW_PACKAGES=(
   imagemagick
   jq
   keychain
-  lua-language-server
+  marksman
   moreutils
   mpc
   mpd

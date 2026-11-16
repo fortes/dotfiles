@@ -81,13 +81,13 @@ Homebrew doesn't uninstall dropped formulae, and old installs in `~/.local/bin`
 shadow the new ones because it comes first on `PATH`:
 
 ```sh
-brew uninstall rust docker docker-compose colima podman f2 difftastic cloudflared
+brew uninstall rust docker docker-compose colima podman f2 difftastic cloudflared lua-language-server
 # Old npm globals (codex, language servers, prettier, qmd, ...) and Corepack shims
 rm -rf ~/.local/lib/node_modules
 # Native Claude Code install (the cask replaces it; ~/.claude is untouched)
 rm -f ~/.local/bin/claude && rm -rf ~/.local/share/claude
 # Old uv tools and cargo installs
-uv tool uninstall epy-reader pynvim pyright ruff streamdown beets
+uv tool uninstall epy-reader pynvim pyright ruff streamdown vim-vint beets
 rm -rf ~/.local/share/cargo
 # Links left dangling by the removals above
 find ~/.local/bin -type l ! -exec test -e {} \; -print -delete
@@ -111,7 +111,7 @@ sudo apt-get purge cargo python3-dev python3-pip python3-venv python3-virtualenv
 sudo apt-get autoremove
 # npm, uv and cargo globals (beets stays: the homelab imports with it)
 rm -rf ~/.local/lib/node_modules ~/.local/share/cargo
-uv tool uninstall epy-reader pynvim pyright ruff streamdown
+uv tool uninstall epy-reader pynvim pyright ruff streamdown vim-vint
 find ~/.local/bin -type l ! -exec test -e {} \; -print -delete
 ```
 
