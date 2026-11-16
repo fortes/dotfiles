@@ -65,24 +65,26 @@ install_apt_packages() {
   echo "Apt packages installed"
 }
 
-setup_backports() {
-  declare -r sources_path="/etc/apt/sources.list.d/backports.sources"
+# Add apt suite $1 from mirror $2, unless already configured. Some Debian
+# images, like ChromeOS's, ship without the security and stable-update suites
+setup_suite() {
+  local suite="$1" uri="$2"
 
   # Ask APT so existing .list/.sources entries and disabled sources are handled.
   # --no-release-info also works before package indexes have been downloaded.
   # shellcheck disable=SC2016 # APT expands $(RELEASE).
   if apt-get indextargets --no-release-info --format '$(RELEASE)' \
-    | grep -Fx "${VERSION_CODENAME}-backports" >/dev/null; then
-    echo "Backports already configured"
+    | grep -Fx "${suite}" >/dev/null; then
+    echo "${suite} already configured"
     return
   fi
 
-  echo "${VERSION_CODENAME}-backports not in sources.list, adding (requires sudo)"
-  sudo tee "$sources_path" >/dev/null <<EOF
+  echo "${suite} not in apt sources, adding (requires sudo)"
+  sudo tee "/etc/apt/sources.list.d/${suite}.sources" >/dev/null <<EOF
 Types: deb
-URIs: http://deb.debian.org/debian
-Suites: ${VERSION_CODENAME}-backports
-Components: main contrib non-free non-free-firmware
+URIs: ${uri}
+Suites: ${suite}
+Components: main
 Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
 EOF
 }
@@ -97,25 +99,6 @@ setup_locale() {
     sudo locale-gen
   fi
   sudo update-locale "LANG=${locale}"
-}
-
-setup_nonfree() {
-  declare -r deb822_path="/etc/apt/sources.list.d/debian.sources"
-
-  if [[ ! -f "$deb822_path" ]]; then
-    echo_stderr "No debian sources found, skipping non-free setup"
-    return
-  fi
-
-  # Match standalone `non-free`, not the default `non-free-firmware`
-  if grep -qE '(^|[[:space:]])non-free([[:space:]]|$)' "$deb822_path"; then
-    echo "Non-free already in ${deb822_path}"
-    return
-  fi
-
-  echo "Adding contrib & non-free to ${deb822_path} (requires sudo)"
-  sudo sed -i -E 's/^Components: main([[:space:]].*)?$/Components: main contrib non-free non-free-firmware/' \
-    "$deb822_path"
 }
 
 setup_shell() {
@@ -142,8 +125,9 @@ main() {
 
   "${dotfiles_root}/script/set_dotfiles_remote"
 
-  setup_nonfree
-  setup_backports
+  setup_suite "${VERSION_CODENAME}-security" http://deb.debian.org/debian-security
+  setup_suite "${VERSION_CODENAME}-updates" http://deb.debian.org/debian
+  setup_suite "${VERSION_CODENAME}-backports" http://deb.debian.org/debian
   install_apt_packages
   "${dotfiles_root}/script/install_1password"
   [[ -z "${IS_DOCKER:-}" ]] && "${dotfiles_root}/script/install_et"
