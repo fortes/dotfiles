@@ -8,12 +8,13 @@ set -euo pipefail
 IFS=$'\n\t'
 export DEBIAN_FRONTEND=noninteractive
 
+# shellcheck source=script/lib.sh
+. "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+
 install_docker() {
   echo "Installing docker (requires sudo)"
   sudo -E apt-get update -qq
-  sudo -E apt-get install -qq -o=Dpkg::Use-Pty=0 --assume-yes \
-    --fix-broken --no-install-recommends \
-    docker.io docker-buildx docker-cli docker-compose
+  apt_install docker.io docker-buildx docker-cli docker-compose
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then

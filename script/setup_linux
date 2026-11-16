@@ -15,17 +15,6 @@ dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # Make sure not to get stuck on any prompts
 export DEBIAN_FRONTEND=noninteractive
 
-# Common apt-get arguments
-declare -r APT_ARGS=(
-  -qq
-  -o=Dpkg::Use-Pty=0
-  -o=Dpkg::Progress-Fancy=0
-  -o=APT::Get::Show-Progress=false
-  --assume-yes
-  --fix-broken
-  --no-install-recommends
-)
-
 declare -r APT_PACKAGES_FILE="${dotfiles_root}/script/apt-packages.txt"
 declare -a APT_PACKAGES
 mapfile -t APT_PACKAGES < <(awk 'NF && $1 !~ /^#/ {print $1}' "${APT_PACKAGES_FILE}")
@@ -55,17 +44,8 @@ install_apt_packages() {
   echo "Running apt-get update (requires sudo)"
   sudo -E apt-get update -qq
 
-  # dpkg ignores -qq and prints four lines per package, over 1,000 on a fresh
-  # machine, so its stdout goes to a log. Errors and warnings are on stderr
-  local log="${XDG_CACHE_HOME:-$HOME/.cache}/dotfiles/apt-install.log"
-  mkdir -p "$(dirname "${log}")"
-  echo "Ensuring apt packages installed (requires sudo), output in ${log}"
-  # shellcheck disable=SC2024 # The log is yours, so the redirect skips sudo
-  if ! sudo -E apt-get install "${APT_ARGS[@]}" "${packages[@]}" >"${log}"; then
-    tail -n 20 "${log}" >&2
-    echo_stderr "apt-get install failed; full output in ${log}"
-    return 1
-  fi
+  echo "Ensuring apt packages installed (requires sudo), output in ~/.cache/dotfiles/apt-install.log"
+  apt_install "${packages[@]}"
   echo "Apt packages installed"
 }
 

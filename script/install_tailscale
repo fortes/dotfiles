@@ -7,6 +7,9 @@ set -euo pipefail
 IFS=$'\n\t'
 export DEBIAN_FRONTEND=noninteractive
 
+# shellcheck source=script/lib.sh
+. "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+
 install_tailscale() {
   declare -r tailscale_sources_list="/etc/apt/sources.list.d/tailscale.sources"
   declare -r legacy_tailscale_sources_list="/etc/apt/sources.list.d/tailscale.list"
@@ -64,8 +67,7 @@ EOF
   sudo -E apt-get update -qq
 
   echo "Installing tailscale package (requires sudo)"
-  sudo -E apt-get install -qq -o=Dpkg::Use-Pty=0 --assume-yes \
-    --fix-broken --no-install-recommends tailscale
+  apt_install tailscale
 
   echo "Run \`sudo tailscale up\` to connect this machine to your tailnet"
 }

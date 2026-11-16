@@ -31,3 +31,20 @@ command_exists() {
 echo_stderr() {
   echo >&2 "${@}"
 }
+
+# Install apt packages (or .deb paths). dpkg ignores -qq and prints four lines
+# per package, so its stdout goes to a log; errors and warnings stay on stderr,
+# and a failure prints the log's end
+apt_install() {
+  local IFS=' ' log="${XDG_CACHE_HOME:-$HOME/.cache}/dotfiles/apt-install.log"
+  mkdir -p "$(dirname "${log}")"
+  echo "=== $(date) apt-get install $*" >>"${log}"
+  # shellcheck disable=SC2024 # The log is yours, so the redirect skips sudo
+  if ! DEBIAN_FRONTEND=noninteractive sudo -E apt-get install -qq --assume-yes \
+    --fix-broken --no-install-recommends -o=Dpkg::Use-Pty=0 \
+    -o=Dpkg::Progress-Fancy=0 -o=APT::Get::Show-Progress=false "$@" >>"${log}"; then
+    tail -n 20 "${log}" >&2
+    echo_stderr "apt-get install failed; full output in ${log}"
+    return 1
+  fi
+}
