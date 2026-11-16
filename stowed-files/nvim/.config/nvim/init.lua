@@ -447,8 +447,11 @@ use({ src = 'https://github.com/nvim-treesitter/nvim-treesitter', version = 'mai
       local ok, err = pcall(function()
         vim.treesitter.start(ev.buf, parser:lang())
         -- Without an `indents` query treesitter indents nothing at all, so
-        -- leave those languages (diff, vim, ...) to Neovim's own indent plugins
-        if vim.treesitter.query.get(parser:lang(), 'indents') then
+        -- leave those languages (diff, vim, ...) to Neovim's own indent plugins.
+        -- Markdown's query is just `@indent.auto`, which is meant to match
+        -- 'autoindent' but returns 0 inside real notes, flattening nested
+        -- bullets on Enter.
+        if parser:lang() ~= 'markdown' and vim.treesitter.query.get(parser:lang(), 'indents') then
           vim.bo[ev.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
         end
       end)
