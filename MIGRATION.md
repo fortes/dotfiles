@@ -96,6 +96,18 @@ find ~/.local/bin -type l ! -exec test -e {} \; -print -delete
 
 Start Apple's container service once with `container system start`.
 
+`mpd-sync` replaces `mpd-sync-playlists`, and also copies the server's beets
+library for `play-albums`, so it no longer needs the media share or `BEETSDIR`.
+It finds `beets.db` next to the music directory, which port 8090 doesn't
+serve: switch `music_directory` in `~/.mpd/mpd.conf.local` to the server's
+HTTPS address, restart MPD, and sync:
+
+```sh
+sed -i '' 's|^music_directory "http://\([^:]*\):8090/music/"|music_directory "https://\1/music/"|' ~/.mpd/mpd.conf.local
+rm -f ~/.local/bin/mpd-sync-playlists
+brew services restart mpd && mpd-sync
+```
+
 ## 3. Debian hosts (homelab, Crostini)
 
 First remove what moved to apt, became on-demand, or went away:

@@ -182,7 +182,7 @@ clean those up:
   ```sh
   defaults write com.lowtechguys.MusicDecoy mediaAppPath /Applications/Plexamp.app
   ```
-- Automount the media share at a fixed path. Unlike Finder mounts, it remounts on access and doesn't litter `/Volumes`. macOS upgrades may reset `/etc/auto_master`; re-run the first command if so. Use the share's read-only login; guest access fails with the misleading "No locks available" (errno 77, an SMB auth error):
+- Optionally, to browse the server's music in Finder, automount the media share at a fixed path (MPD and `play-albums` don't need it). Unlike Finder mounts, it remounts on access and doesn't litter `/Volumes`. macOS upgrades may reset `/etc/auto_master`; re-run the first command if so. Use the share's read-only login; guest access fails with the misleading "No locks available" (errno 77, an SMB auth error):
 
   ```sh
   echo '/-    auto_smb    -nosuid,nobrowse' | sudo tee -a /etc/auto_master
@@ -190,15 +190,15 @@ clean those up:
   sudo automount -cv
   ln -s /System/Volumes/Data/mnt/media/music ~/Music/SERVER
   ```
-- Start MPD, which plays here using the server's library, then use `rmpc` or `play-albums`. Set the server's address in `~/.mpd/mpd.conf.local`, replacing `REPLACE_ME`. `play-albums` turns beets paths into MPD ones by stripping beets' `directory`, so keep that at the server's music path (`/data/media/music`). MPD needs System Settings → Privacy & Security → Local Network access to reach the server, otherwise it fails with "No route to host". Homebrew upgrades may ask again:
+- Start MPD, which plays here using the server's library, then use `rmpc` or `play-albums`. Set the server's address in `~/.mpd/mpd.conf.local`, replacing `REPLACE_ME`; it's the one place the scripts read it from too. MPD needs System Settings → Privacy & Security → Local Network access to reach the server, otherwise it fails with "No route to host". Homebrew upgrades may ask again:
 
   ```sh
   brew services start mpd
   ```
-- The proxy database doesn't share the server's playlists, so copy its `.m3u` files into `~/.mpd/playlists` for rmpc's Playlists tab. Rerun after the server regenerates them. Large playlists load slowly, since MPD looks up each song on the server:
+- Copy the server's playlists and beets library to this Mac. The proxy database doesn't share playlists, so this puts its `.m3u` files in `~/.mpd/playlists` for rmpc's Playlists tab; `play-albums` searches the library copy in `~/.mpd/beets`, offline too. The library only downloads when the server's is newer. Rerun after the server regenerates them. Large playlists load slowly, since MPD looks up each song on the server:
 
   ```sh
-  mpd-sync-playlists
+  mpd-sync
   ```
 - Offline, `mpd-offline on` swaps MPD to the albums synced from the server into `~/Music/albums`, with its own queue; `mpd-offline off` goes back to the server's library. Only local albums play, from rmpc, playlists or `play-albums`. Scrobbles wait in mpdscribble's journal until the network returns. Offline mode doesn't survive a reboot: run `mpd-offline on` again, or `mpd-offline off` to go back.
 - Scrobble MPD plays to Libre.fm and ListenBrainz: fill in the `REPLACE_ME`s in `~/.mpdscribble/mpdscribble.conf` (a private copy of the template, outside git), then start it:

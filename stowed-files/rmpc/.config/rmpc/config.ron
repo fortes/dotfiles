@@ -32,7 +32,7 @@
         album_date_tags: [OriginalDate, Date],
     ),
     // Default tabs minus Directories, Artists and Albums. Playlists shows the
-    // server's .m3u files once mpd-sync-playlists has copied them over. No
+    // server's .m3u files once mpd-sync has copied them over. No
     // borders, and album art lives in the theme's header instead of the Queue
     tabs: [
         (

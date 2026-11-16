@@ -6,5 +6,6 @@ database {
     # Notice connections that died during sleep or a network switch
     keepalive "yes"
 }
-# Song paths from the server's database, fetched over HTTP from Caddy
-music_directory "http://REPLACE_ME:8090/music/"
+# Song paths from the server's database, fetched over HTTP(S) from Caddy.
+# mpd-sync also gets playlists from here, and beets.db from next to it
+music_directory "https://REPLACE_ME/music/"
