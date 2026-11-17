@@ -112,7 +112,7 @@ rm -rf ~/containers/.state   # only once you're done with the shared logins
 Already done: the `.local` files are real private files in `~`, and
 `script/stow -R` ran from the branch. Still to do:
 
-1. `script/setup`, then the cleanup block in MIGRATION.md section 2.
+1. `script/setup`, then the cleanup block in MIGRATION.md section 1.
 2. `which claude codex bash-language-server` all point into `/opt/homebrew/bin`
    (old copies in `~/.local/bin` would shadow them).
 3. Daily use: nvim on a note and on this repo (formatting, language servers),
@@ -125,9 +125,8 @@ A machine that already ran an earlier version of this branch (like the Debian
 VM) needs `rm ~/.local/bin/codex` once before `script/update`: Codex now comes
 from npm, which won't overwrite the old GitHub binary.
 
-Follow MIGRATION.md: section 1 on `main` if the machine hasn't done it yet, then
-`git fetch && git checkout containers` and the rest. Go from lowest to highest
-stakes:
+Follow MIGRATION.md after `git fetch && git checkout containers`. Go from lowest
+to highest stakes:
 
 1. **Crostini** (no services). Migrate, `script/setup`, then a login shell,
    nvim on a note, and tmux.
@@ -139,7 +138,7 @@ stakes:
      As `dev`, clone the repo and run `script/stow` (not `script/setup`; it has
      no sudo), then `dev create scratch`. This is the first run of `dev`'s
      podman path.
-3. **Coder devbox**: after the merge, per MIGRATION.md section 4.
+3. **Coder devbox**: after the merge, per MIGRATION.md section 3.
 
 ## Rolling a machine back
 
