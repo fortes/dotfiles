@@ -199,15 +199,22 @@ run_container() {
     "${image}" sleep infinity >/dev/null
 }
 
-# The keys for `ssh dev-$1`: a host key, kept so recreating the container
-# doesn't change it, and every SSH public key on this machine (the agent's,
-# including one set as IdentityAgent like 1Password's, and ~/.ssh/*.pub), plus
-# the ones allowed to SSH in as this user, who can run `dev $1` anyway
+# The keys for `ssh dev-$1`: this machine's host key for its containers, and
+# every SSH public key on it (the agent's, including one set as IdentityAgent
+# like 1Password's, and ~/.ssh/*.pub), plus the ones allowed to SSH in as this
+# user, who can run `dev $1` anyway. One host key for all of them, since sshd
+# can't read the system's: a new container reusing a name doesn't change it,
+# and connections go through `dev proxy`, so containers can't pose as others
 setup_ssh() {
-  local dir="${root}/$1/ssh" agent keys
-  (umask 077 && mkdir -p "${dir}")
-  if [[ ! -f "${dir}/host_ed25519" ]]; then
-    ssh-keygen -q -t ed25519 -N '' -C "dev-$1" -f "${dir}/host_ed25519"
+  local dir="${root}/$1/ssh" shared="${root}/.ssh/host_ed25519" agent keys
+  (umask 077 && mkdir -p "${dir}" "${root}/.ssh")
+  if [[ ! -f "${shared}" ]]; then
+    ssh-keygen -q -t ed25519 -N '' -C "dev containers on $(hostname)" -f "${shared}"
+  fi
+  if ! cmp -s "${shared}" "${dir}/host_ed25519"; then
+    cp "${shared}" "${shared}.pub" "${dir}/"
+    # It had its own key before, which this machine's SSH remembers
+    ssh-keygen -R "dev-$1" -f ~/.ssh/known_hosts.dev >/dev/null 2>&1 || true
   fi
   agent="$(ssh -G localhost 2>/dev/null | sed -n 's/^identityagent //p')"
   keys="$({
@@ -374,8 +381,6 @@ remove() {
   "${runtime}" rm --force "${name}" >/dev/null 2>&1 || true
   # Removes the shared state's link, not what it points to
   rm -rf "${dir}"
-  # A new container with this name gets a new host key
-  ssh-keygen -R "dev-${name}" -f ~/.ssh/known_hosts.dev >/dev/null 2>&1 || true
   echo "Deleted ${name}"
 }
 
