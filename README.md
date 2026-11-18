@@ -382,6 +382,8 @@ Host dev-*.homelab
   ProxyCommand ssh dev@homelab .local/bin/dev proxy %n
 ```
 
+Each container's `DEV_URL` uses the server's plain hostname (`http://homelab:<port>`; the Mac uses its `.local` name), so it only works from other machines if the network's DNS resolves that name. Otherwise install `avahi-daemon` on the server and use `http://homelab.local:<port>`, or its IP.
+
 Then `ssh dev-blog.homelab` runs `dev proxy` there, which connects to the container `blog`. Its containers trust the keys allowed to SSH in as `dev` (its `~/.ssh/authorized_keys`), as of their last create or recreate.
 
 #### Building locally
