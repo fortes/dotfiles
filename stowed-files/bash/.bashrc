@@ -105,11 +105,23 @@ EXIT_STATUS="${BOLD}${RED}✗\${LAST_EXIT}${RESET} "
 PROMPT_SUFFIX="\${HAS_JOBS:+$JOB_COUNT}\${LAST_EXIT:+$EXIT_STATUS}"
 # Long paths keep their last three folders (.../src/blog/content)
 PROMPT_DIRTRIM=3
+# The last command's exit code for the prompt, or nothing if it succeeded or
+# was only suspended (Ctrl-Z gives 128 plus the stop signal's number, which
+# differs between Linux and macOS, and the jobs count already shows it)
+__prompt_exit() {
+  LAST_EXIT="$1"
+  if [[ "${LAST_EXIT}" == 0 ]]; then
+    LAST_EXIT=
+  elif ((LAST_EXIT > 128)) \
+    && [[ "$(kill -l $((LAST_EXIT - 128)) 2>/dev/null)" =~ ^(SIG)?(TSTP|STOP|TTIN|TTOU)$ ]]; then
+    LAST_EXIT=
+  fi
+}
 # Save the exit code first, before anything else here changes it. Write out
 # history after every command. Not exported, since it calls functions child
 # shells may not have defined (e.g. `bash --norc`). Un-export in case
 # inherited from an older shell
-PROMPT_COMMAND="LAST_EXIT=\$?; [[ \$LAST_EXIT == 0 ]] && LAST_EXIT=; history -a; HAS_JOBS=\$(jobs -sp) "
+PROMPT_COMMAND="__prompt_exit \$?; history -a; HAS_JOBS=\$(jobs -sp) "
 export -n PROMPT_COMMAND
 PS1="$BASE_PROMPT $PROMPT_SUFFIX"
 
