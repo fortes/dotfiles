@@ -105,12 +105,14 @@ EXIT_STATUS="${BOLD}${RED}✗\${LAST_EXIT}${RESET} "
 PROMPT_SUFFIX="\${HAS_JOBS:+$JOB_COUNT}\${LAST_EXIT:+$EXIT_STATUS}"
 # Long paths keep their last three folders (.../src/blog/content)
 PROMPT_DIRTRIM=3
-# The last command's exit code for the prompt, or nothing if it succeeded or
-# was only suspended (Ctrl-Z gives 128 plus the stop signal's number, which
-# differs between Linux and macOS, and the jobs count already shows it)
+# The last command's exit code for the prompt, only when a command ran and
+# failed. Not for success, a command that wasn't found or isn't executable
+# (127, 126) or Ctrl-C (130), whose messages already say so, nor a suspended
+# job (Ctrl-Z gives 128 plus the stop signal's number, which differs between
+# Linux and macOS, and the jobs count already shows it)
 __prompt_exit() {
   LAST_EXIT="$1"
-  if [[ "${LAST_EXIT}" == 0 ]]; then
+  if [[ "${LAST_EXIT}" =~ ^(0|126|127|130)$ ]]; then
     LAST_EXIT=
   elif ((LAST_EXIT > 128)) \
     && [[ "$(kill -l $((LAST_EXIT - 128)) 2>/dev/null)" =~ ^(SIG)?(TSTP|STOP|TTIN|TTOU)$ ]]; then
