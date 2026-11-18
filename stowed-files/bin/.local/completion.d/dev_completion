@@ -1,0 +1,31 @@
+# shellcheck shell=bash
+# Completion for `dev` (stowed-files/bin/.local/bin/dev): its commands and the
+# containers `dev create` made, which are the ~/containers/<name> folders with
+# an `image` file
+
+_dev_containers() {
+  local dir
+  for dir in "${HOME}"/containers/*/; do
+    [[ -e "${dir}image" ]] && basename "${dir}"
+  done
+}
+
+_dev() {
+  local cur="${COMP_WORDS[COMP_CWORD]}" prev="${COMP_WORDS[COMP_CWORD - 1]}"
+  local words
+  if [[ ${COMP_CWORD} -eq 1 ]]; then
+    words="list create recreate $(_dev_containers)"
+  elif [[ "${COMP_WORDS[1]}" == create ]]; then
+    # A port or a new name comes next, so only offer the flags
+    [[ "${prev}" == --publish ]] && return
+    words="--shared-state --publish"
+  elif [[ "${COMP_WORDS[1]}" == recreate && ${COMP_CWORD} -eq 2 ]]; then
+    words="$(_dev_containers)"
+  else
+    return
+  fi
+  # shellcheck disable=SC2207 # Words never contain spaces
+  COMPREPLY=($(compgen -W "${words}" -- "${cur}"))
+}
+
+complete -F _dev dev
