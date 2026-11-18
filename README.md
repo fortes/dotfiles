@@ -254,7 +254,7 @@ What keeps that boundary intact:
 - **Each repo lives on one side.** Clone a container's repos into its `src` and do their git work inside it. Running host git in a checkout a container wrote can run that checkout's `.git/hooks` or `core.fsmonitor` on the host.
 - **Mount only the container's `src` and its state,** never `~` or all of `~/src`.
 - **Agents have passwordless sudo inside,** so they can install whatever a project needs. Treat everything in a container as theirs: the protections are what it's given (mounts, `env`, tokens), not restrictions inside it.
-- **Agent logins live in each container's own `state`,** mounted at `/state` (`CLAUDE_CONFIG_DIR`, `CODEX_HOME`, plus links for agy), so they survive image upgrades and the projects can't see them, though anything running in the container can. `dev create --shared-state` links it to `~/containers/.state` instead, shared by every container created that way: one sign-in, but each of them can read the others' logins. Keep untrusted repos out of the shared ones. GitHub access is always per container, from each one's `env`.
+- **Logins live in each container's own `state`,** mounted at `/state` (`CLAUDE_CONFIG_DIR`, `CODEX_HOME`, `GH_CONFIG_DIR`, plus links for agy), so they survive image upgrades and the projects can't see them, though anything running in the container can. `dev create --shared-state` links it to `~/containers/.state` instead, shared by every container created that way: one sign-in, but each of them can read the others' logins. Keep untrusted repos out of the shared ones. GitHub comes from a `gh auth login` there (shared the same way) or a `GH_TOKEN` in the container's `env`, which overrides it.
 
 #### Using containers
 
@@ -289,7 +289,7 @@ Hosts and containers each sign in separately; the Mac's logins can't be shared w
 | Codex | Run `codex` | `codex login --device-auth` (no browser callback needed) |
 | agy | Install the `antigravity-cli` cask by hand, run `agy` | Run `agy` and follow its sign-in |
 | gemini-api | `gemini-api configure` with an [AI Studio key](https://aistudio.google.com/apikey) | Containers only: `GEMINI_API_KEY` in the container's `env` |
-| GitHub | `gh auth login` as yourself | Containers: a `GH_TOKEN` in `env`, yours or the bot's |
+| GitHub | `gh auth login` as yourself | Containers: `gh auth login` (saved in `/state`, shared with `--shared-state`) or a `GH_TOKEN` in `env`, yours or the bot's |
 
 Claude Code and agy update themselves. On Linux, `script/update` updates Codex (always the newest release, skipping the cooldown) and the rest; containers can also move to a new image. On the Mac, `brew upgrade` covers the casks, and `script/update` covers gemini-api.
 

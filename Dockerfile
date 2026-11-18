@@ -60,9 +60,10 @@ RUN set -eux; \
   rm -rf /var/lib/apt/lists/* /tmp/apt-packages.txt; \
   sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
 
-# Codex requires CODEX_HOME to exist. Pushes use the container's GH_TOKEN
-# through gh, so containers never need SSH keys.
-RUN mkdir -p /workspaces /state/claude /state/codex /state/antigravity /state/gemini && \
+# Codex requires CODEX_HOME to exist. Pushes go through gh (a `gh auth login`
+# saved in /state/gh, or the container's GH_TOKEN), so containers never need
+# SSH keys.
+RUN mkdir -p /workspaces /state/claude /state/codex /state/antigravity /state/gemini /state/gh && \
   chown -R $USER_NAME:$USER_NAME /workspaces /state && \
   git config --system credential.https://github.com.helper '!gh auth git-credential'
 USER $USER_NAME
@@ -91,9 +92,10 @@ RUN --mount=type=secret,id=GH_TOKEN,mode=0444 \
   sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
   rm -rf ~/.cache ~/.local/install/cache ~/.claude ~/.claude.json ~/.codex
 
-# Agent logins go in the /state mount, set only after installing
+# Agent and GitHub logins go in the /state mount, set only after installing
 ENV CLAUDE_CONFIG_DIR=/state/claude \
-    CODEX_HOME=/state/codex
+    CODEX_HOME=/state/codex \
+    GH_CONFIG_DIR=/state/gh
 
 COPY --chown=$USER_NAME:$USER_NAME . dotfiles/
 RUN ./dotfiles/script/stow

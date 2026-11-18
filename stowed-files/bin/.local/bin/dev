@@ -26,19 +26,21 @@ ghcr.io/fortes/dotfiles:latest; pass `dotfiles` for a local build, or a
 project's own image built FROM it.
 
 Options:
-  --shared-state     Share agent logins (Claude Code, Codex, agy) with every
-                     other container made with this flag, through
+  --shared-state     Share logins (Claude Code, Codex, agy, and gh's) with
+                     every other container made with this flag, through
                      ~/containers/.state: sign in once, but each one can read
                      the others' logins. Without it, logins are this
-                     container's own. GitHub tokens are always per container.
+                     container's own. A GH_TOKEN in env overrides gh's login
+                     for one container.
   --publish <port>   Serve the container's <port> on the same port on every
                      host interface, for dev servers bound to 0.0.0.0, so
                      phones and other machines on the LAN reach them. Repeat
                      for more ports. To change them later, edit
                      ~/containers/<name>/ports, then dev recreate <name>.
 
-Afterwards, put a GH_TOKEN and any API keys in ~/containers/<name>/env; the
-next `dev <name>` shell reads it.
+Afterwards, sign in to GitHub inside (`gh auth login`, saved in /state), or
+put a GH_TOKEN and any API keys in ~/containers/<name>/env; the next
+`dev <name>` shell reads it.
 
 Examples:
   dev create blog                      Its own logins, the default image
@@ -196,19 +198,20 @@ create() {
   # Private, since it holds agent logins. A link for shared state, so recreating
   # the container keeps sharing
   if [[ -n "${shared}" ]]; then
-    (umask 077 && mkdir -p "${root}/.state"/{claude,codex,antigravity,gemini})
+    (umask 077 && mkdir -p "${root}/.state"/{claude,codex,antigravity,gemini,gh})
     ln -sfn ../.state "${dir}/state"
   else
-    (umask 077 && mkdir -p "${dir}/state"/{claude,codex,antigravity,gemini})
+    (umask 077 && mkdir -p "${dir}/state"/{claude,codex,antigravity,gemini,gh})
   fi
   if [[ ! -e "${dir}/env" ]]; then
     (
       umask 077
       cat >"${dir}/env" <<'EOF'
 # Read by `dev` each time it opens a shell: KEY=value lines, without `export`
-# or quotes. Leave the GitHub lines commented out for a container without
-# GitHub access. Commits use your identity from ~/.gitconfig.local unless the
-# GIT_* lines set the bot's.
+# or quotes. A GH_TOKEN here overrides a `gh auth login` saved in /state (and
+# shared with --shared-state); leave both out for a container without GitHub
+# access. Commits use your identity from ~/.gitconfig.local unless the GIT_*
+# lines set the bot's.
 # GH_TOKEN=
 # GIT_AUTHOR_NAME=
 # GIT_AUTHOR_EMAIL=
