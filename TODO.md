@@ -86,6 +86,18 @@ Deferred from the branch's testing, to fix forward. MIGRATION.md has the steps f
   - Rootless podman shares the NUC's kernel, unlike Apple's VM per container on the Mac. Incus (trixie has 6.0.4, trixie-backports 7.0.2) can run real KVM VMs, and 6.3+ can run OCI images, so it may run `ghcr.io/fortes/dotfiles` as a VM directly
   - Only after the podman path (separate `dev` user) has been tested on the NUC; it would mean a third `dev` backend. Keep podman and Quadlet for services; plain LXC containers share the kernel too, and Proxmox would replace the Debian host setup
 
+- [ ] **Have editor servers pick up `env` edits** (task)
+  - `dev <name>` and each new `ssh dev-<name>` read `~/containers/<name>/env`, but an editor's server inside the container (VS Code, Zed) keeps the environment of the connection that started it, so its terminals miss edits until it restarts. Mounting `env` and reading it from the login shell would cover them
+
+- [ ] **Stop the agent bot from pushing workflow changes** (task)
+  - `new-github-repo` only warns that the bot's pushes run `.github/workflows/` changes before review. A push ruleset restricting that path (admin bypass) and read-only default workflow permissions could block it, if the plan allows it. While there, print the invite's ID-based accept command instead of the lookup pipeline
+
+- [ ] **Quiet the image build's locale warnings** (task)
+  - The Dockerfile sets `LANG`/`LC_ALL` before `locale-gen` runs, so apt prints perl's "Setting locale failed" during the package install. Set them after
+
+- [ ] **Clean Apple's container images in `cleanup_disk`** (task)
+  - It prunes Docker and podman, not Apple's `container` images and builder cache, which the Mac uses now
+
 - [ ] **Let a machine pick `dev create`'s default image** (feature)
   - A `DEV_IMAGE` in `~/.profile.local` (say `dotfiles`, a local build) instead of `ghcr.io/fortes/dotfiles:latest`, for working on the dotfiles themselves. An image named on the command line still wins
 

@@ -14,6 +14,10 @@ IFS=$'\n\t'
 
 readonly root="${HOME}/containers"
 
+# SSH runs `dev proxy` without a login shell, and apps started from the Dock
+# get a PATH without Homebrew, where `container` lives
+[[ ! -x /opt/homebrew/bin/brew ]] || export PATH="/opt/homebrew/bin:$PATH"
+
 # Print the help for command $1, or the overview
 help() {
   case "${1:-}" in
@@ -72,8 +76,8 @@ pushed is lost), its own logins and its env. Asks you to type the name first.
 A --shared-state container's shared logins stay.
 
 To drop only the container and keep its files, run
-`container rm --force <name>` (`podman rm --force <name>` on Linux);
-`dev recreate <name>` brings it back.
+`container rm --force <name>` (`podman rm --force <name>` on Linux); the next
+`dev <name>` or `ssh dev-<name>` brings it back from its saved image.
 EOF
       ;;
     stop)
@@ -115,7 +119,8 @@ Each container gets a port of its own, the same inside and out: dev servers
 that listen on 0.0.0.0 at $PORT are reachable at $DEV_URL from this machine
 and the LAN, with no recreate. `dev list` shows it.
 
-Over SSH, `ssh dev-<name>` opens the same shell, for editors and apps that
+Over SSH, `ssh dev-<name>` opens a shell in the container (in your home folder;
+editors open whichever folder you pick), for editors and apps that
 work on remote machines (VS Code, Zed, ...). It goes through the container
 runtime, not the network, so no port is open; the container trusts every SSH
 public key on this machine as of its last create or recreate.
@@ -454,16 +459,25 @@ proxy() {
     echo "${name} predates SSH access; run: dev recreate ${name}" >&2
     exit 1
   fi
-  "${runtime}" start "${name}" >/dev/null
+  start_container "${name}"
   exec "${runtime}" exec --interactive --env-file "${root}/${name}/env" \
     "${name}" /usr/local/bin/dev-sshd
+}
+
+# Start container $1, re-creating it from its saved image if the runtime no
+# longer has it (removed by hand, as `dev help rm` suggests, or a runtime reset)
+start_container() {
+  if ! "${runtime}" inspect "$1" >/dev/null 2>&1; then
+    run_container "$1" "$(cat "${root}/$1/image")"
+  fi
+  # A no-op when it's already running
+  "${runtime}" start "$1" >/dev/null
 }
 
 shell() {
   local name="$1"
   require_container "${name}"
-  # A no-op when it's already running
-  "${runtime}" start "${name}" >/dev/null
+  start_container "${name}"
   # exec resets TERM, so pass through the host tmux's TERM and truecolor
   exec "${runtime}" exec --interactive --tty --env TERM --env COLORTERM \
     --env-file "${root}/${name}/env" --workdir /workspaces "${name}" bash --login

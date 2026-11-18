@@ -38,8 +38,10 @@ else
   # Both update themselves once installed
   "${dotfiles_script_dir}/install_agy"
   if ! command_exists claude; then
-    # A throwaway npm cache: nothing else on a host uses npm, and this install
-    # would otherwise leave ~500 MB behind
+    # The cooldown only covers the npm package that runs the installer: it then
+    # downloads the newest native build, which updates itself from then on. A
+    # throwaway npm cache, since this would otherwise leave ~500 MB in the one
+    # the globals above use
     npm_cache="$(mktemp -d)"
     NPM_CONFIG_CACHE="${npm_cache}" npx --yes --min-release-age=3 @anthropic-ai/claude-code install
     rm -rf "${npm_cache}"

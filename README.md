@@ -72,13 +72,9 @@ Once you've run setup, you'll still have to do the following universal manual st
 
 7. On the Mac, log into the GitHub CLI (`gh auth login`) and launch `claude` and `codex` (and `agy`, if installed) once each to sign in. Containers sign in separately (see [Signing in agents](#signing-in-agents)).
 
-## Cleaning up stale symlinks
+## Stale links
 
-`script/stow` doesn't unstow packages that no longer exist in the repo. After pulling changes that delete a `stowed-files/<pkg>/` directory, broken symlinks can linger in `$HOME`. To remove broken symlinks that point into the dotfiles tree:
-
-```sh
-find ~ -maxdepth 5 -lname '*dotfiles/stowed-files*' ! -exec test -e {} \; -exec rm -v {} + 2>/dev/null
-```
+When a file is deleted from the repo, `script/stow` (and so `script/setup`) removes the link it left in `$HOME`: any link into `stowed-files` whose file is gone, in `~` and the folders packages link into.
 
 ## Machine-specific settings
 
@@ -283,9 +279,9 @@ dev rm personal       # Delete it and ~/containers/personal, after you type its 
 
 Run `dev` from a host tmux window rather than nesting tmux. Pass an image as the last argument to use a project's own, e.g. `dev create new-project new-project`.
 
-`ssh dev-<name>` opens the same shell over SSH, for editors and apps that work on remote machines (VS Code or Cursor Remote-SSH, Zed, and any other that reads `~/.ssh/config`). The stowed SSH config sends it through `dev proxy`, which runs the container's `sshd` over the runtime's exec instead of the network, so no port is open. The container trusts every SSH public key on the Mac as of its last `dev create` or `dev recreate` (the agent's, including 1Password's, `~/.ssh/*.pub`, and any in `~/.ssh/authorized_keys`), uses this machine's host key for containers (one for all of them, in `~/containers/.ssh`), and never gets your agent forwarded. SSH sessions get the container's environment and `env` file like `dev <name>` does. Containers made before SSH access need one `dev recreate <name>`.
+`ssh dev-<name>` opens a shell in the container over SSH, starting in your home folder there, for editors and apps that work on remote machines (VS Code or Cursor Remote-SSH, Zed, and any other that reads `~/.ssh/config`). The stowed SSH config sends it through `dev proxy`, which runs the container's `sshd` over the runtime's exec instead of the network, so no port is open. The container trusts every SSH public key on the Mac as of its last `dev create` or `dev recreate` (the agent's, including 1Password's, `~/.ssh/*.pub`, and any in `~/.ssh/authorized_keys`), uses this machine's host key for containers (one for all of them, in `~/containers/.ssh`), and never gets your agent forwarded. SSH sessions get the container's environment and `env` file like `dev <name>` does. Containers made before SSH access need one `dev recreate <name>`.
 
-Each container gets a random port of its own (20000–29999), served on the same number on every interface of the host and kept across recreates, so a dev server is reachable from the Mac and other machines on the LAN (a phone, another laptop) with no setup: inside, `PORT` holds it and `DEV_URL` the address to open (`http://<host>.local:<port>`). Many servers read `PORT` themselves; others take it as a flag (`hugo server --bind 0.0.0.0 --port $PORT --baseURL $DEV_URL/`). They must bind to `0.0.0.0`, not `127.0.0.1`. `dev list` shows each container's port. For a fixed number on top, publish it when creating the container: `dev create --publish 1313 site`. To change them later, edit `~/containers/<name>/ports` (one per line) and run `dev recreate <name>`. On the Mac, the firewall may ask once whether to let `container` accept incoming connections.
+Each container gets a random port of its own (20000–29999), served on the same number on every interface of the host and kept across recreates, so a dev server is reachable from the Mac and other machines on the LAN (a phone, another laptop) with no setup: inside, `PORT` holds it and `DEV_URL` the address to open (`http://<host>.local:<port>`). Many servers read `PORT` themselves; others take it as a flag (`hugo server --bind 0.0.0.0 --port $PORT --baseURL $DEV_URL/`). They must bind to `0.0.0.0`, not `127.0.0.1`. `dev list` shows each container's port. That includes public Wi-Fi, where others on the network can reach whatever an agent serves on it. For a fixed number on top, publish it when creating the container: `dev create --publish 1313 site`. To change them later, edit `~/containers/<name>/ports` (one per line) and run `dev recreate <name>`. On the Mac, the firewall may ask once whether to let `container` accept incoming connections.
 
 `dev create` writes `~/containers/<name>/env` with commented-out variables (a `GH_TOKEN`, yours or the bot's per [GitHub access](#github-access), its git identity, `GEMINI_API_KEY`). It's read each time `dev` opens a shell, so edits apply to the next one without recreating anything; leave the GitHub lines commented out for a container with no GitHub access, or one signed in with `gh auth login`. Git pushes over HTTPS through `gh`, so the token or login is all GitHub needs.
 

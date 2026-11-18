@@ -57,7 +57,10 @@ sudo tee /usr/local/bin/dev-sshd >/dev/null <<'EOF'
 set -euo pipefail
 umask 077
 mkdir -p ~/.ssh
-env | grep -v -E '^(HOME|PWD|OLDPWD|SHLVL|_|HOSTNAME|TERM)=' >~/.ssh/environment
+# Through a temporary file, since editors open several connections at once and
+# sshd could otherwise read a half-written one
+env | grep -v -E '^(HOME|PWD|OLDPWD|SHLVL|_|HOSTNAME|TERM)=' >~/.ssh/environment.$$
+mv -f ~/.ssh/environment.$$ ~/.ssh/environment
 exec /usr/sbin/sshd -i -e -o LogLevel=ERROR \
   -o HostKey=/etc/dev/ssh/host_ed25519 \
   -o AuthorizedKeysFile=/etc/dev/ssh/authorized_keys \
