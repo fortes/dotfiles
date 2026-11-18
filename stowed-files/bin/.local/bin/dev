@@ -1,17 +1,7 @@
 #!/usr/bin/env bash
-# Dev containers from the dotfiles image (see the README's Containers section).
-# Uses Apple's `container` where it's installed, otherwise rootless podman.
-#
-# Usage:
-#   dev [list]       List dev containers: running or not, image and ports
-#   dev <name>       Shell in the container, starting it if needed
-#   dev create [--shared-state] [--publish <port>]... <name> [image]
-#                    Make ~/containers/<name> and its container
-#   dev recreate <name> [image]
-#                    Replace the container, e.g. for a new image, keeping its
-#                    files, logins and ports (and image, unless given)
-#   dev rm <name>    Delete the container and ~/containers/<name> (its files,
-#                    logins and env), after you type its name. Also `remove`
+# Dev containers from the dotfiles image (see the README's Containers section,
+# and `dev --help`). Uses Apple's `container` where it's installed, otherwise
+# rootless podman.
 #
 # Mounts ~/containers/<name>/{src,state} at /workspaces and /state (with
 # --shared-state, state links to the shared ~/containers/.state), and reads
@@ -24,6 +14,120 @@ IFS=$'\n\t'
 
 readonly root="${HOME}/containers"
 
+# Print the help for command $1, or the overview
+help() {
+  case "${1:-}" in
+    create)
+      cat <<'EOF'
+Usage: dev create [--shared-state] [--publish <port>]... <name> [image]
+
+Make ~/containers/<name> and start its container. The image defaults to
+ghcr.io/fortes/dotfiles:latest; pass `dotfiles` for a local build, or a
+project's own image built FROM it.
+
+Options:
+  --shared-state     Share agent logins (Claude Code, Codex, agy) with every
+                     other container made with this flag, through
+                     ~/containers/.state: sign in once, but each one can read
+                     the others' logins. Without it, logins are this
+                     container's own. GitHub tokens are always per container.
+  --publish <port>   Serve the container's <port> on the same port on every
+                     host interface, for dev servers bound to 0.0.0.0, so
+                     phones and other machines on the LAN reach them. Repeat
+                     for more ports. To change them later, edit
+                     ~/containers/<name>/ports, then dev recreate <name>.
+
+Afterwards, put a GH_TOKEN and any API keys in ~/containers/<name>/env; the
+next `dev <name>` shell reads it.
+
+Examples:
+  dev create blog                      Its own logins, the default image
+  dev create --shared-state work       Logins shared with other shared ones
+  dev create --publish 1313 site       Serve port 1313 to the LAN
+  dev create app my-app-image          From a project's own image
+EOF
+      ;;
+    recreate)
+      cat <<'EOF'
+Usage: dev recreate <name> [image]
+
+Replace the container with a fresh one, from <image> or the one it already
+uses (pulled first when it's from a registry). Keeps src/ (/workspaces),
+state/ (logins), env and ports. Resets everything else, like packages
+installed outside /workspaces.
+
+Use it after the image updates, to switch to another image, or to clean up a
+broken container. If the new one fails to start, the old image is kept.
+EOF
+      ;;
+    rm | remove)
+      cat <<'EOF'
+Usage: dev rm <name>    (or: dev remove <name>)
+
+Delete the container and ~/containers/<name>: its files in src/ (anything not
+pushed is lost), its own logins and its env. Asks you to type the name first.
+A --shared-state container's shared logins stay.
+
+To drop only the container and keep its files, run
+`container rm --force <name>` (`podman rm --force <name>` on Linux);
+`dev recreate <name>` brings it back.
+EOF
+      ;;
+    list)
+      cat <<'EOF'
+Usage: dev [list]
+
+List the containers `dev create` made: running or stopped, image and ports.
+EOF
+      ;;
+    *)
+      cat <<'EOF'
+Usage: dev [list | <name> | create | recreate | rm | help] ...
+
+Dev containers from the dotfiles image, one per project or trust group. Each
+lives in ~/containers/<name>: src/ is /workspaces inside, state/ holds its
+agent logins (/state), and env holds tokens and keys, read on every shell.
+
+Commands:
+  dev [list]               List containers: running or stopped, image, ports
+  dev <name>               Shell in /workspaces (starts it if needed)
+  dev create <name>        Make a container (dev create --help for options)
+  dev recreate <name>      Replace it, keeping files, logins, env and ports
+  dev rm <name>            Delete it and its folder (also: remove)
+  dev help [command]       This help, or a command's (or: <command> --help)
+
+Examples:
+  dev create blog                      Its own logins, the default image
+  dev create --shared-state work       Logins shared with other shared ones
+  dev create --publish 1313 site       Serve port 1313 to the LAN
+  dev blog                             Shell in it
+  dev recreate blog                    Pick up a new image
+EOF
+      ;;
+  esac
+}
+
+# Exit after a usage error, pointing at command $1's help
+usage() {
+  help "${1:-}" | sed -n '1p' >&2
+  echo "See: dev help${1:+ $1}" >&2
+  exit 1
+}
+
+# Help works without the container runtime (or its service) running
+case "${1:-}" in
+  -h | --help | help)
+    help "${2:-}"
+    exit 0
+    ;;
+esac
+for arg in "$@"; do
+  if [[ "${arg}" == -h || "${arg}" == --help ]]; then
+    help "$1"
+    exit 0
+  fi
+done
+
 if command -v container >/dev/null 2>&1; then
   runtime=container
   run_args=()
@@ -35,11 +139,6 @@ else
   # shellcheck disable=SC2054 # One argument; its commas aren't separators
   run_args=(--userns=keep-id:uid=1000,gid=1000)
 fi
-
-usage() {
-  echo "Usage: dev [list | <name>] | dev create [--shared-state] [--publish <port>]... <name> [image] | dev recreate <name> [image] | dev rm <name>" >&2
-  exit 1
-}
 
 # Run container $1 from image $2, with the ports saved for it. --init reaps the
 # processes agents' tools leave behind
@@ -64,20 +163,26 @@ create() {
     case "$1" in
       --shared-state) shared=1 ;;
       --publish)
-        [[ "${2:-}" =~ ^[0-9]+$ ]] || usage
+        [[ "${2:-}" =~ ^[0-9]+$ ]] || {
+          echo "--publish needs a port number" >&2
+          usage create
+        }
         ports+=("$2")
         shift
         ;;
-      *) usage ;;
+      *)
+        echo "Unknown option $1" >&2
+        usage create
+        ;;
     esac
     shift
   done
-  [[ $# -ge 1 && $# -le 2 ]] || usage
+  [[ $# -ge 1 && $# -le 2 ]] || usage create
   local name="$1" image="${2:-ghcr.io/fortes/dotfiles:latest}"
   local dir="${root}/${name}"
   # `dev <name>` couldn't reach them
   case "${name}" in
-    list | create | recreate | rm | remove)
+    list | create | recreate | rm | remove | help)
       echo "${name} is a dev command; pick another name" >&2
       exit 1
       ;;
@@ -205,18 +310,17 @@ shell() {
 
 case "${1:-}" in
   '' | list) list ;;
-  -h | --help) usage ;;
   create)
     shift
     create "$@"
     ;;
   recreate)
-    [[ $# -ge 2 && $# -le 3 ]] || usage
+    [[ $# -ge 2 && $# -le 3 ]] || usage recreate
     shift
     recreate "$@"
     ;;
   rm | remove)
-    [[ $# -eq 2 ]] || usage
+    [[ $# -eq 2 ]] || usage rm
     remove "$2"
     ;;
   *)
