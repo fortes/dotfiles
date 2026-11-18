@@ -246,6 +246,12 @@ create() {
   [[ $# -ge 1 && $# -le 2 ]] || usage create
   local name="$1" image="${2:-ghcr.io/fortes/dotfiles:latest}"
   local dir="${root}/${name}"
+  # Dots would clash with `dev proxy`'s .<host> suffix, and Apple's container
+  # rejects one-character names
+  if [[ ! "${name}" =~ ^[A-Za-z0-9][A-Za-z0-9_-]+$ ]]; then
+    echo "Names are letters, digits, - and _, at least two characters: ${name}" >&2
+    exit 1
+  fi
   # `dev <name>` couldn't reach them
   case "${name}" in
     list | create | recreate | rm | remove | help | proxy)

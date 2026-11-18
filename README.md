@@ -384,7 +384,7 @@ Host dev-*.homelab
 
 Each container's `DEV_URL` uses the server's plain hostname (`http://homelab:<port>`; the Mac uses its `.local` name), so it only works from other machines if the network's DNS resolves that name. Otherwise install `avahi-daemon` on the server and use `http://homelab.local:<port>`, or its IP.
 
-Then `ssh dev-blog.homelab` runs `dev proxy` there, which connects to the container `blog`. Its containers trust the keys allowed to SSH in as `dev` (its `~/.ssh/authorized_keys`), as of their last create or recreate.
+Then `ssh dev-blog.homelab` runs `dev proxy` there, which connects to the container `blog`. Its containers trust the keys allowed to SSH in as `dev` (its `~/.ssh/authorized_keys`), as of their last create or recreate. `dev rm` there forgets a name's host key only on the server, so after removing a container and creating a new one with the same name, forget it on the Mac too, or SSH refuses with "REMOTE HOST IDENTIFICATION HAS CHANGED": `ssh-keygen -R dev-blog.homelab -f ~/.ssh/known_hosts.dev`.
 
 #### Building locally
 
