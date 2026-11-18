@@ -32,10 +32,10 @@ Options:
                      the others' logins. Without it, logins are this
                      container's own. A GH_TOKEN in env overrides gh's login
                      for one container.
-  --publish <port>   Serve the container's <port> on the same port on every
-                     host interface, for dev servers bound to 0.0.0.0, so
-                     phones and other machines on the LAN reach them. Repeat
-                     for more ports. To change them later, edit
+  --publish <port>   Also serve this exact port (every container already gets
+                     a random one as $PORT), on every host interface, for dev
+                     servers bound to 0.0.0.0 that need a fixed number.
+                     Repeat for more ports. To change them later, edit
                      ~/containers/<name>/ports, then dev recreate <name>.
 
 Afterwards, sign in to GitHub inside (`gh auth login`, saved in /state), or
@@ -98,6 +98,10 @@ Commands:
   dev rm <name>            Delete it and its folder (also: remove)
   dev help [command]       This help, or a command's (or: <command> --help)
 
+Each container gets a port of its own, the same inside and out: dev servers
+that listen on 0.0.0.0 at $PORT are reachable at $DEV_URL from this machine
+and the LAN, with no recreate. `dev list` shows it.
+
 Over SSH, `ssh dev-<name>` opens the same shell, for editors and apps that
 work on remote machines (VS Code, Zed, ...). It goes through the container
 runtime, not the network, so no port is open; the container trusts every SSH
@@ -147,18 +151,48 @@ else
   run_args=(--userns=keep-id:uid=1000,gid=1000)
 fi
 
-# Run container $1 from image $2, with the ports saved for it. --init reaps the
-# processes agents' tools leave behind
+# A free port for a container's own: not another container's, and not in
+# use on this machine right now
+pick_port() {
+  local port used
+  used="$(cat "${root}"/*/port "${root}"/*/ports 2>/dev/null || true)"
+  for _ in {1..50}; do
+    port=$((20000 + RANDOM % 10000))
+    grep -qxF "${port}" <<<"${used}" && continue
+    (exec 3<>"/dev/tcp/127.0.0.1/${port}") 2>/dev/null && continue
+    echo "${port}"
+    return
+  done
+  echo "No free port found" >&2
+  exit 1
+}
+
+# How the LAN reaches this machine, for $DEV_URL
+lan_host() {
+  if [[ "$(uname -s)" == Darwin ]]; then
+    echo "$(scutil --get LocalHostName).local"
+  else
+    hostname
+  fi
+}
+
+# Run container $1 from image $2, with its own port and the ones saved for it.
+# --init reaps the processes agents' tools leave behind
 run_container() {
-  local name="$1" image="$2" dir="${root}/$1" port publish=()
+  local name="$1" image="$2" dir="${root}/$1" port own publish=()
+  own="$(cat "${dir}/port")"
   while IFS= read -r port; do
     [[ -n "${port}" ]] || continue
     publish+=(--publish "0.0.0.0:${port}:${port}")
-  done <"${dir}/ports"
+  done < <(
+    echo "${own}"
+    cat "${dir}/ports"
+  )
   # Apple's container already uses the name as the hostname, for the prompt
   local hostname=()
   [[ "${runtime}" == podman ]] && hostname=(--hostname "${name}")
   "${runtime}" run --detach --init --name "${name}" --memory 8G \
+    --env "PORT=${own}" --env "DEV_URL=http://$(lan_host):${own}" \
     ${run_args[@]+"${run_args[@]}"} ${hostname[@]+"${hostname[@]}"} ${publish[@]+"${publish[@]}"} \
     --volume "${dir}/src:/workspaces" --volume "$(cd "${dir}/state" && pwd -P):/state" \
     --mount "type=bind,source=${dir}/ssh,target=/etc/dev/ssh,readonly" \
@@ -254,6 +288,7 @@ EOF
   for port in ${ports[@]+"${ports[@]}"}; do
     echo "${port}" >>"${dir}/ports"
   done
+  [[ -s "${dir}/port" ]] || pick_port >"${dir}/port"
   setup_ssh "${name}"
 
   # Podman leaves a container behind when its start fails (a port in use)
@@ -287,7 +322,7 @@ list() {
     status=stopped
     grep -qxF "${name}" <<<"${running}" && status=running
     printf '%-20s %-8s %-40s %s\n' "${name}" "${status}" "$(cat "${dir}/image")" \
-      "$(tr '\n' ' ' <"${dir}/ports")"
+      "$(cat "${dir}/port" 2>/dev/null) $(tr '\n' ' ' <"${dir}/ports")"
   done
 }
 
@@ -299,7 +334,9 @@ recreate() {
   if [[ "${image}" == */* ]]; then
     "${runtime}" image pull "${image}" >/dev/null
   fi
-  # Containers from before SSH have no keys yet; picks up new ones otherwise
+  # Containers from before SSH or their own port get them now; this also picks
+  # up new SSH keys
+  [[ -s "${root}/${name}/port" ]] || pick_port >"${root}/${name}/port"
   setup_ssh "${name}"
   # It may already be gone
   "${runtime}" rm --force "${name}" >/dev/null 2>&1 || true
