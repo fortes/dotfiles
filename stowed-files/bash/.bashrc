@@ -100,7 +100,7 @@ else
   BASE_PROMPT="${BASE_PROMPT}${YELLOW}\w${RESET}"
 fi
 JOB_COUNT="${BOLD}${BLUE}[\j]${RESET} "
-EXIT_STATUS="${BOLD}${RED}✗\${LAST_EXIT}${RESET} "
+EXIT_STATUS="${BOLD}${RED}✗${RESET} "
 # After the path: stopped jobs, then the last command's exit code if it failed
 PROMPT_SUFFIX="\${HAS_JOBS:+$JOB_COUNT}\${LAST_EXIT:+$EXIT_STATUS}"
 # Long paths keep their last three folders (.../src/blog/content)
