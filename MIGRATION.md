@@ -10,9 +10,9 @@ script/setup
 ```
 
 That installs the new formulae and casks (`claude-code`, `codex`, the language
-servers, `oxfmt`, `beets`, `container`). Then remove what moved or went away.
+servers, `oxfmt`, `beets`, `container`). Then remove what moved or went away:
 Homebrew doesn't uninstall dropped formulae, and old installs in `~/.local/bin`
-shadow the new ones because it comes first on `PATH`:
+shadow the new ones because it comes first on `PATH`.
 
 `brew uninstall` also removes dependencies nothing else needs, including
 `lima` (colima's) even if you use it directly, so skip that and check what
@@ -39,9 +39,10 @@ Start Apple's container service once with `container system start`.
 `mpd-sync` replaces `mpd-sync-playlists`, and also copies the server's beets
 library into `BEETSDIR`, which `~/.profile` now sets to `~/.mpd/beets`, so
 `play-albums` and `beet` no longer need the media share. Drop any `BEETSDIR`
-from the Mac's `~/.profile.local`, which would override it. It finds `beets.db` next to the music directory, which port 8090 doesn't
-serve: switch `music_directory` in `~/.mpd/mpd.conf.local` to the server's
-HTTPS address, restart MPD, and sync:
+from the Mac's `~/.profile.local`, which would override it. It finds
+`beets.db` next to the music directory, which port 8090 doesn't serve: switch
+`music_directory` in `~/.mpd/mpd.conf.local` to the server's HTTPS address,
+restart MPD, and sync:
 
 ```sh
 sed -i '' 's|^music_directory "http://\([^:]*\):8090/music/"|music_directory "https://\1/music/"|' ~/.mpd/mpd.conf.local
@@ -81,24 +82,29 @@ Linux: Podman) and run `dev create` as them.
 
 ## 3. Coder devbox
 
-Coder runs `~/figma/dotfiles/users/ffortes/install.sh` on every start, and its
-`git pull --ff-only` fails while the skip-worktree files are there, so run step
-1 once in the workspace, with `export DOTFILES_SKIP_PACKAGES=npm` first:
-`~/.bashrc.local` sets it, but step 1's non-interactive shells don't read it,
-so `script/stow -R` would otherwise link `~/.npmrc` (or conflict with the
-image's). Then run `script/setup`, which adds the `fd` and `bat` links.
+Its `~/dotfiles` already has the private `.local` files, but sits on the
+`containers` branch from testing. Coder runs
+`~/figma/dotfiles/users/ffortes/install.sh` on every start, whose
+`git pull --ff-only` keeps failing there (non-fatally) since the branch was
+rebased. After the merge, move it to `main` once, then set up:
 
-The matching `install.sh` changes are already made in `~/figma/dotfiles` but
-not committed: its delta fallback checks for the real `~/.gitconfig.local` file
-instead of a stow link, and the difftastic fallback is gone. Commit and push
-those first.
+```sh
+cd ~/dotfiles && git fetch && git checkout -B main origin/main && git branch -D containers
+DOTFILES_DEVBOX=1 DOTFILES_SKIP_PACKAGES=npm script/setup
+```
+
+The matching `install.sh` change in `~/figma/dotfiles` is made but not
+committed: its delta fallback checks for the real `~/.gitconfig.local` file
+instead of a stow link (which `main` no longer has, so today it just skips the
+fallback), and the difftastic fallback is gone. Commit and push it.
 
 ## 4. Once, for agents
 
 - For containers where agents run unattended, create the agent bot GitHub
   account and a classic `repo`-scope token for it (README, GitHub access), and
   set `DOTFILES_AGENT_BOT` in the Mac's `~/.profile.local`. Trusted containers
-  can use a fine-grained token of your own instead.
+  can use your own GitHub login instead (`gh auth login`, shared across
+  `--shared-state` containers) or a fine-grained token.
 - `dev create personal`, put the token (and, for the bot, its git identity) in
   `~/containers/personal/env`, then `dev personal` and sign in each agent
   (README, Signing in agents).

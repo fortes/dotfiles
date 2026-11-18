@@ -90,6 +90,8 @@ diff ~/.profile.local local-templates/bash/.profile.local
 
 `~/.bashrc.local`, `~/.vimrc.local` and `~/.ssh/config.local` are yours to create; nothing copies them.
 
+## Apps and platforms
+
 ### Neovim
 
 The very first `nvim` launch on a new machine installs the plugins itself:
@@ -141,7 +143,7 @@ clean those up:
 - Disable iCloud syncing of all but Find My Mac & Safari
 - Set `terminal.app` profile, send option as meta key
 - May want to install command line tools manually in order to get `git`: `xcode-select --install`
-- Run `setup_mac`
+- Run `script/setup`
 - Install apps by hand. They update themselves, which leaves Homebrew's casks stale, so setup skips them. Skip any that MDM already installed:
 
   ```sh
@@ -280,7 +282,7 @@ dev rm personal       # Delete it and ~/containers/personal, after you type its 
 
 Run `dev` from a host tmux window rather than nesting tmux. Pass an image as the last argument to use a project's own, e.g. `dev create new-project new-project`.
 
-`ssh dev-<name>` opens the same shell over SSH, for editors and apps that work on remote machines (VS Code or Cursor Remote-SSH, Zed, and any other that reads `~/.ssh/config`). The stowed SSH config sends it through `dev proxy`, which runs the container's `sshd` over the runtime's exec instead of the network, so no port is open. The container trusts every SSH public key on the Mac as of its last `dev create` or `dev recreate` (the agent's, including 1Password's, and `~/.ssh/*.pub`), uses this machine's host key for containers (one for all of them, in `~/containers/.ssh`), and never gets your agent forwarded. SSH sessions get the container's environment and `env` file like `dev <name>` does. Containers made before SSH access need one `dev recreate <name>`.
+`ssh dev-<name>` opens the same shell over SSH, for editors and apps that work on remote machines (VS Code or Cursor Remote-SSH, Zed, and any other that reads `~/.ssh/config`). The stowed SSH config sends it through `dev proxy`, which runs the container's `sshd` over the runtime's exec instead of the network, so no port is open. The container trusts every SSH public key on the Mac as of its last `dev create` or `dev recreate` (the agent's, including 1Password's, `~/.ssh/*.pub`, and any in `~/.ssh/authorized_keys`), uses this machine's host key for containers (one for all of them, in `~/containers/.ssh`), and never gets your agent forwarded. SSH sessions get the container's environment and `env` file like `dev <name>` does. Containers made before SSH access need one `dev recreate <name>`.
 
 Each container gets a random port of its own (20000–29999), served on the same number on every interface of the host and kept across recreates, so a dev server is reachable from the Mac and other machines on the LAN (a phone, another laptop) with no setup: inside, `PORT` holds it and `DEV_URL` the address to open (`http://<host>.local:<port>`). Many servers read `PORT` themselves; others take it as a flag (`hugo server --bind 0.0.0.0 --port $PORT --baseURL $DEV_URL/`). They must bind to `0.0.0.0`, not `127.0.0.1`. `dev list` shows each container's port. For a fixed number on top, publish it when creating the container: `dev create --publish 1313 site`. To change them later, edit `~/containers/<name>/ports` (one per line) and run `dev recreate <name>`. On the Mac, the firewall may ask once whether to let `container` accept incoming connections.
 
@@ -294,7 +296,7 @@ Anything installed in a container outside `/workspaces` and `/state` is lost whe
 
 #### Signing in agents
 
-Hosts and containers each sign in separately; the Mac's logins can't be shared with containers anyway (Claude Code keeps them in the Keychain).
+Hosts and containers each sign in separately; the Mac's agent logins can't be shared with containers anyway (Claude Code keeps them in the Keychain). GitHub's can, below.
 
 | Tool | Mac | Debian hosts and containers |
 | --- | --- | --- |
@@ -367,7 +369,7 @@ To set up the bot:
 
 #### macOS: Apple container
 
-Homebrew installs [`container`](https://github.com/apple/container), which runs each container in its own lightweight VM. Files containers write to mounts belong to your Mac user. It has no Docker-compatible API, so devcontainer tooling (VS Code, the `devcontainer` CLI) needs podman instead.
+Homebrew installs [`container`](https://github.com/apple/container), which runs each container in its own lightweight VM. Files containers write to mounts belong to your Mac user. It has no Docker-compatible API, so devcontainer tooling (VS Code, the `devcontainer` CLI) needs Docker or podman, which setup no longer installs on the Mac.
 
 #### Linux: Podman
 
@@ -382,9 +384,9 @@ Host dev-*.homelab
   ProxyCommand ssh dev@homelab .local/bin/dev proxy %n
 ```
 
-Each container's `DEV_URL` uses the server's plain hostname (`http://homelab:<port>`; the Mac uses its `.local` name), so it only works from other machines if the network's DNS resolves that name. Otherwise install `avahi-daemon` on the server and use `http://homelab.local:<port>`, or its IP.
-
 Then `ssh dev-blog.homelab` runs `dev proxy` there, which connects to the container `blog`. Its containers trust the keys allowed to SSH in as `dev` (its `~/.ssh/authorized_keys`), as of their last create or recreate. All of a machine's containers share one host key (in `~/containers/.ssh`), so reusing a name doesn't upset SSH.
+
+Each container's `DEV_URL` uses the server's plain hostname (`http://homelab:<port>`; the Mac uses its `.local` name), so it only works from other machines if the network's DNS resolves that name. Otherwise install `avahi-daemon` on the server and use `http://homelab.local:<port>`, or its IP.
 
 #### Building locally
 
