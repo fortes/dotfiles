@@ -100,12 +100,18 @@ else
   BASE_PROMPT="${BASE_PROMPT}${YELLOW}\w${RESET}"
 fi
 JOB_COUNT="${BOLD}${BLUE}[\j]${RESET} "
-# Write out history after every command. Add job count if non-zero stopped.
-# Not exported, since it calls functions child shells may not have defined
-# (e.g. `bash --norc`). Un-export in case inherited from an older shell
-PROMPT_COMMAND="history -a; HAS_JOBS=\$(jobs -sp) "
+EXIT_STATUS="${BOLD}${RED}✗\${LAST_EXIT}${RESET} "
+# After the path: stopped jobs, then the last command's exit code if it failed
+PROMPT_SUFFIX="\${HAS_JOBS:+$JOB_COUNT}\${LAST_EXIT:+$EXIT_STATUS}"
+# Long paths keep their last three folders (.../src/blog/content)
+PROMPT_DIRTRIM=3
+# Save the exit code first, before anything else here changes it. Write out
+# history after every command. Not exported, since it calls functions child
+# shells may not have defined (e.g. `bash --norc`). Un-export in case
+# inherited from an older shell
+PROMPT_COMMAND="LAST_EXIT=\$?; [[ \$LAST_EXIT == 0 ]] && LAST_EXIT=; history -a; HAS_JOBS=\$(jobs -sp) "
 export -n PROMPT_COMMAND
-PS1="$BASE_PROMPT ""\${HAS_JOBS:+$JOB_COUNT}"
+PS1="$BASE_PROMPT $PROMPT_SUFFIX"
 
 git_prompt_location="/etc/bash_completion.d/git-prompt"
 if [ ! -r "${git_prompt_location}" ]; then
@@ -124,7 +130,7 @@ if [ -r "${git_prompt_location}" ]; then
   export GIT_PS1_HIDE_IF_PWD_IGNORED=1
   # shellcheck source=/dev/null
   source "${git_prompt_location}"
-  PROMPT_COMMAND="$PROMPT_COMMAND; __git_ps1 \"$BASE_PROMPT\" \" \${HAS_JOBS:+$JOB_COUNT }\" \" %s$RESET\""
+  PROMPT_COMMAND="$PROMPT_COMMAND; __git_ps1 \"$BASE_PROMPT\" \" $PROMPT_SUFFIX\" \" %s$RESET\""
 fi
 
 # Mark prompt and command output starts (OSC 133) so tmux can jump between
