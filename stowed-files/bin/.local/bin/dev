@@ -201,7 +201,8 @@ run_container() {
 
 # The keys for `ssh dev-$1`: a host key, kept so recreating the container
 # doesn't change it, and every SSH public key on this machine (the agent's,
-# including one set as IdentityAgent like 1Password's, and ~/.ssh/*.pub)
+# including one set as IdentityAgent like 1Password's, and ~/.ssh/*.pub), plus
+# the ones allowed to SSH in as this user, who can run `dev $1` anyway
 setup_ssh() {
   local dir="${root}/$1/ssh" agent keys
   (umask 077 && mkdir -p "${dir}")
@@ -214,7 +215,7 @@ setup_ssh() {
     if [[ -n "${agent}" && "${agent}" != none && "${agent}" != SSH_AUTH_SOCK ]]; then
       SSH_AUTH_SOCK="${agent/#\~/$HOME}" ssh-add -L 2>/dev/null || true
     fi
-    cat "$HOME"/.ssh/*.pub 2>/dev/null || true
+    cat "$HOME"/.ssh/*.pub "$HOME/.ssh/authorized_keys" 2>/dev/null || true
   } | grep -E '^(ssh-|ecdsa-|sk-)' | sort -u || true)"
   printf '%s\n' "${keys}" >"${dir}/authorized_keys"
   if [[ -z "${keys}" ]]; then
@@ -373,9 +374,12 @@ remove() {
 }
 
 # The ProxyCommand for `ssh dev-<name>` (in the stowed ~/.ssh/config): runs
-# sshd's end of the connection through the runtime's exec, with the env file
+# sshd's end of the connection through the runtime's exec, with the env file.
+# Another machine's containers take a suffix, `dev-<name>.<host>`, which the
+# ProxyCommand that SSHes there passes along, so drop it
 proxy() {
   local name="${1#dev-}"
+  name="${name%%.*}"
   require_container "${name}"
   if [[ ! -f "${root}/${name}/ssh/host_ed25519" ]]; then
     echo "${name} predates SSH access; run: dev recreate ${name}" >&2

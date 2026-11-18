@@ -375,6 +375,15 @@ Podman runs containers rootless and is installed by `script/setup`, and `dev` us
 
 Rootless containers stop when their user logs out. Run `sudo loginctl enable-linger dev` to keep long-running ones alive. The `dev` user has no sudo, so it only clones the repo and runs `script/stow` for the `dev` helper and shell config; the host's own setup installed podman.
 
+To reach a server's containers over SSH from the Mac (for `ssh` itself, editors, and the Claude and Codex apps), chain through the `dev` login, which only needs the server's own SSH port. In the Mac's `~/.ssh/config.local`, which comes before the stowed config's `Host dev-*`:
+
+```
+Host dev-*.homelab
+  ProxyCommand ssh dev@homelab .local/bin/dev proxy %n
+```
+
+Then `ssh dev-blog.homelab` runs `dev proxy` there, which connects to the container `blog`. Its containers trust the keys allowed to SSH in as `dev` (its `~/.ssh/authorized_keys`), as of their last create or recreate.
+
 #### Building locally
 
 ```sh
