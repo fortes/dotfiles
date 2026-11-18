@@ -277,6 +277,7 @@ dev recreate <name>
 dev create personal   # ~/containers/personal/{src,state,env} and the container
 dev personal          # Login shell in /workspaces, starting the container if needed
 dev list              # Your containers: running or stopped, image and ports (or just `dev`)
+dev stop personal     # Stop it, keeping everything (or --all); dev personal restarts it
 dev rm personal       # Delete it and ~/containers/personal, after you type its name
 ```
 
@@ -292,7 +293,7 @@ Inside, `claude`, `codex` and `agy` run without permission prompts by default, s
 
 Images are built with some frequency, via CI, for amd64 and arm64. Builds reuse cached install layers until the scripts or package lists change, so a new image doesn't always mean newer tools; `container build --no-cache` (or `podman build --no-cache`) refreshes everything. To move a container to a new image, keeping its `src`, `env`, logins and ports, `dev recreate personal` pulls the image and replaces the container.
 
-Anything installed in a container outside `/workspaces` and `/state` is lost when it's recreated.
+Anything installed in a container outside `/workspaces` and `/state` is lost when it's recreated. Containers keep running until you stop them or the Mac restarts. An idle one uses almost no memory, but what's still running inside does (agents, dev servers, an app's SSH server), so `dev stop` the ones you're done with for a while.
 
 #### Signing in agents
 

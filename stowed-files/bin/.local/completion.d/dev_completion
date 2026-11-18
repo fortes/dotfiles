@@ -14,15 +14,17 @@ _dev() {
   local cur="${COMP_WORDS[COMP_CWORD]}" prev="${COMP_WORDS[COMP_CWORD - 1]}"
   local words
   if [[ ${COMP_CWORD} -eq 1 ]]; then
-    words="list create recreate rm remove help $(_dev_containers)"
+    words="list create recreate stop rm remove help $(_dev_containers)"
   elif [[ "${COMP_WORDS[1]}" == help && ${COMP_CWORD} -eq 2 ]]; then
-    words="list create recreate rm"
+    words="list create recreate stop rm"
   elif [[ "${COMP_WORDS[1]}" == create ]]; then
     # A port or a new name comes next, so only offer the flags
     [[ "${prev}" == --publish ]] && return
     words="--shared-state --publish --help"
   elif [[ "${COMP_WORDS[1]}" =~ ^(recreate|rm|remove)$ && ${COMP_CWORD} -eq 2 ]]; then
     words="$(_dev_containers)"
+  elif [[ "${COMP_WORDS[1]}" == stop ]]; then
+    words="--all $(_dev_containers)"
   else
     return
   fi

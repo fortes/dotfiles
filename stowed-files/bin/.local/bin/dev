@@ -76,6 +76,17 @@ To drop only the container and keep its files, run
 `dev recreate <name>` brings it back.
 EOF
       ;;
+    stop)
+      cat <<'EOF'
+Usage: dev stop <name>... | dev stop --all
+
+Stop containers, keeping their files, logins, env and ports; `dev <name>` or
+`ssh dev-<name>` starts one again. Stops what runs inside too (agents, dev
+servers, apps' SSH servers), which is what uses memory: an idle container uses
+almost none. --all stops every running container `dev create` made, and only
+those.
+EOF
+      ;;
     list)
       cat <<'EOF'
 Usage: dev [list]
@@ -96,6 +107,7 @@ Commands:
   dev <name>               Shell in /workspaces (starts it if needed)
   dev create <name>        Make a container (dev create --help for options)
   dev recreate <name>      Replace it, keeping files, logins, env and ports
+  dev stop <name>|--all    Stop it, keeping everything; dev <name> restarts it
   dev rm <name>            Delete it and its folder (also: remove)
   dev help [command]       This help, or a command's (or: <command> --help)
 
@@ -271,7 +283,7 @@ create() {
   fi
   # `dev <name>` couldn't reach them
   case "${name}" in
-    list | create | recreate | rm | remove | help | proxy)
+    list | create | recreate | stop | rm | remove | help | proxy)
       echo "${name} is a dev command; pick another name" >&2
       exit 1
       ;;
@@ -375,6 +387,37 @@ recreate() {
   echo "Recreated ${name} from ${image}"
 }
 
+# Stop containers $@, or with --all every running one dev made
+stop() {
+  local name names=()
+  if [[ "$*" == --all ]]; then
+    local running dir
+    if [[ "${runtime}" == container ]]; then
+      running="$(container list --quiet)"
+    else
+      running="$(podman ps --format '{{.Names}}')"
+    fi
+    for dir in "${root}"/*/; do
+      name="$(basename "${dir}")"
+      [[ -e "${dir}/image" ]] && grep -qxF "${name}" <<<"${running}" && names+=("${name}")
+    done
+    if [[ ${#names[@]} -eq 0 ]]; then
+      echo "No dev containers running"
+      return
+    fi
+  else
+    for name in "$@"; do
+      require_container "${name}"
+      names+=("${name}")
+    done
+  fi
+  for name in "${names[@]}"; do
+    # Already stopped is fine
+    "${runtime}" stop "${name}" >/dev/null 2>&1 || true
+    echo "Stopped ${name}"
+  done
+}
+
 # Delete container $1 and its folder, once its name is typed back
 remove() {
   local name="$1" dir="${root}/$1"
@@ -436,6 +479,12 @@ case "${1:-}" in
     [[ $# -ge 2 && $# -le 3 ]] || usage recreate
     shift
     recreate "$@"
+    ;;
+  stop)
+    [[ $# -ge 2 ]] || usage stop
+    [[ "$2" != --all || $# -eq 2 ]] || usage stop
+    shift
+    stop "$@"
     ;;
   rm | remove)
     [[ $# -eq 2 ]] || usage rm
