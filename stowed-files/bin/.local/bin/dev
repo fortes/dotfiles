@@ -98,6 +98,11 @@ Commands:
   dev rm <name>            Delete it and its folder (also: remove)
   dev help [command]       This help, or a command's (or: <command> --help)
 
+Over SSH, `ssh dev-<name>` opens the same shell, for editors and apps that
+work on remote machines (VS Code, Zed, ...). It goes through the container
+runtime, not the network, so no port is open; the container trusts every SSH
+public key on this machine as of its last create or recreate.
+
 Examples:
   dev create blog                      Its own logins, the default image
   dev create --shared-state work       Logins shared with other shared ones
@@ -134,7 +139,7 @@ if command -v container >/dev/null 2>&1; then
   runtime=container
   run_args=()
   # Its service doesn't come back after a reboot or a Homebrew upgrade
-  container system status >/dev/null 2>&1 || container system start
+  container system status >/dev/null 2>&1 || container system start >&2
 else
   runtime=podman
   # Maps the image's UID 1000 user to yours, so mounted files stay yours
@@ -156,7 +161,31 @@ run_container() {
   "${runtime}" run --detach --init --name "${name}" --memory 8G \
     ${run_args[@]+"${run_args[@]}"} ${hostname[@]+"${hostname[@]}"} ${publish[@]+"${publish[@]}"} \
     --volume "${dir}/src:/workspaces" --volume "$(cd "${dir}/state" && pwd -P):/state" \
+    --mount "type=bind,source=${dir}/ssh,target=/etc/dev/ssh,readonly" \
     "${image}" sleep infinity >/dev/null
+}
+
+# The keys for `ssh dev-$1`: a host key, kept so recreating the container
+# doesn't change it, and every SSH public key on this machine (the agent's,
+# including one set as IdentityAgent like 1Password's, and ~/.ssh/*.pub)
+setup_ssh() {
+  local dir="${root}/$1/ssh" agent keys
+  (umask 077 && mkdir -p "${dir}")
+  if [[ ! -f "${dir}/host_ed25519" ]]; then
+    ssh-keygen -q -t ed25519 -N '' -C "dev-$1" -f "${dir}/host_ed25519"
+  fi
+  agent="$(ssh -G localhost 2>/dev/null | sed -n 's/^identityagent //p')"
+  keys="$({
+    ssh-add -L 2>/dev/null || true
+    if [[ -n "${agent}" && "${agent}" != none && "${agent}" != SSH_AUTH_SOCK ]]; then
+      SSH_AUTH_SOCK="${agent/#\~/$HOME}" ssh-add -L 2>/dev/null || true
+    fi
+    cat "$HOME"/.ssh/*.pub 2>/dev/null || true
+  } | grep -E '^(ssh-|ecdsa-|sk-)' | sort -u || true)"
+  printf '%s\n' "${keys}" >"${dir}/authorized_keys"
+  if [[ -z "${keys}" ]]; then
+    echo "No SSH public keys found, so ssh dev-$1 won't work; add one, then: dev recreate $1" >&2
+  fi
 }
 
 create() {
@@ -184,7 +213,7 @@ create() {
   local dir="${root}/${name}"
   # `dev <name>` couldn't reach them
   case "${name}" in
-    list | create | recreate | rm | remove | help)
+    list | create | recreate | rm | remove | help | proxy)
       echo "${name} is a dev command; pick another name" >&2
       exit 1
       ;;
@@ -225,6 +254,7 @@ EOF
   for port in ${ports[@]+"${ports[@]}"}; do
     echo "${port}" >>"${dir}/ports"
   done
+  setup_ssh "${name}"
 
   # Podman leaves a container behind when its start fails (a port in use)
   "${runtime}" rm --force "${name}" >/dev/null 2>&1 || true
@@ -269,6 +299,8 @@ recreate() {
   if [[ "${image}" == */* ]]; then
     "${runtime}" image pull "${image}" >/dev/null
   fi
+  # Containers from before SSH have no keys yet; picks up new ones otherwise
+  setup_ssh "${name}"
   # It may already be gone
   "${runtime}" rm --force "${name}" >/dev/null 2>&1 || true
   run_container "${name}" "${image}"
@@ -298,7 +330,23 @@ remove() {
   "${runtime}" rm --force "${name}" >/dev/null 2>&1 || true
   # Removes the shared state's link, not what it points to
   rm -rf "${dir}"
+  # A new container with this name gets a new host key
+  ssh-keygen -R "dev-${name}" -f ~/.ssh/known_hosts.dev >/dev/null 2>&1 || true
   echo "Deleted ${name}"
+}
+
+# The ProxyCommand for `ssh dev-<name>` (in the stowed ~/.ssh/config): runs
+# sshd's end of the connection through the runtime's exec, with the env file
+proxy() {
+  local name="${1#dev-}"
+  require_container "${name}"
+  if [[ ! -f "${root}/${name}/ssh/host_ed25519" ]]; then
+    echo "${name} predates SSH access; run: dev recreate ${name}" >&2
+    exit 1
+  fi
+  "${runtime}" start "${name}" >/dev/null
+  exec "${runtime}" exec --interactive --env-file "${root}/${name}/env" \
+    "${name}" /usr/local/bin/dev-sshd
 }
 
 shell() {
@@ -325,6 +373,10 @@ case "${1:-}" in
   rm | remove)
     [[ $# -eq 2 ]] || usage rm
     remove "$2"
+    ;;
+  proxy)
+    [[ $# -eq 2 ]] || usage
+    proxy "$2"
     ;;
   *)
     [[ $# -eq 1 ]] || usage

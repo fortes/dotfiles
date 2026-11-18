@@ -57,6 +57,8 @@ codex
 agy                   # signs in on first run
 ```
 
+Then `ssh dev-agents-test`: it should open the same shell (try `echo $CLAUDE_CONFIG_DIR`), with no port open. Also try an editor's Remote-SSH (VS Code, Zed) and the Claude and Codex apps' SSH support against `dev-agents-test`.
+
 Things worth confirming: `agy` can sign in without a browser on the container,
 and `claude`/`codex` still have their logins after
 `dev recreate agents-test`.
