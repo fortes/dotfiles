@@ -2,9 +2,11 @@
 
 SHFMT = shfmt --indent 2 --case-indent --binary-next-line
 
-# shfmt only finds files with a shebang or .sh/.bash extension
+# shfmt only finds files with a shebang or .sh/.bash extension; these are
+# sourced, so they have neither
 STARTUP_FILES = stowed-files/bash/.profile stowed-files/bash/.bashrc \
-	stowed-files/bash/.bash_profile stowed-files/bash/.aliases
+	stowed-files/bash/.bash_profile stowed-files/bash/.aliases \
+	$(wildcard stowed-files/*/.local/completion.d/*)
 
 format:
 	@echo "Formatting shell scripts..."

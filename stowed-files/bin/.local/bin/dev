@@ -59,7 +59,8 @@ state/ (logins), env and ports. Resets everything else, like packages
 installed outside /workspaces.
 
 Use it after the image updates, to switch to another image, or to clean up a
-broken container. If the new one fails to start, the old image is kept.
+broken container. If the new one fails to start, the old container is already
+gone but its saved image isn't: `dev recreate <name>` brings it back.
 EOF
       ;;
     rm | remove)
@@ -230,6 +231,15 @@ setup_ssh() {
   fi
 }
 
+# The folders /state needs, in container $1's own state or the shared one it
+# links to, so Codex (which needs CODEX_HOME) and agy's links find them. Also
+# for a state someone switched by hand, which recreate then fills in
+make_state() {
+  local state="${root}/$1/state"
+  [[ -L "${state}" ]] && state="${root}/.state"
+  (umask 077 && mkdir -p "${state}"/{claude,codex,antigravity,gemini,gh})
+}
+
 create() {
   local shared='' ports=() port
   while [[ "${1:-}" == --* ]]; do
@@ -272,14 +282,18 @@ create() {
   fi
 
   mkdir -p "${dir}/src"
+  # A failed earlier try may have made the other kind of state; nothing signed
+  # in there, since its container never ran
+  if [[ -n "${shared}" && -d "${dir}/state" && ! -L "${dir}/state" ]] \
+    || [[ -z "${shared}" && -L "${dir}/state" ]]; then
+    rm -rf "${dir}/state"
+  fi
   # Private, since it holds agent logins. A link for shared state, so recreating
   # the container keeps sharing
   if [[ -n "${shared}" ]]; then
-    (umask 077 && mkdir -p "${root}/.state"/{claude,codex,antigravity,gemini,gh})
     ln -sfn ../.state "${dir}/state"
-  else
-    (umask 077 && mkdir -p "${dir}/state"/{claude,codex,antigravity,gemini,gh})
   fi
+  make_state "${name}"
   if [[ ! -e "${dir}/env" ]]; then
     (
       umask 077
@@ -348,6 +362,7 @@ recreate() {
   if [[ "${image}" == */* ]]; then
     "${runtime}" image pull "${image}" >/dev/null
   fi
+  make_state "${name}"
   # Containers from before SSH or their own port get them now; this also picks
   # up new SSH keys
   [[ -s "${root}/${name}/port" ]] || pick_port >"${root}/${name}/port"
@@ -367,7 +382,7 @@ remove() {
   echo "This deletes the ${name} container and ${dir}:"
   echo "  src/ ($(find "${dir}/src" -mindepth 1 -maxdepth 1 | wc -l | tr -d ' ') items, anything not pushed is lost)"
   if [[ -L "${dir}/state" ]]; then
-    echo "  state/ is the shared logins in ${root}/.state, which stay"
+    echo "  state/ is the shared logins in ${root}/.state, which stay; its env (its tokens) goes"
   else
     echo "  state/ (its agent logins) and env (its tokens)"
   fi

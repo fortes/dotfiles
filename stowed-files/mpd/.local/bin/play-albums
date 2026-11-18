@@ -46,7 +46,7 @@ play-albums() {
 
   # Whichever library BEETSDIR points beets at (mpd-sync's copy by default)
   local library
-  library=$(beet config | sed -n 's/^library: //p')
+  library=$(beet config -d | sed -n 's/^library: //p')
   if [[ -z "${library}" || ! -f "${library/#\~/$HOME}" ]]; then
     echo "No beets library in ${BEETSDIR:-the default beets directory}; run mpd-sync" >&2
     exit 1
