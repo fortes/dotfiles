@@ -102,8 +102,7 @@ block into `~/containers/openinfer/env` with your key, then `dev openinfer` and
 ### Cleaning up
 
 ```sh
-container rm --force agents-test shared-a shared-b openinfer
-rm -rf ~/containers/agents-test ~/containers/shared-a ~/containers/shared-b ~/containers/openinfer
+for c in agents-test shared-a shared-b openinfer; do dev rm "$c"; done
 rm -rf ~/containers/.state   # only once you're done with the shared logins
 ```
 

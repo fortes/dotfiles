@@ -10,6 +10,8 @@
 #   dev recreate <name> [image]
 #                    Replace the container, e.g. for a new image, keeping its
 #                    files, logins and ports (and image, unless given)
+#   dev rm <name>    Delete the container and ~/containers/<name> (its files,
+#                    logins and env), after you type its name. Also `remove`
 #
 # Mounts ~/containers/<name>/{src,state} at /workspaces and /state (with
 # --shared-state, state links to the shared ~/containers/.state), and reads
@@ -35,7 +37,7 @@ else
 fi
 
 usage() {
-  echo "Usage: dev [list | <name>] | dev create [--shared-state] [--publish <port>]... <name> [image] | dev recreate <name> [image]" >&2
+  echo "Usage: dev [list | <name>] | dev create [--shared-state] [--publish <port>]... <name> [image] | dev recreate <name> [image] | dev rm <name>" >&2
   exit 1
 }
 
@@ -75,7 +77,7 @@ create() {
   local dir="${root}/${name}"
   # `dev <name>` couldn't reach them
   case "${name}" in
-    list | create | recreate)
+    list | create | recreate | rm | remove)
       echo "${name} is a dev command; pick another name" >&2
       exit 1
       ;;
@@ -167,6 +169,30 @@ recreate() {
   echo "Recreated ${name} from ${image}"
 }
 
+# Delete container $1 and its folder, once its name is typed back
+remove() {
+  local name="$1" dir="${root}/$1"
+  require_container "${name}"
+  echo "This deletes the ${name} container and ${dir}:"
+  echo "  src/ ($(find "${dir}/src" -mindepth 1 -maxdepth 1 | wc -l | tr -d ' ') items, anything not pushed is lost)"
+  if [[ -L "${dir}/state" ]]; then
+    echo "  state/ is the shared logins in ${root}/.state, which stay"
+  else
+    echo "  state/ (its agent logins) and env (its tokens)"
+  fi
+  local answer
+  read -r -p "Type ${name} to delete it: " answer
+  if [[ "${answer}" != "${name}" ]]; then
+    echo "Not deleted" >&2
+    exit 1
+  fi
+  # It may already be gone
+  "${runtime}" rm --force "${name}" >/dev/null 2>&1 || true
+  # Removes the shared state's link, not what it points to
+  rm -rf "${dir}"
+  echo "Deleted ${name}"
+}
+
 shell() {
   local name="$1"
   require_container "${name}"
@@ -188,6 +214,10 @@ case "${1:-}" in
     [[ $# -ge 2 && $# -le 3 ]] || usage
     shift
     recreate "$@"
+    ;;
+  rm | remove)
+    [[ $# -eq 2 ]] || usage
+    remove "$2"
     ;;
   *)
     [[ $# -eq 1 ]] || usage
