@@ -2,11 +2,34 @@
 
 ## Open Tasks
 
+### First, after merging the containers branch
+
+Deferred from the branch's testing, to fix forward. MIGRATION.md has the steps for each machine.
+
+- [ ] **Migrate the homelab** (task)
+  - Back up `~/dotfiles` and the `.local` files first. If it hasn't pulled `main` since its `.local` files moved out of the repo (#47), do that migration before pulling: its steps were removed from `main`, so read them with `git show 17b1db7^:MIGRATION.md`
+  - After `script/setup`: `beet ls` (plugins load, library intact), SSH and Eternal Terminal still connect, tmux, and anything else it serves
+  - The `dev` user: `sudo adduser dev`, `sudo loginctl enable-linger dev`, the Mac's key in its `~/.ssh/authorized_keys`, then as `dev` clone the repo, `script/stow` and `dev create scratch`
+  - From the Mac, the `Host dev-*.homelab` entry in `~/.ssh/config.local` (README, Linux: Podman), then `ssh dev-scratch.homelab`
+  - `DEV_URL` uses the plain hostname, which needs the LAN's DNS or `avahi-daemon` to resolve from other machines
+
+- [ ] **Migrate Crostini** (task)
+  - Lowest stakes. Then a login shell, nvim on a note, and tmux
+
+- [ ] **Move the Coder devbox to the new setup** (task)
+  - Per MIGRATION.md once it's on `main`, since the devbox pulls `main` on every start
+
+- [ ] **Try the agent bot's GitHub flow** (task)
+  - `new-github-repo fortes/throwaway-test` with `DOTFILES_AGENT_BOT` set, the bot's token in a container's `env`, a PR from the container, and your approval being dismissed by a new commit. Rulesets on private repos need GitHub Pro
+
+- [ ] **Try another model provider in a container** (task)
+  - The README's OpenInfer block in a container's `env`, then `claude`
+
 ### Priority 1 (High)
 
 - [ ] **Ship agent config into containers** (feature)
   - Claude Code's `settings.json`, global `CLAUDE.md`, hooks and MCP servers live in each container's `/state`, so every new container starts from defaults. Copy them in from the dotfiles the way `local-templates/` works, so every container's agents behave the same
-  - For Claude Code, the image can install `/etc/claude-code/managed-settings.json`, which takes precedence over user and project settings: shared hooks, permission rules and MCP servers for every container (https://code.claude.com/docs/en/devcontainer)
+  - For Claude Code, the image already installs `/etc/claude-code/managed-settings.json` (for the permission defaults, in `script/dev/setup_container`), which takes precedence over user and project settings: add shared hooks, permission rules and MCP servers there (https://code.claude.com/docs/en/devcontainer)
 
 - [ ] **Sign containers into Claude Code with `claude setup-token`** (task)
   - A long-lived `CLAUDE_CODE_OAUTH_TOKEN` in a container's env gives it Claude access without a browser sign-in per container or `--shared-state`, and can be revoked on its own
@@ -59,12 +82,15 @@
 - [ ] **Refresh the image's tools on a schedule** (task)
   - Cached install layers mean a new image doesn't always have newer tools. Either a monthly no-cache build in CI (a new trigger, against the narrow-triggers rule) or a manual `--no-cache` build
 
-- [ ] **Try the rollback from BRANCH-TESTING.md once** (task)
-  - It's untested; Crostini is the lowest-stakes machine to try it on
-
 - [ ] **Try Incus VMs for agent containers on the homelab** (task)
   - Rootless podman shares the NUC's kernel, unlike Apple's VM per container on the Mac. Incus (trixie has 6.0.4, trixie-backports 7.0.2) can run real KVM VMs, and 6.3+ can run OCI images, so it may run `ghcr.io/fortes/dotfiles` as a VM directly
   - Only after the podman path (separate `dev` user) has been tested on the NUC; it would mean a third `dev` backend. Keep podman and Quadlet for services; plain LXC containers share the kernel too, and Proxmox would replace the Debian host setup
+
+- [ ] **Let a machine pick `dev create`'s default image** (feature)
+  - A `DEV_IMAGE` in `~/.profile.local` (say `dotfiles`, a local build) instead of `ghcr.io/fortes/dotfiles:latest`, for working on the dotfiles themselves. An image named on the command line still wins
+
+- [ ] **Keep pnpm in the image** (task)
+  - Each new container downloads pnpm on first use, since the image build clears Corepack's cache with `~/.cache`. Keep that cache, or `corepack prepare` into a folder the cleanup skips
 
 - [ ] **Get folke/sidekick.nvim working** (feature)
   - Install and configure folke/sidekick.nvim plugin for Neovim
