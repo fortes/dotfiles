@@ -77,8 +77,9 @@ shopt -qs progcomp_alias 2>/dev/null || true
 # }}}
 
 RED='\[\e[31m\]'
-GREEN='\[\e[32m\]'
 YELLOW='\[\e[33m\]'
+CYAN='\[\e[36m\]'
+DIM='\[\e[2m\]'
 BLUE='\[\e[34m\]'
 BOLD='\[\e[1m\]'
 RESET='\[\e[m\]'
@@ -89,9 +90,10 @@ if ((EUID == 0)) || [[ "${USER:-$(id -un)}" != "${DEFAULT_USERNAME:-fortes}" ]];
 else
   BASE_PROMPT=""
 fi
-# [[user@]host]:pwd $ (green host in containers, red over SSH/ET)
+# [[user@]host]:pwd $ (dim cyan host in containers, red over SSH/ET; not
+# green, which the git prompt uses for branches)
 if [[ "${IS_DOCKER:-}" == "1" ]]; then
-  BASE_PROMPT="${BASE_PROMPT}${GREEN}\h:${YELLOW}\w${RESET}"
+  BASE_PROMPT="${BASE_PROMPT}${DIM}${CYAN}\h:${RESET}${YELLOW}\w${RESET}"
 elif [[ -n "${SSH_TTY:-}" || -n "${ET_VERSION:-}" ]]; then
   BASE_PROMPT="${BASE_PROMPT}${RED}\h:${YELLOW}\w${RESET}"
 else
