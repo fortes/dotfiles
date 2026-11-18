@@ -126,6 +126,16 @@ A machine that already ran an earlier version of this branch (like the Debian
 VM) needs `rm ~/.local/bin/codex` once before `script/update`: Codex now comes
 from npm, which won't overwrite the old GitHub binary.
 
+Dev containers made on this branch before the shared host key had one of
+their own, and switch on their next `dev recreate`. That clears the old key
+only on the machine running them, so if you'd already SSHed into a server's
+container from the Mac, the next connection fails once with "REMOTE HOST
+IDENTIFICATION HAS CHANGED". Forget the old key on the Mac:
+
+```sh
+ssh-keygen -R dev-<name>.homelab -f ~/.ssh/known_hosts.dev
+```
+
 Follow MIGRATION.md after `git fetch && git checkout containers`. Go from lowest
 to highest stakes:
 
