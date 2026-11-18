@@ -273,7 +273,7 @@ To reach a dev server from other machines on the LAN (a phone, another laptop), 
 
 `dev create` writes `~/containers/<name>/env` with commented-out variables (a `GH_TOKEN`, yours or the bot's per [GitHub access](#github-access), its git identity, `GEMINI_API_KEY`). It's read each time `dev` opens a shell; leave it commented out for a container with no GitHub access. Git pushes over HTTPS through `gh`, so the token is all GitHub needs.
 
-Inside, agents run without prompts: `claude --dangerously-skip-permissions`, `codex --dangerously-bypass-approvals-and-sandbox`, `agy --dangerously-skip-permissions`. On hosts, keep their prompts, or for a quick question start them read-only: `claude --permission-mode plan`, `codex --sandbox read-only`, `agy --mode plan`.
+Inside, `claude`, `codex` and `agy` run without permission prompts by default, since the container is the sandbox: the image ships Claude Code's managed settings and Codex's system config in `/etc`, and an alias adds agy's flag. For one session with prompts, run `claude --permission-mode default`, `codex --ask-for-approval on-request --sandbox workspace-write` or `command agy`. On hosts, keep their prompts, or for a quick question start them read-only: `claude --permission-mode plan`, `codex --sandbox read-only`, `agy --mode plan`.
 
 Images are built with some frequency, via CI, for amd64 and arm64. Builds reuse cached install layers until the scripts or package lists change, so a new image doesn't always mean newer tools; `container build --no-cache` (or `podman build --no-cache`) refreshes everything. To move a container to a new image, keeping its `src`, `env`, logins and ports, `dev recreate personal` pulls the image and replaces the container.
 

@@ -49,12 +49,12 @@ Inside, sign in and run each agent. Logins stay in
 
 ```sh
 claude auth login
-claude --dangerously-skip-permissions
+claude                # skips permission prompts in containers by default
 
 codex login --device-auth
-codex --dangerously-bypass-approvals-and-sandbox
+codex
 
-agy --dangerously-skip-permissions   # signs in on first run
+agy                   # signs in on first run
 ```
 
 Things worth confirming: `agy` can sign in without a browser on the container,

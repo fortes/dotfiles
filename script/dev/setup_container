@@ -29,3 +29,20 @@ npm install --global --loglevel=error --no-fund --no-audit --ignore-scripts --mi
   "${NPM_PACKAGES[@]/%/@latest}"
 # pnpm and Yarn shims that select each project's declared version
 corepack enable --install-directory "$HOME/.local/bin" pnpm yarn
+
+# Agents skip their permission prompts here by default, since the container is
+# the sandbox (agy, which has no such setting, gets an alias in .aliases). In
+# /etc, as the per-container /state is mounted over at runtime. Claude Code's
+# managed default can't be changed in /state/claude: pass --permission-mode
+# for one session. Codex's is the lowest layer, so /state/codex can override it
+sudo mkdir -p /etc/claude-code /etc/codex
+sudo tee /etc/claude-code/managed-settings.json >/dev/null <<'EOF'
+{
+  "permissions": { "defaultMode": "bypassPermissions" },
+  "skipDangerousModePermissionPrompt": true
+}
+EOF
+sudo tee /etc/codex/config.toml >/dev/null <<'EOF'
+approval_policy = "never"
+sandbox_mode = "danger-full-access"
+EOF
