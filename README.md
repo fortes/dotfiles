@@ -316,7 +316,7 @@ The URL only works for the `codex login` that's still running, so start over if 
 gh auth token | container exec --interactive <name> gh auth login --with-token
 ```
 
-It's saved in `/state/gh`, so every `--shared-state` container is signed in at once. It's as broad as your own login, and signing out of `gh` on the Mac cuts it off too. Run inside instead, `gh auth login --with-token` waits silently for the token on stdin: paste it, then press Ctrl-D.
+It's saved in `/state/gh`, so every `--shared-state` container is signed in at once. It's as broad as your own login, and signing out of `gh` on the Mac cuts it off too. Or inside the container, run `gh auth login`, choose "Paste an authentication token" and paste the Mac's `gh auth token`. (`gh auth login --with-token` also works, but waits silently for the token on stdin until Ctrl-D.)
 
 Claude Code and agy update themselves. On Linux, `script/update` updates Codex (always the newest release, skipping the cooldown) and the rest; containers can also move to a new image. On the Mac, `brew upgrade` covers the casks, and `script/update` covers gemini-api.
 
