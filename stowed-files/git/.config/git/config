@@ -40,6 +40,9 @@
 [core]
   excludesfile = ~/.config/git/ignore.global
   pager = delta
+  # Remember folder listings between status calls, which the prompt makes on
+  # every command; only folders whose mtime changed get rescanned
+  untrackedCache = true
   whitespace = space-before-tab,tab-in-indent,blank-at-eof,trailing-space,tabwidth=2
 [diff]
   algorithm = minimal
