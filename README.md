@@ -263,6 +263,7 @@ What keeps that boundary intact:
 ```sh
 dev create personal   # ~/containers/personal/{src,state,env} and the container
 dev personal          # Login shell in /workspaces, starting the container if needed
+dev list              # Your containers: running or stopped, image and ports (or just `dev`)
 ```
 
 Run `dev` from a host tmux window rather than nesting tmux. Pass an image as the last argument to use a project's own, e.g. `dev create new-project new-project`.

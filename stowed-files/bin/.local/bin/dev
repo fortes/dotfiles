@@ -3,7 +3,7 @@
 # Uses Apple's `container` where it's installed, otherwise rootless podman.
 #
 # Usage:
-#   dev              List dev containers
+#   dev [list]       List dev containers: running or not, image and ports
 #   dev <name>       Shell in the container, starting it if needed
 #   dev create [--shared-state] [--publish <port>]... <name> [image]
 #                    Make ~/containers/<name> and its container
@@ -30,11 +30,12 @@ if command -v container >/dev/null 2>&1; then
 else
   runtime=podman
   # Maps the image's UID 1000 user to yours, so mounted files stay yours
+  # shellcheck disable=SC2054 # One argument; its commas aren't separators
   run_args=(--userns=keep-id:uid=1000,gid=1000)
 fi
 
 usage() {
-  echo "Usage: dev [<name>] | dev create [--shared-state] [--publish <port>]... <name> [image] | dev recreate <name> [image]" >&2
+  echo "Usage: dev [list | <name>] | dev create [--shared-state] [--publish <port>]... <name> [image] | dev recreate <name> [image]" >&2
   exit 1
 }
 
@@ -72,6 +73,13 @@ create() {
   [[ $# -ge 1 && $# -le 2 ]] || usage
   local name="$1" image="${2:-ghcr.io/fortes/dotfiles:latest}"
   local dir="${root}/${name}"
+  # `dev <name>` couldn't reach them
+  case "${name}" in
+    list | create | recreate)
+      echo "${name} is a dev command; pick another name" >&2
+      exit 1
+      ;;
+  esac
   if [[ -e "${dir}/image" ]]; then
     echo "${name} already exists; use: dev recreate ${name}" >&2
     exit 1
@@ -126,11 +134,19 @@ require_container() {
 }
 
 list() {
-  local dir name
+  local dir name running status
+  if [[ "${runtime}" == container ]]; then
+    running="$(container list --quiet)"
+  else
+    running="$(podman ps --format '{{.Names}}')"
+  fi
+  printf '%-20s %-8s %-40s %s\n' NAME STATUS IMAGE PORTS
   for dir in "${root}"/*/; do
     name="$(basename "${dir}")"
     [[ -e "${dir}/image" ]] || continue
-    printf '%s\t%s\t%s\n' "${name}" "$(cat "${dir}/image")" \
+    status=stopped
+    grep -qxF "${name}" <<<"${running}" && status=running
+    printf '%-20s %-8s %-40s %s\n' "${name}" "${status}" "$(cat "${dir}/image")" \
       "$(tr '\n' ' ' <"${dir}/ports")"
   done
 }
@@ -162,7 +178,7 @@ shell() {
 }
 
 case "${1:-}" in
-  '') list ;;
+  '' | list) list ;;
   -h | --help) usage ;;
   create)
     shift
