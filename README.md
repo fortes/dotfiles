@@ -256,6 +256,17 @@ What keeps that boundary intact:
 - **Agents have passwordless sudo inside,** so they can install whatever a project needs. Treat everything in a container as theirs: the protections are what it's given (mounts, `env`, tokens), not restrictions inside it.
 - **Logins live in each container's own `state`,** mounted at `/state` (`CLAUDE_CONFIG_DIR`, `CODEX_HOME`, `GH_CONFIG_DIR`, plus links for agy), so they survive image upgrades and the projects can't see them, though anything running in the container can. `dev create --shared-state` links it to `~/containers/.state` instead, shared by every container created that way: one sign-in, but each of them can read the others' logins. Keep untrusted repos out of the shared ones. GitHub comes from a `gh auth login` there (shared the same way) or a `GH_TOKEN` in the container's `env`, which overrides it.
 
+To switch an existing container between its own logins and the shared ones (`dev recreate` keeps whichever it has):
+
+```sh
+cd ~/containers/<name>
+# To shared: optionally copy its logins in first (same-named files get overwritten)
+cp -a state/. ../.state/ && rm -rf state && ln -s ../.state state
+# Or back to its own: drops only the link, then sign in again inside
+rm state && mkdir -m 700 state
+dev recreate <name>
+```
+
 #### Using containers
 
 `dev` (in `~/.local/bin`) wraps Apple's `container` on macOS and podman elsewhere:
@@ -271,7 +282,7 @@ Run `dev` from a host tmux window rather than nesting tmux. Pass an image as the
 
 To reach a dev server from other machines on the LAN (a phone, another laptop), publish its port when creating the container: `dev create --publish 1313 site`. It's served on the same port on every interface of the host, so `http://<host>:1313` works from the network with no SSH tunnel, as long as the server binds to `0.0.0.0` (`hugo server --bind 0.0.0.0`; Hugo also needs `--baseURL http://<host>:1313/` for its links to work off the host). To change them later, edit `~/containers/<name>/ports` (one per line) and run `dev recreate <name>`. On the Mac, the firewall may ask once whether to let `container` accept incoming connections.
 
-`dev create` writes `~/containers/<name>/env` with commented-out variables (a `GH_TOKEN`, yours or the bot's per [GitHub access](#github-access), its git identity, `GEMINI_API_KEY`). It's read each time `dev` opens a shell; leave it commented out for a container with no GitHub access. Git pushes over HTTPS through `gh`, so the token is all GitHub needs.
+`dev create` writes `~/containers/<name>/env` with commented-out variables (a `GH_TOKEN`, yours or the bot's per [GitHub access](#github-access), its git identity, `GEMINI_API_KEY`). It's read each time `dev` opens a shell, so edits apply to the next one without recreating anything; leave the GitHub lines commented out for a container with no GitHub access, or one signed in with `gh auth login`. Git pushes over HTTPS through `gh`, so the token or login is all GitHub needs.
 
 Inside, `claude`, `codex` and `agy` run without permission prompts by default, since the container is the sandbox: the image ships Claude Code's managed settings and Codex's system config in `/etc`, and an alias adds agy's flag. For one session with prompts, run `claude --permission-mode default`, `codex --ask-for-approval on-request --sandbox workspace-write` or `command agy`. On hosts, keep their prompts, or for a quick question start them read-only: `claude --permission-mode plan`, `codex --sandbox read-only`, `agy --mode plan`.
 
@@ -286,10 +297,26 @@ Hosts and containers each sign in separately; the Mac's logins can't be shared w
 | Tool | Mac | Debian hosts and containers |
 | --- | --- | --- |
 | Claude Code | Run `claude` | `claude auth login` |
-| Codex | Run `codex` | `codex login --device-auth` (no browser callback needed) |
+| Codex | Run `codex` | `codex login --device-auth`, or `codex login` with the callback step below |
 | agy | Install the `antigravity-cli` cask by hand, run `agy` | Run `agy` and follow its sign-in |
 | gemini-api | `gemini-api configure` with an [AI Studio key](https://aistudio.google.com/apikey) | Containers only: `GEMINI_API_KEY` in the container's `env` |
-| GitHub | `gh auth login` as yourself | Containers: `gh auth login` (saved in `/state`, shared with `--shared-state`) or a `GH_TOKEN` in `env`, yours or the bot's |
+| GitHub | `gh auth login` as yourself | Containers: `gh auth login` (saved in `/state`, shared with `--shared-state`; see below to reuse the Mac's) or a `GH_TOKEN` in `env`, yours or the bot's |
+
+**Codex when device codes are off.** Some ChatGPT workspaces disable `--device-auth`, and plain `codex login` redirects the browser to `http://127.0.0.1:1455/auth/callback`, which on the Mac reaches the Mac, not the container (Codex only listens on the container's loopback, so publishing the port doesn't help). Hand the callback over yourself:
+
+1. In the container, run `codex login`, open the URL it prints on the Mac and sign in. Leave it running.
+2. The browser then fails to load `http://127.0.0.1:1455/auth/callback?code=…`; copy that whole URL.
+3. In a second shell in the same container (`dev <name>` in another tmux pane), run `curl -sS '<the URL>'`, in single quotes. The first shell's login finishes and lands in `/state/codex`.
+
+The URL only works for the `codex login` that's still running, so start over if it exits.
+
+**GitHub from the Mac's login.** To sign a container's `gh` in without a browser, pipe the Mac's token in, from the Mac (`podman exec` on Linux):
+
+```sh
+gh auth token | container exec --interactive <name> gh auth login --with-token
+```
+
+It's saved in `/state/gh`, so every `--shared-state` container is signed in at once. It's as broad as your own login, and signing out of `gh` on the Mac cuts it off too. Run inside instead, `gh auth login --with-token` waits silently for the token on stdin: paste it, then press Ctrl-D.
 
 Claude Code and agy update themselves. On Linux, `script/update` updates Codex (always the newest release, skipping the cooldown) and the rest; containers can also move to a new image. On the Mac, `brew upgrade` covers the casks, and `script/update` covers gemini-api.
 
@@ -316,7 +343,7 @@ Check the provider's terms before giving it code: only clone repos into that con
 
 #### GitHub access
 
-Each container's `GH_TOKEN` decides who its pushes come from. Pick per container:
+A container's GitHub login (`gh auth login`, shared across `--shared-state` containers, or a `GH_TOKEN` in its `env`, which wins) decides who its pushes come from. Pick per container:
 
 - **Your own token**, for trusted work where you don't need to review what lands on `main` (your blog, small personal projects). Use a fine-grained token limited to those repos, with Contents and Pull requests read/write. You and agents push to `main` directly as you, no rulesets needed, and repos are plain `gh repo create`.
 - **The agent bot's token**, for containers where agents run unattended and you want to review everything first. Its PRs need your approval to merge, set up as below. Changes you make yourself in such a container go through a PR too.
