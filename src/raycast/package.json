@@ -1,0 +1,39 @@
+{
+  "$schema": "https://www.raycast.com/schemas/extension.json",
+  "name": "music",
+  "title": "Music",
+  "description": "Play albums from beets in MPD",
+  "icon": "icon.png",
+  "author": "fortes",
+  "categories": ["Media"],
+  "license": "MIT",
+  "commands": [
+    {
+      "name": "play-albums",
+      "title": "Play Albums",
+      "description": "Search beets for albums and play them in MPD",
+      "mode": "view",
+      "arguments": [
+        {
+          "name": "query",
+          "placeholder": "Beets query",
+          "type": "text",
+          "required": false
+        }
+      ]
+    }
+  ],
+  "dependencies": {
+    "@raycast/api": "^1.100.0",
+    "@raycast/utils": "^1.19.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "typescript": "^5.8.0"
+  },
+  "scripts": {
+    "build": "ray build",
+    "dev": "ray develop"
+  }
+}

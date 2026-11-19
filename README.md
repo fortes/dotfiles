@@ -144,7 +144,7 @@ clean those up:
 - Install apps by hand. They update themselves, which leaves Homebrew's casks stale, so setup skips them. Skip any that MDM already installed:
 
   ```sh
-  brew install --cask 1password chatgpt claude firefox ghostty google-chrome obsidian rectangle
+  brew install --cask 1password chatgpt claude firefox ghostty google-chrome obsidian raycast
   # Optional
   brew install --cask antigravity antigravity-cli
   # Personal machines
@@ -161,7 +161,7 @@ clean those up:
     defaults write com.todesktop.xxxxx ApplePressAndHoldEnabled -bool false
     ```
 - `terminal.app` sucks with colors, switch to Ghostty and pin it in the dock
-- Make sure `Rectangle.app` starts on login
+- In Raycast's Window Management settings, switch to the Rectangle-style hotkeys and turn on cycling through displays
 - Install the 1Password extension in Safari (others should sync automatically)
 - Start Apple's container service with `container system start`; the first run downloads a Linux kernel (see [Containers](#containers)).
 
@@ -198,6 +198,11 @@ clean those up:
 
   ```sh
   mpd-sync
+  ```
+- Load the Raycast extension in `src/raycast`, whose Play Albums command searches the same beets library: Enter replaces the queue with an album, ⌘↵ adds it to the end. Raycast keeps it after `npm run dev` exits (Ctrl-C); rerun that after changing it:
+
+  ```sh
+  cd ~/dotfiles/src/raycast && npm ci && npm run dev
   ```
 - Offline, `mpd-offline on` swaps MPD to the albums synced from the server into `~/Music/albums`, with its own queue; `mpd-offline off` goes back to the server's library. Only local albums play, from rmpc, playlists or `play-albums`. Scrobbles wait in mpdscribble's journal until the network returns. Offline mode doesn't survive a reboot: run `mpd-offline on` again, or `mpd-offline off` to go back.
 - Scrobble MPD plays to Libre.fm and ListenBrainz: fill in the `REPLACE_ME`s in `~/.mpdscribble/mpdscribble.conf` (a private copy of the template, outside git), then start it:
