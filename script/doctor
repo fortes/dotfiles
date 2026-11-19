@@ -52,7 +52,10 @@ check_links() {
       fail "~/${file} isn't linked into the repo; run script/stow"
     fi
   done
-  [[ ${#linked[@]} -eq 0 ]] || ok "linked: ${linked[*]}"
+  [[ ${#linked[@]} -eq 0 ]] || ok "${#linked[@]} dotfiles linked"
+}
+
+check_stale_links() {
   local stale
   stale="$({
     find "${HOME}" -maxdepth 1 -type l -lname '*stowed-files/*' ! -exec test -e {} \; -print
@@ -82,7 +85,7 @@ check_private_files() {
       fi
     fi
   done
-  [[ ${#private[@]} -eq 0 ]] || ok "private: ${private[*]}"
+  [[ ${#private[@]} -eq 0 ]] || ok "${#private[@]} local files private"
 }
 
 check_tools() {
@@ -101,9 +104,9 @@ check_tools() {
 check_mac() {
   section "Mac"
   if [[ "$(dscl . -read ~ UserShell 2>/dev/null | cut -d' ' -f2)" == /opt/homebrew/bin/bash ]]; then
-    ok "the login shell is Homebrew's bash"
+    ok "login shell is Homebrew's bash"
   else
-    warn "the login shell isn't Homebrew's bash; run script/setup from a terminal"
+    warn "login shell isn't Homebrew's bash; run script/setup from a terminal"
   fi
   local tool shadowed=()
   for tool in claude codex bash-language-server oxfmt delta nvim fzf; do
@@ -210,10 +213,12 @@ main() {
     check_links
     if [[ "$(uname -s)" == Darwin ]]; then
       check_private_files .profile.local .gitconfig.local .mpd/mpd.conf.local .mpdscribble/mpdscribble.conf
+      check_stale_links
       check_tools brew nvim tmux fzf fd bat rg delta git stow
       check_mac
     elif [[ -r /etc/debian_version ]]; then
       check_private_files .profile.local .gitconfig.local
+      check_stale_links
       check_tools nvim tmux fzf fd bat rg delta git stow
       is_devbox || check_debian
     fi
