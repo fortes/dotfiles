@@ -375,23 +375,22 @@ Podman runs containers rootless and is installed by `script/setup`, and `dev` us
 
 Rootless containers stop when their user logs out. Run `sudo loginctl enable-linger dev` to keep long-running ones alive. The `dev` user has no sudo, so it only clones the repo and runs `script/stow` for the `dev` helper and shell config; the host's own setup installed podman.
 
-To reach a server's containers over SSH from the Mac (for `ssh` itself, editors, and the Claude and Codex apps), chain through the `dev` login, which only needs the server's own SSH port. In the Mac's `~/.ssh/config.local` (the stowed `Host dev-*` block skips names with a dot, so this one repeats its settings):
+To reach a server's containers over SSH from the Mac (for `ssh` itself, editors, and the Claude and Codex apps), chain through the `dev` login, which only needs the server's own SSH port. In the Mac's `~/.ssh/config.local`, before any matching `Host *` block (the stowed `Host dev-*` block skips names with a dot, so this one sets the user, forwarding and known-hosts file itself):
 
 ```
 Host dev-*.homelab
-  ProxyCommand ssh -i ~/containers/.ssh/client_ed25519 -o IdentitiesOnly=yes -o IdentityAgent=none dev@homelab .local/bin/dev proxy %n
+  ProxyCommand ssh -a dev@homelab .local/bin/dev proxy %n
   User fortes
-  IdentityFile ~/containers/.ssh/client_ed25519
-  IdentitiesOnly yes
-  IdentityAgent none
   ForwardAgent no
   UserKnownHostsFile ~/.ssh/known_hosts.dev
   StrictHostKeyChecking accept-new
 ```
 
-Both hops use the Mac's container key (it exists once the Mac has run `dev create`), so allow it into the `dev` account once: `ssh-copy-id -i ~/containers/.ssh/client_ed25519.pub dev@homelab`. That key, which has no passphrase, can then log in as `dev` there too, the account kept free of anything worth taking.
+Both hops authenticate from the Mac using your usual keys and agent: first as `dev` on the server, then as `fortes` in the container. The container trusts plain public-key entries from the server account’s `~/.ssh/authorized_keys`; entries prefixed with options such as `restrict` or `from=` are skipped. Agent forwarding stays off on both hops. Settings under `Host homelab` apply only to the first hop; if your `IdentityFile` or `IdentityAgent` settings live there, repeat them in `Host dev-*.homelab` too. The shared config sets `IdentitiesOnly yes`, so an agent key needs a matching `IdentityFile` (a public-key file is enough when the private key lives in 1Password). Connecting may prompt your agent, unlike containers on the Mac itself.
 
-Then `ssh dev-blog.homelab` runs `dev proxy` there, which connects to the container `blog`. Its containers trust the keys allowed to SSH in as `dev` (its `~/.ssh/authorized_keys`, now including the Mac's container key), as of their last create or recreate. All of a machine's containers share one host key (in `~/containers/.ssh`), so reusing a name doesn't upset SSH.
+To avoid agent prompts, allow the Mac's container key into the `dev` account once (`ssh-copy-id -i ~/containers/.ssh/client_ed25519.pub dev@homelab`, after the Mac has run `dev create`) and set `IdentityFile ~/containers/.ssh/client_ed25519`, `IdentitiesOnly yes` and `IdentityAgent none` in the block, plus `-i ~/containers/.ssh/client_ed25519 -o IdentitiesOnly=yes -o IdentityAgent=none` on its inner `ssh`. That key has no passphrase, so it can then log in as `dev` there too, the account kept free of anything worth taking.
+
+Then `ssh dev-blog.homelab` runs `dev proxy` there, which connects to the container `blog`. Its containers copy those plain public-key entries as of their last create or recreate, so after adding one there, `dev recreate` them. All of a machine's containers share one host key (in `~/containers/.ssh`), so reusing a name doesn't upset SSH.
 
 Each container's `DEV_URL` uses the server's plain hostname (`http://homelab:<port>`; the Mac uses its `.local` name), so it only works from other machines if the network's DNS resolves that name. Otherwise install `avahi-daemon` on the server and use `http://homelab.local:<port>`, or its IP.
 
