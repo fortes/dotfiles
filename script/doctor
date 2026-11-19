@@ -78,8 +78,11 @@ check_ssh_config() {
     for (i = 2; i <= NF; i++) if ($i !~ /[*?!]/) { print $i; exit }
   }' "${local_config}")"
   [[ -n "${alias}" ]] || return 0
-  want="$(ssh -F "${local_config}" -G "${alias}" 2>/dev/null | grep -E '^(user|hostname) ')"
-  got="$(ssh -G "${alias}" 2>/dev/null | grep -E '^(user|hostname) ')"
+  if ! want="$(ssh -F "${local_config}" -G "${alias}" 2>/dev/null | grep -E '^(user|hostname) ')" \
+    || ! got="$(ssh -G "${alias}" 2>/dev/null | grep -E '^(user|hostname) ')"; then
+    fail "couldn't resolve SSH config for ${alias}; run ssh -G ${alias} to check it"
+    return
+  fi
   if [[ "${want}" == "${got}" ]]; then
     ok "~/.ssh/config.local applies (checked ${alias})"
   else
