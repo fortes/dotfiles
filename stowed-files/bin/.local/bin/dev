@@ -122,8 +122,8 @@ and the LAN, with no recreate. `dev list` shows it.
 Over SSH, `ssh dev-<name>` opens a shell in the container (in your home folder;
 editors open whichever folder you pick), for editors and apps that
 work on remote machines (VS Code, Zed, ...). It goes through the container
-runtime, not the network, so no port is open; the container trusts every SSH
-public key on this machine as of its last create or recreate.
+runtime, not the network, so no port is open, with a key of its own
+(~/containers/.ssh/client_ed25519, no passphrase) so nothing prompts.
 
 Examples:
   dev create blog                      Its own logins, the default image
@@ -217,35 +217,33 @@ run_container() {
     "${image}" sleep infinity >/dev/null
 }
 
-# The keys for `ssh dev-$1`: this machine's host key for its containers, and
-# every SSH public key on it (the agent's, including one set as IdentityAgent
-# like 1Password's, and ~/.ssh/*.pub), plus the ones allowed to SSH in as this
-# user, who can run `dev $1` anyway. One host key for all of them, since sshd
-# can't read the system's: a new container reusing a name doesn't change it,
-# and connections go through `dev proxy`, so containers can't pose as others
+# The keys for `ssh dev-$1`, in ~/containers/.ssh: one host key and one client
+# key for all of this machine's containers, both made once without a
+# passphrase. The client key only opens containers, which this account can
+# enter with `dev` anyway, so editors and apps connect without an agent,
+# Keychain or askpass. Containers also trust the keys allowed to SSH in as this
+# user, for reaching them from another machine. One host key, since sshd can't
+# read the system's: reusing a name doesn't change it, and connections go
+# through `dev proxy`, so containers can't pose as others
 setup_ssh() {
-  local dir="${root}/$1/ssh" shared="${root}/.ssh/host_ed25519" agent keys
-  (umask 077 && mkdir -p "${dir}" "${root}/.ssh")
-  if [[ ! -f "${shared}" ]]; then
-    ssh-keygen -q -t ed25519 -N '' -C "dev containers on $(hostname)" -f "${shared}"
+  local dir="${root}/$1/ssh" keys="${root}/.ssh"
+  (umask 077 && mkdir -p "${dir}" "${keys}")
+  if [[ ! -f "${keys}/host_ed25519" ]]; then
+    ssh-keygen -q -t ed25519 -N '' -C "dev containers on $(hostname)" -f "${keys}/host_ed25519"
   fi
-  if ! cmp -s "${shared}" "${dir}/host_ed25519"; then
-    cp "${shared}" "${shared}.pub" "${dir}/"
+  if [[ ! -f "${keys}/client_ed25519" ]]; then
+    ssh-keygen -q -t ed25519 -N '' -C "dev containers from $(hostname)" -f "${keys}/client_ed25519"
+  fi
+  if ! cmp -s "${keys}/host_ed25519" "${dir}/host_ed25519"; then
+    cp "${keys}/host_ed25519" "${keys}/host_ed25519.pub" "${dir}/"
     # It had its own key before, which this machine's SSH remembers
     ssh-keygen -R "dev-$1" -f ~/.ssh/known_hosts.dev >/dev/null 2>&1 || true
   fi
-  agent="$(ssh -G localhost 2>/dev/null | sed -n 's/^identityagent //p')"
-  keys="$({
-    ssh-add -L 2>/dev/null || true
-    if [[ -n "${agent}" && "${agent}" != none && "${agent}" != SSH_AUTH_SOCK ]]; then
-      SSH_AUTH_SOCK="${agent/#\~/$HOME}" ssh-add -L 2>/dev/null || true
-    fi
-    cat "$HOME"/.ssh/*.pub "$HOME/.ssh/authorized_keys" 2>/dev/null || true
-  } | grep -E '^(ssh-|ecdsa-|sk-)' | sort -u || true)"
-  printf '%s\n' "${keys}" >"${dir}/authorized_keys"
-  if [[ -z "${keys}" ]]; then
-    echo "No SSH public keys found, so ssh dev-$1 won't work; add one, then: dev recreate $1" >&2
-  fi
+  {
+    cat "${keys}/client_ed25519.pub"
+    # Usually missing on a Mac
+    cat "$HOME/.ssh/authorized_keys" 2>/dev/null || true
+  } | grep -E '^(ssh-|ecdsa-|sk-)' | sort -u >"${dir}/authorized_keys"
 }
 
 # The folders /state needs, in container $1's own state or the shared one it

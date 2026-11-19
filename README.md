@@ -280,7 +280,7 @@ dev rm personal       # Delete it and ~/containers/personal, after you type its 
 
 Run `dev` from a host tmux window rather than nesting tmux. Pass an image as the last argument to use a project's own, e.g. `dev create new-project new-project`.
 
-`ssh dev-<name>` opens a shell in the container over SSH, starting in your home folder there, for editors and apps that work on remote machines (VS Code or Cursor Remote-SSH, Zed, and any other that reads `~/.ssh/config`). The stowed SSH config sends it through `dev proxy`, which runs the container's `sshd` over the runtime's exec instead of the network, so no port is open. The container trusts every SSH public key on the Mac as of its last `dev create` or `dev recreate` (the agent's, including 1Password's, `~/.ssh/*.pub`, and any in `~/.ssh/authorized_keys`), uses this machine's host key for containers (one for all of them, in `~/containers/.ssh`), and never gets your agent forwarded. SSH sessions get the container's environment and `env` file like `dev <name>` does. Containers made before SSH access need one `dev recreate <name>`.
+`ssh dev-<name>` opens a shell in the container over SSH, starting in your home folder there, for editors and apps that work on remote machines (VS Code or Cursor Remote-SSH, Zed, and any other that reads `~/.ssh/config`). The stowed SSH config sends it through `dev proxy`, which runs the container's `sshd` over the runtime's exec instead of the network, so no port is open. Connections use a key of their own, `~/containers/.ssh/client_ed25519`, which `dev` makes once without a passphrase: it only opens your containers, which your account can enter with `dev` anyway, so editors and apps connect without your agent, 1Password, Keychain or askpass. The same folder has the one host key all of this machine's containers use. Your agent is never forwarded. SSH sessions get the container's environment and `env` file like `dev <name>` does. Containers made before SSH access need one `dev recreate <name>`.
 
 Each container gets a random port of its own (20000–29999), served on the same number on every interface of the host and kept across recreates, so a dev server is reachable from the Mac and other machines on the LAN (a phone, another laptop) with no setup: inside, `PORT` holds it and `DEV_URL` the address to open (`http://<host>.local:<port>`). Many servers read `PORT` themselves; others take it as a flag (`hugo server --bind 0.0.0.0 --port $PORT --baseURL $DEV_URL/`). They must bind to `0.0.0.0`, not `127.0.0.1`. `dev list` shows each container's port. That includes public Wi-Fi, where others on the network can reach whatever an agent serves on it. For a fixed number on top, publish it when creating the container: `dev create --publish 1313 site`. To change them later, edit `~/containers/<name>/ports` (one per line) and run `dev recreate <name>`. On the Mac, the firewall may ask once whether to let `container` accept incoming connections.
 
@@ -379,15 +379,19 @@ To reach a server's containers over SSH from the Mac (for `ssh` itself, editors,
 
 ```
 Host dev-*.homelab
-  ProxyCommand ssh dev@homelab .local/bin/dev proxy %n
+  ProxyCommand ssh -i ~/containers/.ssh/client_ed25519 -o IdentitiesOnly=yes -o IdentityAgent=none dev@homelab .local/bin/dev proxy %n
   User fortes
-  IdentitiesOnly no
+  IdentityFile ~/containers/.ssh/client_ed25519
+  IdentitiesOnly yes
+  IdentityAgent none
   ForwardAgent no
   UserKnownHostsFile ~/.ssh/known_hosts.dev
   StrictHostKeyChecking accept-new
 ```
 
-Then `ssh dev-blog.homelab` runs `dev proxy` there, which connects to the container `blog`. Its containers trust the keys allowed to SSH in as `dev` (its `~/.ssh/authorized_keys`), as of their last create or recreate. All of a machine's containers share one host key (in `~/containers/.ssh`), so reusing a name doesn't upset SSH.
+Both hops use the Mac's container key (it exists once the Mac has run `dev create`), so allow it into the `dev` account once: `ssh-copy-id -i ~/containers/.ssh/client_ed25519.pub dev@homelab`. That key, which has no passphrase, can then log in as `dev` there too, the account kept free of anything worth taking.
+
+Then `ssh dev-blog.homelab` runs `dev proxy` there, which connects to the container `blog`. Its containers trust the keys allowed to SSH in as `dev` (its `~/.ssh/authorized_keys`, now including the Mac's container key), as of their last create or recreate. All of a machine's containers share one host key (in `~/containers/.ssh`), so reusing a name doesn't upset SSH.
 
 Each container's `DEV_URL` uses the server's plain hostname (`http://homelab:<port>`; the Mac uses its `.local` name), so it only works from other machines if the network's DNS resolves that name. Otherwise install `avahi-daemon` on the server and use `http://homelab.local:<port>`, or its IP.
 
