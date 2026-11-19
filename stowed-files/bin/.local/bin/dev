@@ -1,0 +1,529 @@
+#!/usr/bin/env bash
+# Dev containers from the dotfiles image (see the README's Containers section,
+# and `dev --help`). Uses Apple's `container` where it's installed, otherwise
+# rootless podman.
+#
+# Mounts ~/containers/<name>/{src,state} at /workspaces and /state (with
+# --shared-state, state links to the shared ~/containers/.state), and reads
+# ~/containers/<name>/env on every shell. --publish serves a container port on
+# the same port on every host interface, so other machines on the LAN can
+# reach dev servers that bind to 0.0.0.0.
+
+set -euo pipefail
+IFS=$'\n\t'
+
+readonly root="${HOME}/containers"
+
+# SSH runs `dev proxy` without a login shell, and apps started from the Dock
+# get a PATH without Homebrew, where `container` lives
+[[ ! -x /opt/homebrew/bin/brew ]] || export PATH="/opt/homebrew/bin:$PATH"
+
+# Print the help for command $1, or the overview
+help() {
+  case "${1:-}" in
+    create)
+      cat <<'EOF'
+Usage: dev create [--shared-state] [--publish <port>]... <name> [image]
+
+Make ~/containers/<name> and start its container. The image defaults to
+ghcr.io/fortes/dotfiles:latest; pass `dotfiles` for a local build, or a
+project's own image built FROM it.
+
+Options:
+  --shared-state     Share logins (Claude Code, Codex, agy, and gh's) with
+                     every other container made with this flag, through
+                     ~/containers/.state: sign in once, but each one can read
+                     the others' logins. Without it, logins are this
+                     container's own. A GH_TOKEN in env overrides gh's login
+                     for one container.
+  --publish <port>   Also serve this exact port (every container already gets
+                     a random one as $PORT), on every host interface, for dev
+                     servers bound to 0.0.0.0 that need a fixed number.
+                     Repeat for more ports. To change them later, edit
+                     ~/containers/<name>/ports, then dev recreate <name>.
+
+Afterwards, sign in to GitHub inside (`gh auth login`, saved in /state), or
+put a GH_TOKEN and any API keys in ~/containers/<name>/env; the next
+`dev <name>` shell reads it.
+
+Examples:
+  dev create blog                      Its own logins, the default image
+  dev create --shared-state work       Logins shared with other shared ones
+  dev create --publish 1313 site       Serve port 1313 to the LAN
+  dev create app my-app-image          From a project's own image
+EOF
+      ;;
+    recreate)
+      cat <<'EOF'
+Usage: dev recreate <name> [image]
+
+Replace the container with a fresh one, from <image> or the one it already
+uses (pulled first when it's from a registry). Keeps src/ (/workspaces),
+state/ (logins), env and ports. Resets everything else, like packages
+installed outside /workspaces.
+
+Use it after the image updates, to switch to another image, or to clean up a
+broken container. If the new one fails to start, the old container is already
+gone but its saved image isn't: `dev recreate <name>` brings it back.
+EOF
+      ;;
+    rm | remove)
+      cat <<'EOF'
+Usage: dev rm <name>    (or: dev remove <name>)
+
+Delete the container and ~/containers/<name>: its files in src/ (anything not
+pushed is lost), its own logins and its env. Asks you to type the name first.
+A --shared-state container's shared logins stay.
+
+To drop only the container and keep its files, run
+`container rm --force <name>` (`podman rm --force <name>` on Linux); the next
+`dev <name>` or `ssh dev-<name>` brings it back from its saved image.
+EOF
+      ;;
+    stop)
+      cat <<'EOF'
+Usage: dev stop <name>... | dev stop --all
+
+Stop containers, keeping their files, logins, env and ports; `dev <name>` or
+`ssh dev-<name>` starts one again. Stops what runs inside too (agents, dev
+servers, apps' SSH servers), which is what uses memory: an idle container uses
+almost none. --all stops every running container `dev create` made, and only
+those.
+EOF
+      ;;
+    list)
+      cat <<'EOF'
+Usage: dev [list]
+
+List the containers `dev create` made: running or stopped, image and ports.
+EOF
+      ;;
+    *)
+      cat <<'EOF'
+Usage: dev [list | <name> | create | recreate | stop | rm | help] ...
+
+Dev containers from the dotfiles image, one per project or trust group. Each
+lives in ~/containers/<name>: src/ is /workspaces inside, state/ holds its
+agent logins (/state), and env holds tokens and keys, read on every shell.
+
+Commands:
+  dev [list]               List containers: running or stopped, image, ports
+  dev <name>               Shell in /workspaces (starts it if needed)
+  dev create <name>        Make a container (dev create --help for options)
+  dev recreate <name>      Replace it, keeping files, logins, env and ports
+  dev stop <name>|--all    Stop it, keeping everything; dev <name> restarts it
+  dev rm <name>            Delete it and its folder (also: remove)
+  dev help [command]       This help, or a command's (or: <command> --help)
+
+Each container gets a port of its own, the same inside and out: dev servers
+that listen on 0.0.0.0 at $PORT are reachable at $DEV_URL from this machine
+and the LAN, with no recreate. `dev list` shows it.
+
+Over SSH, `ssh dev-<name>` opens a shell in the container (in your home folder;
+editors open whichever folder you pick), for editors and apps that
+work on remote machines (VS Code, Zed, ...). It goes through the container
+runtime, not the network, so no port is open, with a key of its own
+(~/containers/.ssh/client_ed25519, no passphrase) so nothing prompts.
+
+Examples:
+  dev create blog                      Its own logins, the default image
+  dev create --shared-state work       Logins shared with other shared ones
+  dev create --publish 1313 site       Serve port 1313 to the LAN
+  dev blog                             Shell in it
+  dev recreate blog                    Pick up a new image
+EOF
+      ;;
+  esac
+}
+
+# Exit after a usage error, pointing at command $1's help
+usage() {
+  help "${1:-}" | sed -n '1p' >&2
+  echo "See: dev help${1:+ $1}" >&2
+  exit 1
+}
+
+# Help works without the container runtime (or its service) running
+case "${1:-}" in
+  -h | --help | help)
+    help "${2:-}"
+    exit 0
+    ;;
+esac
+for arg in "$@"; do
+  if [[ "${arg}" == -h || "${arg}" == --help ]]; then
+    help "$1"
+    exit 0
+  fi
+done
+
+if command -v container >/dev/null 2>&1; then
+  runtime=container
+  run_args=()
+  # Its service doesn't come back after a reboot or a Homebrew upgrade
+  container system status >/dev/null 2>&1 || container system start >&2
+else
+  runtime=podman
+  # Maps the image's UID 1000 user to yours, so mounted files stay yours
+  # shellcheck disable=SC2054 # One argument; its commas aren't separators
+  run_args=(--userns=keep-id:uid=1000,gid=1000)
+fi
+
+# A free port for a container's own: not another container's, and not in
+# use on this machine right now
+pick_port() {
+  local port used
+  used="$(cat "${root}"/*/port "${root}"/*/ports 2>/dev/null || true)"
+  for _ in {1..50}; do
+    port=$((20000 + RANDOM % 10000))
+    grep -qxF "${port}" <<<"${used}" && continue
+    (exec 3<>"/dev/tcp/127.0.0.1/${port}") 2>/dev/null && continue
+    echo "${port}"
+    return
+  done
+  echo "No free port found" >&2
+  exit 1
+}
+
+# How the LAN reaches this machine, for $DEV_URL
+lan_host() {
+  if [[ "$(uname -s)" == Darwin ]]; then
+    echo "$(scutil --get LocalHostName).local"
+  else
+    hostname
+  fi
+}
+
+# Run container $1 from image $2, with its own port and the ones saved for it.
+# --init reaps the processes agents' tools leave behind
+run_container() {
+  local name="$1" image="$2" dir="${root}/$1" port own publish=()
+  own="$(cat "${dir}/port")"
+  while IFS= read -r port; do
+    [[ -n "${port}" ]] || continue
+    publish+=(--publish "0.0.0.0:${port}:${port}")
+  done < <(
+    echo "${own}"
+    cat "${dir}/ports"
+  )
+  # Apple's container already uses the name as the hostname, for the prompt
+  local hostname=()
+  [[ "${runtime}" == podman ]] && hostname=(--hostname "${name}")
+  "${runtime}" run --detach --init --name "${name}" --memory 8G \
+    --env "PORT=${own}" --env "DEV_URL=http://$(lan_host):${own}" \
+    ${run_args[@]+"${run_args[@]}"} ${hostname[@]+"${hostname[@]}"} ${publish[@]+"${publish[@]}"} \
+    --volume "${dir}/src:/workspaces" --volume "$(cd "${dir}/state" && pwd -P):/state" \
+    --mount "type=bind,source=${dir}/ssh,target=/etc/dev/ssh,readonly" \
+    "${image}" sleep infinity >/dev/null
+}
+
+# The keys for `ssh dev-$1`, in ~/containers/.ssh: one host key and one client
+# key for all of this machine's containers, both made once without a
+# passphrase. The client key only opens containers, which this account can
+# enter with `dev` anyway, so editors and apps connect without an agent,
+# Keychain or askpass. Containers also trust the keys allowed to SSH in as this
+# user, for reaching them from another machine. One host key, since sshd can't
+# read the system's: reusing a name doesn't change it, and connections go
+# through `dev proxy`, so containers can't pose as others
+setup_ssh() {
+  local dir="${root}/$1/ssh" keys="${root}/.ssh"
+  (umask 077 && mkdir -p "${dir}" "${keys}")
+  if [[ ! -f "${keys}/host_ed25519" ]]; then
+    ssh-keygen -q -t ed25519 -N '' -C "dev containers on $(hostname)" -f "${keys}/host_ed25519"
+  fi
+  if [[ ! -f "${keys}/client_ed25519" ]]; then
+    ssh-keygen -q -t ed25519 -N '' -C "dev containers from $(hostname)" -f "${keys}/client_ed25519"
+  fi
+  if ! cmp -s "${keys}/host_ed25519" "${dir}/host_ed25519"; then
+    cp "${keys}/host_ed25519" "${keys}/host_ed25519.pub" "${dir}/"
+    # It had its own key before, which this machine's SSH remembers
+    ssh-keygen -R "dev-$1" -f ~/.ssh/known_hosts.dev >/dev/null 2>&1 || true
+  fi
+  {
+    cat "${keys}/client_ed25519.pub"
+    # Usually missing on a Mac
+    cat "$HOME/.ssh/authorized_keys" 2>/dev/null || true
+  } | grep -E '^(ssh-|ecdsa-|sk-)' | sort -u >"${dir}/authorized_keys"
+}
+
+# The folders /state needs, in container $1's own state or the shared one it
+# links to, so Codex (which needs CODEX_HOME) and agy's links find them. Also
+# for a state someone switched by hand, which recreate then fills in
+make_state() {
+  local state="${root}/$1/state"
+  [[ -L "${state}" ]] && state="${root}/.state"
+  (umask 077 && mkdir -p "${state}"/{claude,codex,antigravity,gemini,gh})
+}
+
+create() {
+  local shared='' ports=() port
+  while [[ "${1:-}" == --* ]]; do
+    case "$1" in
+      --shared-state) shared=1 ;;
+      --publish)
+        [[ "${2:-}" =~ ^[0-9]+$ ]] || {
+          echo "--publish needs a port number" >&2
+          usage create
+        }
+        ports+=("$2")
+        shift
+        ;;
+      *)
+        echo "Unknown option $1" >&2
+        usage create
+        ;;
+    esac
+    shift
+  done
+  [[ $# -ge 1 && $# -le 2 ]] || usage create
+  # Options go before the name; one after it would be taken as the image
+  [[ "${2:-}" != -* ]] || usage create
+  local name="$1" image="${2:-ghcr.io/fortes/dotfiles:latest}"
+  local dir="${root}/${name}"
+  # Dots would clash with `dev proxy`'s .<host> suffix, and Apple's container
+  # rejects one-character names
+  if [[ ! "${name}" =~ ^[A-Za-z0-9][A-Za-z0-9_-]+$ ]]; then
+    echo "Names are letters, digits, - and _, at least two characters: ${name}" >&2
+    exit 1
+  fi
+  # `dev <name>` couldn't reach them
+  case "${name}" in
+    list | create | recreate | stop | rm | remove | help | proxy)
+      echo "${name} is a dev command; pick another name" >&2
+      exit 1
+      ;;
+  esac
+  if [[ -e "${dir}/image" ]]; then
+    echo "${name} already exists; use: dev recreate ${name}" >&2
+    exit 1
+  fi
+
+  mkdir -p "${dir}/src"
+  # A failed earlier try may have made the other kind of state; nothing signed
+  # in there, since its container never ran
+  if [[ -n "${shared}" && -d "${dir}/state" && ! -L "${dir}/state" ]] \
+    || [[ -z "${shared}" && -L "${dir}/state" ]]; then
+    rm -rf "${dir}/state"
+  fi
+  # Private, since it holds agent logins. A link for shared state, so recreating
+  # the container keeps sharing
+  if [[ -n "${shared}" ]]; then
+    ln -sfn ../.state "${dir}/state"
+  fi
+  make_state "${name}"
+  if [[ ! -e "${dir}/env" ]]; then
+    (
+      umask 077
+      cat >"${dir}/env" <<'EOF'
+# Read by `dev` each time it opens a shell: KEY=value lines, without `export`
+# or quotes. A GH_TOKEN here overrides a `gh auth login` saved in /state (and
+# shared with --shared-state); leave both out for a container without GitHub
+# access. Commits use your identity from ~/.gitconfig.local unless the GIT_*
+# lines set the bot's.
+# GH_TOKEN=
+# GIT_AUTHOR_NAME=
+# GIT_AUTHOR_EMAIL=
+# GIT_COMMITTER_NAME=
+# GIT_COMMITTER_EMAIL=
+# GEMINI_API_KEY=
+EOF
+    )
+  fi
+  : >"${dir}/ports"
+  for port in ${ports[@]+"${ports[@]}"}; do
+    echo "${port}" >>"${dir}/ports"
+  done
+  [[ -s "${dir}/port" ]] || pick_port >"${dir}/port"
+  setup_ssh "${name}"
+
+  # Podman leaves a container behind when its start fails (a port in use)
+  "${runtime}" rm --force "${name}" >/dev/null 2>&1 || true
+  run_container "${name}" "${image}"
+  # Only once it runs, so a failed create (a typo in the image, a port in use)
+  # can simply be rerun
+  echo "${image}" >"${dir}/image"
+  echo "Created ${name}. Add its GitHub token to ${dir}/env if it needs one, then: dev ${name}"
+}
+
+# Exit unless `dev create` made container $1
+require_container() {
+  [[ -e "${root}/$1/image" ]] || {
+    echo "No dev container $1; use: dev create $1" >&2
+    exit 1
+  }
+}
+
+list() {
+  local dir name running status
+  if [[ "${runtime}" == container ]]; then
+    running="$(container list --quiet)"
+  else
+    running="$(podman ps --format '{{.Names}}')"
+  fi
+  printf '%-20s %-8s %-40s %s\n' NAME STATUS IMAGE PORTS
+  for dir in "${root}"/*/; do
+    name="$(basename "${dir}")"
+    [[ -e "${dir}/image" ]] || continue
+    status=stopped
+    grep -qxF "${name}" <<<"${running}" && status=running
+    printf '%-20s %-8s %-40s %s\n' "${name}" "${status}" "$(cat "${dir}/image")" \
+      "$(cat "${dir}/port" 2>/dev/null) $(tr '\n' ' ' <"${dir}/ports")"
+  done
+}
+
+recreate() {
+  local name="$1" image
+  require_container "${name}"
+  image="${2:-$(cat "${root}/${name}/image")}"
+  # Pull the newest from a registry; local builds are already current
+  if [[ "${image}" == */* ]]; then
+    "${runtime}" image pull "${image}" >/dev/null
+  fi
+  make_state "${name}"
+  # Containers from before SSH or their own port get them now; this also picks
+  # up new SSH keys
+  [[ -s "${root}/${name}/port" ]] || pick_port >"${root}/${name}/port"
+  setup_ssh "${name}"
+  # It may already be gone
+  "${runtime}" rm --force "${name}" >/dev/null 2>&1 || true
+  run_container "${name}" "${image}"
+  # Only once it runs, so a typo in a new image keeps the old one
+  echo "${image}" >"${root}/${name}/image"
+  echo "Recreated ${name} from ${image}"
+}
+
+# Stop containers $@, or with --all every running one dev made
+stop() {
+  local name names=()
+  if [[ "$*" == --all ]]; then
+    local running dir
+    if [[ "${runtime}" == container ]]; then
+      running="$(container list --quiet)"
+    else
+      running="$(podman ps --format '{{.Names}}')"
+    fi
+    for dir in "${root}"/*/; do
+      name="$(basename "${dir}")"
+      [[ -e "${dir}/image" ]] && grep -qxF "${name}" <<<"${running}" && names+=("${name}")
+    done
+    if [[ ${#names[@]} -eq 0 ]]; then
+      echo "No dev containers running"
+      return
+    fi
+  else
+    for name in "$@"; do
+      require_container "${name}"
+      names+=("${name}")
+    done
+  fi
+  for name in "${names[@]}"; do
+    # Stopping a stopped one succeeds; other errors should show
+    "${runtime}" stop "${name}" >/dev/null
+    echo "Stopped ${name}"
+  done
+}
+
+# Delete container $1 and its folder, once its name is typed back
+remove() {
+  local name="$1" dir="${root}/$1"
+  require_container "${name}"
+  echo "This deletes the ${name} container and ${dir}:"
+  echo "  src/ ($(find "${dir}/src" -mindepth 1 -maxdepth 1 | wc -l | tr -d ' ') items, anything not pushed is lost)"
+  if [[ -L "${dir}/state" ]]; then
+    echo "  state/ is the shared logins in ${root}/.state, which stay; its env (its tokens) goes"
+  else
+    echo "  state/ (its agent logins) and env (its tokens)"
+  fi
+  local answer
+  read -r -p "Type ${name} to delete it: " answer
+  if [[ "${answer}" != "${name}" ]]; then
+    echo "Not deleted" >&2
+    exit 1
+  fi
+  # It may already be gone
+  "${runtime}" rm --force "${name}" >/dev/null 2>&1 || true
+  # Removes the shared state's link, not what it points to. On podman, files
+  # root wrote inside (an agent's sudo) belong to another of your user IDs, so
+  # delete from inside the container's user namespace
+  if [[ "${runtime}" == podman ]]; then
+    podman unshare rm -rf "${dir}"
+  else
+    rm -rf "${dir}"
+  fi
+  echo "Deleted ${name}"
+}
+
+# The ProxyCommand for `ssh dev-<name>` (in the stowed ~/.ssh/config): runs
+# sshd's end of the connection through the runtime's exec, with the env file.
+# Another machine's containers take a suffix, `dev-<name>.<host>`, which the
+# ProxyCommand that SSHes there passes along, so drop it
+proxy() {
+  local name="${1#dev-}"
+  name="${name%%.*}"
+  require_container "${name}"
+  if [[ ! -f "${root}/${name}/ssh/host_ed25519" ]]; then
+    echo "${name} predates SSH access; run: dev recreate ${name}" >&2
+    exit 1
+  fi
+  start_container "${name}"
+  exec "${runtime}" exec --interactive --env-file "${root}/${name}/env" \
+    "${name}" /usr/local/bin/dev-sshd
+}
+
+# Start container $1, re-creating it from its saved image if the runtime no
+# longer has it (removed by hand, as `dev help rm` suggests, or a runtime reset)
+start_container() {
+  local exists=(inspect "$1")
+  # Plain `podman inspect` also finds images, which can share the name
+  [[ "${runtime}" == podman ]] && exists=(container exists "$1")
+  if ! "${runtime}" "${exists[@]}" >/dev/null 2>&1; then
+    run_container "$1" "$(cat "${root}/$1/image")"
+  fi
+  # A no-op when it's already running
+  "${runtime}" start "$1" >/dev/null
+}
+
+shell() {
+  local name="$1"
+  require_container "${name}"
+  start_container "${name}"
+  # exec resets TERM, so pass through the host tmux's TERM and truecolor
+  exec "${runtime}" exec --interactive --tty --env TERM --env COLORTERM \
+    --env-file "${root}/${name}/env" --workdir /workspaces "${name}" bash --login
+}
+
+case "${1:-}" in
+  '' | list) list ;;
+  create)
+    shift
+    create "$@"
+    ;;
+  recreate)
+    [[ $# -ge 2 && $# -le 3 ]] || usage recreate
+    shift
+    recreate "$@"
+    ;;
+  stop)
+    shift
+    [[ $# -ge 1 ]] || usage stop
+    # --all on its own, not mixed with names
+    if [[ $# -gt 1 ]]; then
+      for arg in "$@"; do
+        [[ "${arg}" != --all ]] || usage stop
+      done
+    fi
+    stop "$@"
+    ;;
+  rm | remove)
+    [[ $# -eq 2 ]] || usage rm
+    remove "$2"
+    ;;
+  proxy)
+    [[ $# -eq 2 ]] || usage
+    proxy "$2"
+    ;;
+  *)
+    [[ $# -eq 1 ]] || usage
+    shell "$1"
+    ;;
+esac

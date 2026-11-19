@@ -20,17 +20,14 @@ dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BREW_PACKAGES=(
   bash
   bash-completion@2
+  bash-language-server
   bat
+  beets
   oven-sh/bun/bun
   chafa
-  cloudflared
-  # Docker fallback for projects that need it, alongside podman
-  colima
   container
   delta
-  difftastic
-  docker
-  docker-compose
+  dockerfile-language-server
   duf
   MisterTea/et/et
   eza
@@ -54,7 +51,6 @@ BREW_PACKAGES=(
   imagemagick
   jq
   keychain
-  lua-language-server
   moreutils
   mpc
   mpd
@@ -64,9 +60,9 @@ BREW_PACKAGES=(
   ncdu
   neovim
   node
+  oxfmt
   # For :Obsidian paste_img
   pngpaste
-  podman
   ripgrep
   rmpc
   sad
@@ -79,7 +75,9 @@ BREW_PACKAGES=(
   tmux
   tree-sitter-cli
   uv
+  vscode-langservers-extracted
   wget
+  yaml-language-server
   yazi
   yq
   yt-dlp
@@ -90,6 +88,8 @@ BREW_PACKAGES=(
 # by hand instead (see README), since brew loses track of their versions
 CASK_PACKAGES=(
   1password-cli
+  claude-code
+  codex
   font-google-sans-code
   font-jetbrains-mono
   # For yazi
@@ -121,9 +121,11 @@ setup_homebrew() {
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
   fi
 
-  if [[ ! -f "$HOME/.profile.brew" ]]; then
+  # shellenv prints nothing when Homebrew is already first on PATH, so run it
+  # from a clean one. Rewrite an empty file an earlier run left behind
+  if [[ ! -s "$HOME/.profile.brew" ]]; then
     echo "Exporting brew shellenv"
-    "${brew_prefix}/bin/brew" shellenv >"$HOME/.profile.brew"
+    PATH=/usr/bin:/bin "${brew_prefix}/bin/brew" shellenv bash >"$HOME/.profile.brew"
   fi
 
   # Ensure `brew` in path for rest of script

@@ -1,5 +1,6 @@
-# Debian/apt packages required by setup_linux and the Docker image
-# Lines starting with # are ignored
+# Debian/apt packages for hosts, which the image shares except `# host-only`
+# lines (media tools, and server tools for remote mounts and SSH keys). Lines
+# starting with # are ignored; project toolchains belong in each project.
 
 # For yazi
 7zip
@@ -8,39 +9,40 @@ apt-utils
 aptitude
 bash-completion
 bat
+# Neovim compiles its treesitter parsers and telescope-fzf-native
+build-essential
 # Codex sandbox requirement
 bubblewrap
-build-essential
 ca-certificates
-chafa
+chafa  # host-only
 curl
 dnsutils
 duf
 eza
 fd-find
-ffmpeg
+ffmpeg  # host-only
 # Required for `yazi`
 file
 # Trixie's 0.60 predates `--ghost` (0.61), which .fzf-default-options uses,
 # so every fzf call errors. Get it from `install_github_packages`
 # fzf
-# Debian version ancient, get from `install_github_packages`
+# Debian version ancient; the image gets it from `install_github_packages`
 # gh
 git
 git-crypt
+# Provides `delta`, git's pager
+git-delta
 git-extras
 git-lfs
 gnupg
-gocryptfs/trixie-backports
+gocryptfs/trixie-backports  # host-only
 gron
 htop
-# Debian version ancient, get from `install_github_packages`
-# hugo
 iftop
-imagemagick
+imagemagick  # host-only
 info
 jq
-keychain
+keychain  # host-only
 less
 # Official Node.js binaries (script/install_node) link against it
 libatomic1
@@ -62,19 +64,19 @@ rsync
 shellcheck/trixie-backports
 shfmt
 ssh
-ssh-import-id
-sshfs
+ssh-import-id  # host-only
+sshfs  # host-only
 stow
 sudo
 tmux/trixie-backports
 trash-cli
-# Automatic security updates on servers and Crostini
-unattended-upgrades
+# Security updates on servers and Crostini; images are rebuilt instead
+unattended-upgrades  # host-only
 unzip
 wamerican
 wget
 # Debian ships a different `yq` (a python jq wrapper with an incompatible
 # CLI), get mikefarah's from `install_github_packages`
 # yq
-yt-dlp/trixie-backports
+yt-dlp/trixie-backports  # host-only
 zoxide

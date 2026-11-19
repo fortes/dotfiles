@@ -49,7 +49,10 @@ cleanup_docker() {
 cleanup_podman() {
   if command -v podman >/dev/null 2>&1 && podman info >/dev/null 2>&1; then
     echo "Cleaning up Podman..."
-    podman system prune -af
+    # Images and build cache only: dev containers are stopped after a reboot
+    # until their next `dev` shell, and pruning them would drop them
+    podman image prune -af
+    podman builder prune -af
     if [[ "${PRUNE_VOLUMES}" -eq 1 ]]; then
       echo "Pruning Podman volumes..."
       podman volume prune -af

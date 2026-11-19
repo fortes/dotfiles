@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Install this project's pinned tools and dependencies. Safe to rerun, and the
+# one setup step every environment runs: dev containers, CI, and Claude's and
+# Codex's cloud setup scripts.
+
+set -euo pipefail
+IFS=$'\n\t'
+
+cd "$(dirname "${BASH_SOURCE[0]}")/.."
+
+# Install from lock files, e.g. `npm ci` or `uv sync --frozen`

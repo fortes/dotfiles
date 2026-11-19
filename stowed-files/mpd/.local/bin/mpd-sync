@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+# Copies the server's playlists and beets library to this Mac, so rmpc's
+# Playlists tab, play-albums and `beet` work without mounting the media share,
+# offline too. The library goes in $BEETSDIR (~/.mpd/beets, from ~/.profile).
+# Both come over HTTP from next to the music directory in mpd.conf.local:
+# playlists from <music>/playlists/, beets.db from the server's root. Rerun
+# after the server regenerates them. Needs the server's library, so not while
+# `mpd-offline on`
+
+set -euo pipefail
+IFS=$'\n\t'
+
+# e.g. https://server/music/
+music_url=$(sed -n 's/^music_directory "\(.*\)"/\1/p' ~/.mpd/mpd.conf.local)
+playlist_dir=~/.mpd/playlists
+beets_dir="${BEETSDIR:?BEETSDIR is not set; open a new login shell}"
+# Where the server's beets keeps its music. play-albums strips it from beets'
+# paths to get MPD's, which are relative to the music directory
+server_music_dir=/data/media/music
+
+# The proxy database doesn't share stored playlists
+for path in $(mpc ls playlists); do
+  name=$(basename "${path}")
+  # Downloaded first, so a failure keeps the last good copy. `:url` encodes
+  # names with spaces, `#` or `?`
+  playlist=$(curl -fsS --variable "name=${name}" \
+    --expand-url "${music_url}playlists/{{name:url}}")
+  # `../albums/x.mp3` becomes `albums/x.mp3`, relative to the music directory
+  sed -e 's|^\.\./||' <<<"${playlist}" >"${playlist_dir}/${name}"
+done
+echo "Playlists synced"
+
+# The library is hundreds of MB, so only download it when the server's copy is
+# newer (--remote-time keeps the server's date for the next comparison). Into
+# a temporary file first, so a failed download keeps the last good copy
+mkdir -p "${beets_dir}"
+db="${beets_dir}/library.db"
+time_cond=()
+# Smaller is an empty library a `beet` command made before the first sync
+# (about 50 KB), not a real one (hundreds of MB), so download it again
+if [[ -f "${db}" && "$(wc -c <"${db}")" -gt 500000 ]]; then
+  time_cond=(--time-cond "${db}")
+fi
+curl -fsS --remote-time ${time_cond[@]+"${time_cond[@]}"} \
+  --output "${db}.download" "${music_url%music/}beets.db"
+if [[ -s "${db}.download" ]]; then
+  mv "${db}.download" "${db}"
+  echo "Beets library updated"
+else
+  rm -f "${db}.download"
+  echo "Beets library already current"
+fi
+
+# Once, so your own settings (plugins, formats) survive later syncs
+if [[ ! -f "${beets_dir}/config.yaml" ]]; then
+  printf '%s\n' "directory: ${server_music_dir}" "library: ${db}" \
+    >"${beets_dir}/config.yaml"
+fi

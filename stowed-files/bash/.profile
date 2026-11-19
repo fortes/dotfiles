@@ -51,12 +51,24 @@ if [[ -n ${VISUAL:-} ]]; then
 fi
 
 export PNPM_HOME="${HOME}/.local/share/pnpm"
+# Where `pnpm add --global` links binaries: $PNPM_HOME/bin in newer pnpm (12
+# does), the directory itself in older ones. pnpm refuses global installs when
+# it's not on PATH
+add_to_path "${PNPM_HOME}"
+add_to_path "${PNPM_HOME}/bin"
 # Corepack otherwise asks before fetching a project's pnpm or Yarn, which
 # leaves agents' commands hanging
 export COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 
 # Keep bun's cache and any globals under ~/.local
 export BUN_INSTALL="${HOME}/.local"
+
+# With the MPD setup, beets reads the copy of the server's library that
+# mpd-sync keeps, so play-albums and any `beet` command agree. A server with
+# its own library sets BEETSDIR in ~/.profile.local, which comes later
+if [[ -d "$HOME/.mpd" ]]; then
+  export BEETSDIR="$HOME/.mpd/beets"
+fi
 
 # Use NeoVim as man pager, when available
 if command_exists nvim; then
@@ -87,8 +99,9 @@ export LIBVIRT_DEFAULT_URI="qemu:///system"
 export RIPGREP_CONFIG_PATH="$XDG_CONFIG_HOME/ripgrep/rc"
 
 if [ -z "${SSH_AUTH_SOCK:-}" ] && command_exists keychain; then
-  # Don't prompt for password to load key if not already loaded
-  eval "$(keychain --eval --noask --agents ssh --quiet)"
+  # Don't prompt for password to load key if not already loaded. Starts only
+  # ssh-agent by default; keychain 3 deprecated --agents and warns about it
+  eval "$(keychain --eval --noask --quiet)"
 
   # Use consistent location for SSH_AUTH_SOCK, useful for tmux sessions where
   # can end up on different machines, or reconnecting to a session

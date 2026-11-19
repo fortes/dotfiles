@@ -7,6 +7,9 @@ set -euo pipefail
 IFS=$'\n\t'
 export DEBIAN_FRONTEND=noninteractive
 
+# shellcheck source=script/lib.sh
+. "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+
 install_et() {
   declare -r et_sources_list="/etc/apt/sources.list.d/et.sources"
   declare -r et_key_url="https://github.com/MisterTea/debian-et/raw/master/et.gpg"
@@ -31,8 +34,7 @@ EOF
   sudo -E apt-get update -qq
 
   echo "Installing et package (requires sudo)"
-  sudo -E apt-get install -qq -o=Dpkg::Use-Pty=0 --assume-yes \
-    --fix-broken --no-install-recommends et
+  apt_install et
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then

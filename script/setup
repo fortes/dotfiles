@@ -13,7 +13,7 @@ set -euo pipefail
 if [[ "$(uname -s)" == Darwin ]]; then
   exec "${dotfiles_script_dir}/setup_mac" ${@+"$@"}
 elif is_devbox; then
-  exec "${dotfiles_script_dir}/setup_devbox" ${@+"$@"}
+  exec "${dotfiles_script_dir}/dev/setup_devbox" ${@+"$@"}
 elif command_exists apt-get; then
   exec "${dotfiles_script_dir}/setup_linux" ${@+"$@"}
 else

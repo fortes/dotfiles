@@ -69,6 +69,25 @@ backup_default_dotfiles() {
   done
 }
 
+# Remove links into stowed-files dir $1 whose file is gone, which restowing
+# leaves behind when a file is deleted from the repo. Only ~'s top level and
+# the folders packages link into, not all of ~
+prune_stale_links() {
+  local top dirs=() link
+  while IFS= read -r top; do
+    [[ -d "${HOME}/${top}" && ! -L "${HOME}/${top}" ]] && dirs+=("${HOME}/${top}")
+  done < <(find "$1" -mindepth 2 -maxdepth 2 -exec basename {} \; | sort -u)
+  while IFS= read -r link; do
+    rm -f "${link}"
+    echo "Removed stale link ~/${link#"${HOME}/"}"
+  done < <({
+    find "${HOME}" -maxdepth 1 -type l -lname '*stowed-files/*' ! -exec test -e {} \; -print
+    if [[ ${#dirs[@]} -gt 0 ]]; then
+      find "${dirs[@]}" -maxdepth 4 -type l -lname '*stowed-files/*' ! -exec test -e {} \; -print
+    fi
+  } 2>/dev/null)
+}
+
 main() {
   local dotfiles_root
   dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -131,6 +150,7 @@ main() {
     for package in "${packages[@]}"; do
       copy_local_templates "${dotfiles_root}/local-templates/${package}"
     done
+    prune_stale_links "${stowed_files_path}"
   fi
 }
 

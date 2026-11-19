@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Check this machine can work on the project, and say how to fix what's
+# missing. Fail only on problems that break the work and warn about the rest,
+# so agents don't stall on harmless differences like a newer patch version.
+
+set -euo pipefail
+IFS=$'\n\t'
+
+declare -i errors=0
+
+ok() { echo "✓ $*"; }
+fail() {
+  echo "✗ $*"
+  errors+=1
+}
+
+# require <command> <how to fix>
+require() {
+  if command -v "$1" >/dev/null 2>&1; then
+    ok "$1"
+  else
+    fail "$1 isn't installed. $2"
+  fi
+}
+
+require git "Install git"
+
+[[ "${errors}" -eq 0 ]]

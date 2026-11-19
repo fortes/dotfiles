@@ -25,6 +25,33 @@ env:
     type=semver,pattern={{major}}
 
 jobs:
+  # Run script/setup the way a fresh Debian server would (the Dockerfile's
+  # `host` target). Nothing is pushed, and one platform is enough to catch host
+  # setup breakage. It gates publishing the image, below
+  host:
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build host target
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          target: host
+          push: false
+          cache-from: type=gha,scope=host
+          cache-to: type=gha,mode=max,scope=host
+          secrets: |
+            GH_TOKEN=${{ secrets.GITHUB_TOKEN }}
+
   # Build each platform on a native runner: under QEMU, arm64 builds took over
   # an hour and newer Node releases crash
   build:
@@ -111,7 +138,8 @@ jobs:
           retention-days: 1
 
   merge:
-    needs: build
+    # Don't publish an image from a commit that breaks fresh host setup
+    needs: [build, host]
     # Same condition as PUSH (env isn't available in job-level `if`)
     if: ${{ github.event.workflow_run.head_branch == github.event.repository.default_branch || startsWith(github.ref, 'refs/tags/v') }}
     runs-on: ubuntu-latest

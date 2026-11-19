@@ -1,0 +1,301 @@
+#!/usr/bin/env bash
+# Check that this machine matches what script/setup sets up (or, in a dev
+# container, what the image and `dev create` do), and say how to fix what
+# doesn't. Changes nothing, so it's safe to run any time.
+#
+# Usage: doctor
+
+# Messages show paths as ~/..., meant literally
+# shellcheck disable=SC2088
+set -uo pipefail
+
+# shellcheck source=script/lib.sh
+. "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+dotfiles_root="$(cd "${dotfiles_script_dir}/.." && pwd)"
+
+failures=0
+warnings=0
+# Colors only in a terminal, unless NO_COLOR is set (https://no-color.org)
+if [[ -t 1 && -z "${NO_COLOR:-}" ]]; then
+  green=$'\e[32m' yellow=$'\e[33m' red=$'\e[31m' bold=$'\e[1m' dim=$'\e[2m' reset=$'\e[m'
+else
+  green='' yellow='' red='' bold='' dim='' reset=''
+fi
+ok() { printf '  %s✓%s %s%s%s\n' "${green}" "${reset}" "${dim}" "$*" "${reset}"; }
+warn() {
+  printf '  %s!%s %s\n' "${yellow}${bold}" "${reset}" "$*"
+  warnings=$((warnings + 1))
+}
+fail() {
+  printf '  %s✗%s %s\n' "${red}${bold}" "${reset}" "$*"
+  failures=$((failures + 1))
+}
+# Count $1 of noun $2, plural with an s
+count() {
+  if [[ "$1" == 1 ]]; then echo "$1 $2"; else echo "$1 $2s"; fi
+}
+section() { printf '\n%s%s%s\n' "${bold}" "$*" "${reset}"; }
+
+# Permission bits of file $1, like 600
+perms() {
+  if [[ "$(uname -s)" == Darwin ]]; then
+    stat -f %Lp "$1"
+  else
+    stat -c %a "$1"
+  fi
+}
+
+# Whether stow package $1 is in the space-separated DOTFILES_SKIP_PACKAGES
+skipped() {
+  [[ " ${DOTFILES_SKIP_PACKAGES:-} " == *" $1 "* ]]
+}
+
+check_links() {
+  section "Dotfiles"
+  local entry file target linked=()
+  # package:file, so skipped packages aren't expected
+  for entry in bash:.bashrc bash:.profile git:.config/git/config nvim:.config/nvim/init.lua \
+    tmux:.config/tmux/tmux.conf; do
+    skipped "${entry%%:*}" && continue
+    file="${entry#*:}"
+    target="$(readlink "${HOME}/${file}" 2>/dev/null || true)"
+    if [[ "${target}" == *stowed-files/* && -e "${HOME}/${file}" ]]; then
+      linked+=("~/${file}")
+    else
+      fail "~/${file} isn't linked into the repo; run script/stow"
+    fi
+  done
+  [[ ${#linked[@]} -eq 0 ]] || ok "$(count ${#linked[@]} dotfile) linked"
+}
+
+# The same places script/stow prunes: ~'s top level and the folders packages
+# link into
+check_stale_links() {
+  local top dirs=() stale
+  while IFS= read -r top; do
+    [[ -d "${HOME}/${top}" && ! -L "${HOME}/${top}" ]] && dirs+=("${HOME}/${top}")
+  done < <(find "${dotfiles_root}/stowed-files" -mindepth 2 -maxdepth 2 -exec basename {} \; | sort -u)
+  stale="$({
+    find "${HOME}" -maxdepth 1 -type l -lname '*stowed-files/*' ! -exec test -e {} \; -print
+    if [[ ${#dirs[@]} -gt 0 ]]; then
+      find "${dirs[@]}" -maxdepth 4 -type l -lname '*stowed-files/*' ! -exec test -e {} \; -print
+    fi
+  } 2>/dev/null | wc -l | tr -d ' ')"
+  if [[ "${stale}" == 0 ]]; then
+    ok "no stale links into the repo"
+  else
+    warn "${stale} stale links into the repo; run script/stow, which removes them"
+  fi
+}
+
+check_private_files() {
+  local entry file private=()
+  for entry in "$@"; do
+    skipped "${entry%%:*}" && continue
+    file="${entry#*:}"
+    if [[ -L "${HOME}/${file}" ]]; then
+      fail "~/${file} is a link, not a private file of its own (see git show 17b1db7^:MIGRATION.md)"
+    elif [[ ! -f "${HOME}/${file}" ]]; then
+      fail "~/${file} is missing; run script/stow, which copies its template"
+    elif [[ "$(perms "${HOME}/${file}")" != 600 ]]; then
+      fail "~/${file} isn't private; chmod 600 ~/${file}"
+    else
+      private+=("~/${file}")
+      if grep -v '^\s*#' "${HOME}/${file}" | grep -q REPLACE_ME; then
+        warn "~/${file} still has REPLACE_MEs to fill in"
+      fi
+    fi
+  done
+  [[ ${#private[@]} -eq 0 ]] || ok "$(count ${#private[@]} "local file") private"
+}
+
+check_tools() {
+  section "Tools"
+  local tool missing=()
+  for tool in "$@"; do
+    command_exists "${tool}" || missing+=("${tool}")
+  done
+  if [[ ${#missing[@]} -eq 0 ]]; then
+    ok "all here: $*"
+  else
+    fail "missing: ${missing[*]}; run script/setup"
+  fi
+}
+
+check_mac() {
+  section "Mac"
+  if [[ "$(dscl . -read ~ UserShell 2>/dev/null | cut -d' ' -f2)" == /opt/homebrew/bin/bash ]]; then
+    ok "login shell is Homebrew's bash"
+  else
+    warn "login shell isn't Homebrew's bash; run script/setup from a terminal"
+  fi
+  local tool shadowed=()
+  for tool in claude codex bash-language-server oxfmt delta nvim fzf; do
+    [[ -e "${HOME}/.local/bin/${tool}" && -e "/opt/homebrew/bin/${tool}" ]] && shadowed+=("${tool}")
+  done
+  if [[ ${#shadowed[@]} -eq 0 ]]; then
+    ok "nothing in ~/.local/bin shadows Homebrew's tools"
+  else
+    fail "~/.local/bin has old copies of ${shadowed[*]}, which shadow Homebrew's; remove them"
+  fi
+  if container system status >/dev/null 2>&1; then
+    ok "Apple's container service is running"
+  else
+    warn "Apple's container service isn't running; dev starts it, or: container system start"
+  fi
+  if launchctl print "gui/$(id -u)/local.mpd-now-playable" >/dev/null 2>&1; then
+    ok "mpd-now-playable is loaded"
+  else
+    warn "mpd-now-playable isn't loaded: launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/local.mpd-now-playable.plist"
+  fi
+}
+
+check_debian() {
+  section "Debian"
+  local suite suites
+  # shellcheck disable=SC2016 # APT expands $(RELEASE)
+  suites="$(apt-get indextargets --no-release-info --format '$(RELEASE)' 2>/dev/null | sort -u)"
+  # shellcheck source=/dev/null
+  . /etc/os-release
+  for suite in "${VERSION_CODENAME}-security" "${VERSION_CODENAME}-updates" "${VERSION_CODENAME}-backports"; do
+    if grep -qxF "${suite}" <<<"${suites}"; then
+      ok "apt has ${suite}"
+    else
+      fail "apt is missing ${suite}; run script/setup"
+    fi
+  done
+  # The setting that turns them on, which dpkg-reconfigure writes
+  if [[ "$(apt-config dump APT::Periodic::Unattended-Upgrade 2>/dev/null)" == *'"1";'* ]]; then
+    ok "unattended-upgrades runs"
+  else
+    warn "unattended-upgrades isn't turned on: sudo dpkg-reconfigure unattended-upgrades"
+  fi
+  if [[ -e /var/run/reboot-required ]]; then
+    warn "a reboot is pending, for $({ tr '\n' ' ' </var/run/reboot-required.pkgs; } 2>/dev/null || echo updates)"
+  else
+    ok "no reboot pending"
+  fi
+
+  # Crostini skips podman, since it's already a container
+  compgen -G "/etc/apt/sources.list.d/cros.*" >/dev/null && return
+  if [[ "$(podman info --format '{{.Host.Security.Rootless}}' 2>/dev/null)" == true ]]; then
+    ok "rootless podman works"
+  else
+    fail "rootless podman doesn't work; run script/setup, then podman info"
+  fi
+  if ! id dev >/dev/null 2>&1; then
+    warn "no dev user, so containers would run as $(id -un) (README, Linux: Podman)"
+  elif [[ "$(loginctl show-user dev --property Linger --value 2>/dev/null)" == yes ]]; then
+    ok "the dev user exists and lingers"
+  else
+    warn "the dev user's containers stop when it logs out: sudo loginctl enable-linger dev"
+  fi
+}
+
+# This account's dev containers that predate something `dev recreate` adds:
+# their own port, the machine's shared host key, or trusting its client key
+check_containers() {
+  local dir name keys="${HOME}/containers/.ssh" current=() stale=()
+  for dir in "${HOME}"/containers/*/; do
+    [[ -e "${dir}image" ]] || continue
+    name="$(basename "${dir}")"
+    if [[ -s "${dir}port" ]] && cmp -s "${keys}/host_ed25519" "${dir}ssh/host_ed25519" \
+      && grep -qxF "$(cat "${keys}/client_ed25519.pub" 2>/dev/null)" "${dir}ssh/authorized_keys" 2>/dev/null; then
+      current+=("${name}")
+    else
+      stale+=("${name}")
+    fi
+  done
+  [[ ${#current[@]} -gt 0 || ${#stale[@]} -gt 0 ]] || return 0
+  section "Dev containers"
+  [[ ${#current[@]} -eq 0 ]] || ok "$(count ${#current[@]} container) up to date"
+  local name
+  for name in ${stale[@]+"${stale[@]}"}; do
+    warn "${name} predates this setup (port, SSH keys): dev recreate ${name}"
+  done
+}
+
+check_dev_container() {
+  section "Dev container"
+  local problems=0 dir link
+  if [[ ! -w /state ]]; then
+    fail "/state isn't writable; recreate the container with dev recreate"
+    problems=1
+  fi
+  # Claude Code, Codex and gh say where through variables; agy's folders are
+  # links the image makes into /state
+  for dir in "${CLAUDE_CONFIG_DIR:-}" "${CODEX_HOME:-}" "${GH_CONFIG_DIR:-}"; do
+    if [[ -z "${dir}" ]]; then
+      fail "an agent's config variable is unset; the image is older than this checkout"
+      problems=1
+    elif [[ ! -d "${dir}" ]]; then
+      warn "${dir} is missing; dev recreate makes it"
+      problems=1
+    fi
+  done
+  for link in .antigravity .gemini; do
+    if [[ ! -d "${HOME}/${link}" ]]; then
+      warn "~/${link} doesn't reach /state, so agy's login won't stick; dev recreate fixes it"
+      problems=1
+    fi
+  done
+  [[ ${problems} -gt 0 ]] || ok "/state mounted, with Claude Code's, Codex's, agy's and gh's folders"
+  if gh auth status >/dev/null 2>&1; then
+    ok "gh is signed in"
+  else
+    warn "gh isn't signed in (README, Signing in agents)"
+  fi
+  if [[ -n "${PORT:-}" ]]; then
+    ok "PORT is ${PORT} (${DEV_URL:-no DEV_URL})"
+  else
+    warn "no PORT; dev recreate gives the container one"
+  fi
+}
+
+main() {
+  [[ $# -eq 0 ]] || {
+    echo >&2 'Usage: doctor (no arguments)'
+    return 1
+  }
+  printf '%sChecking %s%s %sagainst %s%s\n' "${bold}" "$(hostname -s)" "${reset}" "${dim}" "${dotfiles_root}" "${reset}"
+
+  if [[ -n "${DOTFILES_DEV_IMAGE:-}" ]]; then
+    check_dev_container
+    check_tools node pnpm bun claude codex agy gh nvim git
+  else
+    check_links
+    if [[ "$(uname -s)" == Darwin ]]; then
+      check_private_files bash:.profile.local git:.gitconfig.local mpd:.mpd/mpd.conf.local \
+        mpd:.mpdscribble/mpdscribble.conf
+      check_stale_links
+      check_tools brew nvim tmux fzf fd bat rg delta git stow
+      check_mac
+      check_containers
+    elif [[ -r /etc/debian_version ]]; then
+      check_private_files bash:.profile.local git:.gitconfig.local
+      check_stale_links
+      # The dev user only stows (it has no sudo), and the tools and system
+      # come from the main account's setup
+      if [[ "$(id -un)" != dev ]]; then
+        check_tools nvim tmux fzf fd bat rg delta git stow
+        is_devbox || check_debian
+      fi
+      check_containers
+    fi
+  fi
+
+  echo
+  if [[ ${failures} -gt 0 ]]; then
+    printf '%s✗ %s failed%s, %s\n' "${red}${bold}" "${failures}" "${reset}" "$(count "${warnings}" warning)"
+  elif [[ ${warnings} -gt 0 ]]; then
+    printf '%s! All good, with %s%s\n' "${yellow}${bold}" "$(count "${warnings}" warning)" "${reset}"
+  else
+    printf '%s✓ All good%s\n' "${green}${bold}" "${reset}"
+  fi
+  [[ ${failures} -eq 0 ]]
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  # Bash 3.2 treats an empty "$@" as unset under `set -u`
+  main ${@+"$@"}
+fi

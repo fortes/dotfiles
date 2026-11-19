@@ -7,6 +7,9 @@ set -euo pipefail
 IFS=$'\n\t'
 export DEBIAN_FRONTEND=noninteractive
 
+# shellcheck source=script/lib.sh
+. "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+
 install_zerotier() {
   declare -r zerotier_sources_list="/etc/apt/sources.list.d/zerotier.sources"
   declare -r zerotier_key_url="https://raw.githubusercontent.com/zerotier/ZeroTierOne/master/doc/contact%40zerotier.com.gpg"
@@ -31,8 +34,7 @@ EOF
   sudo -E apt-get update -qq
 
   echo "Installing zerotier package (requires sudo)"
-  sudo -E apt-get install -qq -o=Dpkg::Use-Pty=0 --assume-yes \
-    --fix-broken --no-install-recommends zerotier-one
+  apt_install zerotier-one
 
   echo "Join network via \`sudo zerotier-cli join xxxxxxxxx\`"
 }
