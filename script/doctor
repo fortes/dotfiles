@@ -68,6 +68,28 @@ check_links() {
   [[ ${#linked[@]} -eq 0 ]] || ok "$(count ${#linked[@]} dotfile) linked"
 }
 
+# Whether ~/.ssh/config applies config.local: the first host named there
+# should get the same user and hostname from the full config as from
+# config.local alone. A misplaced Include can hide it behind another Host
+check_ssh_config() {
+  local local_config="${HOME}/.ssh/config.local" alias want got
+  [[ -r "${local_config}" ]] || return 0
+  alias="$(awk 'tolower($1) == "host" {
+    for (i = 2; i <= NF; i++) if ($i !~ /[*?!]/) { print $i; exit }
+  }' "${local_config}")"
+  [[ -n "${alias}" ]] || return 0
+  if ! want="$(ssh -F "${local_config}" -G "${alias}" 2>/dev/null | grep -E '^(user|hostname) ')" \
+    || ! got="$(ssh -G "${alias}" 2>/dev/null | grep -E '^(user|hostname) ')"; then
+    fail "couldn't resolve SSH config for ${alias}; run ssh -G ${alias} to check it"
+    return
+  fi
+  if [[ "${want}" == "${got}" ]]; then
+    ok "~/.ssh/config.local applies (checked ${alias})"
+  else
+    fail "~/.ssh/config.local doesn't apply to ${alias}; check where ~/.ssh/config includes it"
+  fi
+}
+
 # The same places script/stow prunes: ~'s top level and the folders packages
 # link into
 check_stale_links() {
@@ -267,12 +289,14 @@ main() {
     if [[ "$(uname -s)" == Darwin ]]; then
       check_private_files bash:.profile.local git:.gitconfig.local mpd:.mpd/mpd.conf.local \
         mpd:.mpdscribble/mpdscribble.conf
+      check_ssh_config
       check_stale_links
       check_tools brew nvim tmux fzf fd bat rg delta git stow
       check_mac
       check_containers
     elif [[ -r /etc/debian_version ]]; then
       check_private_files bash:.profile.local git:.gitconfig.local
+      check_ssh_config
       check_stale_links
       # The dev user only stows (it has no sudo), and the tools and system
       # come from the main account's setup

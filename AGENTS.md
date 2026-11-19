@@ -9,7 +9,7 @@ Personal dotfiles for macOS, Debian Trixie (headless servers, Docker image), Ubu
 ./script/stow     # Relink dotfiles only (-n dry run, -v verbose, -D/-R)
 ./script/update   # Install/update user tools; OS packages stay with apt/brew
 ./script/doctor   # Check the machine against what setup does; changes nothing
-make test         # shellcheck + shfmt (also what CI runs)
+make test         # shellcheck, shfmt and what the SSH config resolves to (also what CI runs)
 ```
 
 `script/setup` runs `setup_mac`, `setup_linux` (Debian), or `dev/setup_devbox` (Ubuntu or `DOTFILES_DEVBOX=1`: a light, run-on-every-boot subset that leaves system config alone).

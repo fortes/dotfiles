@@ -1,4 +1,4 @@
-.PHONY: format format-check lint test
+.PHONY: format format-check lint ssh-check test
 
 SHFMT = shfmt --indent 2 --case-indent --binary-next-line
 
@@ -26,4 +26,10 @@ lint:
 		$$(grep -rlE '^#!.*(bash|/sh)' stowed-files)
 	@shellcheck --severity=error --shell=sh stowed-files/ssh/.ssh/rc
 
-test: lint format-check
+# What the stowed SSH config resolves to for a few hosts, so a misplaced
+# Include or Host line shows up
+ssh-check:
+	@echo "Checking the SSH config..."
+	@script/check_ssh_config
+
+test: lint format-check ssh-check
