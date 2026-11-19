@@ -36,6 +36,7 @@ Set `DOTFILES_SKIP_PACKAGES="bash ssh"` (for example) to leave stow packages alo
 | `script/setup` | Provision the platform, install/update tools, and link configuration. |
 | `script/stow` | Relink configuration without package installs. |
 | `script/update` | Update user tools, not OS config; in the image, also `script/dev/setup_container`. |
+| `script/doctor` | Check this machine (or dev container) against what setup does, and say how to fix what doesn't. Changes nothing. |
 
 On Linux, some GitHub binaries aren't installed by default, like cloudflared, difftastic and hugo. Install them when needed with `script/install_github_packages <name>`; `--help` lists them all. Likewise, `script/install_docker` sets up Docker on Debian when a project needs it (use `sudo docker`, since it skips the docker group).
 

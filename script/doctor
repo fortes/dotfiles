@@ -1,0 +1,220 @@
+#!/usr/bin/env bash
+# Check that this machine matches what script/setup sets up (or, in a dev
+# container, what the image and `dev create` do), and say how to fix what
+# doesn't. Changes nothing, so it's safe to run any time.
+#
+# Usage: doctor
+
+# Messages show paths as ~/..., meant literally
+# shellcheck disable=SC2088
+set -uo pipefail
+
+# shellcheck source=script/lib.sh
+. "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+dotfiles_root="$(cd "${dotfiles_script_dir}/.." && pwd)"
+
+failures=0
+warnings=0
+ok() { printf '  ok    %s\n' "$*"; }
+warn() {
+  printf '  warn  %s\n' "$*"
+  warnings=$((warnings + 1))
+}
+fail() {
+  printf '  FAIL  %s\n' "$*"
+  failures=$((failures + 1))
+}
+section() { printf '\n%s\n' "$*"; }
+
+# Permission bits of file $1, like 600
+perms() {
+  if [[ "$(uname -s)" == Darwin ]]; then
+    stat -f %Lp "$1"
+  else
+    stat -c %a "$1"
+  fi
+}
+
+check_links() {
+  section "Dotfiles"
+  local file target
+  for file in .bashrc .profile .config/git/config .config/nvim/init.lua .config/tmux/tmux.conf; do
+    target="$(readlink "${HOME}/${file}" 2>/dev/null || true)"
+    if [[ "${target}" == *stowed-files/* && -e "${HOME}/${file}" ]]; then
+      ok "~/${file} is linked"
+    else
+      fail "~/${file} isn't linked into the repo; run script/stow"
+    fi
+  done
+  local stale
+  stale="$({
+    find "${HOME}" -maxdepth 1 -type l -lname '*stowed-files/*' ! -exec test -e {} \; -print
+    find "${HOME}/.config" "${HOME}/.local" -maxdepth 4 -type l -lname '*stowed-files/*' \
+      ! -exec test -e {} \; -print
+  } 2>/dev/null | wc -l | tr -d ' ')"
+  if [[ "${stale}" == 0 ]]; then
+    ok "no stale links into the repo"
+  else
+    warn "${stale} stale links into the repo; run script/stow, which removes them"
+  fi
+}
+
+check_private_files() {
+  local file
+  for file in "$@"; do
+    if [[ -L "${HOME}/${file}" ]]; then
+      fail "~/${file} is a link, not a private file of its own (see git show 17b1db7^:MIGRATION.md)"
+    elif [[ ! -f "${HOME}/${file}" ]]; then
+      fail "~/${file} is missing; run script/stow, which copies its template"
+    elif [[ "$(perms "${HOME}/${file}")" != 600 ]]; then
+      fail "~/${file} isn't private; chmod 600 ~/${file}"
+    elif grep -v '^\s*#' "${HOME}/${file}" | grep -q REPLACE_ME; then
+      warn "~/${file} still has REPLACE_MEs to fill in"
+    else
+      ok "~/${file} is private"
+    fi
+  done
+}
+
+check_tools() {
+  section "Tools"
+  local tool missing=()
+  for tool in "$@"; do
+    command_exists "${tool}" || missing+=("${tool}")
+  done
+  if [[ ${#missing[@]} -eq 0 ]]; then
+    ok "all here: $*"
+  else
+    fail "missing: ${missing[*]}; run script/setup"
+  fi
+}
+
+check_mac() {
+  section "Mac"
+  if [[ "$(dscl . -read ~ UserShell 2>/dev/null | cut -d' ' -f2)" == /opt/homebrew/bin/bash ]]; then
+    ok "the login shell is Homebrew's bash"
+  else
+    warn "the login shell isn't Homebrew's bash; run script/setup from a terminal"
+  fi
+  local tool shadowed=()
+  for tool in claude codex bash-language-server oxfmt delta nvim fzf; do
+    [[ -e "${HOME}/.local/bin/${tool}" && -e "/opt/homebrew/bin/${tool}" ]] && shadowed+=("${tool}")
+  done
+  if [[ ${#shadowed[@]} -eq 0 ]]; then
+    ok "nothing in ~/.local/bin shadows Homebrew's tools"
+  else
+    fail "~/.local/bin has old copies of ${shadowed[*]}, which shadow Homebrew's; remove them"
+  fi
+  if container system status >/dev/null 2>&1; then
+    ok "Apple's container service is running"
+  else
+    warn "Apple's container service isn't running; dev starts it, or: container system start"
+  fi
+  if launchctl print "gui/$(id -u)/local.mpd-now-playable" >/dev/null 2>&1; then
+    ok "mpd-now-playable is loaded"
+  else
+    warn "mpd-now-playable isn't loaded: launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/local.mpd-now-playable.plist"
+  fi
+}
+
+check_debian() {
+  section "Debian"
+  local suite suites
+  # shellcheck disable=SC2016 # APT expands $(RELEASE)
+  suites="$(apt-get indextargets --no-release-info --format '$(RELEASE)' 2>/dev/null | sort -u)"
+  # shellcheck source=/dev/null
+  . /etc/os-release
+  for suite in "${VERSION_CODENAME}-security" "${VERSION_CODENAME}-updates" "${VERSION_CODENAME}-backports"; do
+    if grep -qxF "${suite}" <<<"${suites}"; then
+      ok "apt has ${suite}"
+    else
+      fail "apt is missing ${suite}; run script/setup"
+    fi
+  done
+  if systemctl is-enabled unattended-upgrades >/dev/null 2>&1; then
+    ok "unattended-upgrades is enabled"
+  else
+    warn "unattended-upgrades isn't enabled: sudo dpkg-reconfigure unattended-upgrades"
+  fi
+  if [[ -e /var/run/reboot-required ]]; then
+    warn "a reboot is pending, for $(tr '\n' ' ' </var/run/reboot-required.pkgs 2>/dev/null || echo 'updates')"
+  else
+    ok "no reboot pending"
+  fi
+
+  # Crostini skips podman, since it's already a container
+  compgen -G "/etc/apt/sources.list.d/cros.*" >/dev/null && return
+  if [[ "$(podman info --format '{{.Host.Security.Rootless}}' 2>/dev/null)" == true ]]; then
+    ok "rootless podman works"
+  else
+    fail "rootless podman doesn't work; run script/setup, then podman info"
+  fi
+  if ! id dev >/dev/null 2>&1; then
+    warn "no dev user, so containers would run as $(id -un) (README, Linux: Podman)"
+  elif [[ "$(loginctl show-user dev --property Linger --value 2>/dev/null)" == yes ]]; then
+    ok "the dev user exists and lingers"
+  else
+    warn "the dev user's containers stop when it logs out: sudo loginctl enable-linger dev"
+  fi
+}
+
+check_dev_container() {
+  section "Dev container"
+  if [[ -w /state ]]; then
+    ok "/state is mounted and writable"
+  else
+    fail "/state isn't writable; recreate the container with dev recreate"
+  fi
+  local dir
+  for dir in "${CLAUDE_CONFIG_DIR:-}" "${CODEX_HOME:-}" "${GH_CONFIG_DIR:-}"; do
+    if [[ -z "${dir}" ]]; then
+      fail "an agent's config variable is unset; the image is older than this checkout"
+    elif [[ -d "${dir}" ]]; then
+      ok "${dir} is there"
+    else
+      warn "${dir} is missing; dev recreate makes it"
+    fi
+  done
+  if [[ -n "${PORT:-}" ]]; then
+    ok "PORT is ${PORT} (${DEV_URL:-no DEV_URL})"
+  else
+    warn "no PORT; dev recreate gives the container one"
+  fi
+  if gh auth status >/dev/null 2>&1; then
+    ok "gh is signed in"
+  else
+    warn "gh isn't signed in (README, Signing in agents)"
+  fi
+}
+
+main() {
+  [[ $# -eq 0 ]] || {
+    echo >&2 'Usage: doctor (no arguments)'
+    return 1
+  }
+  echo "Checking $(hostname) against ${dotfiles_root}"
+
+  if [[ -n "${DOTFILES_DEV_IMAGE:-}" ]]; then
+    check_dev_container
+    check_tools node pnpm bun claude codex gh nvim git
+  else
+    check_links
+    if [[ "$(uname -s)" == Darwin ]]; then
+      check_private_files .profile.local .gitconfig.local .mpd/mpd.conf.local .mpdscribble/mpdscribble.conf
+      check_tools brew nvim tmux fzf fd bat rg delta git stow
+      check_mac
+    elif [[ -r /etc/debian_version ]]; then
+      check_private_files .profile.local .gitconfig.local
+      check_tools nvim tmux fzf fd bat rg delta git stow
+      is_devbox || check_debian
+    fi
+  fi
+
+  printf '\n%s failed, %s warnings\n' "${failures}" "${warnings}"
+  [[ ${failures} -eq 0 ]]
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  # Bash 3.2 treats an empty "$@" as unset under `set -u`
+  main ${@+"$@"}
+fi

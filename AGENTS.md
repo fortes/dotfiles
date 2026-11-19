@@ -8,6 +8,7 @@ Personal dotfiles for macOS, Debian Trixie (headless servers, Docker image), Ubu
 ./script/setup    # Provision the platform, stow dotfiles, then run script/update
 ./script/stow     # Relink dotfiles only (-n dry run, -v verbose, -D/-R)
 ./script/update   # Install/update user tools; OS packages stay with apt/brew
+./script/doctor   # Check the machine against what setup does; changes nothing
 make test         # shellcheck + shfmt (also what CI runs)
 ```
 
