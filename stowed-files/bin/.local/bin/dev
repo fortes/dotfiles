@@ -100,7 +100,7 @@ EOF
       ;;
     *)
       cat <<'EOF'
-Usage: dev [list | <name> | create | recreate | rm | help] ...
+Usage: dev [list | <name> | create | recreate | stop | rm | help] ...
 
 Dev containers from the dotfiles image, one per project or trust group. Each
 lives in ~/containers/<name>: src/ is /workspaces inside, state/ holds its
@@ -276,6 +276,8 @@ create() {
     shift
   done
   [[ $# -ge 1 && $# -le 2 ]] || usage create
+  # Options go before the name; one after it would be taken as the image
+  [[ "${2:-}" != -* ]] || usage create
   local name="$1" image="${2:-ghcr.io/fortes/dotfiles:latest}"
   local dir="${root}/${name}"
   # Dots would clash with `dev proxy`'s .<host> suffix, and Apple's container
@@ -440,8 +442,14 @@ remove() {
   fi
   # It may already be gone
   "${runtime}" rm --force "${name}" >/dev/null 2>&1 || true
-  # Removes the shared state's link, not what it points to
-  rm -rf "${dir}"
+  # Removes the shared state's link, not what it points to. On podman, files
+  # root wrote inside (an agent's sudo) belong to another of your user IDs, so
+  # delete from inside the container's user namespace
+  if [[ "${runtime}" == podman ]]; then
+    podman unshare rm -rf "${dir}"
+  else
+    rm -rf "${dir}"
+  fi
   echo "Deleted ${name}"
 }
 

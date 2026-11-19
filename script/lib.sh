@@ -42,9 +42,12 @@ apt_install() {
   # So a failure shows only this install's output
   local start
   start="$(wc -l <"${log}")"
+  # Keep edited config files without asking: the question would go to the log,
+  # leaving setup waiting on an answer nobody sees
   # shellcheck disable=SC2024 # The log is yours, so the redirect skips sudo
   if ! DEBIAN_FRONTEND=noninteractive sudo -E apt-get install -qq --assume-yes \
     --fix-broken --no-install-recommends -o=Dpkg::Use-Pty=0 \
+    -o=Dpkg::Options::=--force-confdef -o=Dpkg::Options::=--force-confold \
     -o=Dpkg::Progress-Fancy=0 -o=APT::Get::Show-Progress=false "$@" >>"${log}"; then
     tail -n "+$((start + 1))" "${log}" | tail -n 20 >&2
     echo_stderr "apt-get install failed; full output in ${log}"

@@ -274,8 +274,12 @@ main() {
     elif [[ -r /etc/debian_version ]]; then
       check_private_files bash:.profile.local git:.gitconfig.local
       check_stale_links
-      check_tools nvim tmux fzf fd bat rg delta git stow
-      is_devbox || check_debian
+      # The dev user only stows (it has no sudo), and the tools and system
+      # come from the main account's setup
+      if [[ "$(id -un)" != dev ]]; then
+        check_tools nvim tmux fzf fd bat rg delta git stow
+        is_devbox || check_debian
+      fi
       check_containers
     fi
   fi

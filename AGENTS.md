@@ -36,6 +36,6 @@ The Obsidian vault is `$NOTES_DIR` (default `~/notes`); `notes` in `.aliases` op
 - **No test harnesses.** `make test`, the Docker image build and running setup on the Mac are the tests.
 - **CI cost:** `.github/workflows/bash-syntax.yml` has narrow path triggers, and the Docker image build chains off it. Don't widen the triggers; add directories to its sparse checkout instead.
 - **Linux-only code:** Scripts only the image runs can assume GNU/Linux. Host scripts and shell config still have to work on macOS.
-- **Bash 3.2:** `setup_mac`, `script/stow` and `script/lib.sh` can run under macOS's `/bin/bash` before Homebrew bash exists. Avoid Bash 4 features and GNU-only flags there.
+- **Bash 3.2:** `setup_mac`, `script/stow`, `script/lib.sh` and `script/doctor` can run under macOS's `/bin/bash` before Homebrew bash exists, and so does `dev` when SSH starts `dev proxy` for an app launched from the Dock. Avoid Bash 4 features and GNU-only flags there.
 - **`~/.vimrc` stays self-contained.** It's also used via `nvim -u ~/.vimrc` and copied to servers, so it must load without errors on distro Vim/Neovim and `vim.tiny`.
 - Use `uname -s` for macOS vs Linux, `IS_DOCKER` for containers, and `DOTFILES_DEV_IMAGE` for the dev image.
