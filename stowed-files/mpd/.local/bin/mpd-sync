@@ -30,29 +30,20 @@ for path in $(mpc ls playlists); do
 done
 echo "Playlists synced"
 
-# The library is hundreds of MB, so only download it when the server's copy
-# changed, going by the ETag saved with the last download, and only while the
-# library is the one that download left: any `beet` command (even
-# `beet version`) creates an empty one when none is there, which a date check
-# would take as current. Into a temporary file first, so a failed download
-# keeps the last good copy
+# The library is hundreds of MB, so only download it when the server's copy is
+# newer (--remote-time keeps the server's date for the next comparison). Into
+# a temporary file first, so a failed download keeps the last good copy
 mkdir -p "${beets_dir}"
 db="${beets_dir}/library.db"
-etag="${beets_dir}/library.db.etag"
-etag_compare=()
-if [[ -s "${db}" && -s "${etag}" && ! "${db}" -nt "${etag}" ]]; then
-  etag_compare=(--etag-compare "${etag}")
-fi
-curl -fsS ${etag_compare[@]+"${etag_compare[@]}"} --etag-save "${etag}.download" \
+time_cond=()
+[[ -f "${db}" ]] && time_cond=(--time-cond "${db}")
+curl -fsS --remote-time ${time_cond[@]+"${time_cond[@]}"} \
   --output "${db}.download" "${music_url%music/}beets.db"
 if [[ -s "${db}.download" ]]; then
   mv "${db}.download" "${db}"
-  mv "${etag}.download" "${etag}"
-  # Not older than the library, so the check above holds
-  touch "${etag}"
   echo "Beets library updated"
 else
-  rm -f "${db}.download" "${etag}.download"
+  rm -f "${db}.download"
   echo "Beets library already current"
 fi
 
