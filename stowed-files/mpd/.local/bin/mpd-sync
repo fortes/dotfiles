@@ -36,7 +36,11 @@ echo "Playlists synced"
 mkdir -p "${beets_dir}"
 db="${beets_dir}/library.db"
 time_cond=()
-[[ -f "${db}" ]] && time_cond=(--time-cond "${db}")
+# Smaller is an empty library a `beet` command made before the first sync
+# (about 50 KB), not a real one (hundreds of MB), so download it again
+if [[ -f "${db}" && "$(wc -c <"${db}")" -gt 500000 ]]; then
+  time_cond=(--time-cond "${db}")
+fi
 curl -fsS --remote-time ${time_cond[@]+"${time_cond[@]}"} \
   --output "${db}.download" "${music_url%music/}beets.db"
 if [[ -s "${db}.download" ]]; then
