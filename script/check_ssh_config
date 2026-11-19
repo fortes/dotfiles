@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+# Check what the stowed SSH config resolves to, with `ssh -G` (which connects
+# to nothing), for make test. Uses a copy whose Include points at a sample
+# config.local, so it doesn't depend on this machine's.
+#
+# Usage: check_ssh_config
+
+set -euo pipefail
+
+dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+tmp="$(mktemp -d)"
+trap 'rm -rf "${tmp}"' EXIT
+
+printf '%s\n' 'Host included-host' '  User included-user' >"${tmp}/config.local"
+sed "s|~/.ssh/config.local|${tmp}/config.local|" \
+  "${dotfiles_root}/stowed-files/ssh/.ssh/config" >"${tmp}/config"
+
+failures=0
+# Expect `ssh -G` for host $1 to have line $2
+expect() {
+  if ssh -F "${tmp}/config" -G "$1" 2>/dev/null | grep -qxF "$2"; then
+    echo "  ok    $1: $2"
+  else
+    echo "  FAIL  $1: expected $2" >&2
+    failures=$((failures + 1))
+  fi
+}
+# Expect `ssh -G` for host $1 to have no line starting with $2
+expect_no() {
+  if ssh -F "${tmp}/config" -G "$1" 2>/dev/null | grep -q "^$2"; then
+    echo "  FAIL  $1: unexpected $2" >&2
+    failures=$((failures + 1))
+  else
+    echo "  ok    $1: no $2"
+  fi
+}
+
+# config.local applies to every host, not just the ones above its Include
+expect included-host 'user included-user'
+# Local dev containers go through dev proxy with only dev's key, no agent
+expect dev-blog 'proxycommand ~/.local/bin/dev proxy %n'
+expect dev-blog 'identityagent none'
+expect dev-blog 'forwardagent no'
+# Names with a dot (another machine's containers, real servers) don't
+expect_no dev-blog.example.com proxycommand
+expect github.com 'user git'
+
+[[ ${failures} -eq 0 ]]
