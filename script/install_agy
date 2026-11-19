@@ -1,22 +1,10 @@
 #!/usr/bin/env bash
-# Install the auto-updating Antigravity CLI on Debian; macOS uses Homebrew.
+# Install the auto-updating Antigravity CLI on Linux. macOS installs it by hand
+# (see README).
 set -euo pipefail
-# shellcheck source=script/lib.sh
-. "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
-command_exists apt-get || {
-  echo >&2 'install_agy is Linux-only'
-  exit 1
-}
 [[ ! -x "$HOME/.local/bin/agy" ]] || exit 0
 
-case "$(uname -m)" in
-  x86_64 | amd64) arch=amd64 ;;
-  arm64 | aarch64) arch=arm64 ;;
-  *)
-    echo >&2 "Unsupported architecture: $(uname -m)"
-    exit 1
-    ;;
-esac
+arch="$(dpkg --print-architecture)"
 base_url='https://antigravity-cli-auto-updater-974169037036.us-central1.run.app'
 manifest="$(curl -fsSL "${base_url}/manifests/linux_${arch}.json")"
 version="$(jq -r '.version' <<<"${manifest}")"
@@ -24,24 +12,16 @@ url="$(jq -er '.url' <<<"${manifest}")"
 sha512="$(jq -er '.sha512' <<<"${manifest}")"
 
 echo "Installing agy ${version} ..."
-cache="$HOME/.cache/antigravity"
-mkdir -p "${cache}" "$HOME/.local/bin"
-curl -fsSL -o "${cache}/release" "${url}"
-[[ "$(sha512sum "${cache}/release" | cut -d' ' -f1)" == "${sha512}" ]] \
-  || {
-    echo >&2 'Checksum mismatch for agy'
-    exit 1
-  }
+download="$(mktemp -d)"
+curl -fsSL -o "${download}/release" "${url}"
+sha512sum --check --quiet <<<"${sha512}  ${download}/release"
 if [[ "${url}" == *.tar.gz* ]]; then
-  tar -xzf "${cache}/release" -C "${cache}" antigravity
-  cp "${cache}/antigravity" "$HOME/.local/bin/agy"
-  rm "${cache}/antigravity"
+  tar -xzf "${download}/release" -C "${download}" antigravity
+  install -D --mode=755 "${download}/antigravity" "$HOME/.local/bin/agy"
 else
-  cp "${cache}/release" "$HOME/.local/bin/agy"
+  install -D --mode=755 "${download}/release" "$HOME/.local/bin/agy"
 fi
-rm "${cache}/release"
-chmod 755 "$HOME/.local/bin/agy"
-# Configures the shell environment, and exits non-zero on soft warnings (as
-# upstream's install.sh notes)
-"$HOME/.local/bin/agy" install || true
+rm -rf "${download}"
+# Not `agy install`: it only adds ~/.local/bin to PATH, which .profile already
+# does, by appending to the shell startup files, i.e. the stowed ones in the repo
 echo 'agy installed!'

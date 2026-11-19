@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+# The coding toolchain the container image adds on top of the Debian host
+# setup. script/update runs it in the image, so run that to update.
+
+set -euo pipefail
+IFS=$'\n\t'
+
+# shellcheck source=script/lib.sh
+. "$(dirname "${BASH_SOURCE[0]}")/../lib.sh"
+
+# On top of the host's (script/update)
+GITHUB_PACKAGES=(fx gemini-api github-cli sad yq)
+
+NPM_PACKAGES=(
+  @playwright/mcp
+  agent-browser
+  corepack
+  oxlint
+  tsx
+  typescript
+)
+
+"${dotfiles_script_dir}/install_github_packages" "${GITHUB_PACKAGES[@]}"
+
+# No global needs its install scripts (agent-browser's launcher links its
+# native binary on first run), which also leaves no native addons to rebuild
+# after Node major upgrades
+npm install --global --loglevel=error --no-fund --no-audit --ignore-scripts --min-release-age=3 \
+  "${NPM_PACKAGES[@]/%/@latest}"
+# pnpm and Yarn shims that select each project's declared version
+corepack enable --install-directory "$HOME/.local/bin" pnpm yarn
+
+# Agents skip their permission prompts here by default, since the container is
+# the sandbox (agy, which has no such setting, gets an alias in .aliases). In
+# /etc, as the per-container /state is mounted over at runtime. Claude Code's
+# managed default can't be changed in /state/claude: pass --permission-mode
+# for one session. Codex's is the lowest layer, so /state/codex can override it
+sudo mkdir -p /etc/claude-code /etc/codex
+sudo tee /etc/claude-code/managed-settings.json >/dev/null <<'EOF'
+{
+  "permissions": { "defaultMode": "bypassPermissions" },
+  "skipDangerousModePermissionPrompt": true
+}
+EOF
+sudo tee /etc/codex/config.toml >/dev/null <<'EOF'
+approval_policy = "never"
+sandbox_mode = "danger-full-access"
+EOF
+
+# `ssh dev-<name>` runs this through the container runtime (`dev proxy`), so
+# no port is open. sshd starts sessions with a bare environment, so hand them
+# this one: the image's (PATH, CLAUDE_CONFIG_DIR, ...) plus the container's
+# env file, which `dev proxy` passes in. The keys are in the container's
+# folder on the host, mounted at /etc/dev/ssh
+sudo tee /usr/local/bin/dev-sshd >/dev/null <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+umask 077
+mkdir -p ~/.ssh
+# Through a temporary file, since editors open several connections at once and
+# sshd could otherwise read a half-written one
+env | grep -v -E '^(HOME|PWD|OLDPWD|SHLVL|_|HOSTNAME|TERM)=' >~/.ssh/environment.$$
+mv -f ~/.ssh/environment.$$ ~/.ssh/environment
+exec /usr/sbin/sshd -i -e -o LogLevel=ERROR \
+  -o HostKey=/etc/dev/ssh/host_ed25519 \
+  -o AuthorizedKeysFile=/etc/dev/ssh/authorized_keys \
+  -o PermitUserEnvironment=yes -o UsePAM=no -o StrictModes=no -o PidFile=none \
+  -o PasswordAuthentication=no -o KbdInteractiveAuthentication=no
+EOF
+sudo chmod 755 /usr/local/bin/dev-sshd

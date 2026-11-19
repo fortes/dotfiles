@@ -2,7 +2,7 @@
 # Install packages directly from GitHub, for ones the OS doesn't ship or ships
 # too old. `--help` lists the packages supported on this platform.
 #
-# Usage `install_github_packages [package_names...]`
+# Usage `install_github_packages package_name...`
 
 set -euo pipefail
 # So a failure inside `$(...)`, like a bad download in `fetch_asset`, stops the
@@ -234,7 +234,7 @@ install_deb() {
   echo "Installing $1 (requires sudo) ... "
   # apt, not `dpkg -i`, so the deb's dependencies resolve. apt reads an
   # argument without a slash as a package name, so it needs the full path.
-  sudo apt-get install -qq --assume-yes --no-install-recommends "${file}"
+  apt_install "${file}"
 }
 
 install_bun() {
@@ -271,8 +271,9 @@ install_gemini_api() {
 }
 
 install_hugo() {
-  # The version is digits and dots, which keeps out `hugo_extended_withdeploy_`
-  install_deb 'gohugoio/hugo' '/hugo_extended_[0-9.]*_linux-{ARCH}\.deb$'
+  # The version is digits and dots, which keeps out `hugo_extended_withdeploy_`.
+  # The tarball, since some releases skip the arm64 .deb
+  install_bin 'gohugoio/hugo' '/hugo_extended_[0-9.]*_linux-{ARCH}\.tar\.gz$'
 }
 
 install_luals() {
@@ -360,7 +361,8 @@ install_github_packages() {
   done
 
   if [ "${#packages[@]}" -eq 0 ]; then
-    packages=("${AVAILABLE_PACKAGES[@]}")
+    print_usage >&2
+    exit 1
   fi
 
   # Up front, so a typo doesn't stop the run partway through

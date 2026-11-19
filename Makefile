@@ -2,9 +2,11 @@
 
 SHFMT = shfmt --indent 2 --case-indent --binary-next-line
 
-# shfmt only finds files with a shebang or .sh/.bash extension
+# shfmt only finds files with a shebang or .sh/.bash extension; these are
+# sourced, so they have neither
 STARTUP_FILES = stowed-files/bash/.profile stowed-files/bash/.bashrc \
-	stowed-files/bash/.bash_profile stowed-files/bash/.aliases
+	stowed-files/bash/.bash_profile stowed-files/bash/.aliases \
+	$(wildcard stowed-files/*/.local/completion.d/*)
 
 format:
 	@echo "Formatting shell scripts..."
@@ -19,7 +21,7 @@ format-check:
 # Stowed helpers and startup files get error-level checks only
 lint:
 	@echo "Linting shell scripts..."
-	@shellcheck --external-sources $$(grep -lE '^#!.*(bash|/sh)' script/*)
+	@shellcheck --external-sources $$(grep --directories=skip -lE '^#!.*(bash|/sh)' script/* script/dev/* script/dev/project-template/script/*)
 	@shellcheck --external-sources --severity=error --shell=bash $(STARTUP_FILES) \
 		$$(grep -rlE '^#!.*(bash|/sh)' stowed-files)
 	@shellcheck --severity=error --shell=sh stowed-files/ssh/.ssh/rc

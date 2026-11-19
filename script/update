@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Deliberately update user tools; does not relink dotfiles or reconfigure the OS.
-# Use apt/Homebrew separately to upgrade system packages and macOS apps.
+# Update user tools, not OS packages or links. Keep the host lists short: the
+# coding toolchain belongs in dev/setup_container.
 set -euo pipefail
 [[ $# -eq 0 ]] || {
   echo >&2 'Usage: update (no arguments)'
@@ -9,20 +9,43 @@ set -euo pipefail
 # shellcheck source=script/lib.sh
 . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
-# Match setup's lightweight path, rather than installing the full workstation
-# toolset on a devbox that only opted into a few GitHub binaries and language
-# servers.
 if is_devbox; then
-  "${dotfiles_script_dir}/install_github_packages" "${DEVBOX_GITHUB_PACKAGES[@]}"
-  npm_packages=("${DEVBOX_NPM_PACKAGES[@]%%:*}")
-  npm install --global --loglevel=error --no-fund --no-audit "${npm_packages[@]/%/@latest}"
-  exit
+  exec "${dotfiles_script_dir}/dev/setup_devbox" --upgrade
 fi
 
-"${dotfiles_script_dir}/install_github_packages"
-if [[ "$(uname -s)" == Linux ]]; then
+if [[ "$(uname -s)" == Darwin ]]; then
+  "${dotfiles_script_dir}/install_github_packages" gemini-api
+  # Media keys for MPD. Python 3.15 breaks its Core Foundation event loop
+  # (`_add_reader()` gets an unexpected `context`), so stay on the version
+  # it targets
+  uv tool install --quiet --force --refresh --python 3.12 mpd-now-playable
+else
+  # Debian's are missing or too old for git, the shell, init.lua, notes and yazi.
+  # Codex, agy and Claude Code are for quick questions on servers too
+  "${dotfiles_script_dir}/install_github_packages" bun fzf harper-ls \
+    neovim tree-sitter-cli uv yazi
+  # Debian's nodejs is past upstream end of life
   "${dotfiles_script_dir}/install_node"
+  # The notes formatter and language servers, like Homebrew's on the Mac. None
+  # needs install scripts: oxfmt's and Codex's native binaries are dependencies
+  npm install --global --loglevel=error --no-fund --no-audit --ignore-scripts \
+    --min-release-age=3 oxfmt@latest bash-language-server@latest \
+    dockerfile-language-server-nodejs@latest vscode-langservers-extracted@latest \
+    yaml-language-server@latest
+  # Codex releases often and nags until updated, so it skips the cooldown
+  npm install --global --loglevel=error --no-fund --no-audit --ignore-scripts \
+    --min-release-age=0 @openai/codex@latest
+  # Both update themselves once installed
   "${dotfiles_script_dir}/install_agy"
+  if ! command_exists claude; then
+    # The cooldown only covers the npm package that runs the installer: it then
+    # downloads the newest native build, which updates itself from then on. A
+    # throwaway npm cache, since this would otherwise leave ~500 MB in the one
+    # the globals above use
+    npm_cache="$(mktemp -d)"
+    NPM_CONFIG_CACHE="${npm_cache}" npx --yes --min-release-age=3 @anthropic-ai/claude-code install
+    rm -rf "${npm_cache}"
+  fi
   # Trixie's ncurses-term only has `ghostty`, not the `xterm-ghostty` Ghostty
   # sets, which tmux needs for its modified keys and true color
   infocmp xterm-ghostty &>/dev/null \
@@ -30,8 +53,16 @@ if [[ "$(uname -s)" == Linux ]]; then
   # Debian names these fdfind and batcat
   ln -sf /usr/bin/fdfind "$HOME/.local/bin/fd"
   ln -sf /usr/bin/batcat "$HOME/.local/bin/bat"
+  if [[ -n "${DOTFILES_DEV_IMAGE:-}" ]]; then
+    # IS_DOCKER is true in any container, so the dev image's Dockerfile sets this
+    "${dotfiles_script_dir}/dev/setup_container"
+  else
+    # The homelab's imports use these plugins. macOS uses Homebrew's beets,
+    # since its config only needs built-in plugins
+    uv tool install --quiet --force --refresh beets --with requests --with pylast \
+      --with 'beets[embedart,fetchart,lyrics,lastgenre,plexupdate]'
+  fi
 fi
-for step in install_node_packages install_claude_code install_python_packages \
-  install_yazi_plugins generate_completions; do
-  "${dotfiles_script_dir}/${step}"
-done
+
+"${dotfiles_script_dir}/install_yazi_plugins"
+"${dotfiles_script_dir}/generate_completions"

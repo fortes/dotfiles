@@ -15,20 +15,9 @@ dotfiles_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # Make sure not to get stuck on any prompts
 export DEBIAN_FRONTEND=noninteractive
 
-# Common apt-get arguments
-declare -r APT_ARGS=(
-  -qq
-  -o=Dpkg::Use-Pty=0
-  -o=Dpkg::Progress-Fancy=0
-  -o=APT::Get::Show-Progress=false
-  --assume-yes
-  --fix-broken
-  --no-install-recommends
-)
-
 declare -r APT_PACKAGES_FILE="${dotfiles_root}/script/apt-packages.txt"
 declare -a APT_PACKAGES
-mapfile -t APT_PACKAGES < <(awk 'NF && $1 !~ /^#/' "${APT_PACKAGES_FILE}")
+mapfile -t APT_PACKAGES < <(awk 'NF && $1 !~ /^#/ {print $1}' "${APT_PACKAGES_FILE}")
 
 check_prerequisites() {
   if ! command_exists apt-get; then
@@ -44,24 +33,19 @@ check_prerequisites() {
 }
 
 install_apt_packages() {
-  if [[ -n "${SKIP_INITIAL_APT_INSTALL:-}" ]]; then
-    echo "Skipping apt package installation (SKIP_INITIAL_APT_INSTALL set)"
-    return
-  fi
-
   local -a packages=("${APT_PACKAGES[@]}")
   # Crostini is already a container, on a modest machine. Include rootless
   # recommends skipped by --no-install-recommends (networking, UID mapping,
   # user bus, and an init for pods and --init)
-  if [[ -z "${IS_DOCKER:-}" ]] && ! compgen -G "/etc/apt/sources.list.d/cros.*" >/dev/null; then
+  if ! compgen -G "/etc/apt/sources.list.d/cros.*" >/dev/null; then
     packages+=(podman passt uidmap dbus-user-session catatonit)
   fi
 
   echo "Running apt-get update (requires sudo)"
   sudo -E apt-get update -qq
 
-  echo "Ensuring apt packages installed (requires sudo)"
-  sudo -E apt-get install "${APT_ARGS[@]}" "${packages[@]}"
+  echo "Ensuring apt packages installed (requires sudo), output in ~/.cache/dotfiles/apt-install.log"
+  apt_install "${packages[@]}"
   echo "Apt packages installed"
 }
 
@@ -130,7 +114,7 @@ main() {
   setup_suite "${VERSION_CODENAME}-backports" http://deb.debian.org/debian
   install_apt_packages
   "${dotfiles_root}/script/install_1password"
-  [[ -z "${IS_DOCKER:-}" ]] && "${dotfiles_root}/script/install_et"
+  "${dotfiles_root}/script/install_et"
   "${dotfiles_root}/script/stow" -R
 
   setup_locale

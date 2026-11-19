@@ -40,6 +40,12 @@ else
   alias ll='ls --color=auto -AlpFhv'
 fi
 
+# The dev image already makes Claude Code and Codex skip their prompts
+# (script/dev/setup_container); agy has no setting for it
+if [[ -n "${DOTFILES_DEV_IMAGE:-}" ]]; then
+  alias agy='agy --dangerously-skip-permissions'
+fi
+
 # Just for typing: tools that open an editor use $VISUAL/$EDITOR instead.
 # Not ex/view/vimdiff, since nvim ignores the name it's run as.
 if command_exists nvim; then
