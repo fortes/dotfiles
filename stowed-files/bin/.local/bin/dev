@@ -415,8 +415,8 @@ stop() {
     done
   fi
   for name in "${names[@]}"; do
-    # Already stopped is fine
-    "${runtime}" stop "${name}" >/dev/null 2>&1 || true
+    # Stopping a stopped one succeeds; other errors should show
+    "${runtime}" stop "${name}" >/dev/null
     echo "Stopped ${name}"
   done
 }
@@ -465,7 +465,10 @@ proxy() {
 # Start container $1, re-creating it from its saved image if the runtime no
 # longer has it (removed by hand, as `dev help rm` suggests, or a runtime reset)
 start_container() {
-  if ! "${runtime}" inspect "$1" >/dev/null 2>&1; then
+  local exists=(inspect "$1")
+  # Plain `podman inspect` also finds images, which can share the name
+  [[ "${runtime}" == podman ]] && exists=(container exists "$1")
+  if ! "${runtime}" "${exists[@]}" >/dev/null 2>&1; then
     run_container "$1" "$(cat "${root}/$1/image")"
   fi
   # A no-op when it's already running
@@ -493,9 +496,14 @@ case "${1:-}" in
     recreate "$@"
     ;;
   stop)
-    [[ $# -ge 2 ]] || usage stop
-    [[ "$2" != --all || $# -eq 2 ]] || usage stop
     shift
+    [[ $# -ge 1 ]] || usage stop
+    # --all on its own, not mixed with names
+    if [[ $# -gt 1 ]]; then
+      for arg in "$@"; do
+        [[ "${arg}" != --all ]] || usage stop
+      done
+    fi
     stop "$@"
     ;;
   rm | remove)

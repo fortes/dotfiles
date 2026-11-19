@@ -30,6 +30,10 @@ fail() {
   printf '  %s✗%s %s\n' "${red}${bold}" "${reset}" "$*"
   failures=$((failures + 1))
 }
+# Count $1 of noun $2, plural with an s
+count() {
+  if [[ "$1" == 1 ]]; then echo "$1 $2"; else echo "$1 $2s"; fi
+}
 section() { printf '\n%s%s%s\n' "${bold}" "$*" "${reset}"; }
 
 # Permission bits of file $1, like 600
@@ -41,10 +45,19 @@ perms() {
   fi
 }
 
+# Whether stow package $1 is in the space-separated DOTFILES_SKIP_PACKAGES
+skipped() {
+  [[ " ${DOTFILES_SKIP_PACKAGES:-} " == *" $1 "* ]]
+}
+
 check_links() {
   section "Dotfiles"
-  local file target linked=()
-  for file in .bashrc .profile .config/git/config .config/nvim/init.lua .config/tmux/tmux.conf; do
+  local entry file target linked=()
+  # package:file, so skipped packages aren't expected
+  for entry in bash:.bashrc bash:.profile git:.config/git/config nvim:.config/nvim/init.lua \
+    tmux:.config/tmux/tmux.conf; do
+    skipped "${entry%%:*}" && continue
+    file="${entry#*:}"
     target="$(readlink "${HOME}/${file}" 2>/dev/null || true)"
     if [[ "${target}" == *stowed-files/* && -e "${HOME}/${file}" ]]; then
       linked+=("~/${file}")
@@ -52,15 +65,21 @@ check_links() {
       fail "~/${file} isn't linked into the repo; run script/stow"
     fi
   done
-  [[ ${#linked[@]} -eq 0 ]] || ok "${#linked[@]} dotfiles linked"
+  [[ ${#linked[@]} -eq 0 ]] || ok "$(count ${#linked[@]} dotfile) linked"
 }
 
+# The same places script/stow prunes: ~'s top level and the folders packages
+# link into
 check_stale_links() {
-  local stale
+  local top dirs=() stale
+  while IFS= read -r top; do
+    [[ -d "${HOME}/${top}" && ! -L "${HOME}/${top}" ]] && dirs+=("${HOME}/${top}")
+  done < <(find "${dotfiles_root}/stowed-files" -mindepth 2 -maxdepth 2 -exec basename {} \; | sort -u)
   stale="$({
     find "${HOME}" -maxdepth 1 -type l -lname '*stowed-files/*' ! -exec test -e {} \; -print
-    find "${HOME}/.config" "${HOME}/.local" -maxdepth 4 -type l -lname '*stowed-files/*' \
-      ! -exec test -e {} \; -print
+    if [[ ${#dirs[@]} -gt 0 ]]; then
+      find "${dirs[@]}" -maxdepth 4 -type l -lname '*stowed-files/*' ! -exec test -e {} \; -print
+    fi
   } 2>/dev/null | wc -l | tr -d ' ')"
   if [[ "${stale}" == 0 ]]; then
     ok "no stale links into the repo"
@@ -70,8 +89,10 @@ check_stale_links() {
 }
 
 check_private_files() {
-  local file private=()
-  for file in "$@"; do
+  local entry file private=()
+  for entry in "$@"; do
+    skipped "${entry%%:*}" && continue
+    file="${entry#*:}"
     if [[ -L "${HOME}/${file}" ]]; then
       fail "~/${file} is a link, not a private file of its own (see git show 17b1db7^:MIGRATION.md)"
     elif [[ ! -f "${HOME}/${file}" ]]; then
@@ -85,7 +106,7 @@ check_private_files() {
       fi
     fi
   done
-  [[ ${#private[@]} -eq 0 ]] || ok "${#private[@]} local files private"
+  [[ ${#private[@]} -eq 0 ]] || ok "$(count ${#private[@]} "local file") private"
 }
 
 check_tools() {
@@ -143,13 +164,14 @@ check_debian() {
       fail "apt is missing ${suite}; run script/setup"
     fi
   done
-  if systemctl is-enabled unattended-upgrades >/dev/null 2>&1; then
-    ok "unattended-upgrades is enabled"
+  # The setting that turns them on, which dpkg-reconfigure writes
+  if [[ "$(apt-config dump APT::Periodic::Unattended-Upgrade 2>/dev/null)" == *'"1";'* ]]; then
+    ok "unattended-upgrades runs"
   else
-    warn "unattended-upgrades isn't enabled: sudo dpkg-reconfigure unattended-upgrades"
+    warn "unattended-upgrades isn't turned on: sudo dpkg-reconfigure unattended-upgrades"
   fi
   if [[ -e /var/run/reboot-required ]]; then
-    warn "a reboot is pending, for $(tr '\n' ' ' </var/run/reboot-required.pkgs 2>/dev/null || echo 'updates')"
+    warn "a reboot is pending, for $({ tr '\n' ' ' </var/run/reboot-required.pkgs; } 2>/dev/null || echo updates)"
   else
     ok "no reboot pending"
   fi
@@ -168,6 +190,29 @@ check_debian() {
   else
     warn "the dev user's containers stop when it logs out: sudo loginctl enable-linger dev"
   fi
+}
+
+# This account's dev containers that predate something `dev recreate` adds:
+# their own port, the machine's shared host key, or trusting its client key
+check_containers() {
+  local dir name keys="${HOME}/containers/.ssh" current=() stale=()
+  for dir in "${HOME}"/containers/*/; do
+    [[ -e "${dir}image" ]] || continue
+    name="$(basename "${dir}")"
+    if [[ -s "${dir}port" ]] && cmp -s "${keys}/host_ed25519" "${dir}ssh/host_ed25519" \
+      && grep -qxF "$(cat "${keys}/client_ed25519.pub" 2>/dev/null)" "${dir}ssh/authorized_keys" 2>/dev/null; then
+      current+=("${name}")
+    else
+      stale+=("${name}")
+    fi
+  done
+  [[ ${#current[@]} -gt 0 || ${#stale[@]} -gt 0 ]] || return 0
+  section "Dev containers"
+  [[ ${#current[@]} -eq 0 ]] || ok "$(count ${#current[@]} container) up to date"
+  local name
+  for name in ${stale[@]+"${stale[@]}"}; do
+    warn "${name} predates this setup (port, SSH keys): dev recreate ${name}"
+  done
 }
 
 check_dev_container() {
@@ -220,23 +265,26 @@ main() {
   else
     check_links
     if [[ "$(uname -s)" == Darwin ]]; then
-      check_private_files .profile.local .gitconfig.local .mpd/mpd.conf.local .mpdscribble/mpdscribble.conf
+      check_private_files bash:.profile.local git:.gitconfig.local mpd:.mpd/mpd.conf.local \
+        mpd:.mpdscribble/mpdscribble.conf
       check_stale_links
       check_tools brew nvim tmux fzf fd bat rg delta git stow
       check_mac
+      check_containers
     elif [[ -r /etc/debian_version ]]; then
-      check_private_files .profile.local .gitconfig.local
+      check_private_files bash:.profile.local git:.gitconfig.local
       check_stale_links
       check_tools nvim tmux fzf fd bat rg delta git stow
       is_devbox || check_debian
+      check_containers
     fi
   fi
 
   echo
   if [[ ${failures} -gt 0 ]]; then
-    printf '%s✗ %s failed%s, %s warnings\n' "${red}${bold}" "${failures}" "${reset}" "${warnings}"
+    printf '%s✗ %s failed%s, %s\n' "${red}${bold}" "${failures}" "${reset}" "$(count "${warnings}" warning)"
   elif [[ ${warnings} -gt 0 ]]; then
-    printf '%s! All good, with %s warnings%s\n' "${yellow}${bold}" "${warnings}" "${reset}"
+    printf '%s! All good, with %s%s\n' "${yellow}${bold}" "$(count "${warnings}" warning)" "${reset}"
   else
     printf '%s✓ All good%s\n' "${green}${bold}" "${reset}"
   fi
