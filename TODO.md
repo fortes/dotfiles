@@ -9,7 +9,7 @@ Deferred from the branch's testing, to fix forward. MIGRATION.md has the steps f
 - [ ] **Migrate the homelab** (task)
   - Back up `~/dotfiles` and the `.local` files first. If it hasn't pulled `main` since its `.local` files moved out of the repo (#47), do that migration before pulling: its steps were removed from `main`, so read them with `git show 17b1db7^:MIGRATION.md`
   - After `script/setup`: `beet ls` (plugins load, library intact), SSH and Eternal Terminal still connect, tmux, and anything else it serves
-  - The `dev` user: `sudo adduser dev`, `sudo loginctl enable-linger dev`, the Mac's container key in its `~/.ssh/authorized_keys` (`ssh-copy-id -i ~/containers/.ssh/client_ed25519.pub dev@homelab`), then as `dev` clone the repo, `script/stow` and `dev create scratch`
+  - The `dev` user: `sudo adduser dev`, `sudo loginctl enable-linger dev`, your usual key in its `~/.ssh/authorized_keys`, then as `dev` clone the repo, `script/stow` and `dev create scratch`
   - From the Mac, the `Host dev-*.homelab` entry in `~/.ssh/config.local` (README, Linux: Podman), then `ssh dev-scratch.homelab`
   - `DEV_URL` uses the plain hostname, which needs the LAN's DNS or `avahi-daemon` to resolve from other machines
   - Rootless containers lean on unprivileged user namespaces, so run patched kernels: `unattended-upgrades` installs security updates but never reboots. Once its services come back on their own after a reboot, set `Unattended-Upgrade::Automatic-Reboot "true";` and `Unattended-Upgrade::Automatic-Reboot-Time "04:00";` in `/etc/apt/apt.conf.d/52unattended-upgrades-local`. `script/doctor` warns while a reboot is pending
