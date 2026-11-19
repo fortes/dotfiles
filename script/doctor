@@ -172,30 +172,38 @@ check_debian() {
 
 check_dev_container() {
   section "Dev container"
-  if [[ -w /state ]]; then
-    ok "/state is mounted and writable"
-  else
+  local problems=0 dir link
+  if [[ ! -w /state ]]; then
     fail "/state isn't writable; recreate the container with dev recreate"
+    problems=1
   fi
-  local dir
+  # Claude Code, Codex and gh say where through variables; agy's folders are
+  # links the image makes into /state
   for dir in "${CLAUDE_CONFIG_DIR:-}" "${CODEX_HOME:-}" "${GH_CONFIG_DIR:-}"; do
     if [[ -z "${dir}" ]]; then
       fail "an agent's config variable is unset; the image is older than this checkout"
-    elif [[ -d "${dir}" ]]; then
-      ok "${dir} is there"
-    else
+      problems=1
+    elif [[ ! -d "${dir}" ]]; then
       warn "${dir} is missing; dev recreate makes it"
+      problems=1
     fi
   done
-  if [[ -n "${PORT:-}" ]]; then
-    ok "PORT is ${PORT} (${DEV_URL:-no DEV_URL})"
-  else
-    warn "no PORT; dev recreate gives the container one"
-  fi
+  for link in .antigravity .gemini; do
+    if [[ ! -d "${HOME}/${link}" ]]; then
+      warn "~/${link} doesn't reach /state, so agy's login won't stick; dev recreate fixes it"
+      problems=1
+    fi
+  done
+  [[ ${problems} -gt 0 ]] || ok "/state mounted, with Claude Code's, Codex's, agy's and gh's folders"
   if gh auth status >/dev/null 2>&1; then
     ok "gh is signed in"
   else
     warn "gh isn't signed in (README, Signing in agents)"
+  fi
+  if [[ -n "${PORT:-}" ]]; then
+    ok "PORT is ${PORT} (${DEV_URL:-no DEV_URL})"
+  else
+    warn "no PORT; dev recreate gives the container one"
   fi
 }
 
@@ -208,7 +216,7 @@ main() {
 
   if [[ -n "${DOTFILES_DEV_IMAGE:-}" ]]; then
     check_dev_container
-    check_tools node pnpm bun claude codex gh nvim git
+    check_tools node pnpm bun claude codex agy gh nvim git
   else
     check_links
     if [[ "$(uname -s)" == Darwin ]]; then
