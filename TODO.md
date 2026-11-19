@@ -12,6 +12,7 @@ Deferred from the branch's testing, to fix forward. MIGRATION.md has the steps f
   - The `dev` user: `sudo adduser dev`, `sudo loginctl enable-linger dev`, the Mac's container key in its `~/.ssh/authorized_keys` (`ssh-copy-id -i ~/containers/.ssh/client_ed25519.pub dev@homelab`), then as `dev` clone the repo, `script/stow` and `dev create scratch`
   - From the Mac, the `Host dev-*.homelab` entry in `~/.ssh/config.local` (README, Linux: Podman), then `ssh dev-scratch.homelab`
   - `DEV_URL` uses the plain hostname, which needs the LAN's DNS or `avahi-daemon` to resolve from other machines
+  - Rootless containers lean on unprivileged user namespaces, so run patched kernels: `unattended-upgrades` installs security updates but never reboots. Once its services come back on their own after a reboot, set `Unattended-Upgrade::Automatic-Reboot "true";` and `Unattended-Upgrade::Automatic-Reboot-Time "04:00";` in `/etc/apt/apt.conf.d/52unattended-upgrades-local`. `script/doctor` warns while a reboot is pending
 
 - [ ] **Migrate Crostini** (task)
   - Lowest stakes. Then a login shell, nvim on a note, and tmux

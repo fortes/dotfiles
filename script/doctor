@@ -15,16 +15,22 @@ dotfiles_root="$(cd "${dotfiles_script_dir}/.." && pwd)"
 
 failures=0
 warnings=0
-ok() { printf '  ok    %s\n' "$*"; }
+# Colors only in a terminal, unless NO_COLOR is set (https://no-color.org)
+if [[ -t 1 && -z "${NO_COLOR:-}" ]]; then
+  green=$'\e[32m' yellow=$'\e[33m' red=$'\e[31m' bold=$'\e[1m' dim=$'\e[2m' reset=$'\e[m'
+else
+  green='' yellow='' red='' bold='' dim='' reset=''
+fi
+ok() { printf '  %s✓%s %s%s%s\n' "${green}" "${reset}" "${dim}" "$*" "${reset}"; }
 warn() {
-  printf '  warn  %s\n' "$*"
+  printf '  %s!%s %s\n' "${yellow}${bold}" "${reset}" "$*"
   warnings=$((warnings + 1))
 }
 fail() {
-  printf '  FAIL  %s\n' "$*"
+  printf '  %s✗%s %s\n' "${red}${bold}" "${reset}" "$*"
   failures=$((failures + 1))
 }
-section() { printf '\n%s\n' "$*"; }
+section() { printf '\n%s%s%s\n' "${bold}" "$*" "${reset}"; }
 
 # Permission bits of file $1, like 600
 perms() {
@@ -37,15 +43,16 @@ perms() {
 
 check_links() {
   section "Dotfiles"
-  local file target
+  local file target linked=()
   for file in .bashrc .profile .config/git/config .config/nvim/init.lua .config/tmux/tmux.conf; do
     target="$(readlink "${HOME}/${file}" 2>/dev/null || true)"
     if [[ "${target}" == *stowed-files/* && -e "${HOME}/${file}" ]]; then
-      ok "~/${file} is linked"
+      linked+=("~/${file}")
     else
       fail "~/${file} isn't linked into the repo; run script/stow"
     fi
   done
+  [[ ${#linked[@]} -eq 0 ]] || ok "linked: ${linked[*]}"
   local stale
   stale="$({
     find "${HOME}" -maxdepth 1 -type l -lname '*stowed-files/*' ! -exec test -e {} \; -print
@@ -60,7 +67,7 @@ check_links() {
 }
 
 check_private_files() {
-  local file
+  local file private=()
   for file in "$@"; do
     if [[ -L "${HOME}/${file}" ]]; then
       fail "~/${file} is a link, not a private file of its own (see git show 17b1db7^:MIGRATION.md)"
@@ -68,12 +75,14 @@ check_private_files() {
       fail "~/${file} is missing; run script/stow, which copies its template"
     elif [[ "$(perms "${HOME}/${file}")" != 600 ]]; then
       fail "~/${file} isn't private; chmod 600 ~/${file}"
-    elif grep -v '^\s*#' "${HOME}/${file}" | grep -q REPLACE_ME; then
-      warn "~/${file} still has REPLACE_MEs to fill in"
     else
-      ok "~/${file} is private"
+      private+=("~/${file}")
+      if grep -v '^\s*#' "${HOME}/${file}" | grep -q REPLACE_ME; then
+        warn "~/${file} still has REPLACE_MEs to fill in"
+      fi
     fi
   done
+  [[ ${#private[@]} -eq 0 ]] || ok "private: ${private[*]}"
 }
 
 check_tools() {
@@ -192,7 +201,7 @@ main() {
     echo >&2 'Usage: doctor (no arguments)'
     return 1
   }
-  echo "Checking $(hostname) against ${dotfiles_root}"
+  printf '%sChecking %s%s %sagainst %s%s\n' "${bold}" "$(hostname -s)" "${reset}" "${dim}" "${dotfiles_root}" "${reset}"
 
   if [[ -n "${DOTFILES_DEV_IMAGE:-}" ]]; then
     check_dev_container
@@ -210,7 +219,14 @@ main() {
     fi
   fi
 
-  printf '\n%s failed, %s warnings\n' "${failures}" "${warnings}"
+  echo
+  if [[ ${failures} -gt 0 ]]; then
+    printf '%s✗ %s failed%s, %s warnings\n' "${red}${bold}" "${failures}" "${reset}" "${warnings}"
+  elif [[ ${warnings} -gt 0 ]]; then
+    printf '%s! All good, with %s warnings%s\n' "${yellow}${bold}" "${warnings}" "${reset}"
+  else
+    printf '%s✓ All good%s\n' "${green}${bold}" "${reset}"
+  fi
   [[ ${failures} -eq 0 ]]
 }
 
