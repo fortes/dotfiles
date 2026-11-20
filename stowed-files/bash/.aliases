@@ -46,6 +46,26 @@ if [[ -n "${DOTFILES_DEV_IMAGE:-}" ]]; then
   alias agy='agy --dangerously-skip-permissions'
 fi
 
+# Run Claude Code through OpenInfer without changing its normal sign-in.
+# Declare the context window and compact at 100k, Claude Code's minimum.
+# https://console.openinfer.ai/docs/getting-started/coding-agents
+if [[ -n "${OPENINFER_API_KEY:-}" ]] && command_exists claude; then
+  oi-claude() {
+    # Clear any inherited Anthropic API key so the auth token is used.
+    ANTHROPIC_BASE_URL=https://api.openinfer.ai \
+      ANTHROPIC_AUTH_TOKEN="${OPENINFER_API_KEY}" \
+      ANTHROPIC_API_KEY= \
+      ANTHROPIC_MODEL=@oi/GLM-5.3-Flash \
+      ANTHROPIC_DEFAULT_OPUS_MODEL=@oi/GLM-5.3-Flash \
+      ANTHROPIC_DEFAULT_SONNET_MODEL=@oi/GLM-5.3-Flash \
+      ANTHROPIC_DEFAULT_HAIKU_MODEL=@oi/Qwen3.5-9B \
+      CLAUDE_CODE_SUBAGENT_MODEL=@oi/GLM-5.3-Flash \
+      CLAUDE_CODE_MAX_CONTEXT_TOKENS=131072 \
+      CLAUDE_CODE_AUTO_COMPACT_WINDOW=100000 \
+      command claude "$@"
+  }
+fi
+
 # Just for typing: tools that open an editor use $VISUAL/$EDITOR instead.
 # Not ex/view/vimdiff, since nvim ignores the name it's run as.
 if command_exists nvim; then
