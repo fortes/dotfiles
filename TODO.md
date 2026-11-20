@@ -4,21 +4,10 @@
 
 ### First, after merging the containers branch
 
-Deferred from the branch's testing, to fix forward. MIGRATION.md has the steps for each machine.
+Deferred from the branch's testing, to fix forward.
 
-- [ ] **Migrate the homelab** (task)
-  - Back up `~/dotfiles` and the `.local` files first. If it hasn't pulled `main` since its `.local` files moved out of the repo (#47), do that migration before pulling: its steps were removed from `main`, so read them with `git show 17b1db7^:MIGRATION.md`
-  - After `script/setup`: `beet ls` (plugins load, library intact), SSH and Eternal Terminal still connect, tmux, and anything else it serves
-  - The `dev` user: `sudo adduser dev`, `sudo loginctl enable-linger dev`, your usual key in its `~/.ssh/authorized_keys`, then as `dev` clone the repo, `script/stow` and `dev create scratch`
-  - From the Mac, the `Host dev-*.homelab` entry in `~/.ssh/config.local` (README, Linux: Podman), then `ssh dev-scratch.homelab`
-  - `DEV_URL` uses the plain hostname, which needs the LAN's DNS or `avahi-daemon` to resolve from other machines
+- [ ] **Reboot the homelab automatically for kernel updates** (task)
   - Rootless containers lean on unprivileged user namespaces, so run patched kernels: `unattended-upgrades` installs security updates but never reboots. Once its services come back on their own after a reboot, set `Unattended-Upgrade::Automatic-Reboot "true";` and `Unattended-Upgrade::Automatic-Reboot-Time "04:00";` in `/etc/apt/apt.conf.d/52unattended-upgrades-local`. `script/doctor` warns while a reboot is pending
-
-- [ ] **Migrate Crostini** (task)
-  - Lowest stakes. Then a login shell, nvim on a note, and tmux
-
-- [ ] **Move the Coder devbox to the new setup** (task)
-  - Per MIGRATION.md once it's on `main`, since the devbox pulls `main` on every start
 
 - [ ] **Try the agent bot's GitHub flow** (task)
   - `new-github-repo fortes/throwaway-test` with `DOTFILES_AGENT_BOT` set, the bot's token in a container's `env`, a PR from the container, and your approval being dismissed by a new commit. Rulesets on private repos need GitHub Pro
