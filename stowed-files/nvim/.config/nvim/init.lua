@@ -1016,17 +1016,35 @@ use('https://github.com/kevinhwang91/nvim-bqf', function()
   })
 end)
 
--- Color scheme
+-- Color scheme, matching Ghostty's theme
 use('https://github.com/RRethy/base16-nvim', function()
-  if vim.o.termguicolors then
-    if os.getenv('COLOR_THEME') == 'light' then
-      vim.opt.background = 'light'
-      vim.cmd.colorscheme('base16-default-light')
-    else
-      vim.opt.background = 'dark'
-      vim.cmd.colorscheme('base16-default-dark')
-    end
+  if not vim.o.termguicolors then
+    return
   end
+  local base16 = require('base16-colorscheme')
+  -- Otherwise base16 hides Telescope's borders
+  base16.with_config({ telescope_borders = true })
+  -- Thin gray borders and plain titles on every floating window, instead of
+  -- base16's text-colored borders and Telescope's colored title blocks. Again
+  -- whenever a base16 scheme loads, which resets them
+  vim.api.nvim_create_autocmd('ColorScheme', {
+    pattern = 'base16-*',
+    callback = function()
+      local c = base16.colors
+      local border = { fg = c.base03, bg = c.base00 }
+      local title = { fg = c.base04, bg = c.base00 }
+      for _, group in ipairs({ 'FloatBorder', 'TelescopeBorder', 'TelescopePromptBorder' }) do
+        vim.api.nvim_set_hl(0, group, border)
+      end
+      for _, group in ipairs({ 'FloatTitle', 'TelescopePromptTitle', 'TelescopeResultsTitle', 'TelescopePreviewTitle' }) do
+        vim.api.nvim_set_hl(0, group, title)
+      end
+      -- The completion menu's border sits on its own background
+      vim.api.nvim_set_hl(0, 'PmenuBorder', { fg = c.base03, bg = vim.api.nvim_get_hl(0, { name = 'Pmenu' }).bg })
+    end,
+  })
+  vim.opt.background = 'dark'
+  vim.cmd.colorscheme('base16-tomorrow-night')
 end)
 
 -- Install plugins and run setup functions

@@ -30,30 +30,30 @@
     song_table_format: [
         (
             prop: (kind: Property(Artist), default: (kind: Text("Unknown"))),
-            label_prop: (kind: Text("Artist"), style: (fg: "#262626")),
+            label_prop: (kind: Text("Artist"), style: (fg: "#1d1f21")),
             width: "20%",
         ),
         (
             prop: (kind: Property(Album), style: (fg: "white"),
                 default: (kind: Text("Unknown Album"), style: (fg: "white"))
             ),
-            label_prop: (kind: Text("Album"), style: (fg: "#262626")),
+            label_prop: (kind: Text("Album"), style: (fg: "#1d1f21")),
             width: "20%",
         ),
         (
             prop: (kind: Property(Track), style: (fg: "dark_gray"), default: (kind: Text(""))),
-            label_prop: (kind: Text("#"), style: (fg: "#262626")),
+            label_prop: (kind: Text("#"), style: (fg: "#1d1f21")),
             width: "3",
             alignment: Right,
         ),
         (
             prop: (kind: Property(Title), default: (kind: Text("Unknown"))),
-            label_prop: (kind: Text("Title"), style: (fg: "#262626")),
+            label_prop: (kind: Text("Title"), style: (fg: "#1d1f21")),
             width: "45%",
         ),
         (
             prop: (kind: Property(Other("genre")), style: (fg: "dark_gray"), default: (kind: Text(""))),
-            label_prop: (kind: Text("Genre"), style: (fg: "#262626")),
+            label_prop: (kind: Text("Genre"), style: (fg: "#1d1f21")),
             width: "15%",
             alignment: Right,
         ),
@@ -63,12 +63,12 @@
                 content: (kind: Property(Other("originaldate")), default: (kind: Property(Other("date")))),
                 length: 4,
             )), style: (fg: "dark_gray"), default: (kind: Text(""))),
-            label_prop: (kind: Text("Year"), style: (fg: "#262626")),
+            label_prop: (kind: Text("Year"), style: (fg: "#1d1f21")),
             width: "4",
         ),
         (
             prop: (kind: Property(Duration), default: (kind: Text("-"))),
-            label_prop: (kind: Text("Time"), style: (fg: "#262626")),
+            label_prop: (kind: Text("Time"), style: (fg: "#1d1f21")),
             width: "6",
             alignment: Right,
         ),

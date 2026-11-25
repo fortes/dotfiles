@@ -98,6 +98,10 @@ export LIBVIRT_DEFAULT_URI="qemu:///system"
 # Rg, for whatever reason, needs to manually specify location for config
 export RIPGREP_CONFIG_PATH="$XDG_CONFIG_HOME/ripgrep/rc"
 
+# Syntax colors from the terminal's palette (base16 layout, as in Ghostty's
+# theme), for bat and delta
+export BAT_THEME="base16-256"
+
 if [ -z "${SSH_AUTH_SOCK:-}" ] && command_exists keychain; then
   # Don't prompt for password to load key if not already loaded. Starts only
   # ssh-agent by default; keychain 3 deprecated --agents and warns about it
