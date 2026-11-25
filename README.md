@@ -380,6 +380,32 @@ Podman runs containers rootless and is installed by `script/setup`, and `dev` us
 
 Rootless containers stop when their user logs out. Run `sudo loginctl enable-linger dev` to keep long-running ones alive. The `dev` user has no sudo, so it only clones the repo and runs `script/stow` for the `dev` helper and shell config; the host's own setup installed podman.
 
+Containers belong to whichever account runs `dev`, and nothing switches accounts for you: run `dev` as your own user and the container is yours, with the escape landing next to your keys. `script/doctor` warns about any container your own account has once a `dev` user exists. To get from your account into `dev` on the server, SSH in rather than `su` or `sudo -u`, which skip the login session rootless podman needs (`XDG_RUNTIME_DIR`, the user's systemd). Allow your server key in once:
+
+```sh
+sudo install --directory --owner=dev --group=dev --mode=700 ~dev/.ssh
+sudo tee --append ~dev/.ssh/authorized_keys <~/.ssh/id_ed25519.pub >/dev/null
+sudo chown dev:dev ~dev/.ssh/authorized_keys
+```
+
+Then `ssh dev@localhost` (an alias in `~/.bashrc.local` saves typing). Becoming `dev` this way adds nothing your account couldn't already do with sudo; never set it up the other way round, or source or run anything from `dev`'s home as yourself, since containers can write there. That key also gets into `dev`'s containers after their next `dev recreate`, like every plain entry in its `authorized_keys`.
+
+Images are per account too. `dev` can build without sudo (`adduser` gives it a subuid range), so either `podman build --tag dotfiles .` in its own clone, or copy yours across: `podman save dotfiles | ssh dev@localhost podman load`. `dev create` and `dev recreate` pull `ghcr.io/fortes/dotfiles:latest` themselves.
+
+##### Moving containers to dev
+
+A container's files live in `~/containers/<name>` (`src/`, logins in `state/`, `env`, its port), so moving is copying that folder and recreating the container as `dev`. Make sure `dev` has the container's image first (`cat ~/containers/<name>/image`; see above for a local `dotfiles`), and that `dev`'s `~/.ssh/authorized_keys` has the keys you reach containers with, since recreate copies them in. For a `dev` with no containers yet:
+
+```sh
+podman rm --force default                  # as you: frees its port
+sudo cp --archive ~/containers ~dev/       # .ssh keeps the host key, so SSH doesn't complain
+sudo chown --recursive dev:dev ~dev/containers
+ssh dev@localhost .local/bin/dev recreate default
+podman unshare rm -rf ~/containers         # as you, once it works; root-owned files inside need unshare
+```
+
+Files the container's root wrote (an agent's `sudo apt install` leftovers in `src/`) come out owned by the container user after the `chown`, which is harmless. If `dev` already has containers, copy only `~/containers/<name>` (and `.state` for `--shared-state` ones, merging by hand), and `dev recreate` gives it the `dev` account's SSH keys.
+
 To reach a server's containers over SSH from the Mac (for `ssh` itself, editors, and the Claude and Codex apps), chain through the `dev` login, which only needs the server's own SSH port. In the Mac's `~/.ssh/config.local`, before any matching `Host *` block (the stowed `Host dev-*` block skips names with a dot, so this one sets the user, forwarding and known-hosts file itself):
 
 ```

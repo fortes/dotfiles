@@ -217,11 +217,18 @@ check_debian() {
   fi
   if ! id dev >/dev/null 2>&1; then
     warn "no dev user, so containers would run as $(id -un) (README, Linux: Podman)"
+    return
   elif [[ "$(loginctl show-user dev --property Linger --value 2>/dev/null)" == yes ]]; then
     ok "the dev user exists and lingers"
   else
     warn "the dev user's containers stop when it logs out: sudo loginctl enable-linger dev"
   fi
+  # Containers belong to whoever started them, and `dev` doesn't switch
+  # accounts, so having the dev user doesn't mean it's used
+  local name
+  for name in $(podman ps --all --format '{{.Names}}' 2>/dev/null); do
+    warn "container ${name} belongs to $(id -un), not dev, so an escape lands here (README, Moving containers to dev)"
+  done
 }
 
 # This account's dev containers that predate something `dev recreate` adds:
