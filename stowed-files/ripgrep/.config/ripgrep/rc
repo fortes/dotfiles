@@ -6,8 +6,8 @@
 --hidden
 
 # Exclude these directories from results
---glob=!.git/*
---glob=!node_modules/*
+--glob=!.git
+--glob=!node_modules
 
 # (Mostly) case insensitive
 --smart-case
