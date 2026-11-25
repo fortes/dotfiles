@@ -69,17 +69,27 @@ check_links() {
 }
 
 # Whether ~/.ssh/config applies config.local: the first host named there
-# should get the same user and hostname from the full config as from
-# config.local alone. A misplaced Include can hide it behind another Host
+# should get the options its block sets from the full config as from
+# config.local alone. Only that block's options, since others (like User
+# when the block doesn't set it) can legitimately come from ~/.ssh/config. A
+# misplaced Include can hide it behind another Host
 check_ssh_config() {
-  local local_config="${HOME}/.ssh/config.local" alias want got
+  local local_config="${HOME}/.ssh/config.local" alias keys want got
   [[ -r "${local_config}" ]] || return 0
-  alias="$(awk 'tolower($1) == "host" {
-    for (i = 2; i <= NF; i++) if ($i !~ /[*?!]/) { print $i; exit }
-  }' "${local_config}")"
+  # First concrete alias, then the options its block sets as a grep pattern
+  read -r alias keys <<<"$(awk '
+    tolower($1) == "host" || tolower($1) == "match" {
+      if (alias != "") exit
+      if (tolower($1) == "host")
+        for (i = 2; i <= NF; i++) if ($i !~ /[*?!]/) { alias = $i; break }
+      next
+    }
+    alias != "" && $1 !~ /^#/ && NF { keys = keys (keys ? "|" : "") tolower($1) }
+    END { if (alias != "" && keys != "") print alias, keys }
+  ' "${local_config}")"
   [[ -n "${alias}" ]] || return 0
-  if ! want="$(ssh -F "${local_config}" -G "${alias}" 2>/dev/null | grep -E '^(user|hostname) ')" \
-    || ! got="$(ssh -G "${alias}" 2>/dev/null | grep -E '^(user|hostname) ')"; then
+  if ! want="$(ssh -F "${local_config}" -G "${alias}" 2>/dev/null | grep -E "^(${keys}) ")" \
+    || ! got="$(ssh -G "${alias}" 2>/dev/null | grep -E "^(${keys}) ")"; then
     fail "couldn't resolve SSH config for ${alias}; run ssh -G ${alias} to check it"
     return
   fi
