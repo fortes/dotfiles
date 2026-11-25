@@ -17,12 +17,22 @@ if [ -x /usr/bin/lesspipe ]; then
   export LESSCLOSE='/usr/bin/lesspipe %s %s'
 fi
 
-HISTFILE=$HOME/.bash_history
+# Not the default ~/.bash_history, which any shell that skips this file (`bash
+# --norc`) cuts back to 500 lines on exit. Dev containers keep it in /state so
+# it survives a rebuild
+if [[ -n "${DOTFILES_DEV_IMAGE:-}" ]]; then
+  HISTFILE=/state/bash_history
+else
+  HISTFILE="${XDG_STATE_HOME:-$HOME/.local/state}/bash/history"
+  [[ -d "${HISTFILE%/*}" ]] || mkdir -p "${HISTFILE%/*}"
+fi
 # Never forget
 HISTFILESIZE=-1
 HISTSIZE=-1
 # Don't put duplicate lines into history, ignore commands w/ initial space
-HISTCONTROL=ignoreboth:erasedups
+HISTCONTROL=ignoreboth
+# Save when each command ran, and show it in `history`
+HISTTIMEFORMAT='%F %T '
 
 # Make sure the terminal type we're using is supported (tmux-256color doesn't
 # work everywhere yet)
