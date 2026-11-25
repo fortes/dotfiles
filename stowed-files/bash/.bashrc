@@ -50,21 +50,21 @@ if [[ -z "${COLORTERM:-}" && "$TERM" =~ "256color" ]]; then
 fi
 
 # Bash Options {{{
-# cd without typing cd (unsupported in Mac version)
+# cd without typing cd (Bash 4+, not macOS's /bin/bash)
 shopt -qs autocd 2>/dev/null || true
 # Auto-correct directory typos
 shopt -qs cdspell
 # Check hash before executing
 shopt -qs checkhash
-# Check for stopped jobs before exiting (unsupported in Mac version)
+# Check for stopped jobs before exiting (Bash 4+, not macOS's /bin/bash)
 shopt -qs checkjobs 2>/dev/null || true
 # Check window size after each command, and update $LINES and $COLUMNS
 shopt -qs checkwinsize
 # Save all lines of multiline commands
 shopt -qs cmdhist
-# Expand directory names when doing file completion (unsupported in Mac version)
+# Expand directory names when doing file completion (Bash 4+, not macOS's /bin/bash)
 shopt -qs direxpand 2>/dev/null || true
-# Fix typos for directories in completion (unsupported in Mac version)
+# Fix typos for directories in completion (Bash 4+, not macOS's /bin/bash)
 shopt -qs dirspell 2>/dev/null || true
 # Include filenames that begin with '.' in filename expansion
 shopt -qs dotglob
@@ -72,7 +72,7 @@ shopt -qs dotglob
 shopt -qs extglob
 # Allow escape sequencing within ${parameter} expansions
 shopt -qs extquote
-# Support ** for expansion (unsupported in Mac version)
+# Support ** for expansion (Bash 4+, not macOS's /bin/bash)
 shopt -qs globstar 2>/dev/null || true
 # Append to history list. Allow editing of history substitution in readline
 shopt -qs histappend histreedit histverify
@@ -82,7 +82,7 @@ shopt -qs hostcomplete
 shopt -qs no_empty_cmd_completion
 # Case insensitive glob matching and case statements
 shopt -qs nocaseglob nocasematch
-# Expand aliases in order to find completions (unsupported in Mac version)
+# Expand aliases in order to find completions (Bash 4+, not macOS's /bin/bash)
 shopt -qs progcomp_alias 2>/dev/null || true
 # }}}
 
