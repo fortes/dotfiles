@@ -60,8 +60,6 @@ shopt -qs checkhash
 shopt -qs checkjobs 2>/dev/null || true
 # Check window size after each command, and update $LINES and $COLUMNS
 shopt -qs checkwinsize
-# Save all lines of multiline commands
-shopt -qs cmdhist
 # Expand directory names when doing file completion (Bash 4+, not macOS's /bin/bash)
 shopt -qs direxpand 2>/dev/null || true
 # Fix typos for directories in completion (Bash 4+, not macOS's /bin/bash)
@@ -70,14 +68,10 @@ shopt -qs dirspell 2>/dev/null || true
 shopt -qs dotglob
 # Extended pattern matching
 shopt -qs extglob
-# Allow escape sequencing within ${parameter} expansions
-shopt -qs extquote
 # Support ** for expansion (Bash 4+, not macOS's /bin/bash)
 shopt -qs globstar 2>/dev/null || true
 # Append to history list. Allow editing of history substitution in readline
 shopt -qs histappend histreedit histverify
-# Do hostname completion on words that contain @
-shopt -qs hostcomplete
 # Don't search path for completions when on an empty line
 shopt -qs no_empty_cmd_completion
 # Case insensitive glob matching and case statements

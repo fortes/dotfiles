@@ -10,14 +10,10 @@
 # AI API keys
 # export ANTHROPIC_API_KEY="REPLACE_ME"
 # export GEMINI_API_KEY="REPLACE_ME"
-# export LLM_GEMINI_KEY="${GEMINI_API_KEY}"
-# export LLM_MISTRAL_KEY="REPLACE_ME"
 # export OPENAI_API_KEY="REPLACE_ME"
 # export OPENROUTER_API_KEY="REPLACE_ME"
 
-# Typescript language server can OOM on large codebases
-# export MAX_TS_SERVER_MEMORY=32768
-# Same, but for eslint and others
+# Language servers and linters in Node can OOM on large codebases
 # export NODE_OPTIONS='--max_old_space_size=16384'
 
 # Add machine-specific items below
