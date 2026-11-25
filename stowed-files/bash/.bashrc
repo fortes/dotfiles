@@ -111,8 +111,9 @@ else
 fi
 JOB_COUNT="${BOLD}${BLUE}[\j]${RESET} "
 EXIT_STATUS="${BOLD}${RED}✗${RESET} "
-# After the path: stopped jobs, then the last command's exit code if it failed
-PROMPT_SUFFIX="\${HAS_JOBS:+$JOB_COUNT}\${LAST_EXIT:+$EXIT_STATUS}"
+# After the path: stopped jobs, then the last command's exit code if it failed.
+# How long a slow command took goes at the right edge (see __prompt_duration)
+PROMPT_SUFFIX="\[\${LAST_DURATION}\]\${HAS_JOBS:+$JOB_COUNT}\${LAST_EXIT:+$EXIT_STATUS}"
 # Long paths keep their last three folders (.../src/blog/content)
 PROMPT_DIRTRIM=3
 # The last command's exit code for the prompt, only when a command ran and
@@ -129,11 +130,42 @@ __prompt_exit() {
     LAST_EXIT=
   fi
 }
+# PS0 is expanded just before a command runs (not for an empty line), so the
+# arithmetic notes the start time and the empty substring prints nothing. Of
+# SECONDS, since bash skips the arithmetic for an unset variable
+PS0='${SECONDS:0:$((__command_start = SECONDS, 0))}'
+# How long the last command took, for the prompt, only when 30s or more
+__prompt_duration() {
+  LAST_DURATION=
+  [[ -n "${__command_start:-}" ]] || return
+  local seconds=$((SECONDS - __command_start)) command text
+  unset __command_start
+  ((seconds >= 30)) || return
+  # Not for programs you spend time in, where it's just how long you stayed.
+  # By name, from history: not `sudo vim`, and a command typed with a leading
+  # space (never saved) gets judged by the one before it
+  read -r _ command _ <<<"$(HISTTIMEFORMAT='' builtin history 1)"
+  case "${command##*/}" in
+    agy | claude | codex | dev | et | htop | less | man | nvim | rmpc | ssh | tmux | top | vi | vim | yazi) return ;;
+  esac
+  if ((seconds >= 3600)); then
+    printf -v text '[%dh%02dm]' $((seconds / 3600)) $((seconds % 3600 / 60))
+  elif ((seconds >= 60)); then
+    printf -v text '[%dm%02ds]' $((seconds / 60)) $((seconds % 60))
+  else
+    text="[${seconds}s]"
+  fi
+  # Dim at the right edge: save the cursor, move there, print, restore. What
+  # you type past it covers it up. The column is fixed when the prompt is
+  # drawn, so after a resize, or with a prompt too long to leave room, it lands
+  # in the wrong spot until the next prompt
+  LAST_DURATION=$'\e7\e['"$((COLUMNS - ${#text} + 1))"$'G\e[2m'"${text}"$'\e[m\e8'
+}
 # Save the exit code first, before anything else here changes it. Write out
 # history after every command. Not exported, since it calls functions child
 # shells may not have defined (e.g. `bash --norc`). Un-export in case
 # inherited from an older shell
-PROMPT_COMMAND="__prompt_exit \$?; history -a; HAS_JOBS=\$(jobs -sp) "
+PROMPT_COMMAND="__prompt_exit \$?; __prompt_duration; history -a; HAS_JOBS=\$(jobs -sp) "
 export -n PROMPT_COMMAND
 PS1="$BASE_PROMPT $PROMPT_SUFFIX"
 
