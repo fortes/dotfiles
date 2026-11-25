@@ -170,13 +170,18 @@ if [[ -n "${TMUX:-}" ]]; then
   [[ "${PS0:-}" == *'133;C'* ]] || PS0="${PS0:-}"'\e]133;C\a'
 fi
 
-if command_exists dircolors; then
+# Sets LS_COLORS, which readline's completion colors also come from. Homebrew's
+# coreutils names it gdircolors
+dircolors_command=dircolors
+command_exists dircolors || dircolors_command=gdircolors
+if command_exists "${dircolors_command}"; then
   if [[ -r "$HOME/.dircolors" ]]; then
-    eval "$(dircolors -b "$HOME/.dircolors")"
+    eval "$("${dircolors_command}" -b "$HOME/.dircolors")"
   else
-    eval "$(dircolors -b)"
+    eval "$("${dircolors_command}" -b)"
   fi
 fi
+unset dircolors_command
 
 if command_exists zoxide; then
   eval "$(zoxide init bash --hook pwd)"
