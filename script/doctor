@@ -116,7 +116,7 @@ check_private_files() {
     skipped "${entry%%:*}" && continue
     file="${entry#*:}"
     if [[ -L "${HOME}/${file}" ]]; then
-      fail "~/${file} is a link, not a private file of its own (see git show 17b1db7^:MIGRATION.md)"
+      fail "~/${file} is a link into the repo; make it a private copy: cp ~/${file} ~/${file}.new && mv ~/${file}.new ~/${file} && chmod 600 ~/${file}"
     elif [[ ! -f "${HOME}/${file}" ]]; then
       fail "~/${file} is missing; run script/stow, which copies its template"
     elif [[ "$(perms "${HOME}/${file}")" != 600 ]]; then
@@ -150,15 +150,6 @@ check_mac() {
     ok "login shell is Homebrew's bash"
   else
     warn "login shell isn't Homebrew's bash; run script/setup from a terminal"
-  fi
-  local tool shadowed=()
-  for tool in claude codex bash-language-server oxfmt delta nvim fzf; do
-    [[ -e "${HOME}/.local/bin/${tool}" && -e "/opt/homebrew/bin/${tool}" ]] && shadowed+=("${tool}")
-  done
-  if [[ ${#shadowed[@]} -eq 0 ]]; then
-    ok "nothing in ~/.local/bin shadows Homebrew's tools"
-  else
-    fail "~/.local/bin has old copies of ${shadowed[*]}, which shadow Homebrew's; remove them"
   fi
   if container system status >/dev/null 2>&1; then
     ok "Apple's container service is running"
@@ -212,29 +203,6 @@ check_debian() {
   else
     warn "the dev user's containers stop when it logs out: sudo loginctl enable-linger dev"
   fi
-}
-
-# This account's dev containers that predate something `dev recreate` adds:
-# their own port, the machine's shared host key, or trusting its client key
-check_containers() {
-  local dir name keys="${HOME}/containers/.ssh" current=() stale=()
-  for dir in "${HOME}"/containers/*/; do
-    [[ -e "${dir}image" ]] || continue
-    name="$(basename "${dir}")"
-    if [[ -s "${dir}port" ]] && cmp -s "${keys}/host_ed25519" "${dir}ssh/host_ed25519" \
-      && grep -qxF "$(cat "${keys}/client_ed25519.pub" 2>/dev/null)" "${dir}ssh/authorized_keys" 2>/dev/null; then
-      current+=("${name}")
-    else
-      stale+=("${name}")
-    fi
-  done
-  [[ ${#current[@]} -gt 0 || ${#stale[@]} -gt 0 ]] || return 0
-  section "Dev containers"
-  [[ ${#current[@]} -eq 0 ]] || ok "$(count ${#current[@]} container) up to date"
-  local name
-  for name in ${stale[@]+"${stale[@]}"}; do
-    warn "${name} predates this setup (port, SSH keys): dev recreate ${name}"
-  done
 }
 
 check_dev_container() {
@@ -293,7 +261,6 @@ main() {
       check_stale_links
       check_tools brew nvim tmux fzf fd bat rg delta git stow
       check_mac
-      check_containers
     elif [[ -r /etc/debian_version ]]; then
       check_private_files bash:.profile.local git:.gitconfig.local
       check_ssh_config
@@ -304,7 +271,6 @@ main() {
         check_tools nvim tmux fzf fd bat rg delta git stow
         is_devbox || check_debian
       fi
-      check_containers
     fi
   fi
 

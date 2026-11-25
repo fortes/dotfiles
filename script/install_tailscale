@@ -12,43 +12,16 @@ export DEBIAN_FRONTEND=noninteractive
 
 install_tailscale() {
   declare -r tailscale_sources_list="/etc/apt/sources.list.d/tailscale.sources"
-  declare -r legacy_tailscale_sources_list="/etc/apt/sources.list.d/tailscale.list"
   declare -r tailscale_key_path="/usr/share/keyrings/tailscale-archive-keyring.gpg"
-
-  if ! command -v apt-get >/dev/null 2>&1 || ! command -v dpkg >/dev/null 2>&1; then
-    echo "Tailscale installer currently supports Debian-based systems with apt" >&2
-    return 1
-  fi
-
-  local distribution suite
+  local suite
   # shellcheck source=/dev/null
-  distribution="$(. /etc/os-release && printf '%s' "${ID}")"
-  if [[ "${distribution}" != debian ]]; then
-    echo "Tailscale installer currently supports Debian; detected ${distribution}" >&2
-    return 1
-  fi
+  suite="$(. /etc/os-release && printf '%s' "${VERSION_CODENAME}")"
 
-  # shellcheck source=/dev/null
-  suite="$(. /etc/os-release && printf '%s' "${VERSION_CODENAME:-}")"
-  if [[ -z "${suite}" ]]; then
-    echo "Could not determine Debian release codename from /etc/os-release" >&2
-    return 1
-  fi
+  if [[ ! -f "${tailscale_sources_list}" ]]; then
+    echo "Adding Tailscale signing key (requires sudo)"
+    curl -fsSL "https://pkgs.tailscale.com/stable/debian/${suite}.noarmor.gpg" \
+      | sudo tee "${tailscale_key_path}" >/dev/null
 
-  if [[ ! -f "${tailscale_key_path}" ]]; then
-    declare -r key_url="https://pkgs.tailscale.com/stable/debian/${suite}.noarmor.gpg"
-
-    echo "Downloading Tailscale signing key from ${key_url}"
-    (
-      temporary_key="$(mktemp)"
-      trap 'rm -f -- "${temporary_key}"' EXIT
-      curl -fsSL "${key_url}" -o "${temporary_key}"
-      sudo install -d -m 0755 /usr/share/keyrings
-      sudo install -m 0644 "${temporary_key}" "${tailscale_key_path}"
-    )
-  fi
-
-  if [[ ! -f "${tailscale_sources_list}" && ! -f "${legacy_tailscale_sources_list}" ]]; then
     echo "Adding Tailscale apt source (requires sudo)"
     sudo tee "${tailscale_sources_list}" >/dev/null <<EOF
 Types: deb
@@ -57,12 +30,8 @@ Suites: ${suite}
 Components: main
 Signed-By: ${tailscale_key_path}
 EOF
-  elif [[ -f "${legacy_tailscale_sources_list}" && ! -f "${tailscale_sources_list}" ]]; then
-    echo "Found existing Tailscale apt source; keeping ${legacy_tailscale_sources_list}"
   fi
 
-  # Refresh even when configuration exists: a previous update may have failed,
-  # or cached package indexes may have been removed or become stale.
   echo "Updating apt package indexes (requires sudo)"
   sudo -E apt-get update -qq
 
@@ -73,5 +42,5 @@ EOF
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-  install_tailscale "${@}"
+  install_tailscale
 fi
