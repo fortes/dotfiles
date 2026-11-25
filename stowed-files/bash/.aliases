@@ -30,12 +30,8 @@ if command_exists eza; then
   alias la='eza --all --group-directories-first --classify=auto'
   alias ll='eza --header --git --long --group-directories-first --classify=auto'
   alias ltree='eza --header --git --long --tree --level=2 --group-directories-first --classify=auto'
-elif [[ "$(uname -s)" == Darwin ]]; then
-  alias ls='ls -GpFh'
-  alias la='ls -GApFh'
-  alias ll='ls -GAlpFh'
 else
-  alias ls='ls --color=auto -pFhv --quoting-style=shell-escape'
+  alias ls='ls --color=auto -pFhv'
   alias la='ls --color=auto -ApFhv'
   alias ll='ls --color=auto -AlpFhv'
 fi

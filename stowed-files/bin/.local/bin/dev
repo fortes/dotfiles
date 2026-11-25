@@ -367,7 +367,7 @@ list() {
     status=stopped
     grep -qxF "${name}" <<<"${running}" && status=running
     printf '%-20s %-8s %-40s %s\n' "${name}" "${status}" "$(cat "${dir}/image")" \
-      "$(cat "${dir}/port" 2>/dev/null) $(tr '\n' ' ' <"${dir}/ports")"
+      "$(cat "${dir}/port") $(tr '\n' ' ' <"${dir}/ports")"
   done
 }
 
@@ -380,9 +380,7 @@ recreate() {
     "${runtime}" image pull "${image}" >/dev/null
   fi
   make_state "${name}"
-  # Containers from before SSH or their own port get them now; this also picks
-  # up new SSH keys
-  [[ -s "${root}/${name}/port" ]] || pick_port >"${root}/${name}/port"
+  # Picks up new SSH keys
   setup_ssh "${name}"
   # It may already be gone
   "${runtime}" rm --force "${name}" >/dev/null 2>&1 || true
@@ -461,10 +459,6 @@ proxy() {
   local name="${1#dev-}"
   name="${name%%.*}"
   require_container "${name}"
-  if [[ ! -f "${root}/${name}/ssh/host_ed25519" ]]; then
-    echo "${name} predates SSH access; run: dev recreate ${name}" >&2
-    exit 1
-  fi
   start_container "${name}"
   exec "${runtime}" exec --interactive --env-file "${root}/${name}/env" \
     "${name}" /usr/local/bin/dev-sshd

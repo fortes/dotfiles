@@ -326,7 +326,6 @@ use('https://github.com/neovim/nvim-lspconfig', function()
     html = 'vscode-html-language-server',
     jsonls = 'vscode-json-language-server',
     ty = 'ty',
-    vimls = 'vim-language-server',
   }
   for server, bin in pairs(simple_servers) do
     if vim.fn.executable(bin) == 1 then
@@ -625,11 +624,6 @@ use('https://github.com/stevearc/conform.nvim', function()
       return {}
     end,
     formatters = {
-      oxfmt = {
-        command = 'oxfmt',
-        args = { '--stdin-filepath', '$FILENAME' },
-        stdin = true,
-      },
       shfmt = {
         prepend_args = { '-i', '2', '-ci', '-bn' },
       },
@@ -642,7 +636,7 @@ use('https://github.com/stevearc/conform.nvim', function()
       json = { 'oxfmt' },
       jsonc = { 'oxfmt' },
       markdown = { 'oxfmt' },
-      python = { 'ruff' },
+      python = { 'ruff_format' },
       sh = { 'shfmt' },
       typescript = { 'oxfmt' },
       typescriptreact = { 'oxfmt' },
@@ -906,7 +900,6 @@ use('https://github.com/lewis6991/gitsigns.nvim', function()
       map('x', '<leader>hs', function()
         gitsigns.stage_hunk({ vim.fn.line('.'), vim.fn.line('v') })
       end, { buffer = bufnr, desc = 'Stage hunk' })
-      map('n', '<leader>hS', ':Gitsigns undo_stage_hunk<CR>', { buffer = bufnr, desc = 'Unstage hunk' })
       map('n', '<leader>hp', ':Gitsigns preview_hunk<CR>', { buffer = bufnr, desc = 'Preview hunk' })
       map('n', '<leader>hi', ':Gitsigns preview_hunk_inline<CR>', { buffer = bufnr, desc = 'Preview hunk inline' })
       map('n', '<leader>hr', ':Gitsigns reset_hunk<CR>', { buffer = bufnr, desc = 'Reset hunk' })
@@ -916,7 +909,6 @@ use('https://github.com/lewis6991/gitsigns.nvim', function()
 
       map('n', '<leader>gB', ':Gitsigns blame_line<CR>', { buffer = bufnr, desc = 'Show blame for current line' })
       map('n', '<leader>gbl', ':Gitsigns toggle_current_line_blame<CR>', { buffer = bufnr, desc = 'Toggle current line blame' })
-      map('n', '<leader>gd', ':Gitsigns toggle_deleted<CR>', { buffer = bufnr, desc = 'Toggle deleted markers' })
       map('n', '<leader>gs', ':Gitsigns toggle_signs<CR>', { buffer = bufnr, desc = 'Toggle git signs' })
       map('n', '<leader>gw', ':Gitsigns toggle_word_diff<CR>', { buffer = bufnr, desc = 'Toggle word diff' })
     end,
@@ -935,8 +927,7 @@ use('https://github.com/tpope/vim-fugitive')
 -- Better file browser (replaces netrw)
 -- `-` to open parent dir, `x` to add to arglist, visual <Enter> to open all
 use('https://github.com/justinmk/vim-dirvish', function()
-  vim.o.autochdir = false
-  vim.g['loaded_netrwPlugin'] = 1
+  vim.g.loaded_netrwPlugin = 1
   vim.api.nvim_create_autocmd('FileType', {
     group = vim.api.nvim_create_augroup('dirvish_bindings', { clear = true }),
     pattern = 'dirvish',

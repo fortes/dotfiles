@@ -5,7 +5,7 @@ import { promisify } from "node:util";
 
 // Raycast doesn't run a login shell, so it misses Homebrew's PATH and the
 // BEETSDIR that ~/.profile sets for the MPD setup
-export const env = {
+const env = {
   ...process.env,
   PATH: `/opt/homebrew/bin:/usr/local/bin:${process.env.PATH}`,
   BEETSDIR: process.env.BEETSDIR ?? `${homedir()}/.mpd/beets`,
@@ -31,12 +31,9 @@ export function errorMessage(error: unknown): string {
 }
 
 // Where beets keeps its music, with `-d` filling in the default
-let musicDir: Promise<string> | undefined;
-function getMusicDir() {
-  musicDir ??= run("beet", ["config", "-d"]).then((config) =>
-    (config.match(/^directory: (.*)$/m)?.[1] ?? "").replace(/^~/, homedir()).replace(/\/$/, ""),
-  );
-  return musicDir;
+async function getMusicDir() {
+  const config = await run("beet", ["config", "-d"]);
+  return (config.match(/^directory: (.*)$/m)?.[1] ?? "").replace(/^~/, homedir()).replace(/\/$/, "");
 }
 
 export type Album = { id: string; year: string; artist: string; album: string; genres: string };
