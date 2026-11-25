@@ -522,9 +522,6 @@ use('https://github.com/nvim-telescope/telescope.nvim', function()
 
   telescope.setup({
     defaults = {
-      -- Conflicts with `winborder`; remove once
-      -- https://github.com/nvim-lua/plenary.nvim/pull/649 lands
-      border = false,
       -- Show all mappings via <C-/>
       mappings = {
         i = {
