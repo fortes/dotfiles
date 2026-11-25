@@ -234,6 +234,25 @@ source_if_exists "$HOME/.local/completion.d"
 # `**<tab>` for commands without their own completion
 if command_exists fzf; then
   eval "$(fzf --bash)"
+
+  # Ctrl-R like fzf's own, plus when each command ran (fzf's reads history
+  # through `fc`, which has no times), searching only the commands. It reads
+  # the history file, so it has every shell's commands. Uses fzf's helpers for
+  # its options (height, FZF_CTRL_R_OPTS) and tmux popups. No Shift-Delete or
+  # Alt-R
+  __fzf_history_with_time() {
+    local output
+    # Not there until the first command is saved
+    [[ -r "$HISTFILE" ]] || return
+    output=$(
+      fzf-history-source "$HISTFILE" \
+        | FZF_DEFAULT_OPTS=$(__fzf_defaults "" "--ansi --delimiter='\t' --nth=2.. --scheme=history --bind=ctrl-r:toggle-sort --wrap-sign '"$'\t'"↳ ' --highlight-line --no-multi ${FZF_CTRL_R_OPTS-} --read0") \
+        FZF_DEFAULT_OPTS_FILE='' $(__fzfcmd) --query "$READLINE_LINE"
+    ) || return
+    READLINE_LINE=${output#*$'\t'}
+    READLINE_POINT=0x7fffffff
+  }
+  bind -m emacs-standard -x '"\C-r": __fzf_history_with_time'
 fi
 
 # Note: --multi set by default here, so need to disable when inappropriate

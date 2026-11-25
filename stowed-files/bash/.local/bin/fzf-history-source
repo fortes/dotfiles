@@ -1,0 +1,42 @@
+#!/usr/bin/env perl
+# Bash history for fzf's Ctrl-R, newest first without repeats, with a dim
+# column for when each command ran. Reads the history file instead of the
+# shell's memory, where commands saved before HISTTIMEFORMAT was set would all
+# show when the shell started. Those get an empty column
+#
+# Usage: fzf-history-source [history file]
+use strict;
+use warnings;
+use POSIX qw(strftime);
+
+# Each command, after its `#<epoch>` line once timestamps are on. Lines up to
+# the next timestamp belong to the same (multi-line) command
+my @entries;
+while (my $line = <>) {
+  chomp $line;
+  if ($line =~ /^#(\d{9,})$/) {
+    push @entries, [$1, undef];
+  } elsif (@entries && defined $entries[-1][0]) {
+    $entries[-1][1] = defined $entries[-1][1] ? "$entries[-1][1]\n$line" : $line;
+  } else {
+    push @entries, [undef, $line];
+  }
+}
+
+# Shells append a command when it finishes but stamp when it started, so
+# sort by time. Commands without one are older, and keep their order, newest
+# first
+my @order = sort { ($entries[$b][0] // 0) <=> ($entries[$a][0] // 0) || $b <=> $a } 0 .. $#entries;
+
+my $this_year = (localtime)[5];
+my %seen;
+for my $entry (@entries[@order]) {
+  my ($time, $command) = @$entry;
+  next if !defined $command || $seen{$command}++;
+  my $when = '';
+  if (defined $time) {
+    my @local = localtime $time;
+    $when = strftime($local[5] == $this_year ? '%b %e %H:%M' : '%Y-%m-%d', @local);
+  }
+  printf "\e[2m%-12s\e[m\t%s\0", $when, $command;
+}
