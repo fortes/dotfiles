@@ -11,6 +11,9 @@ $if Bash
 $endif
 Control-j: menu-complete
 Control-k: menu-complete-backward
+# Up/Down only go through commands that start with what's typed so far
+"\e[A": history-search-backward
+"\e[B": history-search-forward
 
 # Stop the ringing
 set bell-style none
@@ -18,14 +21,16 @@ set bell-style none
 set blink-matching-paren on
 # Show colors when doing completion
 set colored-stats on
+# Color the part of each match that's already typed
+set colored-completion-prefix on
 # Use case-insensitive filename matching
 set completion-ignore-case on
 # Treat hyphens and underscores as equivalent when matching
 set completion-map-case on
-# Hide what's already been completed with ...
-set completion-prefix-display-length 1
 # Confirm if we really want completion past this many results
 set completion-query-items 300
+# Ctrl-J/K first fill in the shared prefix and list the matches, then cycle
+set menu-complete-display-prefix on
 # Append on directories when completing
 set mark-directories on
 # Append slash on completed symlinks

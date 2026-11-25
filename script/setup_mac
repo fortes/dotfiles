@@ -26,6 +26,8 @@ BREW_PACKAGES=(
   oven-sh/bun/bun
   chafa
   container
+  # For gdircolors, so completion has LS_COLORS to color with
+  coreutils
   delta
   dockerfile-language-server
   duf

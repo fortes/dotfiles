@@ -63,9 +63,6 @@ Deferred from the branch's testing, to fix forward.
   - Experimental, and relies on tools honoring `HTTP_PROXY`. Check whether its `baseImage` can be `ghcr.io/fortes/dotfiles`, or whether to borrow the proxy pattern for `container run` instead
   - Filtering has to be enforced outside the container (host proxy, host network rules): agents have passwordless sudo inside it by design, so an in-container firewall like Anthropic's reference `init-firewall.sh` (iptables with `NET_ADMIN`) could just be turned off
 
-- [ ] **Keep shell history across container rebuilds** (feature)
-  - `~/.bash_history` is lost when a container is recreated; point `HISTFILE` into `/state`
-
 - [ ] **Manage homelab services as Quadlet files in the dotfiles** (feature)
   - So a rebuilt NUC gets its services back from `script/setup`, with systemd logs and podman auto-updates
 

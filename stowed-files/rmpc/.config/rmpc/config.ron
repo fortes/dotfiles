@@ -40,8 +40,8 @@
             pane: Split(
                 direction: Vertical,
                 panes: [
-                    // Gray bar like cmus's, with the label colors in the theme
-                    (size: "1", background_color: "#949494", pane: Pane(QueueHeader())),
+                    // Gray bar like cmus's in Tomorrow Night's comment gray; label colors in the theme
+                    (size: "1", background_color: "#969896", pane: Pane(QueueHeader())),
                     (size: "100%", pane: Pane(Queue)),
                 ],
             ),

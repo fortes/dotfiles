@@ -17,12 +17,22 @@ if [ -x /usr/bin/lesspipe ]; then
   export LESSCLOSE='/usr/bin/lesspipe %s %s'
 fi
 
-HISTFILE=$HOME/.bash_history
+# Not the default ~/.bash_history, which any shell that skips this file (`bash
+# --norc`) cuts back to 500 lines on exit. Dev containers keep it in /state so
+# it survives a rebuild
+if [[ -n "${DOTFILES_DEV_IMAGE:-}" ]]; then
+  HISTFILE=/state/bash_history
+else
+  HISTFILE="${XDG_STATE_HOME:-$HOME/.local/state}/bash/history"
+  [[ -d "${HISTFILE%/*}" ]] || mkdir -p "${HISTFILE%/*}"
+fi
 # Never forget
 HISTFILESIZE=-1
 HISTSIZE=-1
 # Don't put duplicate lines into history, ignore commands w/ initial space
-HISTCONTROL=ignoreboth:erasedups
+HISTCONTROL=ignoreboth
+# Save when each command ran, and show it in `history`
+HISTTIMEFORMAT='%F %T '
 
 # Make sure the terminal type we're using is supported (tmux-256color doesn't
 # work everywhere yet)
@@ -40,21 +50,21 @@ if [[ -z "${COLORTERM:-}" && "$TERM" =~ "256color" ]]; then
 fi
 
 # Bash Options {{{
-# cd without typing cd (unsupported in Mac version)
+# cd without typing cd (Bash 4+, not macOS's /bin/bash)
 shopt -qs autocd 2>/dev/null || true
 # Auto-correct directory typos
 shopt -qs cdspell
 # Check hash before executing
 shopt -qs checkhash
-# Check for stopped jobs before exiting (unsupported in Mac version)
+# Check for stopped jobs before exiting (Bash 4+, not macOS's /bin/bash)
 shopt -qs checkjobs 2>/dev/null || true
 # Check window size after each command, and update $LINES and $COLUMNS
 shopt -qs checkwinsize
 # Save all lines of multiline commands
 shopt -qs cmdhist
-# Expand directory names when doing file completion (unsupported in Mac version)
+# Expand directory names when doing file completion (Bash 4+, not macOS's /bin/bash)
 shopt -qs direxpand 2>/dev/null || true
-# Fix typos for directories in completion (unsupported in Mac version)
+# Fix typos for directories in completion (Bash 4+, not macOS's /bin/bash)
 shopt -qs dirspell 2>/dev/null || true
 # Include filenames that begin with '.' in filename expansion
 shopt -qs dotglob
@@ -62,7 +72,7 @@ shopt -qs dotglob
 shopt -qs extglob
 # Allow escape sequencing within ${parameter} expansions
 shopt -qs extquote
-# Support ** for expansion (unsupported in Mac version)
+# Support ** for expansion (Bash 4+, not macOS's /bin/bash)
 shopt -qs globstar 2>/dev/null || true
 # Append to history list. Allow editing of history substitution in readline
 shopt -qs histappend histreedit histverify
@@ -72,7 +82,7 @@ shopt -qs hostcomplete
 shopt -qs no_empty_cmd_completion
 # Case insensitive glob matching and case statements
 shopt -qs nocaseglob nocasematch
-# Expand aliases in order to find completions (unsupported in Mac version)
+# Expand aliases in order to find completions (Bash 4+, not macOS's /bin/bash)
 shopt -qs progcomp_alias 2>/dev/null || true
 # }}}
 
@@ -101,8 +111,9 @@ else
 fi
 JOB_COUNT="${BOLD}${BLUE}[\j]${RESET} "
 EXIT_STATUS="${BOLD}${RED}✗${RESET} "
-# After the path: stopped jobs, then the last command's exit code if it failed
-PROMPT_SUFFIX="\${HAS_JOBS:+$JOB_COUNT}\${LAST_EXIT:+$EXIT_STATUS}"
+# After the path: stopped jobs, then the last command's exit code if it failed.
+# How long a slow command took goes at the right edge (see __prompt_duration)
+PROMPT_SUFFIX="\[\${LAST_DURATION}\]\${HAS_JOBS:+$JOB_COUNT}\${LAST_EXIT:+$EXIT_STATUS}"
 # Long paths keep their last three folders (.../src/blog/content)
 PROMPT_DIRTRIM=3
 # The last command's exit code for the prompt, only when a command ran and
@@ -119,11 +130,42 @@ __prompt_exit() {
     LAST_EXIT=
   fi
 }
+# PS0 is expanded just before a command runs (not for an empty line), so the
+# arithmetic notes the start time and the empty substring prints nothing. Of
+# SECONDS, since bash skips the arithmetic for an unset variable
+PS0='${SECONDS:0:$((__command_start = SECONDS, 0))}'
+# How long the last command took, for the prompt, only when 30s or more
+__prompt_duration() {
+  LAST_DURATION=
+  [[ -n "${__command_start:-}" ]] || return
+  local seconds=$((SECONDS - __command_start)) command text
+  unset __command_start
+  ((seconds >= 30)) || return
+  # Not for programs you spend time in, where it's just how long you stayed.
+  # By name, from history: not `sudo vim`, and a command typed with a leading
+  # space (never saved) gets judged by the one before it
+  read -r _ command _ <<<"$(HISTTIMEFORMAT='' builtin history 1)"
+  case "${command##*/}" in
+    agy | claude | codex | dev | et | htop | less | man | nvim | rmpc | ssh | tmux | top | vi | vim | yazi) return ;;
+  esac
+  if ((seconds >= 3600)); then
+    printf -v text '[%dh%02dm]' $((seconds / 3600)) $((seconds % 3600 / 60))
+  elif ((seconds >= 60)); then
+    printf -v text '[%dm%02ds]' $((seconds / 60)) $((seconds % 60))
+  else
+    text="[${seconds}s]"
+  fi
+  # Dim at the right edge: save the cursor, move there, print, restore. What
+  # you type past it covers it up. The column is fixed when the prompt is
+  # drawn, so after a resize, or with a prompt too long to leave room, it lands
+  # in the wrong spot until the next prompt
+  LAST_DURATION=$'\e7\e['"$((COLUMNS - ${#text} + 1))"$'G\e[2m'"${text}"$'\e[m\e8'
+}
 # Save the exit code first, before anything else here changes it. Write out
 # history after every command. Not exported, since it calls functions child
 # shells may not have defined (e.g. `bash --norc`). Un-export in case
 # inherited from an older shell
-PROMPT_COMMAND="__prompt_exit \$?; history -a; HAS_JOBS=\$(jobs -sp) "
+PROMPT_COMMAND="__prompt_exit \$?; __prompt_duration; history -a; HAS_JOBS=\$(jobs -sp) "
 export -n PROMPT_COMMAND
 PS1="$BASE_PROMPT $PROMPT_SUFFIX"
 
@@ -160,13 +202,18 @@ if [[ -n "${TMUX:-}" ]]; then
   [[ "${PS0:-}" == *'133;C'* ]] || PS0="${PS0:-}"'\e]133;C\a'
 fi
 
-if command_exists dircolors; then
+# Sets LS_COLORS, which readline's completion colors also come from. Homebrew's
+# coreutils names it gdircolors
+dircolors_command=dircolors
+command_exists dircolors || dircolors_command=gdircolors
+if command_exists "${dircolors_command}"; then
   if [[ -r "$HOME/.dircolors" ]]; then
-    eval "$(dircolors -b "$HOME/.dircolors")"
+    eval "$("${dircolors_command}" -b "$HOME/.dircolors")"
   else
-    eval "$(dircolors -b)"
+    eval "$("${dircolors_command}" -b)"
   fi
 fi
+unset dircolors_command
 
 if command_exists zoxide; then
   eval "$(zoxide init bash --hook pwd)"
@@ -187,6 +234,25 @@ source_if_exists "$HOME/.local/completion.d"
 # `**<tab>` for commands without their own completion
 if command_exists fzf; then
   eval "$(fzf --bash)"
+
+  # Ctrl-R like fzf's own, plus when each command ran (fzf's reads history
+  # through `fc`, which has no times), searching only the commands. It reads
+  # the history file, so it has every shell's commands. Uses fzf's helpers for
+  # its options (height, FZF_CTRL_R_OPTS) and tmux popups. No Shift-Delete or
+  # Alt-R
+  __fzf_history_with_time() {
+    local output
+    # Not there until the first command is saved
+    [[ -r "$HISTFILE" ]] || return
+    output=$(
+      fzf-history-source "$HISTFILE" \
+        | FZF_DEFAULT_OPTS=$(__fzf_defaults "" "--ansi --delimiter='\t' --nth=2.. --scheme=history --bind=ctrl-r:toggle-sort --wrap-sign '"$'\t'"↳ ' --highlight-line --no-multi ${FZF_CTRL_R_OPTS-} --read0") \
+        FZF_DEFAULT_OPTS_FILE='' $(__fzfcmd) --query "$READLINE_LINE"
+    ) || return
+    READLINE_LINE=${output#*$'\t'}
+    READLINE_POINT=0x7fffffff
+  }
+  bind -m emacs-standard -x '"\C-r": __fzf_history_with_time'
 fi
 
 # Note: --multi set by default here, so need to disable when inappropriate
