@@ -4,8 +4,8 @@
   skippedCherryPicks = false
 [alias]
   # Fuzzy add modified files, optionally via patch
-  addm = "!git ls-files -z --deleted --modified --other --exclude-standard | fzf --exit-0 --multi --read0 --print0 --preview 'git diff --color=always -- {}' | xargs -0 -r git add --"
-  addmp = "!git ls-files -z --deleted --modified --exclude-standard | fzf --exit-0 --multi --read0 --print0 --preview 'git diff --color=always -- {}' | xargs -0 -r -o git add -p --"
+  addm = "!git ls-files -z --modified --other --exclude-standard | fzf --exit-0 --multi --read0 --print0 --preview 'git diff --color=always -- {}' | xargs -0 -r git add --"
+  addmp = "!git ls-files -z --modified --exclude-standard | fzf --exit-0 --multi --read0 --print0 --preview 'git diff --color=always -- {}' | xargs -0 -r -o git add -p --"
   # Add all changes to last commit
   append = "commit --all --amend --no-edit"
   # Fuzzy checkout a branch, showing most recent commit
@@ -61,8 +61,9 @@
 [merge]
   autostash = true
   conflictStyle = zdiff3
-  prompt = false
   tool = nvim
+[mergetool]
+  prompt = false
 [mergetool "nvim"]
   cmd = nvim -d \"$MERGED\" \"$LOCAL\" \"$REMOTE\"
 [pull]
